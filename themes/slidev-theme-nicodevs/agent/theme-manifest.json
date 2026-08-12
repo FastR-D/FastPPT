@@ -1,0 +1,62 @@
+{
+  "id": "slidev-theme-nicodevs",
+  "packageName": "slidev-theme-nicodevs",
+  "displayName": "Nicodevs",
+  "version": "0.1.1-fastppt.1",
+  "description": "深色、高对比、无过渡的粗野主义技术演讲主题。",
+  "repositoryUrl": "https://github.com/nicodevs/slidev-theme-nicodevs",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-nicodevs",
+    "sourceDir": "agent",
+    "version": "0.1.1-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "fact",
+      "label": "Fact"
+    },
+    {
+      "id": "intro",
+      "label": "Intro"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "brutalist-dark",
+      "label": "深色粗野主义",
+      "description": "Space Grotesk 与强对比排版塑造技术感。"
+    },
+    {
+      "id": "direct-layouts",
+      "label": "直接表达",
+      "description": "fact、statement 与 quote 面向单一强信息。"
+    }
+  ]
+}

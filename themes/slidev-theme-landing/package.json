@@ -1,0 +1,66 @@
+{
+  "name": "slidev-theme-landing",
+  "version": "0.0.5-fastppt.1",
+  "private": true,
+  "type": "module",
+  "description": "FastPPT Landing Slidev theme",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "landing"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "vue-tsc --noEmit && node ../../scripts/theme-build.mjs .",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "node ../../scripts/theme-smoke.mjs ."
+  },
+  "files": [
+    "agent",
+    "components",
+    "layouts",
+    "plugins",
+    "public",
+    "setup",
+    "styles",
+    "uno.config.ts",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "dependencies": {
+    "@chenglou/pretext": "catalog:",
+    "@citation-js/core": "^0.7.21",
+    "@citation-js/plugin-bibtex": "^0.7.21",
+    "@citation-js/plugin-csl": "^0.7.22",
+    "@citation-js/plugin-doi": "^0.7.21",
+    "@iconify-json/ant-design": "^1.2.8",
+    "@iconify-json/mdi": "^1.2.3",
+    "@slidev/client": "catalog:",
+    "@slidev/types": "catalog:",
+    "pinia": "^4.0.2",
+    "@fastppt/slidewave": "workspace:*",
+    "unocss": "^66.3.3",
+    "unocss-preset-palette": "^0.5.0",
+    "vite": "catalog:",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vue-tsc": "^3.0.4"
+  },
+  "slidev": {
+    "colorSchema": "light",
+    "defaults": {
+      "fonts": {
+        "sans": "Source Han Sans",
+        "mono": "JetBrains Mono"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuGuMur/slidev-theme-whu-landing.git"
+  }
+}

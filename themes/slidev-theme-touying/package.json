@@ -1,0 +1,77 @@
+{
+  "name": "slidev-theme-touying",
+  "version": "0.1.10-fastppt.1",
+  "private": true,
+  "type": "module",
+  "description": "A Slidev theme inspired by typst-touying",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "touying",
+    "dewdrop",
+    "university",
+    "simple"
+  ],
+  "author": {
+    "name": "_Kerman",
+    "email": "kermanx@qq.com",
+    "url": "https://github.com/kermanx"
+  },
+  "homepage": "https://github.com/kermanx/slidev-theme-touying#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kermanx/slidev-theme-touying.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "slidev": ">=0.52.0"
+  },
+  "slidev": {
+    "colorSchema": "light",
+    "defaults": {
+      "aspectRatio": "16/9",
+      "fonts": {
+        "serif": "Libertinus Serif, Linux Libertine, Noto Serif SC, Source Han Serif SC, Noto Serif CJK SC, Georgia, serif",
+        "sans": "Fira Sans",
+        "mono": "Fira Code",
+        "weights": "400,600",
+        "local": "Libertinus Serif, Linux Libertine, Source Han Serif SC, Noto Serif CJK SC, Georgia, serif"
+      }
+    }
+  },
+  "files": [
+    "composables",
+    "layouts",
+    "setup",
+    "styles",
+    "themes",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "slides.md",
+    "uno.config.ts",
+    "global-top.vue"
+  ],
+  "devDependencies": {
+    "@slidev/cli": "^52.14.1",
+    "@types/node": "^25.5.0"
+  },
+  "dependencies": {
+    "@slidev/client": "catalog:",
+    "@slidev/types": "catalog:",
+    "unocss": "^66.3.3",
+    "@antfu/utils": "^9.3.0",
+    "@fontsource/libertinus-serif": "^5.2.1",
+    "@vueuse/core": "^14.2.1",
+    "vue": "^3.5.18"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "dev": "slidev",
+    "build": "node ../../scripts/theme-build.mjs .",
+    "dev:entry": "slidev ./entry.md",
+    "dev:dewdrop": "slidev ./examples/dewdrop.md",
+    "dev:university": "slidev ./examples/university.md",
+    "dev:simple": "slidev ./examples/simple.md"
+  }
+}

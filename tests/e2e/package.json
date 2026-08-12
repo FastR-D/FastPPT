@@ -1,0 +1,25 @@
+{
+  "name": "@fastppt/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "playwright test",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@fastppt/gateway": "workspace:*",
+    "@fastppt/harness-core": "workspace:*",
+    "@fastppt/protocol": "workspace:*",
+    "@fastppt/slidewave": "workspace:*",
+    "tsx": "^4.20.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

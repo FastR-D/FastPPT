@@ -1,0 +1,159 @@
+{
+  "id": "slidev-theme-tahta",
+  "packageName": "slidev-theme-tahta",
+  "displayName": "Tahta",
+  "version": "0.13.3-fastppt.1",
+  "description": "面向高完成度叙事、数据与技术演讲的多变体设计系统主题。",
+  "repositoryUrl": "https://github.com/zcag/tahta",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-tahta",
+    "sourceDir": "agent",
+    "version": "0.13.3-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "agenda",
+      "label": "Agenda"
+    },
+    {
+      "id": "bigtype",
+      "label": "Bigtype"
+    },
+    {
+      "id": "bleed",
+      "label": "Bleed"
+    },
+    {
+      "id": "chart",
+      "label": "Chart"
+    },
+    {
+      "id": "code-explain",
+      "label": "Code Explain"
+    },
+    {
+      "id": "code",
+      "label": "Code"
+    },
+    {
+      "id": "columns",
+      "label": "Columns"
+    },
+    {
+      "id": "compare",
+      "label": "Compare"
+    },
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "define",
+      "label": "Define"
+    },
+    {
+      "id": "diagram",
+      "label": "Diagram"
+    },
+    {
+      "id": "embed",
+      "label": "Embed"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "fact",
+      "label": "Fact"
+    },
+    {
+      "id": "feature",
+      "label": "Feature"
+    },
+    {
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "id": "lead",
+      "label": "Lead"
+    },
+    {
+      "id": "logos",
+      "label": "Logos"
+    },
+    {
+      "id": "metric",
+      "label": "Metric"
+    },
+    {
+      "id": "panels",
+      "label": "Panels"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "reference",
+      "label": "Reference"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "showcase",
+      "label": "Showcase"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    },
+    {
+      "id": "stats",
+      "label": "Stats"
+    },
+    {
+      "id": "steps",
+      "label": "Steps"
+    },
+    {
+      "id": "timeline",
+      "label": "Timeline"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    },
+    {
+      "id": "vs",
+      "label": "Vs"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "variants",
+      "label": "多视觉变体",
+      "description": "提供 editorial、brutalist、soft、minimal、paper 等完整视觉方向。"
+    },
+    {
+      "id": "data-storytelling",
+      "label": "数据叙事",
+      "description": "包含统计、指标、图表、比较与流程布局。"
+    },
+    {
+      "id": "component-system",
+      "label": "组件系统",
+      "description": "提供图表、终端、人物、标签、图像和状态组件。"
+    }
+  ]
+}

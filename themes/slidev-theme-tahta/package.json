@@ -1,0 +1,84 @@
+{
+  "name": "slidev-theme-tahta",
+  "version": "0.13.3-fastppt.1",
+  "private": true,
+  "description": "Tahta — a pristine, themeable Slidev design system. Token-driven style variants, declarative frontmatter layouts, charts.",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "presentation",
+    "design-system",
+    "tahta",
+    "slidev-template",
+    "keynote",
+    "slides",
+    "presentation-theme",
+    "themeable"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "build": "node ../../scripts/theme-build.mjs .",
+    "prepublishOnly": "node ../../scripts/preflight.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/zcag/tahta",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zcag/tahta",
+    "directory": "packages/theme"
+  },
+  "engines": {
+    "slidev": ">=0.48.0"
+  },
+  "bin": {
+    "tahta-lint": "./lint.mjs",
+    "tahta-imagine": "./imagine.mjs"
+  },
+  "files": [
+    "layouts",
+    "components",
+    "lib",
+    "setup",
+    "styles",
+    "global-bottom.vue",
+    "AGENTS.md",
+    "layouts.json",
+    "variants.json",
+    "tokens.json",
+    "lint.mjs",
+    "imagine.mjs",
+    "modules"
+  ],
+  "peerDependencies": {
+    "echarts": "^5 || ^6",
+    "katex": "^0.16"
+  },
+  "peerDependenciesMeta": {
+    "echarts": {
+      "optional": true
+    },
+    "katex": {
+      "optional": true
+    }
+  },
+  "slidev": {
+    "colorSchema": "dark",
+    "highlighter": "shiki",
+    "fonts": {
+      "sans": "Hanken Grotesk",
+      "serif": "Fraunces",
+      "mono": "JetBrains Mono"
+    }
+  },
+  "dependencies": {
+    "@iconify-json/lucide": "^1.2.0",
+    "@iconify/vue": "^5.0.0"
+  },
+  "optionalDependencies": {
+    "yaml": "^2.0.0",
+    "sharp": "^0.33.0"
+  }
+}

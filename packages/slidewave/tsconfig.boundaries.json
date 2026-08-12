@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.strict.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["test/package-boundaries.test.ts"]
+}

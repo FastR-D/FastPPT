@@ -1,0 +1,318 @@
+:root {
+}
+
+/* The unnamed styles */
+.slidev-layout {
+    @apply text-zinc-100;
+}
+
+/*  General layout styles */
+.slidev-layout {
+    @apply bg-[url(/nmt-bg-top-red.svg)];
+    @apply bg-cover;
+
+    :not(pre) > code {
+        @apply bg-zinc-800;
+        @apply text-zinc-300;
+    }
+
+    h1 + p {
+        opacity: 1;
+    }
+
+    blockquote {
+        @apply flex items-center;
+        @apply py-2;
+        @apply bg-zinc-800;
+        @apply text-zinc-300;
+        @apply border-l-4 border-pink-500;
+        @apply text-2xl;
+    }
+
+    h1 {
+        @apply -mt-2
+        @apply text-4xl;
+        @apply -rotate-2;
+    }
+
+    h2 {
+        @apply text-3xl;
+    }
+
+    h3 {
+        @apply text-2xl;
+    }
+
+    h4 {
+        @apply text-xl;
+    }
+
+    h5 {
+        @apply text-base;
+    }
+
+    a {
+        color: inherit;
+
+        &:hover {
+            color: inherit;
+        }
+    }
+
+    h2 + p,
+    h2 + ul {
+        @apply mt-4;
+    }
+
+    p + h2,
+    ul + h2,
+    table + h2,
+    p + blockquote,
+    h2 + blockquote,
+    h3 + blockquote,
+    h4 + blockquote,
+    h5 + blockquote {
+        @apply mt-8;
+    }
+
+    li input[type="checkbox"] {
+        @apply mr-2 h-4 w-4 rounded border-1 border-gray-300 text-indigo-600 focus:ring-indigo-500;
+        appearance: none;
+
+        &:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='currentcolor' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            @apply border-transparent;
+            @apply bg-sky-500;
+            @apply bg-cover;
+        }
+    }
+
+    .slidev-code code {
+        @apply text-md;
+    }
+}
+
+.slidev-layout.cover,
+.slidev-layout.intro {
+
+
+    @apply h-full grid;
+
+    h1 {
+        @apply text-6xl leading-20;
+    }
+
+    h1 + p {
+        @apply -mt-2 opacity-50 mb-4;
+    }
+}
+
+.slidev-layout.cover,
+.slidev-layout.section,
+.slidev-layout.intro,
+.slidev-layout.default,
+.slidev-layout.center,
+.slidev-layout.two-columns,
+.slidev-layout[layout="default"],
+.about-me {
+
+    h1 {
+        display: inline-block;
+        @apply p-2;
+        position: relative;
+        margin-bottom: 1em;
+        z-index: 1;
+
+        &::before {
+            @apply shadow-md shadow-black/50;
+            content: " ";
+            display: block;
+            position: absolute;
+            width: calc(100%);
+            height: calc(100%);
+            margin-left: -0.25em;
+            margin-top: -0.25em;
+            z-index: -1;
+        }
+
+        code {
+            background: transparent !important;
+            font-size: inherit;
+            outline: 0 !important;
+        }
+    }
+}
+
+/*  Default */
+.slidev-layout.default,
+.slidev-layout[layout="default"] {
+
+    h1 {
+        &::before {
+            @apply bg-red-700;
+            @apply rounded;
+        }
+    }
+
+    p {
+    }
+}
+
+/*  Cover */
+.slidev-layout.cover {
+
+    &::before {
+        content: " ";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+
+    &.no-background {
+        &::before {
+            display: none;
+        }
+    }
+
+    h1 + p {
+        @apply pl-8;
+    }
+
+    > div {
+        z-index: 1;
+
+        h1 {
+            @apply font-bold;
+            @apply capitalize;
+            @apply px-2 py-1;
+            @apply m-0;
+
+            &::before {
+                @apply -ml-2 mt-0.5;
+                @apply p-6;
+                @apply bg-red-700;
+                @apply rounded-md overflow-hidden;
+            }
+        }
+
+        p {
+            @apply mt-8;
+            @apply pl-2;
+            @apply text-2xl;
+            @apply leading-18;
+        }
+
+        h2 {
+            @apply text-3xl font-semibold;
+            @apply my-8 pl-2;
+        }
+
+        code {
+            @apply text-zinc-300;
+        }
+    }
+}
+
+/*  Section */
+.slidev-layout.section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    height: 100%;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+
+    h1 {
+        width: -moz-fit-content;
+        width: fit-content;
+
+        &::before {
+            @apply bg-red-800;
+            @apply rounded;
+        }
+    }
+
+    p {
+        font-size: 1.25rem;
+        margin-bottom: 1em;
+        line-height: 1.25em;
+    }
+}
+
+/*  Center */
+.slidev-layout.center {
+
+    h1 {
+        width: -moz-fit-content;
+        width: fit-content;
+        margin-bottom: 0;
+
+        &::before {
+            @apply bg-red-800;
+            @apply rounded;
+
+            code {
+                background: transparent !important;
+            }
+        }
+
+        p {
+            font-size: 1.25rem;
+        }
+    }
+}
+
+/* Two columns */
+
+.slidev-layout.two-columns {
+
+    h1 {
+
+        &::before {
+            @apply bg-red-800;
+            @apply rounded;
+        }
+    }
+}
+
+/* About me slide */
+
+.about-me {
+    @apply text-zinc-400;
+    @apply text-md;
+
+    h1 {
+        @apply text-zinc-300;
+        @apply p-4 py-2;
+        @apply mb-0;
+        /*font-weight: bold;*/
+        /*font-size: 3em;*/
+        @apply font-bold;
+        @apply text-5xl;
+
+        &::before {
+            @apply -mt-1;
+
+            @apply bg-fit;
+            @apply bg-red-700;
+            @apply rounded-md;
+        }
+    }
+
+    h2 {
+        @apply text-3xl;
+        @apply font-semibold;
+        @apply text-amber-600;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+}

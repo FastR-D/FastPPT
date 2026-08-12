@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "exactOptionalPropertyTypes": false,
+    "useUnknownInCatchVariables": false,
+    "noUncheckedIndexedAccess": false,
+    "types": ["node", "vite/client"],
+    "outDir": ".tsbuild/core",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/cache.ts",
+    "src/index.ts",
+    "src/internal/**/*.ts",
+    "src/pres.ts",
+    "src/preview/**/*.ts",
+    "src/primitives/**/*.ts",
+    "src/slide.ts",
+    "src/theme.ts",
+    "src/types.ts",
+    "src/utils/**/*.ts",
+    "src/validate.ts"
+  ]
+}

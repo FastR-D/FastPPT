@@ -1,0 +1,62 @@
+{
+  "id": "slidev-theme-raft",
+  "packageName": "slidev-theme-raft",
+  "displayName": "Raft",
+  "version": "0.0.4-fastppt.1",
+  "description": "以硬边框、硬阴影和奶油底色为特征的新粗野主义主题。",
+  "repositoryUrl": "https://www.npmjs.com/package/slidev-theme-raft",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-raft",
+    "sourceDir": "agent",
+    "version": "0.0.4-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "image-right",
+      "label": "Image Right"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "neo-brutalism",
+      "label": "新粗野主义",
+      "description": "硬边框、硬阴影与高对比强调色。"
+    },
+    {
+      "id": "callouts",
+      "label": "强提示组件",
+      "description": "Callout 适合结论、风险和重要提醒。"
+    }
+  ]
+}

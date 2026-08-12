@@ -1,0 +1,34 @@
+{
+  "id": "slidev-theme-nord",
+  "packageName": "slidev-theme-nord",
+  "displayName": "Nord",
+  "version": "0.0.6-fastppt.1",
+  "description": "基于 Nord 色板的克制、冷色调通用主题。",
+  "repositoryUrl": "https://github.com/oller/slidev-theme-nord",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-nord",
+    "sourceDir": "agent",
+    "version": "0.0.6-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "label": "Default"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "nord-palette",
+      "label": "Nord 色板",
+      "description": "统一使用极夜、霜冻、极光与雪暴色组。"
+    },
+    {
+      "id": "dark-light",
+      "label": "明暗模式",
+      "description": "同时支持明暗配色模式。"
+    }
+  ]
+}

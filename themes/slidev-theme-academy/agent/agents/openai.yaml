@@ -1,0 +1,4 @@
+interface:
+  display_name: "FastPPT Academy Theme"
+  short_description: "Author rigorous Academy academic Slidev decks"
+  default_prompt: "Use $fastppt-theme-academy to design an academic Slidev deck with the Academy theme."

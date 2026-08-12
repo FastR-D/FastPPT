@@ -1,0 +1,51 @@
+{
+  "name": "@fastppt/gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./dist/server.js",
+    "./app": "./src/app.ts",
+    "./source": "./src/server.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/websocket": "^11.2.0",
+    "@fastppt/config": "workspace:*",
+    "@fastppt/database": "workspace:*",
+    "@fastppt/fastppt-mcp": "workspace:*",
+    "@fastppt/fastppt-skill": "workspace:*",
+    "@fastppt/harness-claude": "workspace:*",
+    "@fastppt/harness-codex": "workspace:*",
+    "@fastppt/harness-core": "workspace:*",
+    "@fastppt/icons": "workspace:*",
+    "@fastppt/logger": "workspace:*",
+    "@fastppt/markdown": "workspace:*",
+    "@fastppt/protocol": "workspace:*",
+    "@fastppt/slidev-host": "workspace:*",
+    "@fastppt/theme-registry": "workspace:*",
+    "@fastppt/workspace": "workspace:*",
+    "fastify": "^5.4.0",
+    "http-proxy": "^1.18.1",
+    "@fastppt/slidewave": "workspace:*",
+    "ws": "^8.21.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/http-proxy": "^1.17.17",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.20.3",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

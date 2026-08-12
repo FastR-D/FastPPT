@@ -1,0 +1,162 @@
+/* Raft neo-brutalism tokens, adapted from Raft's production design system.
+   Keep values in sync with the app: ink is text/border/shadow all at once,
+   cream is the canvas, saturated colors are accents only — never body text. */
+:root {
+  --raft-ink: #141111;
+  --raft-cream: #fffaef;
+  --raft-white: #ffffff;
+  --raft-yellow: #ffd440;
+  --raft-amber: #e3b100;
+  --raft-pink: #fe7da8;
+  --raft-lavender: #bbafe6;
+  --raft-cyan: #27ccf3;
+  --raft-orange: #f8a16f;
+  --raft-lime: #a9d877;
+  --raft-red: #f97264;
+  --raft-stone: #c0b9b1;
+
+  --raft-border: 2px solid var(--raft-ink);
+  --raft-shadow-sm: 2px 2px 0 var(--raft-ink);
+  --raft-shadow: 4px 4px 0 var(--raft-ink);
+  --raft-shadow-lg: 6px 6px 0 var(--raft-ink);
+}
+
+.slidev-layout {
+  height: 100%;
+  background: var(--raft-cream);
+  color: var(--raft-ink);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 500;
+  padding: 3.2rem 3.6rem;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--raft-ink);
+}
+
+.slidev-layout h1 {
+  font-size: 2.6rem;
+  margin-bottom: 1.6rem;
+}
+
+.slidev-layout h2 {
+  font-size: 1.9rem;
+  margin-bottom: 1rem;
+}
+
+.slidev-layout h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.slidev-layout b,
+.slidev-layout strong {
+  font-weight: 700;
+  background: var(--raft-yellow);
+  padding: 0 0.25em;
+  border: var(--raft-border);
+  border-width: 1.5px;
+  box-decoration-break: clone;
+}
+
+.slidev-layout a {
+  color: var(--raft-ink);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 2.5px solid var(--raft-ink);
+  transition: all 100ms ease;
+}
+
+.slidev-layout a:hover {
+  background: var(--raft-cyan);
+}
+
+.slidev-layout ul,
+.slidev-layout ol {
+  margin: 0.6rem 0;
+}
+
+.slidev-layout ul > li {
+  list-style: none;
+  position: relative;
+  padding-left: 1.4em;
+  margin: 0.4em 0;
+}
+
+.slidev-layout ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0.1em;
+  top: 0.52em;
+  width: 0.55em;
+  height: 0.55em;
+  background: var(--raft-yellow);
+  border: var(--raft-border);
+}
+
+.slidev-layout ul > li > ul > li::before {
+  background: var(--raft-pink);
+}
+
+.slidev-layout blockquote {
+  background: var(--raft-white);
+  border: var(--raft-border);
+  border-left-width: 8px;
+  box-shadow: var(--raft-shadow-sm);
+  padding: 0.7rem 1.1rem;
+  margin: 1rem 0;
+  font-style: normal;
+}
+
+.slidev-layout blockquote p {
+  margin: 0;
+}
+
+.slidev-layout table {
+  border-collapse: collapse;
+  border: var(--raft-border);
+  box-shadow: var(--raft-shadow);
+  background: var(--raft-white);
+  margin: 1rem 0;
+}
+
+.slidev-layout th {
+  background: var(--raft-ink);
+  color: var(--raft-cream);
+  font-weight: 700;
+  text-transform: lowercase;
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 0.85em;
+  padding: 0.5rem 1rem;
+}
+
+.slidev-layout td {
+  border: 1.5px solid var(--raft-ink);
+  padding: 0.5rem 1rem;
+}
+
+.slidev-layout hr {
+  border: none;
+  border-top: var(--raft-border);
+  margin: 1.4rem 0;
+}
+
+/* Slide number chip: lowercase mono in a bordered tab, Raft footer style. */
+.slidev-page > .slidev-slide-number,
+.slidev-layout .slidev-slide-number {
+  font-family: 'Space Mono', ui-monospace, monospace;
+  color: var(--raft-ink);
+  opacity: 1;
+}

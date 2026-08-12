@@ -1,0 +1,111 @@
+.profile h1 {
+  color: var(--color-primary-900);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.profile > .frame-content {
+  justify-content: stretch;
+}
+
+.profile .profile-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  gap: var(--size-8);
+  padding: 0 var(--size-6);
+  align-items: stretch;
+}
+
+.profile .profile-inner:has(.profile-aside) {
+  grid-template-columns: 1fr 1fr;
+}
+
+.profile .profile-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--size-6);
+  min-width: 0;
+  min-height: 0;
+}
+
+.profile .profile-name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2);
+}
+
+.profile .profile-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4);
+}
+
+.profile .profile-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-3);
+  justify-content: flex-start;
+  min-width: 0;
+  height: 100%;
+  align-self: stretch;
+}
+
+.profile .profile-aside h2,
+.profile .profile-aside h3 {
+  color: var(--color-primary-900);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+.profile .profile-aside hr {
+  border: none;
+  border-top: var(--size-px) solid var(--color-gray-300);
+  margin: var(--size-1) 0;
+}
+
+.profile p {
+  font-size: var(--text-base);
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+.profile .body {
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-medium);
+}
+
+.profile ol {
+  list-style: decimal;
+  padding-left: var(--profile-list-pl);
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  flex-direction: column;
+  gap: var(--profile-list-gap);
+}
+
+.profile ol li {
+  font-size: var(--text-base);
+}
+
+.slidev-layout .profile-body ol > li::first-line {
+  font-weight: var(--font-weight-bold);
+}
+
+.profile .profile-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--size-2);
+}
+
+.profile .profile-field + .profile-field {
+  margin-top: var(--size-3);
+}

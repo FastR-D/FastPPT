@@ -1,0 +1,4 @@
+interface:
+  display_name: "FastPPT Landing Theme"
+  short_description: "Author polished Landing Slidev decks"
+  default_prompt: "Use $fastppt-theme-landing to design a Slidev deck with the Landing theme."

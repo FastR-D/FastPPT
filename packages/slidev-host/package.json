@@ -1,0 +1,29 @@
+{
+  "name": "@fastppt/slidev-host",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "files": [
+    "src",
+    "runner.mjs"
+  ],
+  "dependencies": {
+    "@fastppt/protocol": "workspace:*",
+    "@slidev/cli": "catalog:",
+    "@slidev/theme-default": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

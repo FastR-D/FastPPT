@@ -1,0 +1,54 @@
+{
+  "id": "slidev-theme-the-unnamed",
+  "packageName": "slidev-theme-the-unnamed",
+  "displayName": "The Unnamed",
+  "version": "0.0.24-fastppt.1",
+  "description": "深色、简约、面向开发者内容的经典 Slidev 主题。",
+  "repositoryUrl": "https://github.com/estruyf/slidev-theme-the-unnamed",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-the-unnamed",
+    "sourceDir": "agent",
+    "version": "0.0.24-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "about-me",
+      "label": "About Me"
+    },
+    {
+      "id": "center",
+      "label": "Center"
+    },
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "developer-dark",
+      "label": "开发者深色风格",
+      "description": "适合代码、产品和个人技术演讲。"
+    },
+    {
+      "id": "simple-layouts",
+      "label": "简洁布局",
+      "description": "以少量稳定布局覆盖常见内容。"
+    }
+  ]
+}

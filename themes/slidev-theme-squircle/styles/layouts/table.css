@@ -1,0 +1,80 @@
+/* Table layout */
+.table-layout.frame > .frame-content.table-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(var(--frame) + var(--pad));
+  overflow: auto;
+  gap: var(--size-6);
+}
+
+.table-layout h1,
+.table-layout h2,
+.table-layout h3 {
+  color: var(--color-primary-900);
+}
+
+.table-layout h1 {
+  font-size: var(--text-2xl);
+}
+
+.table-layout h2 {
+  font-size: var(--text-xl);
+}
+
+.table-layout h3 {
+  font-size: var(--text-base);
+}
+
+.table-layout table {
+  width: 100%;
+  max-width: calc(100% - (var(--size-4) * 2));
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--color-white);
+  border-radius: var(--size-2);
+  overflow: hidden;
+  box-shadow: 0 0 0 var(--size-px) var(--color-gray-200);
+}
+
+.table-layout thead {
+  background: var(--color-primary-900);
+  color: var(--color-white);
+}
+
+.table-layout thead th {
+  font-weight: var(--font-weight-semibold);
+}
+
+.table-layout th,
+.table-layout td {
+  padding: var(--size-4) var(--size-5);
+  border: none;
+  border-right: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-200);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table-layout th:last-child,
+.table-layout td:last-child {
+  border-right: none;
+}
+
+.table-layout tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-layout thead th {
+  border-bottom-color: color-mix(in oklch, var(--color-white) 20%, transparent);
+}
+
+.table-layout tbody tr:nth-child(even) {
+  background: var(--color-gray-100);
+}
+
+.table-layout .table-caption {
+  font-size: var(--text-base);
+  color: var(--color-neutral-700);
+}

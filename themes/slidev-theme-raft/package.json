@@ -1,0 +1,45 @@
+{
+  "name": "slidev-theme-raft",
+  "version": "0.0.4-fastppt.1",
+  "private": true,
+  "description": "A neo-brutalism Slidev theme in the visual language of Raft — Raft Ink borders, hard shadows, Cotton Core cream, and Soft Signal yellow.",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "theme",
+    "neo-brutalism",
+    "raft"
+  ],
+  "license": "MIT",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "docs/screenshots",
+    "global-top.vue",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 980,
+      "transition": "none",
+      "fonts": {
+        "sans": "Space Grotesk",
+        "mono": "Space Mono",
+        "weights": "400,500,700"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "dev": "pnpm --filter slidev-theme-raft-demo dev",
+    "build": "node ../../scripts/theme-build.mjs ."
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "slidev-theme-nicodevs",
+  "version": "0.1.1-fastppt.1",
+  "private": true,
+  "description": "A bold, brutalist Slidev theme with Space Grotesk and JetBrains Mono.",
+  "type": "module",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "theme",
+    "brutalist",
+    "dark"
+  ],
+  "author": "Nico Devs <hi@nicodevs.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicodevs/slidev-theme-nicodevs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nicodevs/slidev-theme-nicodevs/issues"
+  },
+  "homepage": "https://github.com/nicodevs/slidev-theme-nicodevs#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "slidev": ">=0.48.0"
+  },
+  "files": [
+    "layouts",
+    "setup",
+    "styles",
+    "example.md"
+  ],
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "build": "node ../../scripts/theme-build.mjs .",
+    "dev": "slidev example.md --open",
+    "export": "slidev export example.md",
+    "screenshot": "slidev export example.md --format png"
+  },
+  "dependencies": {
+    "@slidev/types": "^52.14.1"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.14.1"
+  },
+  "slidev": {
+    "colorSchema": "dark",
+    "defaults": {
+      "fonts": {
+        "sans": "Space Grotesk",
+        "mono": "JetBrains Mono"
+      },
+      "transition": "none"
+    }
+  }
+}

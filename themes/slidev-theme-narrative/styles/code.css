@@ -1,0 +1,38 @@
+/* =============================================================================
+   Monolith — code & inline mono
+   Kept quiet and monochrome; code is rarely the hero in this style.
+   ========================================================================== */
+
+.slidev-layout code,
+.slidev-layout pre {
+  font-family: 'Fira Code', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-feature-settings: 'zero';
+}
+
+/* Inline code — a subtle chip, not a color accent. */
+.slidev-layout :not(pre) > code {
+  background: var(--bg-alt);
+  border: 1px solid var(--hairline);
+  border-radius: 0.375rem;
+  padding: 0.1em 0.4em;
+  font-size: 0.9em;
+  color: var(--text);
+}
+
+html.dark .slidev-layout :not(pre) > code {
+  background: #161616;
+}
+
+/* Fenced blocks. */
+.slidev-layout pre {
+  background: var(--bg-alt) !important;
+  border: 1px solid var(--hairline);
+  border-radius: var(--mono-radius);
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+html.dark .slidev-layout pre {
+  background: #121212 !important;
+}

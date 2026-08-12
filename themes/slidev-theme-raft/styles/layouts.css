@@ -1,0 +1,25 @@
+/* Shared building blocks used by the theme's layout components. */
+.raft-panel {
+  background: var(--raft-white);
+  border: var(--raft-border);
+  box-shadow: var(--raft-shadow);
+}
+
+.raft-tag {
+  display: inline-block;
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 0.8rem;
+  text-transform: lowercase;
+  background: var(--raft-white);
+  border: var(--raft-border);
+  box-shadow: var(--raft-shadow-sm);
+  padding: 0.15rem 0.7rem;
+}
+
+.raft-block-title {
+  display: inline-block;
+  background: var(--raft-yellow);
+  border: var(--raft-border);
+  box-shadow: var(--raft-shadow-lg);
+  padding: 0.4rem 1.2rem;
+}

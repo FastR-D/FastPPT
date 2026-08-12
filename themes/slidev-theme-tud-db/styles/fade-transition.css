@@ -1,0 +1,36 @@
+/*
+ * Custom transitions with a smooth slide and fade animation
+ * Far more subtle than the build-in
+ *
+ * Usage:
+ * ```
+ * transition: slide-fade-left | slide-fade-right
+ * ```
+ */
+
+.slide-fade-right-enter-active,
+.slide-fade-left-enter-active {
+  transition:
+    opacity var(--slidev-transition-duration) ease
+      calc(var(--slidev-transition-duration) * 0.5), /* some additional delay here */
+    transform calc(var(--slidev-transition-duration) * 1.5) ease;
+}
+
+.slide-fade-right-leave-active,
+.slide-fade-left-leave-active {
+  transition:
+    opacity var(--slidev-transition-duration) ease,
+    transform calc(var(--slidev-transition-duration) * 1.5) ease;
+}
+
+.slide-fade-right-leave-to,
+.slide-fade-left-enter-from {
+  opacity: 0;
+  transform: translateX(4%);
+}
+
+.slide-fade-right-enter-from,
+.slide-fade-left-leave-to {
+  opacity: 0;
+  transform: translateX(-4%);
+}

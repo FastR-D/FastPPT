@@ -1,0 +1,54 @@
+{
+  "id": "slidev-theme-tud-db",
+  "packageName": "slidev-theme-tud-db",
+  "displayName": "TU Dresden DB",
+  "version": "0.0.4-fastppt.1",
+  "description": "复刻德累斯顿工业大学数据库研究组品牌体系的正式主题。",
+  "repositoryUrl": "https://github.com/vmelisch/slidev-theme-db",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-tud-db",
+    "sourceDir": "agent",
+    "version": "0.0.4-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "section-num",
+      "label": "Section Num"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "two-cols-grid",
+      "label": "Two Cols Grid"
+    },
+    {
+      "id": "two-cols-header",
+      "label": "Two Cols Header"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "institutional-brand",
+      "label": "机构品牌",
+      "description": "包含 TU Dresden 与研究组标志、马赛克和字体规范。"
+    },
+    {
+      "id": "numbered-sections",
+      "label": "编号章节",
+      "description": "section-num 提供正式章节编号。"
+    }
+  ]
+}

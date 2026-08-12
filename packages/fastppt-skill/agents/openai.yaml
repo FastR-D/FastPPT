@@ -1,0 +1,4 @@
+interface:
+  display_name: 'FastPPT'
+  short_description: 'Author Slidev decks with validated generated assets'
+  default_prompt: 'Use $fastppt to create and validate a Slidev presentation in this workspace.'

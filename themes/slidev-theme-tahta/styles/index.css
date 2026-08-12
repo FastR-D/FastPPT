@@ -1,0 +1,488 @@
+@import './tokens.css';
+
+/* ===== base ===== */
+.slidev-layout {
+  position: relative;
+  height: 100%;
+  background-color: var(--ink);
+  color: var(--fg);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  padding: var(--pad-y) var(--pad-x);
+  overflow: hidden;
+  font-feature-settings: "ss01", "tnum";
+  -webkit-font-smoothing: antialiased;
+}
+/* texture layer (grain / grid / none) — opacity per variant */
+.slidev-layout::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: var(--bg-texture); background-size: var(--bg-texture-size);
+  opacity: var(--bg-texture-op);
+}
+
+/* ===== per-slide background slot (frontmatter `bg:`, via <SlideBg>) =====
+   Generated backgrounds are drawn by the browser (CSS gradients + the shared
+   --grain SVG), derived from --accent via OKLCH — zero assets, deterministic on
+   export, and can't break the AA gate (every layer is low-alpha & accent-tuned).
+   `bg:` also accepts an image path → painted with an automatic contrast scrim.
+   Rendered as an early child so it sits above the ink bg + variant texture, below content. */
+.slide-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+/* mesh — soft accent light-pools, two corners */
+.slide-bg[data-bg="mesh"] {
+  background:
+    radial-gradient(58% 55% at 84% -8%, oklch(from var(--accent) l c h / 0.16), transparent 60%),
+    radial-gradient(46% 44% at -6% 106%, oklch(from var(--accent) l c calc(h + 44) / 0.10), transparent 60%);
+}
+/* aurora — wider, multi-hue ribbons (still pure gradient, no blur artifacts) */
+.slide-bg[data-bg="aurora"] {
+  background:
+    radial-gradient(40% 80% at 12% 0%, oklch(from var(--accent) calc(l + 0.04) c calc(h - 36) / 0.16), transparent 62%),
+    radial-gradient(46% 90% at 58% 18%, oklch(from var(--accent) l c calc(h + 60) / 0.13), transparent 60%),
+    radial-gradient(44% 80% at 100% 90%, oklch(from var(--accent) calc(l - 0.04) c calc(h + 8) / 0.14), transparent 60%);
+}
+/* grain — the shared fractal-noise SVG, deterministic */
+.slide-bg[data-bg="grain"] {
+  background-image: var(--grain); background-size: 200px 200px; opacity: 0.06; mix-blend-mode: overlay;
+}
+/* dots — accent-tinted dot grid */
+.slide-bg[data-bg="dots"] {
+  background-image: radial-gradient(circle, oklch(from var(--accent) l c h / 0.5) 1.1px, transparent 1.2px);
+  background-size: 26px 26px; opacity: 0.5;
+}
+/* grid — hairline blueprint grid */
+.slide-bg[data-bg="grid"] {
+  background-image:
+    linear-gradient(oklch(from var(--fg) l c h / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(from var(--fg) l c h / 0.06) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px;
+}
+/* image — author's own photo, always under a contrast scrim so text stays AA-legible */
+.slide-bg[data-bg="image"] {
+  background-image:
+    linear-gradient(to top, oklch(from var(--ink) l c h / 0.92), oklch(from var(--ink) l c h / 0.55) 55%, oklch(from var(--ink) l c h / 0.7)),
+    var(--bg-image, none);
+  background-size: cover, cover; background-position: center, center;
+}
+
+.slidev-layout h1 { font-family: var(--font-display); font-weight: var(--w-display); letter-spacing: var(--tr-display); line-height: 1.0; }
+.slidev-layout h2 { font-family: var(--font-display); font-weight: var(--w-display); letter-spacing: var(--tr-display); line-height: 1.06; }
+/* editorial emphasis inside headings/titles — <em> sets a true italic (gorgeous in Fraunces),
+   accent-colored. The designed-headline lever beyond a flat accent2 color span. */
+.slidev-layout h1 em, .slidev-layout h2 em, .accent2 em, h1 .em, h2 .em {
+  font-style: italic; color: var(--accent); font-weight: inherit; }
+.slidev-layout p  { margin: 0.4em 0; max-width: 54ch; }
+.slidev-layout a  { color: var(--accent); text-underline-offset: 3px; }
+.slidev-layout strong { color: var(--fg); font-weight: var(--w-strong); }
+.accent2 { color: var(--accent); }
+.dim { color: var(--fg-dim); }
+
+/* ===== type + measure utilities (token-driven; use these, never raw text-Nxl) ===== */
+.fs-kicker { font-size: var(--fs-kicker); }
+.fs-lead { font-size: var(--fs-lead); }
+.fs-lead-xl { font-size: var(--fs-lead-xl); }
+.fs-lead-title { font-size: var(--fs-lead-title); }
+.fs-bigtype { font-size: var(--fs-bigtype); }
+.fs-body { font-size: var(--fs-body); }
+.fs-h2 { font-size: var(--fs-h2); }
+.fs-cover { font-size: var(--fs-cover); }
+.fs-section { font-size: var(--fs-section); }
+.fs-quote { font-size: var(--fs-quote); }
+.fs-stat-xl { font-size: var(--fs-stat-xl); }
+.fs-stat-lg { font-size: var(--fs-stat-lg); }
+.fs-stat-md { font-size: var(--fs-stat-md); }
+.fs-stat-sm { font-size: var(--fs-stat-sm); }
+.fs-bleed-stat { font-size: var(--fs-bleed-stat); }
+.mw-cover { max-width: var(--mw-cover); }
+.mw-title { max-width: var(--mw-title); }
+.mw-prose { max-width: var(--mw-prose); }
+.mw-lead { max-width: var(--mw-lead); }
+.mw-quote { max-width: var(--mw-quote); }
+
+/* ===== optical sizing (variable fonts with an opsz axis, e.g. Fraunces) ===== */
+.slidev-layout { font-variation-settings: "opsz" var(--opsz-body); }
+.slidev-layout h1, .slidev-layout h2, .stat-num, .quote-mark, .ghost { font-variation-settings: "opsz" var(--opsz-display); }
+
+/* ===== motion — <Reveal> entrance, personality from variant tokens ===== */
+@keyframes tahta-reveal { from { opacity: 0; transform: var(--reveal-from, none); } to { opacity: 1; transform: none; } }
+.reveal { animation: tahta-reveal var(--motion-dur) var(--motion-ease) both; will-change: opacity, transform; }
+@media (prefers-reduced-motion: reduce) { .reveal { animation: none; } }
+.print .reveal, .slidev-print .reveal, [data-print] .reveal { animation: none; }
+
+/* ===== kicker (deco shape varies by variant) ===== */
+.kicker {
+  font: 600 var(--fs-kicker)/1 var(--font-mono);
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 0.6rem; margin-bottom: var(--sp-4);
+}
+.kicker::before { content: ""; width: 1.6rem; height: 2px; background: var(--accent); }
+:root[data-variant='brutalist'] .kicker::before { content: "["; width: auto; height: auto; background: none; color: var(--accent); font-weight: 700; }
+:root[data-variant='brutalist'] .kicker::after  { content: "]"; color: var(--accent); font-weight: 700; }
+:root[data-variant='soft'] .kicker::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+:root[data-variant='minimal'] .kicker::before { display: none; }
+
+.accent-bar { height: 3px; width: 4.5rem; background: var(--accent); border-radius: calc(var(--radius-sm) / 4); }
+
+/* ===== atmosphere ===== */
+.glow  { position: absolute; inset: 0; pointer-events: none; background: var(--glow); z-index: 0; }
+.ghost { position: absolute; top: -3rem; right: -0.5rem; z-index: 0; font-family: var(--font-display);
+  font-weight: 800; font-size: 23rem; line-height: 1; letter-spacing: -0.05em; color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in oklab, var(--fg) 7%, transparent); pointer-events: none; user-select: none; }
+
+/* ===== cards ===== */
+/* role-color: each card in a grid cycles a distinct hue from the variant's --cat ramp
+   (the Gamma "every card has its own color" signature). Set on the grid child so it
+   cascades to the cell even when wrapped (e.g. feature's <Reveal>). */
+.panels > *:nth-child(5n+1), .feature > *:nth-child(5n+1), .cols > *:nth-child(5n+1) { --card-accent: var(--cat-1); }
+.panels > *:nth-child(5n+2), .feature > *:nth-child(5n+2), .cols > *:nth-child(5n+2) { --card-accent: var(--cat-2); }
+.panels > *:nth-child(5n+3), .feature > *:nth-child(5n+3), .cols > *:nth-child(5n+3) { --card-accent: var(--cat-3); }
+.panels > *:nth-child(5n+4), .feature > *:nth-child(5n+4), .cols > *:nth-child(5n+4) { --card-accent: var(--cat-4); }
+.panels > *:nth-child(5n+5), .feature > *:nth-child(5n+5), .cols > *:nth-child(5n+5) { --card-accent: var(--cat-5); }
+
+.card {
+  position: relative; background: var(--surface-bg); border: var(--surface-border);
+  border-color: color-mix(in oklab, var(--card-accent, var(--accent)) 32%, var(--line));
+  border-radius: var(--radius); padding: var(--sp-6) var(--sp-6); box-shadow: var(--surface-shadow);
+}
+.card::before { content: ""; position: absolute; top: calc(var(--rule-w) * -1); left: 1.3rem;
+  width: 2.2rem; height: 2px; background: var(--card-accent, var(--accent)); opacity: var(--card-tick); }
+
+/* ===== stats ===== */
+.stat-grid { display: grid; gap: var(--sp-12); }
+.stat-num { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.04em; line-height: 0.9; color: var(--fg); }
+.stat-num.accent-num, .accent-num { color: var(--accent); }
+.stat-unit { font-size: 0.46em; font-weight: 700; color: var(--accent); margin-left: 0.04em; }
+.stat-label { color: var(--fg-dim); margin-top: var(--sp-3); font-size: 0.98rem; }
+
+/* ===== quote ===== */
+.quote-mark { font-family: var(--font-serif); font-weight: 600; font-size: 7rem; line-height: 0.5; color: var(--accent); }
+.quote-body { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; line-height: 1.12; }
+
+/* ===== icons ===== */
+.tahta-icon { display: inline-block; vertical-align: -0.125em; }
+.stat-icon { font-size: 1.7rem; color: var(--accent); margin-bottom: var(--sp-3); }
+.step-icon { font-size: 1.5rem; color: var(--accent); margin-bottom: var(--sp-3); display: block; }
+.feature-icon { font-size: 1.9rem; color: var(--card-accent, var(--accent)); margin-bottom: var(--sp-4); }
+
+/* ===== feature grid ===== */
+.feature { display: grid; gap: var(--gap); }
+.feature-cell { display: flex; flex-direction: column; }
+.feature-title { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.4rem; margin-bottom: var(--sp-2); color: var(--card-accent, var(--fg)); }
+.feature-desc { color: var(--fg-dim); }
+
+/* ===== fact (single giant figure) ===== */
+.fact-num { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.04em; line-height: 0.86; color: var(--accent); font-size: var(--fs-fact); font-variation-settings: "opsz" var(--opsz-display); }
+
+/* ===== two columns ===== */
+.two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-12); align-items: start; }
+
+/* ===== code layout ===== */
+.code-wrap { max-width: 64rem; width: 100%; margin: 0 auto; }
+.code-wrap .slidev-code, .code-wrap pre { font-size: 1.05rem; }
+
+/* ===== embed (video / iframe) ===== */
+.embed { width: 100%; height: 100%; border-radius: var(--radius); overflow: hidden; border: var(--surface-border); background: #000; }
+.embed iframe, .embed video { width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
+
+/* ===== timeline (horizontal) ===== */
+.timeline { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--sp-6); position: relative; padding-top: 1.6rem; }
+.timeline::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 2px; background: var(--line); }
+.tl-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--accent); position: absolute; top: 0; box-shadow: 0 0 0 4px var(--ink); }
+.tl-date { font: 600 0.74rem/1 var(--font-mono); letter-spacing: 0.08em; color: var(--accent); margin: 1.1rem 0 0.5rem; }
+.tl-title { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.2rem; margin-bottom: 0.3rem; }
+.tl-desc { color: var(--fg-dim); font-size: 0.95rem; max-width: 22ch; }
+
+/* ===== logo wall ===== */
+.logos { display: grid; gap: var(--sp-8); align-items: center; justify-items: center; }
+.logo-cell { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; color: var(--fg-dim); }
+.logo-cell .tahta-icon { font-size: 2.4rem; color: var(--fg); }
+.logo-cell .logo-text { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.4rem; color: var(--fg); letter-spacing: -0.01em; }
+
+/* ===== showcase (deliberate asymmetric hero — fixed ratio, won't reflow with content) ===== */
+.showcase { display: grid; grid-template-columns: 43% 57%; height: 100%; }
+.showcase.flip { grid-template-columns: 57% 43%; }
+.showcase-media { position: relative; background-size: cover; background-position: center; }
+.showcase-media::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 160px rgba(0,0,0,0.45); }
+.showcase-body { display: flex; flex-direction: column; justify-content: center; padding: var(--pad-y) var(--pad-x); }
+
+/* ===== callout (tone via --tone) ===== */
+.callout { display: flex; gap: var(--sp-4); padding: var(--sp-4) var(--sp-6); border-radius: var(--radius); background: var(--surface-bg); border: var(--surface-border); border-left: 3px solid var(--tone, var(--accent)); align-items: flex-start; }
+.callout .tahta-icon { color: var(--tone, var(--accent)); font-size: 1.4rem; margin-top: 0.1rem; flex: none; }
+
+/* ===== badge — inline semantic pill (tone via --tone) ===== */
+.badge { display: inline-flex; align-items: center; gap: 0.3em; padding: 0.16em 0.6em; border-radius: 999px;
+  font: 600 0.82em/1.4 var(--font-mono); color: var(--tone, var(--accent));
+  background: color-mix(in oklab, var(--tone, var(--accent)) 15%, transparent);
+  border: 1px solid color-mix(in oklab, var(--tone, var(--accent)) 34%, transparent); }
+
+/* ===== fit-to-frame ===== */
+.fit { height: 100%; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.fit-inner { transform-origin: top center; }
+
+/* ===== steps ===== */
+.steps { display: flex; align-items: stretch; gap: var(--sp-3); text-align: center; }
+.steps .arrow { display: flex; align-items: center; color: var(--accent); font-size: 1.3rem; font-weight: 700; }
+.step-title { font-family: var(--font-display); font-weight: var(--w-display); font-size: var(--fs-step-title); margin-bottom: var(--sp-2); }
+.step-desc { font-size: 0.92rem; color: var(--fg-dim); }
+
+/* ===== footer ===== */
+.foot { position: absolute; bottom: 1.5rem; left: var(--pad-x); right: var(--pad-x); z-index: 60;
+  display: flex; justify-content: space-between; align-items: center;
+  font: 500 0.68rem/1 var(--font-mono); color: color-mix(in oklab, var(--fg-dim) 70%, transparent); letter-spacing: 0.06em; }
+.foot .pg { color: var(--accent); }
+.foot-left { display: flex; align-items: center; gap: 0.5rem; }
+
+/* brand logo (themeConfig.logo) — hero on openers, small mark in the footer */
+.brand-logo { display: block; width: auto; }
+.brand-logo.hero { height: 2.4rem; margin-bottom: 1.7rem; }
+.brand-logo.mark { height: 0.92rem; opacity: 0.8; }
+.brand-logo.invert { filter: invert(1) grayscale(1) brightness(1.85); }  /* monochrome mark on the opposite scheme */
+
+/* ===== table ===== */
+.slidev-layout table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.slidev-layout thead th { text-align: left; color: var(--fg-dim); font: 600 0.68rem/1 var(--font-mono);
+  text-transform: uppercase; letter-spacing: 0.12em; padding: var(--sp-2) var(--sp-4); border-bottom: var(--rule-w) solid var(--line); }
+.slidev-layout tbody td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line); }
+.slidev-layout tbody tr:last-child td { border-bottom: none; }
+
+/* ===== code ===== */
+.slidev-layout pre { background: var(--code-bg) !important; border: var(--rule-w) solid var(--line);
+  border-radius: var(--radius-sm); padding: 1.1rem 1.3rem !important; font-size: 0.9rem; }
+
+/* ===== bullets ===== */
+.slidev-layout ul { list-style: none; padding-left: 0; }
+.slidev-layout ul > li { position: relative; padding-left: 1.45rem; margin: var(--sp-2) 0; }
+.slidev-layout ul > li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent); }
+:root[data-variant='brutalist'] .slidev-layout ul > li::before { border-radius: 0; }
+
+/* ===== image split ===== */
+.split { display: grid; grid-template-columns: 1fr 1fr; height: 100%; }
+.split.left { grid-template-columns: 0.9fr 1.1fr; }
+.split-media { background-size: cover; background-position: center; position: relative;
+  /* feather the seam edge so the image dissolves into the body ground instead of a hard cut */
+  --feather: 13%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--feather)); mask-image: linear-gradient(to right, transparent 0, #000 var(--feather)); }
+.split.left .split-media { -webkit-mask-image: linear-gradient(to left, transparent 0, #000 var(--feather)); mask-image: linear-gradient(to left, transparent 0, #000 var(--feather)); }
+.split-body { display: flex; flex-direction: column; justify-content: center; padding: var(--pad-y) var(--pad-x); }
+
+/* ===== bleed ===== */
+.bleed-img { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0; }
+.bleed-img.duotone { filter: grayscale(1) contrast(1.05) brightness(0.55); }
+.bleed-duotone { position: absolute; inset: 0; z-index: 1; mix-blend-mode: color; background: var(--accent); opacity: 0.2; }
+/* bleed sits over a darkened photo → always a dark canvas, regardless of variant scheme */
+.bleed-scrim { position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(90deg, rgba(8,9,11,0.96) 0%, rgba(8,9,11,0.66) 46%, rgba(8,9,11,0.14) 100%); }
+.l-bleed .l-center { z-index: 3; color: #fff; }
+.l-bleed .l-center h2 { color: #fff; }
+.l-bleed .l-center .bleed-sub { color: rgba(255,255,255,0.78); }
+
+/* ===== layout scaffolding ===== */
+.slidev-layout.l-topic, .slidev-layout.l-cover, .slidev-layout.l-statement, .slidev-layout.l-end { display: flex; flex-direction: column; height: 100%; }
+.l-head { position: relative; z-index: 1; }
+.l-body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+.l-center { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: var(--pad-y) var(--pad-x); z-index: 1; }
+.l-center.middle { align-items: center; text-align: center; }
+.slidev-layout.l-bleed, .slidev-layout.l-split { padding: 0; }
+
+/* ===== lead — asymmetric opener (title anchored low-left, vast negative space top-right) ===== */
+.slidev-layout.l-lead { height: 100%; }
+/* full-height wrapper so <Fit> can measure overflow (mirrors .l-center on cover); content
+   bottom-anchored to keep the low-left opener look. .fit centers by default → flex-end here;
+   when <Fit> scales it overrides to flex-start inline (top-align) so a shrunk title can't
+   bleed off the top. transform-origin top-left so left-anchored content scales in place. */
+.l-lead-inner { position: absolute; inset: 0; padding: var(--pad-y) var(--pad-x); z-index: 1; }
+.l-lead .fit { justify-content: flex-end; }
+.l-lead .fit-inner { transform-origin: top left; }
+.lead-body { max-width: 66%; }
+.l-lead h1 { font-size: var(--fs-lead-title); line-height: 0.96; }
+.l-lead .accent-bar { margin-bottom: var(--sp-6); }
+
+/* ===== bigtype — full-bleed type; the phrase IS the slide ===== */
+.slidev-layout.l-bigtype { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+.bigtype-body { position: relative; z-index: 1; }
+.l-bigtype h1 { font-size: var(--fs-bigtype); line-height: 0.94; letter-spacing: -0.03em; max-width: 17ch; }
+
+/* ===== metric — asymmetric giant number + context aside (vs centered `fact`) ===== */
+.slidev-layout.l-metric { display: grid; grid-template-columns: 1.1fr 0.9fr; align-items: center; height: 100%; gap: var(--sp-12); }
+.metric-num { display: flex; align-items: flex-start; line-height: 0.8; }
+.metric-num .stat-num { font-size: var(--fs-fact); line-height: 0.8; }
+.metric-aside { position: relative; z-index: 1; max-width: 30ch; }
+.metric-aside .metric-label { font-size: var(--fs-lead-xl); margin-top: var(--sp-4); line-height: 1.2; }
+
+/* ===== drop cap (opt-in via `class: dropcap` on a default slide) ===== */
+.dropcap .l-body p:first-of-type::first-letter {
+  float: left; font-family: var(--font-display); font-weight: var(--w-display);
+  font-size: 3.4em; line-height: 0.68; padding: 0.02em 0.1em 0 0; color: var(--accent); }
+
+.tl-item { position: relative; }
+
+/* ============================================================
+   TEACHING / TECHNICAL PACK — reference, columns, panels, agenda,
+   define, code-explain, vs + Kbd / Terminal / FileTree.
+   All tokenized (no hardcoded values) so every variant restyles them.
+   ============================================================ */
+
+/* ----- reference / cheatsheet (term → desc, optionally grouped) ----- */
+.ref-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: var(--sp-8) var(--sp-12); align-content: start; }
+.ref-group-title { font: 600 var(--fs-kicker)/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: var(--sp-3); }
+.ref-list { display: grid; }
+.ref-row { display: grid; grid-template-columns: minmax(7rem, auto) 1fr; gap: var(--sp-4); align-items: baseline; padding: 0.5rem 0; border-bottom: 1px solid color-mix(in oklab, var(--line) 70%, transparent); }
+.ref-row:last-child { border-bottom: 0; }
+.ref-term { font: 600 0.95rem/1.3 var(--font-mono); color: var(--fg); white-space: nowrap; }
+.ref-desc { color: var(--fg-dim); font-size: 0.98rem; line-height: 1.35; }
+
+/* ----- columns — N headed columns (clean, rule-topped) ----- */
+.cols { display: flex; gap: var(--sp-10, 2.5rem); align-items: stretch; }
+.cols > .col { flex: 1 1 0; min-width: 0; }
+.col-rule { height: var(--rule-w); background: var(--card-accent, var(--accent)); width: 2.4rem; margin-bottom: var(--sp-4); }
+.col-head { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.3rem; letter-spacing: var(--tr-display); margin-bottom: var(--sp-3); color: var(--card-accent, var(--fg)); }
+.col-body { color: var(--fg-dim); }
+.col-body ul { margin: 0; }
+
+/* ----- panels — 2–4 carded sub-topics in a grid ----- */
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--gap); }
+.panels.two { grid-template-columns: repeat(2, 1fr); }
+.panel { position: relative; background: var(--surface-bg); border: var(--surface-border); border-color: color-mix(in oklab, var(--card-accent, var(--accent)) 32%, var(--line)); border-radius: var(--radius); padding: var(--sp-6); box-shadow: var(--surface-shadow); }
+.panel::before { content: ""; position: absolute; top: calc(var(--rule-w) * -1); left: var(--sp-6); width: 2.2rem; height: 2px; background: var(--card-accent, var(--accent)); opacity: var(--card-tick); }
+.panel-title { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.2rem; margin-bottom: var(--sp-3); color: var(--card-accent, var(--fg)); }
+.panel-title .tahta-icon { color: var(--card-accent, var(--accent)); font-size: 1.3rem; }
+.panel-body { color: var(--fg-dim); font-size: 0.98rem; }
+.panel-body ul { margin: 0; }
+
+/* ----- agenda / toc — numbered module overview ----- */
+.agenda { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6) var(--sp-12); align-content: start; }
+.agenda-item { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-4); align-items: baseline; }
+.agenda-num { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.6rem; line-height: 1; color: var(--accent); font-variation-settings: "opsz" var(--opsz-display); min-width: 1.6em; }
+.agenda-topic { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.25rem; letter-spacing: var(--tr-display); }
+.agenda-desc { color: var(--fg-dim); font-size: 0.96rem; margin-top: 0.15rem; }
+
+/* ----- define — term + definition ----- */
+.define-term { font-family: var(--font-display); font-weight: var(--w-display); letter-spacing: var(--tr-display); font-size: var(--fs-cover); line-height: 1.0; margin-bottom: var(--sp-4); }
+.define-body { font-size: var(--fs-lead-xl); color: var(--fg); line-height: 1.3; max-width: 34ch; }
+.define-points { margin-top: var(--sp-6); color: var(--fg-dim); }
+
+/* ----- code-explain — code + numbered notes ----- */
+.code-explain { display: grid; grid-template-columns: 1.12fr 0.88fr; gap: var(--sp-10, 2.5rem); align-items: center; }
+.code-explain .ce-code { min-width: 0; }
+.code-explain .ce-code pre { margin: 0; }
+.explain-notes { display: grid; gap: var(--sp-4); counter-reset: ce; }
+.explain-note { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); align-items: baseline; color: var(--fg-dim); }
+.explain-note::before { counter-increment: ce; content: counter(ce); font: 700 0.8rem/1.4 var(--font-mono);
+  color: var(--accent); border: 1px solid color-mix(in oklab, var(--accent) 40%, transparent); border-radius: 999px;
+  width: 1.5rem; height: 1.5rem; display: grid; place-items: center; }
+.explain-note strong { color: var(--fg); }
+/* click-synced emphasis: the note for the highlighted code line lights up, the rest dim */
+.explain-note { transition: opacity .25s; }
+.explain-note.note-idle { opacity: 0.38; }
+.explain-note.note-active { color: var(--fg); }
+.explain-note.note-active::before { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+
+/* ----- vs — A vs B with a centered divider ----- */
+.vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: var(--sp-6); }
+.vs-side { background: var(--surface-bg); border: var(--surface-border); border-radius: var(--radius); padding: var(--sp-6); box-shadow: var(--surface-shadow); }
+.vs-head { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.25rem; margin-bottom: var(--sp-3); }
+.vs-side.b .vs-head { color: var(--accent); }
+.vs-side ul { margin: 0; color: var(--fg-dim); }
+.vs-div { align-self: center; font: 700 0.8rem/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--fg-dim); border: var(--rule-w) solid var(--line); border-radius: 999px; padding: 0.5rem 0.55rem; background: var(--ink); }
+
+/* ----- Kbd — keycap ----- */
+.kbd { display: inline-flex; align-items: center; gap: 0.2em; font: 600 0.82em/1 var(--font-mono); color: var(--fg);
+  padding: 0.28em 0.5em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--fg) 6%, transparent); white-space: nowrap; vertical-align: 0.06em; }
+
+/* ----- Terminal — shell session window ----- */
+.terminal { border: var(--surface-border); border-radius: var(--radius-sm); overflow: hidden; background: var(--code-bg); box-shadow: var(--surface-shadow); font: 500 0.92rem/1.65 var(--font-mono); }
+.terminal-bar { display: flex; align-items: center; gap: 0.45rem; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); }
+.terminal-bar i { width: 0.66rem; height: 0.66rem; border-radius: 50%; background: color-mix(in oklab, var(--fg-dim) 45%, transparent); }
+.terminal-bar .term-title { margin-left: 0.4rem; font-size: 0.74rem; color: var(--fg-dim); letter-spacing: 0.04em; }
+.terminal-body { padding: var(--sp-4) var(--sp-6); white-space: pre-wrap; }
+.term-cmd { color: var(--fg); }
+.term-cmd::before { content: "$ "; color: var(--accent); font-weight: 700; }
+.term-out { color: var(--fg-dim); }
+.term-comment { color: color-mix(in oklab, var(--fg-dim) 75%, transparent); }
+
+/* ----- FileTree ----- */
+.filetree { font: 500 0.95rem/1.7 var(--font-mono); color: var(--fg-dim); }
+.filetree .ft-row { white-space: pre; }
+.filetree .ft-name { color: var(--fg); }
+.filetree .ft-dir { color: var(--accent); }
+.filetree .ft-guide { color: color-mix(in oklab, var(--fg-dim) 55%, transparent); }
+
+/* ----- Figure (image / diagram + caption + credit) ----- */
+.tahta-figure { margin: 0; }
+.tahta-figure img { display: block; width: 100%; border-radius: var(--radius-sm); border: var(--surface-border); }
+.tahta-figure figcaption { margin-top: var(--sp-3); font-size: 0.92rem; color: var(--fg-dim); display: flex; justify-content: space-between; gap: var(--sp-4); align-items: baseline; }
+.tahta-figure .tf-credit { font: 500 0.76rem/1.4 var(--font-mono); opacity: 0.8; white-space: nowrap; }
+
+/* ----- Meter (labeled progress bar) ----- */
+.meter { display: grid; gap: 0.45rem; }
+.meter-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-4); }
+.meter-label { color: var(--fg); }
+.meter-val { font: 700 0.85rem/1 var(--font-mono); color: var(--tone, var(--accent)); }
+.meter-track { height: 0.55rem; border-radius: 999px; background: color-mix(in oklab, var(--fg) 10%, transparent); overflow: hidden; }
+.meter-fill { height: 100%; border-radius: 999px; background: var(--tone, var(--accent)); }
+
+/* ----- Person (avatar + name + role) ----- */
+.person { display: flex; align-items: center; gap: var(--sp-4); }
+.person-avatar { width: 3.4rem; height: 3.4rem; flex: none; border-radius: 50%; background-size: cover; background-position: center;
+  display: grid; place-items: center; border: 2px solid var(--accent); color: var(--accent);
+  font: var(--w-display) 1.05rem/1 var(--font-display); background-color: color-mix(in oklab, var(--accent) 12%, transparent); }
+.person-name { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.1rem; letter-spacing: var(--tr-display); }
+.person-role { color: var(--fg-dim); font-size: 0.95rem; }
+
+/* ----- Tags (keyword chips) ----- */
+.tags { display: inline-flex; flex-wrap: wrap; gap: 0.45rem; }
+.tags .tag { font: 600 0.8rem/1.5 var(--font-mono); padding: 0.16em 0.7em; border-radius: 999px;
+  color: var(--fg-dim); border: 1px solid var(--line); background: color-mix(in oklab, var(--fg) 4%, transparent); }
+
+/* ============================================================
+   DIAGRAM — a framed stage for a visual (Mermaid SVG, Figure, …).
+   Mermaid is themed entirely from tokens so a diagram reskins with the
+   variant like every other layout. We win over mermaid's own embedded
+   <style> (ID-scoped but NOT !important) with class-level !important.
+   ============================================================ */
+.diagram-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
+/* Slidev renders Mermaid inside a ShadowRoot (host = .mermaid), so document CSS can't
+   reach the SVG — the diagram is THEMED via Mermaid themeVariables (setup/mermaid.ts),
+   derived from these same tokens. Here we only size the light-DOM host to the stage. */
+.diagram-stage .mermaid { display: flex; align-items: center; justify-content: center; max-width: 100%; max-height: 60vh; }
+.diagram-stage .mermaid svg { max-width: 100%; max-height: 60vh; height: auto; }
+.diagram-note { margin: var(--sp-4) auto 0; max-width: 60ch; text-align: center; font-size: 0.95rem; }
+
+/* ===== Grid — cell layout for memory/byte/row-vs-column/matrix visuals ===== */
+.tahta-grid { display: grid; grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr)); gap: 4px;
+  font-family: var(--font-mono); font-size: 0.95rem; max-width: 56rem; }
+.grid-cell { padding: 0.55rem 0.7rem; text-align: center; color: var(--fg-dim);
+  background: var(--surface-bg); border: var(--rule-w) solid var(--line); border-radius: var(--radius-sm); }
+.grid-cell.is-head { color: var(--fg); font-weight: var(--w-strong); background: color-mix(in oklab, var(--fg) 7%, var(--surface-bg)); }
+.grid-cell.is-hi { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+
+/* ===== section progress rail (global-top.vue) — "you are here" across the deck ===== */
+.tahta-rail { position: absolute; top: 0; left: 0.5rem; right: 0.5rem; height: 4px; z-index: 50;
+  display: flex; gap: 3px; pointer-events: none; }
+.rail-seg { flex: 1 1 0; border-radius: 999px; background: color-mix(in oklab, var(--fg) 12%, transparent);
+  transition: background var(--motion-dur) var(--motion-ease); }
+.rail-seg.done { background: color-mix(in oklab, var(--accent) 42%, transparent); }
+.rail-seg.current { background: var(--accent); box-shadow: 0 0 10px -1px color-mix(in oklab, var(--accent) 60%, transparent); }
+
+/* ===== aside / deep-dive — mark a tangent or optional deep-dive so it reads as one
+   (frontmatter `aside: true` or `aside: "label"`). A left accent rail + a corner tag;
+   tokenized so it carries the variant. ===== */
+.l-aside::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--accent); opacity: 0.85; z-index: 2; }
+.aside-tag { position: absolute; top: 1.5rem; right: var(--pad-x); z-index: 60;
+  font: 600 0.62rem/1 var(--font-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+  border: 1px solid color-mix(in oklab, var(--accent) 40%, transparent); border-radius: 999px; padding: 0.32rem 0.62rem; }
+
+/* ===== variant signature motifs ===== */
+/* atelier — gradient display titles (h1 = cover/section/end heroes) */
+:root[data-variant='atelier'] h1 {
+  background: linear-gradient(100deg, #ffffff 0%, var(--accent) 58%, oklch(from var(--accent) calc(l + 0.08) c calc(h - 26)) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+/* notebook — dashed section rules, ruled paper, highlighter callout */
+:root[data-variant='notebook'] h2 { border-bottom: 2px dashed color-mix(in oklab, var(--accent) 45%, transparent); padding-bottom: 0.16em; }
+:root[data-variant='notebook'] .callout { background: #fdf6cf; border-color: #efe4a3; border-left-color: var(--tone, #c79b1f); }
+:root[data-variant='notebook'] .callout .tahta-icon { color: var(--tone, #a97c00); }
+:root[data-variant='notebook'] .slidev-layout pre { border-style: dashed; }

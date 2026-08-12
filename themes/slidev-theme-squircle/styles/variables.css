@@ -1,0 +1,238 @@
+:root {
+  --font-stack-fallback:
+    'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+
+  /*
+   * Default: Gen Interface JP — UI typeface blending Inter with Noto Sans JP.
+   * https://gen.typesetting.jp/
+   * Switch via themeConfig.font: inter | gen-interface-jp
+   * Ellipsis (…) routing via themeConfig.ellipsisFont: cjk | latin
+   * Color palette via themeConfig.color: teal | cobalt | rose | indigo | charcoal
+   */
+  --font-family-sans: 'Gen Interface JP', var(--font-stack-fallback);
+  --font-family-display: 'Gen Interface JP Display', var(--font-family-sans);
+
+  /* Fullwidth opening punctuation pull (e.g. TOC labels starting with 「) */
+  --cjk-open-pull: 0.375em;
+
+  /*
+   * Primary palette — default: teal (reference squircle look).
+   * Overridden by themeConfig.color below.
+   */
+  --color-primary-50: oklch(0.98 0.02 185);
+  --color-primary-100: oklch(0.94 0.04 185);
+  --color-primary-200: oklch(0.88 0.06 185);
+  --color-primary-300: oklch(0.78 0.08 185);
+  --color-primary-400: oklch(0.68 0.1 185);
+  --color-primary-500: oklch(0.6 0.1 185);
+  --color-primary-600: oklch(0.56 0.1 185);
+  --color-primary-700: oklch(0.54 0.1 185);
+  --color-primary-800: oklch(0.52 0.1 185);
+  /* ≈ #108b83 — main brand / slide background */
+  --color-primary-900: oklch(0.505 0.095 185);
+  --color-primary-950: oklch(0.35 0.07 185);
+
+  --slidev-theme-primary: var(--color-primary-900);
+
+  --color-amber-50: oklch(0.987 0.022 95.277);
+  --color-amber-100: oklch(0.962 0.059 95.617);
+  --color-amber-200: oklch(0.924 0.12 95.746);
+  --color-amber-300: oklch(0.879 0.169 91.605);
+  --color-amber-400: oklch(0.828 0.189 84.429);
+  --color-amber-500: oklch(0.769 0.188 70.08);
+  --color-amber-600: oklch(0.666 0.179 58.318);
+  --color-amber-700: oklch(0.555 0.163 48.998);
+  --color-amber-800: oklch(0.473 0.137 46.201);
+  --color-amber-900: oklch(0.414 0.112 45.904);
+  --color-amber-950: oklch(0.279 0.077 45.635);
+
+  --color-neutral-50: oklch(0.985 0 0);
+  --color-neutral-100: oklch(0.97 0 0);
+  --color-neutral-200: oklch(0.922 0 0);
+  --color-neutral-300: oklch(0.87 0 0);
+  --color-neutral-400: oklch(0.708 0 0);
+  --color-neutral-500: oklch(0.556 0 0);
+  --color-neutral-600: oklch(0.439 0 0);
+  --color-neutral-700: oklch(0.371 0 0);
+  --color-neutral-800: oklch(0.269 0 0);
+  --color-neutral-900: oklch(0.205 0 0);
+  --color-neutral-950: oklch(0.145 0 0);
+
+  --color-gray-50: oklch(0.985 0.002 247.839);
+  --color-gray-100: oklch(0.967 0.003 264.542);
+  --color-gray-200: oklch(0.928 0.006 264.531);
+  --color-gray-300: oklch(0.872 0.01 258.338);
+  --color-gray-400: oklch(0.707 0.022 261.325);
+  --color-gray-500: oklch(0.551 0.027 264.364);
+  --color-gray-600: oklch(0.446 0.03 256.802);
+  --color-gray-700: oklch(0.373 0.034 259.733);
+  --color-gray-800: oklch(0.278 0.033 256.848);
+  --color-gray-900: oklch(0.21 0.034 264.665);
+  --color-gray-950: oklch(0.13 0.028 261.692);
+
+  --color-black: #000;
+  --color-white: #fff;
+
+  /*
+	 * Spacing scale — values match Tailwind's default spacing scale.
+	 * https://tailwindcss.com/docs/customizing-spacing
+	 * 1 unit = 0.25rem = 4px
+	 */
+  --size-0: 0px;
+  --size-px: 1px;
+  --size-0\.5: 0.125rem;
+  --size-1: 0.25rem;
+  --size-1\.5: 0.375rem;
+  --size-2: 0.5rem;
+  --size-2\.5: 0.625rem;
+  --size-3: 0.75rem;
+  --size-3\.5: 0.875rem;
+  --size-4: 1rem;
+  --size-5: 1.25rem;
+  --size-6: 1.5rem;
+  --size-7: 1.75rem;
+  --size-8: 2rem;
+  --size-9: 2.25rem;
+  --size-10: 2.5rem;
+  --size-11: 2.75rem;
+  --size-12: 3rem;
+  --size-14: 3.5rem;
+  --size-16: 4rem;
+  --size-20: 5rem;
+  --size-24: 6rem;
+  --size-28: 7rem;
+  --size-32: 8rem;
+  --size-36: 9rem;
+  --size-40: 10rem;
+  --size-44: 11rem;
+  --size-48: 12rem;
+  --size-52: 13rem;
+  --size-56: 14rem;
+  --size-60: 15rem;
+  --size-64: 16rem;
+  --size-72: 18rem;
+  --size-80: 20rem;
+  --size-96: 24rem;
+
+  /*
+   * Typography scale — matches Tailwind CSS font-size
+   * https://tailwindcss.com/docs/font-size
+   */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+}
+
+/* ── Color palettes (themeConfig.color) ───────────────────────────── */
+
+/* teal — default; deep emerald used in the reference slides */
+body:not([style*='--slidev-theme-color:']),
+body[style*='--slidev-theme-color: teal'] {
+  --color-primary-50: oklch(0.98 0.02 185);
+  --color-primary-100: oklch(0.94 0.04 185);
+  --color-primary-200: oklch(0.88 0.06 185);
+  --color-primary-300: oklch(0.78 0.08 185);
+  --color-primary-400: oklch(0.68 0.1 185);
+  --color-primary-500: oklch(0.6 0.1 185);
+  --color-primary-600: oklch(0.56 0.1 185);
+  --color-primary-700: oklch(0.54 0.1 185);
+  --color-primary-800: oklch(0.52 0.1 185);
+  --color-primary-900: oklch(0.505 0.095 185);
+  --color-primary-950: oklch(0.35 0.07 185);
+}
+
+/* cobalt — deep blue from the previous theme */
+body[style*='--slidev-theme-color: cobalt'] {
+  --color-primary-50: oklch(0.97 0.014 254.604);
+  --color-primary-100: oklch(0.932 0.032 255.585);
+  --color-primary-200: oklch(0.882 0.059 254.128);
+  --color-primary-300: oklch(0.809 0.105 251.813);
+  --color-primary-400: oklch(0.707 0.165 254.624);
+  --color-primary-500: oklch(0.623 0.214 259.815);
+  --color-primary-600: oklch(0.546 0.245 262.881);
+  --color-primary-700: oklch(0.488 0.243 264.376);
+  --color-primary-800: oklch(0.424 0.199 265.638);
+  --color-primary-900: oklch(0.379 0.146 265.522);
+  --color-primary-950: oklch(0.282 0.091 267.935);
+}
+
+/* rose — warm terracotta / deep coral */
+body[style*='--slidev-theme-color: rose'] {
+  --color-primary-50: oklch(0.97 0.02 25);
+  --color-primary-100: oklch(0.94 0.04 25);
+  --color-primary-200: oklch(0.88 0.07 25);
+  --color-primary-300: oklch(0.78 0.11 25);
+  --color-primary-400: oklch(0.68 0.14 25);
+  --color-primary-500: oklch(0.58 0.15 25);
+  --color-primary-600: oklch(0.52 0.14 25);
+  --color-primary-700: oklch(0.48 0.14 25);
+  --color-primary-800: oklch(0.46 0.14 25);
+  --color-primary-900: oklch(0.45 0.14 25);
+  --color-primary-950: oklch(0.3 0.09 25);
+}
+
+/* indigo — muted creative violet */
+body[style*='--slidev-theme-color: indigo'] {
+  --color-primary-50: oklch(0.97 0.02 285);
+  --color-primary-100: oklch(0.94 0.04 285);
+  --color-primary-200: oklch(0.88 0.07 285);
+  --color-primary-300: oklch(0.78 0.1 285);
+  --color-primary-400: oklch(0.68 0.13 285);
+  --color-primary-500: oklch(0.55 0.15 285);
+  --color-primary-600: oklch(0.48 0.15 285);
+  --color-primary-700: oklch(0.44 0.14 285);
+  --color-primary-800: oklch(0.42 0.13 285);
+  --color-primary-900: oklch(0.4 0.13 285);
+  --color-primary-950: oklch(0.28 0.09 285);
+}
+
+/* charcoal — formal cool gray */
+body[style*='--slidev-theme-color: charcoal'] {
+  --color-primary-50: oklch(0.97 0.005 260);
+  --color-primary-100: oklch(0.93 0.008 260);
+  --color-primary-200: oklch(0.87 0.01 260);
+  --color-primary-300: oklch(0.75 0.015 260);
+  --color-primary-400: oklch(0.6 0.018 260);
+  --color-primary-500: oklch(0.48 0.02 260);
+  --color-primary-600: oklch(0.42 0.02 260);
+  --color-primary-700: oklch(0.38 0.02 260);
+  --color-primary-800: oklch(0.36 0.02 260);
+  --color-primary-900: oklch(0.35 0.02 260);
+  --color-primary-950: oklch(0.22 0.015 260);
+}
+
+/* Gen Interface JP + CJK ellipsis (Noto Sans JP glyph) */
+body[style*='--slidev-theme-ellipsisFont: cjk']:not([style*='--slidev-theme-font: inter']) {
+  --font-family-sans: 'Squircle Ellipsis CJK', 'Gen Interface JP', var(--font-stack-fallback);
+}
+
+/* Gen Interface JP + Latin ellipsis (Inter glyph) */
+body[style*='--slidev-theme-ellipsisFont: latin']:not([style*='--slidev-theme-font: inter']) {
+  --font-family-sans: 'Squircle Ellipsis Latin', 'Gen Interface JP', var(--font-stack-fallback);
+}
+
+/* Inter font stack */
+body[style*='--slidev-theme-font: inter'] {
+  --font-family-sans: 'Inter Variable', 'Noto Sans JP Variable', var(--font-stack-fallback);
+  --font-family-display: var(--font-family-sans);
+  --cjk-open-pull: 0.28em;
+}
+
+/* Inter + CJK ellipsis */
+body[style*='--slidev-theme-font: inter'][style*='--slidev-theme-ellipsisFont: cjk'] {
+  --font-family-sans:
+    'Squircle Ellipsis CJK', 'Inter Variable', 'Noto Sans JP Variable', var(--font-stack-fallback);
+}
+
+/* Inter + Latin ellipsis */
+body[style*='--slidev-theme-font: inter'][style*='--slidev-theme-ellipsisFont: latin'] {
+  --font-family-sans:
+    'Squircle Ellipsis Latin', 'Inter Variable', 'Noto Sans JP Variable', var(--font-stack-fallback);
+}

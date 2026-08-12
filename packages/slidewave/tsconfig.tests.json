@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.core.json",
+  "compilerOptions": {
+    "composite": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "outDir": null,
+    "rootDir": null
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "vite.config.ts"]
+}

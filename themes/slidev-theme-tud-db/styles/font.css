@@ -1,0 +1,28 @@
+@font-face {
+  font-family: NotoSans;
+  src: url('../assets/fonts/NotoSans-VariableFont_wdth\,wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 100%;
+  font-display: swap;
+  font-optical-sizing: auto;
+}
+
+@font-face {
+  font-family: NotoSans;
+  src: url('../assets/fonts/NotoSans-Italic-VariableFont_wdth\,wght.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 100 900;
+  font-stretch: 100%;
+  font-display: swap;
+  font-optical-sizing: auto;
+}
+
+@font-face {
+  font-family: FiraCode;
+  src: url('../assets/fonts/FiraCode-VariableFont_wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  font-optical-sizing: auto;
+}

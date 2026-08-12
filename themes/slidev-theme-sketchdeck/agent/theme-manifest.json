@@ -1,0 +1,74 @@
+{
+  "id": "slidev-theme-sketchdeck",
+  "packageName": "@captainsafia/slidev-theme-sketchdeck",
+  "displayName": "Sketchdeck",
+  "version": "0.1.0-fastppt.1",
+  "description": "白板纸张、手绘边框和便签构成的技术草图主题。",
+  "repositoryUrl": "https://github.com/captainsafia/slidev-theme-sketchdeck",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-sketchdeck",
+    "sourceDir": "agent",
+    "version": "0.1.0-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "center",
+      "label": "Center"
+    },
+    {
+      "id": "code",
+      "label": "Code"
+    },
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "stats",
+      "label": "Stats"
+    },
+    {
+      "id": "table",
+      "label": "Table"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "whiteboard",
+      "label": "白板表达",
+      "description": "whiteboard 布局适合架构草图和工作坊共创。"
+    },
+    {
+      "id": "hand-drawn",
+      "label": "手绘组件",
+      "description": "提供便签、涂画、手绘框和强调线。"
+    }
+  ]
+}

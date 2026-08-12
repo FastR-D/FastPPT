@@ -1,0 +1,12 @@
+.frame-header {
+  position: absolute;
+  top: calc(var(--frame) + var(--pad));
+  left: calc(var(--frame) + var(--pad));
+  display: inline-flex;
+  align-items: center;
+  gap: var(--label-bar-gap);
+  color: var(--color-primary-900);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}

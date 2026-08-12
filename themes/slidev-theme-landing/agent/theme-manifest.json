@@ -1,0 +1,78 @@
+{
+  "id": "slidev-theme-landing",
+  "packageName": "slidev-theme-landing",
+  "displayName": "Landing",
+  "version": "0.0.5-fastppt.1",
+  "description": "强调品牌色、灵活内容编排与交互展示的现代演示主题。",
+  "repositoryUrl": "https://github.com/GuGuMur/slidev-theme-whu-landing",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-landing",
+    "sourceDir": "agent",
+    "version": "0.0.5-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "content-flex",
+      "label": "Flexible content"
+    },
+    {
+      "id": "content-grid",
+      "label": "Grid content"
+    },
+    {
+      "id": "my-image",
+      "label": "Image"
+    },
+    {
+      "id": "paper-summary",
+      "label": "Paper summary"
+    },
+    {
+      "id": "toc",
+      "label": "Table of contents"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "landing-palette",
+      "label": "品牌配色",
+      "description": "内置蓝绿主色、强调色与适用于校园品牌演示的视觉规范。"
+    },
+    {
+      "id": "paper-summary",
+      "label": "论文摘要布局",
+      "description": "通过摘要、详情、顶部和底部插槽组织论文解读与研究总结。"
+    },
+    {
+      "id": "citations",
+      "label": "DOI 引用",
+      "description": "支持 DOI 驱动的行内引用与自动参考文献格式化。"
+    },
+    {
+      "id": "tabs",
+      "label": "交互标签页",
+      "description": "提供与点击步骤联动的标签页组件，适合分阶段揭示内容。"
+    },
+    {
+      "id": "scroll",
+      "label": "滚动导航",
+      "description": "支持滚轮驱动的幻灯片导航，并与 Slidev 演示状态协同。"
+    },
+    {
+      "id": "uno-utilities",
+      "label": "UnoCSS 工具类",
+      "description": "提供灵活的布局、间距、颜色与响应式工具类组合。"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+name: Publish npm packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      npm_tag:
+        description: npm distribution tag
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+  release:
+    types: [published]
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      NPM_TAG: ${{ inputs.npm_tag || 'latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+          scope: '@fastppt'
+      - name: Install trusted-publishing compatible npm
+        run: npm install --global npm@11.5.1
+      - run: pnpm install --frozen-lockfile
+      - name: Verify publishable packages
+        run: |
+          pnpm --filter @fastppt/slidewave typecheck
+          pnpm --filter @fastppt/slidewave lint
+          pnpm --filter @fastppt/slidewave test
+          pnpm --filter @fastppt/cli typecheck
+          pnpm --filter @fastppt/cli lint
+          pnpm --filter @fastppt/cli test
+      - name: Pack packages
+        run: |
+          mkdir -p "$RUNNER_TEMP/npm-packages"
+          pnpm --dir packages/slidewave pack --out "$RUNNER_TEMP/npm-packages/fastppt-slidewave.tgz"
+          pnpm --dir apps/cli pack --out "$RUNNER_TEMP/npm-packages/fastppt-cli.tgz"
+      - name: Publish packages
+        run: |
+          publish_if_missing() {
+            package_name="$1"
+            package_dir="$2"
+            archive="$3"
+            package_version="$(node -p "require('./${package_dir}/package.json').version")"
+
+            if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+              echo "${package_name}@${package_version} already exists; skipping"
+              return
+            fi
+
+            npm publish "$archive" --access public --provenance --tag "$NPM_TAG"
+          }
+
+          publish_if_missing \
+            '@fastppt/slidewave' \
+            'packages/slidewave' \
+            "$RUNNER_TEMP/npm-packages/fastppt-slidewave.tgz"
+          publish_if_missing \
+            '@fastppt/cli' \
+            'apps/cli' \
+            "$RUNNER_TEMP/npm-packages/fastppt-cli.tgz"

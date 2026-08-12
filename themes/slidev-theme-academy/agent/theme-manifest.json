@@ -1,0 +1,116 @@
+{
+  "id": "slidev-theme-academy",
+  "packageName": "slidev-theme-academy",
+  "displayName": "Academy",
+  "version": "0.1.22-fastppt.2",
+  "description": "面向学术汇报、论文解读与正式会议演讲的严谨型主题。",
+  "repositoryUrl": "https://github.com/luocfprime/slidev-theme-ustc",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-academy",
+    "sourceDir": "agent",
+    "version": "0.1.22-fastppt.2"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "content",
+      "label": "Content"
+    },
+    {
+      "id": "split",
+      "label": "Split"
+    },
+    {
+      "id": "toc",
+      "label": "Table of contents"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "backup",
+      "label": "Backup"
+    },
+    {
+      "id": "blank",
+      "label": "Blank"
+    },
+    {
+      "id": "academic-figure",
+      "label": "Academic figure",
+      "description": "Figure-led academic explanation inspired by slidev-theme-academic."
+    },
+    {
+      "id": "scholarly-result",
+      "label": "Scholarly result",
+      "description": "Claim, evidence, and implication framing inspired by slidev-theme-scholarly."
+    },
+    {
+      "id": "frankfurt-agenda",
+      "label": "Frankfurt agenda",
+      "description": "Beamer-like active-section agenda inspired by slidev-theme-frankfurt."
+    },
+    {
+      "id": "cobalt-cards",
+      "label": "Cobalt cards",
+      "description": "Structured card grid inspired by slidev-theme-cobalt."
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "academic-cover",
+      "label": "学术封面",
+      "description": "支持作者、机构、会议、日期、报告人标记及学校标识的结构化封面。"
+    },
+    {
+      "id": "section-progress",
+      "label": "章节进度",
+      "description": "提供完整、精简和仅标签模式的章节导航与进度展示。"
+    },
+    {
+      "id": "citations",
+      "label": "页内引用",
+      "description": "适合学术材料的逐页脚注、引用编号与来源标注。"
+    },
+    {
+      "id": "figures",
+      "label": "图表编排",
+      "description": "包含图片编号、标题、缩放查看和多种科研图像布局。"
+    },
+    {
+      "id": "tables",
+      "label": "学术表格",
+      "description": "提供可编号、可说明且适配紧凑内容密度的表格样式。"
+    },
+    {
+      "id": "typst",
+      "label": "Typst 公式",
+      "description": "支持 Typst 内容编译与适合论文公式的展示样式。"
+    },
+    {
+      "id": "plotly",
+      "label": "Plotly 图表",
+      "description": "支持交互式 Plotly 可视化并兼顾预览与导出工作流。"
+    },
+    {
+      "id": "merged-academic-patterns",
+      "label": "融合学术版式",
+      "description": "吸纳 Academic、Scholarly、Frankfurt 与 Cobalt 的图文、结论、议程和卡片表达，并统一为 Academy 视觉语言。"
+    }
+  ]
+}

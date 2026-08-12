@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@slidev/client": ["./types/slidev-runtime.d.ts"],
+      "@slidev/types": ["./types/slidev-runtime.d.ts"]
+    },
+    "types": ["node", "vite/client"]
+  },
+  "include": [
+    "components/**/*.vue",
+    "layouts/**/*.vue",
+    "setup/**/*.ts",
+    "styles/**/*.ts",
+    "utils/**/*.ts",
+    "global-top.vue",
+    "env.d.ts",
+    "types/**/*.d.ts"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.strict.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "outDir": ".tsbuild/server",
+    "rootDir": "src"
+  },
+  "references": [
+    { "path": "./tsconfig.contracts.json" },
+    { "path": "./tsconfig.core.json" }
+  ],
+  "include": [
+    "src/server/**/*.ts",
+    "src/slidev/font-family.ts",
+    "src/slidev/render-svg.ts",
+    "src/slidev/render-types.ts",
+    "src/slidev/render.ts",
+    "src/snapshot-types.ts",
+    "src/types.ts"
+  ]
+}

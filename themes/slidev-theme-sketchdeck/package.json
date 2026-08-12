@@ -1,0 +1,63 @@
+{
+  "name": "@captainsafia/slidev-theme-sketchdeck",
+  "version": "0.1.0-fastppt.1",
+  "private": true,
+  "description": "A whimsical-but-technical Slidev theme: whiteboard paper, hand-drawn borders, Excalidraw-flavoured accents.",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "excalidraw",
+    "tldraw",
+    "handwritten",
+    "whiteboard"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/captainsafia/slidev-theme-sketchdeck.git"
+  },
+  "homepage": "https://github.com/captainsafia/slidev-theme-sketchdeck#readme",
+  "bugs": "https://github.com/captainsafia/slidev-theme-sketchdeck/issues",
+  "type": "module",
+  "dependencies": {
+    "@slidev/types": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "slidev": ">=0.48.0"
+  },
+  "slidev": {
+    "colorSchema": "light",
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1920,
+      "transition": "fade-out",
+      "highlighter": "shiki",
+      "fonts": {
+        "sans": "Shantell Sans",
+        "serif": "Shantell Sans",
+        "mono": "JetBrains Mono",
+        "handwriting": "Caveat"
+      }
+    }
+  },
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "setup",
+    "*.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@slidev/cli": "^52.0.0"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "dev": "slidev example.md --open",
+    "build": "node ../../scripts/theme-build.mjs .",
+    "export": "slidev export example.md"
+  }
+}

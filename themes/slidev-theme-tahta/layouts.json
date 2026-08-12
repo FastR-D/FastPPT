@@ -1,0 +1,284 @@
+{
+  "$comment": "Machine-readable layout + component contract for slidev-theme-tahta. Source of truth — AGENTS.md is generated from this (npm run docs). Consumed via slidev-theme-tahta/layouts.json.",
+  "themeConfig": {
+    "description": "Deck-level config set in the first slide's headmatter under themeConfig.",
+    "fields": [
+      { "name": "variant", "type": "enum", "required": true, "enum": ["editorial", "brutalist", "soft", "minimal", "paper", "atelier", "notebook"], "description": "Choose one deliberately to fit the talk's tone/audience (see the Variants table's 'best for'). Don't omit it to coast on a default." },
+      { "name": "accent", "type": "string", "required": false, "description": "Override the brand accent (any CSS color). NOT reproduced exactly — only the HUE is honored; lightness/saturation adapt to the variant's envelope so the color stays legible and on-style instead of clashing. So a brand color won't render as its literal hex, but its hue carries through the whole palette (tints, shades, chart series, on-accent text)." },
+      { "name": "lang", "type": "string", "required": false, "description": "BCP-47 language tag, e.g. 'tr'. Drives correct locale casing on uppercase kickers (Turkish i→İ)." },
+      { "name": "logo", "type": "string", "required": false, "description": "Brand logo (path/URL). Renders prominently on openers (cover/section/lead/end) and as a small footer mark on content slides (opt out per slide with `mark: false`). Supply a logo that reads on the variant's scheme. Inert if unset." },
+      { "name": "logoInvert", "type": "boolean", "required": false, "description": "Invert the logo (for a monochrome mark whose color is wrong for the variant's scheme — e.g. a black mark on a dark variant). Don't use on a full-color logo." }
+    ]
+  },
+  "universal": {
+    "description": "Per-slide frontmatter available on every layout.",
+    "fields": [
+      { "name": "bg", "type": "enum", "required": false, "enum": ["mesh", "aurora", "grain", "dots", "grid"], "description": "Slide background. A generated (asset-free, accent-derived) background — mesh | aurora | grain | dots | grid — or an image path/URL, which is painted under an automatic contrast scrim. Opt-in; omit for the variant's default." },
+      { "name": "ghost", "type": "string", "required": false, "description": "Giant faint background glyph (on default/section/stats/steps/fact)." },
+      { "name": "glow", "type": "boolean", "required": false, "description": "Force the accent glow on (topic slides) or off (cover/section/statement)." },
+      { "name": "foot", "type": "string", "required": false, "description": "Override the auto footer label for this slide." },
+      { "name": "aside", "type": "boolean|string", "required": false, "description": "Mark a slide as a tangent / optional deep-dive ('under the hood', an internals detour). Adds a left accent rail + a small corner tag, so the audience reads it as a side-thread, not the main spine. `aside: true` tags it 'deep dive'; `aside: \"label\"` sets the tag text. Use on topic/content slides." }
+    ]
+  },
+  "rules": [
+    "Pick the layout that matches the content shape; fill its frontmatter fields. Do not write CSS, grids, or layout HTML.",
+    "One idea per slide.",
+    "Titles/subtitles may contain <span class=\"accent2\">highlight</span> (accent color) or <em>highlight</em> (italic accent — the editorial emphasis). Nothing else needs HTML.",
+    "For varied, designed decks vary the composition: open with lead, punctuate with bigtype, and use metric/agenda/define/columns/panels/reference/vs for teaching content — not every slide as a centered title+body.",
+    "Choose a variant deliberately. themeConfig.variant is required — pick the one whose 'best for' fits the talk's tone, audience, and medium (see the Variants table); never omit it to coast on a default. When you hand back the deck, tell the user which variant you chose and why, and that they can switch it — the visual direction is a shared decision.",
+    "Layouts are your default — the design is built in, so reach for the one that matches the content shape (definition→define, comparison→vs, numbers→stats, process→steps). But don't force every slide into a preset: default/two-cols bodies (and the space under a statement) are a canvas — compose components there (<Callout>, <Stat>, <Plot>, <Terminal>, <Kbd>, <Figure>, <Meter>, <Tags>, …) to enrich a slide, and reach for them whenever no layout cleanly fits. A deck that mixes designed layouts with a few composed slides reads richer than one that only fills templates.",
+    "Use components liberally AND with variety — they are the main source of richness and make each deck feel bespoke rather than templated. Map content to the component it invites: a number→<Stat>/<Meter>, a status→<Badge>, a stack/skill list→<Tags>, a person→<Person>, a command/artifact→<Terminal>/<Plot>/<Kbd>, an aside→<Callout>. Aim for a component on most content slides, and reach for several different ones across the deck — leaning on a single type (e.g. only <Callout>) still reads templated. A deck where nearly every slide carries a fitting component reads custom; one that only fills layout fields reads generic.",
+    "Fence every slide's frontmatter with --- above and below it (--- / layout: … / ---); the separator between two slides is just the first slide's closing --- followed by the next slide's opening ---. Most tahta slides are body-less (cover, section, statement, stats, define, steps, panels, vs, metric, end…), so between two of them you'll see the closing --- then the next opening --- — two --- lines, and that is correct. Two mistakes break a deck: (a) sharing ONE --- between two frontmatter blocks — bare layout:/title: keys right after a --- with no opening fence — which makes Slidev render those keys as body text and mis-parse the rest; (b) on a slide that HAS a markdown body, a stray --- after the body before the next slide's frontmatter ---, which doubles up into a blank slide. lint_deck / `npx tahta-lint` catch both.",
+    "The opening --- block is both the deck headmatter and the first slide's frontmatter — don't set the same key twice in it. A deck-level title plus the first slide's title collide (duplicate YAML key) and break slidev export; let the cover's title stand as the deck title, or start with a headmatter-only block and put the cover next.",
+    "Before finishing, validate the deck: run `npx tahta-lint slides.md` (ships with the theme) and fix what it reports — it catches empty slides, unclosed frontmatter, missing required fields, and bad enum values.",
+    "class: dropcap on a default slide sets a drop cap on the first paragraph.",
+    "Footer label auto-fills from the deck title (override per slide with foot:). Never add page numbers.",
+    "Keep numeric values bare; put the symbol in unit (value: 80, unit: \"%\").",
+    "For cover/section/statement/end/fact, the title comes from frontmatter — leave the slide body empty.",
+    "Inside { ... } flow rows, quote any value containing a comma or colon (before: \"$4,200\").",
+    "ghost: (on default/section/stats/steps/fact) prints a faint giant background glyph.",
+    "Entrance motion is automatic, themeable per variant, and disabled in print + reduced-motion.",
+    "Keep slides scannable, not prose: at most ~6 short bullets, written as phrases not sentences. If the idea is a structure or a flow (architecture, a pipeline, a data structure, who-calls-whom), reach for the `diagram` layout (themed Mermaid) instead of describing it in bullets; numbers→`stats`/`metric`, comparisons→`vs`/`compare`. lint_deck warns on dense slides (too many or too-long bullets, the same layout 3× in a row, an empty diagram).",
+    "Reveal step-by-step for teaching: wrap body items in `<v-clicks>…</v-clicks>` (each child appears on a click) or put `v-click` on one element — great for building a list, or showing a diagram then its explanation. The renderer exports one frame per click-step, so the build-up survives in tela's preview/export and in PDF. Use it for pacing a teaching moment, not on every slide. For code you're genuinely walking through line by line, `code-explain` can sync a click-stepped line highlight (`{1|2|3}`) with its matching note — no manual v-click. But don't reach for it by reflex: a code slide that's just a reference should stay static.",
+    "Add speaker notes as an HTML comment that is the LAST block of a slide's markdown body: `<!-- what you'll say out loud -->`. It never renders on the slide; tela surfaces it as the presenter note. Author notes for any talk you'll actually present — the deck is the slides plus what you say.",
+    "Mark tangents with `aside: true` (or `aside: \"label\"`): an optional deep-dive / 'under the hood' detour gets a left accent rail + a corner tag so the audience knows it's off the main spine. Use it for the curiosity slides, not the core argument.",
+    "Math: write `$inline$` and `$$block$$` LaTeX in a slide BODY (default/statement/two-cols/columns markdown) — Slidev renders it with KaTeX in the variant's type. Frontmatter title/field text is injected as HTML and does NOT run KaTeX, with one exception: the `define` layout renders math in its `definition`/`points`. So for a 'term = formula' slide use `define`; for heavier math, put it in a body.",
+    "Sections give you wayfinding for free: when a deck has `layout: section` dividers, a thin progress rail at the top edge shows the audience which part they're in. Group a longer talk into 3–6 sections so the rail (and the deck) reads as a structured arc."
+  ],
+  "layouts": [
+    { "id": "cover", "useFor": "Title / opening slide.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": true, "description": "HTML allowed (accent2 span)." },
+      { "name": "subtitle", "type": "string", "required": false } ],
+      "example": "layout: cover\nkicker: Team · 2026\ntitle: Shipping Faster\nsubtitle: How we cut <span class=\"accent2\">p95 80%</span>" },
+    { "id": "section", "useFor": "Part / chapter divider.", "fields": [
+      { "name": "index", "type": "string", "required": false, "description": "Big faint background glyph + small accent label." },
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": true },
+      { "name": "subtitle", "type": "string", "required": false } ],
+      "example": "layout: section\nindex: \"02\"\nkicker: Part two\ntitle: The migration" },
+    { "id": "default", "useFor": "General content; body is markdown (bullets, prose). Auto fit-to-frame. A canvas — compose components in the body for richer slides.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "ghost", "type": "string", "required": false } ],
+      "example": "layout: default\nkicker: The problem\ntitle: Slow far from <span class=\"accent2\">us-east-1</span>\n---\n\n- Average round trip was 220ms\n- p95 hit 480ms" },
+    { "id": "statement", "useFor": "One big centered takeaway.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": true } ],
+      "example": "layout: statement\nkicker: The setup\ntitle: Your dashboard says 42ms. Your angriest user waited 1.9s." },
+    { "id": "quote", "useFor": "Testimonial / pull quote.", "fields": [
+      { "name": "quote", "type": "string", "required": true },
+      { "name": "author", "type": "string", "required": false } ],
+      "example": "layout: quote\nquote: It just feels instant now.\nauthor: A beta user" },
+    { "id": "stats", "useFor": "2–4 hero numbers.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "ghost", "type": "string", "required": false },
+      { "name": "columns", "type": "number", "required": false },
+      { "name": "stats", "type": "array", "required": true, "items": { "value": "string|number", "unit": "string?", "label": "string?", "icon": "string? (lucide:*)", "tone": "enum? good|warn|bad|info" } } ],
+      "example": "layout: stats\nkicker: The numbers\ntitle: What changed\nstats:\n  - { value: 80, unit: \"%\", label: lower p95, icon: \"lucide:trending-down\", tone: good }\n  - { value: 0, label: downtime, tone: good }" },
+    { "id": "fact", "useFor": "One giant figure.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "value", "type": "string|number", "required": true },
+      { "name": "unit", "type": "string", "required": false },
+      { "name": "label", "type": "string", "required": false } ],
+      "example": "layout: fact\nkicker: The takeaway\nvalue: \"80\"\nunit: \"%\"\nlabel: lower p95 worldwide" },
+    { "id": "compare", "useFor": "Before/after table.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "columns", "type": "array", "required": false, "description": "Header labels; default [Metric, Before, After, Δ]." },
+      { "name": "rows", "type": "array", "required": true, "items": { "metric": "string", "before": "string", "after": "string", "delta": "string?" } } ],
+      "example": "layout: compare\nkicker: Before vs after\ntitle: Every metric moved\nrows:\n  - { metric: p95, before: 480ms, after: 95ms, delta: −80% }" },
+    { "id": "chart", "useFor": "Data visualization (ECharts).", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "note", "type": "string", "required": false },
+      { "name": "chart", "type": "object", "required": true, "props": { "type": "enum bar|line|area|donut (default bar)", "unit": "string?", "categories": "array", "series": "array of { name?, data[] }", "horizontal": "boolean? (bar)", "height": "string?" } } ],
+      "example": "layout: chart\nkicker: Before vs after\ntitle: Latency, drawn\nchart:\n  type: area\n  unit: ms\n  categories: [p50, p95, cold start]\n  series:\n    - { name: Before, data: [120, 480, 900] }\n    - { name: After, data: [38, 95, 12] }" },
+    { "id": "steps", "useFor": "A process / pipeline.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "ghost", "type": "string", "required": false },
+      { "name": "steps", "type": "array", "required": true, "items": { "title": "string", "desc": "string?", "icon": "string? (lucide:*)" } } ],
+      "example": "layout: steps\nkicker: The migration\ntitle: Incremental, zero downtime\nsteps:\n  - { title: Extract, desc: pull handlers out, icon: \"lucide:scissors\" }" },
+    { "id": "feature", "useFor": "Icon + title + blurb cells.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "columns", "type": "number", "required": false },
+      { "name": "features", "type": "array", "required": true, "items": { "icon": "string? (lucide:*)", "title": "string", "desc": "string?" } } ],
+      "example": "layout: feature\nkicker: Why it works\ntitle: Three reasons\nfeatures:\n  - { icon: \"lucide:zap\", title: Fast, desc: Edge in 300+ locations }" },
+    { "id": "timeline", "useFor": "A horizontal dated sequence.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "events", "type": "array", "required": true, "items": { "date": "string", "title": "string", "desc": "string?" } } ],
+      "example": "layout: timeline\nkicker: Roadmap\ntitle: Next quarters\nevents:\n  - { date: Q3, title: Alerts, desc: anomaly detection }" },
+    { "id": "logos", "useFor": "A trust / logo wall.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "columns", "type": "number", "required": false },
+      { "name": "logos", "type": "array", "required": true, "items": { "icon": "string? (lucide:*)", "text": "string" } } ],
+      "example": "layout: logos\nkicker: Trusted by\ntitle: Teams on the edge\nlogos:\n  - { icon: \"lucide:cloud\", text: Northwind }" },
+    { "id": "code", "useFor": "Code, optionally Magic Move. Body is a fenced code block.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false } ],
+      "example": "layout: code\nkicker: How it works\ntitle: Cache, then render\n---\n\n````md magic-move\n```js\nconst x = await get(url)\n```\n```js\nconst x = await cache.match(url) ?? get(url)\n```\n````" },
+    { "id": "two-cols", "useFor": "Generic split; left = body, right = after ::right::. Each column is a canvas — compose components in either.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false } ],
+      "example": "layout: two-cols\ntitle: Before vs after\n---\n\n**Before** — one region.\n\n::right::\n\n**After** — 18 regions." },
+    { "id": "image", "useFor": "Text + a side image (markdown body is the text column).", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "image", "type": "string", "required": true, "description": "Path in the deck's public/ folder, e.g. /shot.png." },
+      { "name": "side", "type": "enum", "required": false, "enum": ["left", "right"] } ],
+      "example": "layout: image\nside: right\nimage: /shot.png\ntitle: The product\n---\n\n- A media column plus a text column" },
+    { "id": "showcase", "useFor": "Asymmetric image hero (fixed 43/57; deterministic).", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "subtitle", "type": "string", "required": false },
+      { "name": "image", "type": "string", "required": true },
+      { "name": "side", "type": "enum", "required": false, "enum": ["left", "right"] } ],
+      "example": "layout: showcase\nside: right\nimage: /shot.png\nkicker: The product\ntitle: Finally <span class=\"accent2\">visible</span>\nsubtitle: One line of config." },
+    { "id": "bleed", "useFor": "Full-bleed image hero with overlaid text.", "fields": [
+      { "name": "image", "type": "string", "required": true },
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "stat", "type": "string", "required": false, "description": "A giant overlaid figure." },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "subtitle", "type": "string", "required": false },
+      { "name": "duotone", "type": "boolean", "required": false, "description": "Grayscale + accent duotone the image (default true)." } ],
+      "example": "layout: bleed\nimage: /cover.jpg\nduotone: true\nkicker: Results\nstat: \"−80%\"\ntitle: p95 latency, worldwide" },
+    { "id": "embed", "useFor": "Video or iframe.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "video", "type": "string", "required": false, "description": "mp4 URL/path." },
+      { "name": "iframe", "type": "string", "required": false, "description": "Embed URL (https)." } ],
+      "example": "layout: embed\ntitle: Demo\nvideo: /demo.mp4" },
+    { "id": "end", "useFor": "Closing slide.", "fields": [
+      { "name": "title", "type": "string", "required": false },
+      { "name": "subtitle", "type": "string", "required": false },
+      { "name": "contact", "type": "string", "required": false } ],
+      "example": "layout: end\ntitle: Thanks\nsubtitle: Questions welcome\ncontact: team@example.com" },
+
+    { "id": "lead", "useFor": "Asymmetric opener — title anchored low-left, big negative space. A dramatic alternative to cover.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": true, "description": "HTML allowed: <em>word</em> = italic accent emphasis; <span class=\"accent2\">word</span> = accent color." },
+      { "name": "subtitle", "type": "string", "required": false },
+      { "name": "index", "type": "string", "required": false, "description": "Big faint ghost glyph in the negative space." } ],
+      "example": "layout: lead\nindex: \"01\"\nkicker: SREcon · 2026\ntitle: The tail that <em>wags</em> the service." },
+    { "id": "bigtype", "useFor": "Full-bleed type — one phrase fills the slide. A punctuation/transition moment; auto-fits to the frame.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": true, "description": "HTML allowed (em / accent2)." },
+      { "name": "subtitle", "type": "string", "required": false } ],
+      "example": "layout: bigtype\nkicker: The takeaway\ntitle: Optimize the number your <em>worst</em> customer feels." },
+    { "id": "metric", "useFor": "Asymmetric single metric — giant number on one side, context on the other (vs the centered `fact`).", "fields": [
+      { "name": "value", "type": "string", "required": true, "description": "Keep the number bare; put the symbol in unit." },
+      { "name": "unit", "type": "string", "required": false },
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "label", "type": "string", "required": false, "description": "Context line; HTML allowed." },
+      { "name": "ghost", "type": "string", "required": false } ],
+      "example": "layout: metric\nkicker: The arithmetic of scale\nvalue: \"63\"\nunit: \"%\"\nlabel: of renders hit at least <em>one</em> p99 call." },
+    { "id": "agenda", "useFor": "Numbered module overview / table of contents.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "items", "type": "array", "required": true, "items": { "topic": "string", "desc": "string" } } ],
+      "example": "layout: agenda\ntitle: What we'll cover\nitems:\n  - { topic: Getting started, desc: \"install, first run, the loop\" }\n  - { topic: Core tools, desc: \"files, search, bash\" }" },
+    { "id": "define", "useFor": "Term + definition (\"What is X?\").", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "term", "type": "string", "required": true },
+      { "name": "definition", "type": "string", "required": false, "description": "HTML allowed (accent2 span)." },
+      { "name": "points", "type": "array", "required": false, "description": "Supporting bullets (string array)." } ],
+      "example": "layout: define\nkicker: The basics\nterm: What is Claude Code?\ndefinition: An <span class=\"accent2\">agentic coding assistant</span> in your terminal." },
+    { "id": "columns", "useFor": "2–3 headed columns side by side (compare / parallel lists).", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "columns", "type": "array", "required": true, "items": { "title": "string", "items": "string[] (bullets)", "body": "string (html, alt to items)" } } ],
+      "example": "layout: columns\ntitle: One tool, many surfaces\ncolumns:\n  - { title: \"It can…\", items: [\"Read & edit files\", \"Run shell & tests\"] }\n  - { title: \"Available on…\", items: [\"Terminal\", \"VS Code\", \"Web\"] }" },
+    { "id": "panels", "useFor": "2–4 carded sub-topics in a grid.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "panels", "type": "array", "required": true, "items": { "title": "string", "icon": "string (lucide:*)", "items": "string[]", "body": "string (html, alt to items)" } } ],
+      "example": "layout: panels\ntitle: Keep the window healthy\npanels:\n  - { icon: \"lucide:gauge\", title: Watch usage, items: [\"shows % used\"] }\n  - { icon: \"lucide:archive\", title: When it fills, items: [\"auto-compaction\"] }" },
+    { "id": "reference", "useFor": "Cheatsheet — term → description pairs, optionally grouped. For commands, flags, config keys, shortcuts.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "groups", "type": "array", "required": false, "items": { "title": "string", "items": "[{ term, desc }]" }, "description": "Grouped sections. Use groups OR items." },
+      { "name": "items", "type": "array", "required": false, "items": { "term": "string", "desc": "string" }, "description": "Flat list (no grouping)." } ],
+      "example": "layout: reference\ntitle: Slash commands\ngroups:\n  - { title: Essentials, items: [{ term: \"/help\", desc: list commands }, { term: \"/clear\", desc: reset }] }" },
+    { "id": "vs", "useFor": "A-vs-B comparison — two panels with a centered divider.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "left", "type": "object", "required": true, "props": { "title": "string", "items": "string[]" } },
+      { "name": "right", "type": "object", "required": true, "props": { "title": "string", "items": "string[]" } },
+      { "name": "label", "type": "string", "required": false, "description": "Divider label (default \"vs\")." } ],
+      "example": "layout: vs\ntitle: Two ways Claude remembers\nleft: { title: CLAUDE.md, items: [\"You write it\", \"Versioned in git\"] }\nright: { title: Auto memory, items: [\"Claude writes it\", \"Across sessions\"] }" },
+    { "id": "code-explain", "useFor": "Code (in the slide body) + a numbered explanation beside it. Two modes — pick by intent, don't default to either: (1) STATIC — the code stands and every note shows at once; right for a reference, a config, or a short snippet you just point at. (2) STEPPED — only when you're genuinely WALKING the audience through code line by line (a query plan, a gnarly algorithm): give the fenced code a click-stepped line highlight (```sql {1|2|3}``` — pipes = one step per click) and one `note` per step; on each click the highlighted line + its matching note light up while the rest dim (clicks come from the code fence, so it steps in Present/export/PDF). Don't force stepping on a code slide that's just there to be read — reach for it only when the line-by-line walk is the actual point.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "notes", "type": "array", "required": true, "description": "Notes shown beside the code (string array; HTML allowed). STATIC slide → they all show together. STEPPED slide (the fence has `{a|b|c}`) → one note per step, in step order, each lighting up with its line." } ],
+      "example": "layout: code-explain\nkicker: The handler\ntitle: One function, three responsibilities\nnotes:\n  - \"<strong>Auth</strong> — reject before any work.\"\n  - \"<strong>Validate</strong> — fail fast on bad input.\"\n  - \"<strong>Persist</strong> — the actual write.\"\n---\n\n```ts\nasync function handle(req) {\n  const user = await auth(req)        // auth\n  const data = validate(req.body)     // validate\n  return db.orders.insert(user, data) // persist\n}\n```" },
+    { "id": "diagram", "useFor": "A framed stage for a VISUAL — a Mermaid diagram (flowchart, sequence, ER, state, class, gantt), a <Figure>, or composed diagram markup in the slide body. Reach for it whenever the idea is a structure or flow (architecture, a pipeline, a data structure, who-calls-whom) — a drawn diagram beats bullets describing one. The Mermaid SVG is themed from the variant's tokens, so it reskins with the deck.", "fields": [
+      { "name": "kicker", "type": "string", "required": false },
+      { "name": "title", "type": "string", "required": false },
+      { "name": "note", "type": "string", "required": false, "description": "Caption under the diagram; HTML allowed." },
+      { "name": "highlight", "type": "array", "required": false, "description": "FLOWCHART only — a list of node ids to accent (the answer path / the subset that matters); everything else dims. Makes the point of the diagram pop instead of every node looking equal. Use the node ids from your mermaid (e.g. `flowchart TD\\n Root --> M` → `highlight: [Root, M]`); keep ids underscore-free. Edges between two highlighted nodes are accented too." },
+      { "name": "build", "type": "boolean", "required": false, "description": "Opt-in: cascade the diagram's pieces in on entry (ordered top→down — chronological for a sequence, roughly the flow for a TD flowchart) so the audience watches it assemble. Use only when the build-up itself teaches (a sequence playing out, a pipeline forming) — not on every diagram; a reference diagram should just appear. Auto-timed, not click-paced; static in print/export and under reduced-motion. Composes with `highlight` (it builds, then the accent path stays lit)." } ],
+      "example": "layout: diagram\nkicker: The race\ntitle: Two transactions, one seat\nbuild: true\nnote: Without isolation, both reads see <strong>1</strong> — and both writes win.\n---\n\n```mermaid\nsequenceDiagram\n  participant A as Buyer A\n  participant DB\n  participant B as Buyer B\n  A->>DB: SELECT seats → 1\n  B->>DB: SELECT seats → 1\n  A->>DB: UPDATE seats = 0\n  B->>DB: UPDATE seats = 0\n  Note over DB: 2 bookings, 1 seat\n```" }
+  ],
+  "components": [
+    { "name": "Stat", "useFor": "Big number + label (in default/statement bodies).", "props": [
+      { "name": "value", "type": "string|number", "required": true },
+      { "name": "unit", "type": "string" }, { "name": "label", "type": "string" },
+      { "name": "size", "type": "enum sm|md|lg|xl", "default": "xl" },
+      { "name": "icon", "type": "string (lucide:*)" }, { "name": "tone", "type": "enum good|warn|bad|info" },
+      { "name": "accent", "type": "boolean", "default": "true" } ],
+      "example": "<Stat value=\"80\" unit=\"%\" label=\"lower p95\" tone=\"good\" icon=\"lucide:trending-down\" />" },
+    { "name": "StatCard", "useFor": "Stat in a card.", "props": [ { "name": "(same as Stat)", "type": "—", "default": "size=md, accent=false" } ],
+      "example": "<StatCard value=\"38\" unit=\"ms\" label=\"p95 (after)\" accent />" },
+    { "name": "Plot", "useFor": "ECharts chart (alias: BarChart). Used by the chart layout.", "props": [
+      { "name": "type", "type": "enum bar|line|area|donut", "default": "bar" },
+      { "name": "categories", "type": "array" }, { "name": "series", "type": "array" },
+      { "name": "unit", "type": "string" }, { "name": "height", "type": "string" }, { "name": "horizontal", "type": "boolean", "default": "true" } ],
+      "example": "<Plot type=\"line\" :categories=\"['Q1','Q2','Q3']\" :series=\"[{name:'ARR',data:[40,95,180]}]\" unit=\"k\" />" },
+    { "name": "Icon", "useFor": "Lucide icon, bundled offline.", "props": [ { "name": "name", "type": "string (lucide:*)", "required": true }, { "name": "size", "type": "string", "default": "1em" } ],
+      "example": "<Icon name=\"lucide:rocket\" />" },
+    { "name": "Callout", "useFor": "Tinted aside.", "props": [ { "name": "icon", "type": "string (lucide:*)", "default": "lucide:info" }, { "name": "tone", "type": "enum good|warn|bad|info|accent", "default": "accent" } ],
+      "example": "<Callout tone=\"warn\" icon=\"lucide:triangle-alert\">Heads up: this is the one risk.</Callout>" },
+    { "name": "Badge", "useFor": "Inline status pill.", "props": [ { "name": "tone", "type": "enum good|warn|bad|info|accent", "default": "accent" } ],
+      "example": "shipped <Badge tone=\"good\">done</Badge> · <Badge tone=\"warn\">at risk</Badge>" },
+    { "name": "Reveal", "useFor": "Themeable entrance wrapper for extra body content.", "props": [ { "name": "delay", "type": "number (ms)", "default": "0" } ],
+      "example": "<Reveal :delay=\"120\">appears second</Reveal>" },
+    { "name": "Fit", "useFor": "Auto fit-to-frame: scales overflowing content down.", "props": [],
+      "example": "<Fit>long body content that should never overflow</Fit>" },
+    { "name": "Ghost", "useFor": "Giant faint background glyph.", "props": [ { "name": "text", "type": "string|number", "required": true } ],
+      "example": "<Ghost text=\"03\" />" },
+    { "name": "Kbd", "useFor": "Keycap for keyboard shortcuts.", "props": [],
+      "example": "<Kbd>⌘</Kbd><Kbd>K</Kbd> · <Kbd>Ctrl-R</Kbd>" },
+    { "name": "Terminal", "useFor": "Shell-session window (prompt + output).", "props": [
+      { "name": "lines", "type": "array", "required": true, "default": "[]" },
+      { "name": "title", "type": "string" } ],
+      "example": "<Terminal title=\"zsh\" :lines=\"[{cmd:'claude --version'},{out:'2.0.1'}]\" />" },
+    { "name": "FileTree", "useFor": "Project / config tree with guides.", "props": [
+      { "name": "items", "type": "array (nested [{name, dir?, children?}])", "required": true } ],
+      "example": "<FileTree :items=\"[{name:'src', children:[{name:'main.ts'}]}, {name:'README.md'}]\" />" },
+    { "name": "Figure", "useFor": "Image (or slotted diagram) with caption + optional credit.", "props": [
+      { "name": "src", "type": "string (path in public/)" }, { "name": "alt", "type": "string" },
+      { "name": "caption", "type": "string" }, { "name": "credit", "type": "string" } ],
+      "example": "<Figure src=\"/dashboard.png\" caption=\"The tail, finally visible\" credit=\"v2 UI\" />" },
+    { "name": "Meter", "useFor": "Labeled progress / percentage bar.", "props": [
+      { "name": "value", "type": "number|string", "required": true }, { "name": "max", "type": "number|string", "default": "100" },
+      { "name": "label", "type": "string" }, { "name": "display", "type": "string (overrides the % readout)" },
+      { "name": "tone", "type": "enum good|warn|bad|info|accent" } ],
+      "example": "<Meter value=\"72\" label=\"Migration\" /> · <Meter value=\"3\" max=\"5\" display=\"3 / 5\" tone=\"warn\" label=\"Hardening\" />" },
+    { "name": "Person", "useFor": "Avatar + name + role (bios, team, attribution). Falls back to initials with no photo.", "props": [
+      { "name": "name", "type": "string", "required": true }, { "name": "role", "type": "string" }, { "name": "photo", "type": "string (path in public/)" } ],
+      "example": "<Person name=\"Ada Lovelace\" role=\"Founder & CEO\" photo=\"/ada.jpg\" />" },
+    { "name": "Tags", "useFor": "Row of keyword chips (tech stack, topics, skills).", "props": [
+      { "name": "items", "type": "array", "required": true } ],
+      "example": "<Tags :items=\"['TypeScript', 'Vue', 'Vite', 'OKLCH']\" />" },
+    { "name": "Grid", "useFor": "Cell grid for the visuals Mermaid draws badly — memory/byte layouts, row-store vs column-store, a matrix, a small schema. `data` is a 2D array of cells (HTML allowed); `head` makes the first row a header; `highlight` accents a row/col/cell to make a point.", "props": [
+      { "name": "data", "type": "array (2D)", "required": true },
+      { "name": "head", "type": "boolean", "default": "false" },
+      { "name": "highlight", "type": "string  row:N | col:N | cell:R,C  (0-based)" } ],
+      "example": "<Grid :data=\"[['id','name','age'],['1','Ada','36'],['2','Lin','29']]\" head highlight=\"col:2\" />" }
+  ]
+}

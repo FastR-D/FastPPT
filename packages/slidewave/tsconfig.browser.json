@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.strict.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "outDir": ".tsbuild/browser",
+    "rootDir": "src"
+  },
+  "references": [
+    { "path": "./tsconfig.contracts.json" },
+    { "path": "./tsconfig.core.json" }
+  ],
+  "include": [
+    "src/browser/**/*.ts",
+    "src/slidev/capture-style.ts",
+    "src/slidev/capture.ts",
+    "src/slidev/css.ts",
+    "src/slidev/dom.ts",
+    "src/slidev/font-family.ts",
+    "src/slidev/geometry.ts",
+    "src/slidev/render-types.ts",
+    "src/slidev/slidev.ts",
+    "src/slidev/svg.ts",
+    "src/slidev/text-layout.ts",
+    "src/slidev/themes/**/*.ts",
+    "src/slidev/transform.ts",
+    "src/slidev/types.ts",
+    "src/snapshot-types.ts"
+  ]
+}

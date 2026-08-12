@@ -1,0 +1,48 @@
+{
+  "name": "@ricoapon/slidev-theme-narrative",
+  "version": "0.1.2-fastppt.1",
+  "private": true,
+  "type": "module",
+  "description": "A monochrome, one-accent, photography-forward Slidev theme.",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "monochrome",
+    "minimal",
+    "editorial"
+  ],
+  "license": "MIT",
+  "author": "Rico Apon",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricoapon/slidev-theme-narrative.git"
+  },
+  "homepage": "https://github.com/ricoapon/slidev-theme-narrative#readme",
+  "bugs": "https://github.com/ricoapon/slidev-theme-narrative/issues",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "utils"
+  ],
+  "engines": {
+    "slidev": ">=0.48.0"
+  },
+  "scripts": {
+    "build": "node ../../scripts/theme-build.mjs .",
+    "test": "node ../../scripts/theme-smoke.mjs ."
+  },
+  "slidev": {
+    "defaults": {
+      "colorSchema": "dark",
+      "aspectRatio": "16/9",
+      "themeConfig": {
+        "accent": "#3B82F6"
+      }
+    }
+  },
+  "dependencies": {
+    "@fontsource/fira-code": "^5.3.0",
+    "@fontsource/inter": "^5.3.0"
+  }
+}

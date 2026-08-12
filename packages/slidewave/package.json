@@ -1,0 +1,71 @@
+{
+  "name": "@fastppt/slidewave",
+  "version": "0.6.1-fastppt.1",
+  "description": "FastPPT-native Slidewave conversion package for editable PowerPoint generation",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./browser": "./src/browser/index.ts",
+    "./browser/runtime": "./src/browser/capture-runtime.ts",
+    "./snapshot": "./src/snapshot.ts",
+    "./server": "./src/server/index.ts",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./src/browser/capture-runtime.ts",
+    "./dist/browser/runtime.js"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "SLIDEV_EDITABLE_PPT.md",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "format": "prettier --write src test *.json *.ts *.md",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@chenglou/pretext": "catalog:",
+    "lucide": "catalog:",
+    "pptxgenjs": "catalog:",
+    "prismjs": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/prismjs": "^1.26.5",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/core.js",
+      "./browser": "./dist/browser/index.js",
+      "./browser/runtime": "./dist/browser/runtime.js",
+      "./snapshot": "./dist/snapshot.js",
+      "./server": "./dist/server/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FastR-D/FastPPT.git",
+    "directory": "packages/slidewave"
+  },
+  "homepage": "https://github.com/FastR-D/FastPPT#readme",
+  "bugs": {
+    "url": "https://github.com/FastR-D/FastPPT/issues"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,159 @@
+{
+  "id": "slidev-theme-squircle",
+  "packageName": "slidev-theme-squircle",
+  "displayName": "Squircle",
+  "version": "0.1.0-fastppt.1",
+  "description": "以圆角方形框架和可切换色板为核心的现代组件化主题。",
+  "repositoryUrl": "https://github.com/minagishl/slidev-theme-squircle",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-squircle",
+    "sourceDir": "agent",
+    "version": "0.1.0-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "agenda",
+      "label": "Agenda"
+    },
+    {
+      "id": "cards",
+      "label": "Cards"
+    },
+    {
+      "id": "closing",
+      "label": "Closing"
+    },
+    {
+      "id": "cols",
+      "label": "Cols"
+    },
+    {
+      "id": "comparison",
+      "label": "Comparison"
+    },
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "frame-panel",
+      "label": "Frame Panel"
+    },
+    {
+      "id": "image-full",
+      "label": "Image Full"
+    },
+    {
+      "id": "image-left",
+      "label": "Image Left"
+    },
+    {
+      "id": "image-right",
+      "label": "Image Right"
+    },
+    {
+      "id": "intro",
+      "label": "Intro"
+    },
+    {
+      "id": "panel",
+      "label": "Panel"
+    },
+    {
+      "id": "process-flow",
+      "label": "Process Flow"
+    },
+    {
+      "id": "profile",
+      "label": "Profile"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "section-frame",
+      "label": "Section Frame"
+    },
+    {
+      "id": "section-index-center",
+      "label": "Section Index Center"
+    },
+    {
+      "id": "section-index",
+      "label": "Section Index"
+    },
+    {
+      "id": "section-subtitle",
+      "label": "Section Subtitle"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "stats",
+      "label": "Stats"
+    },
+    {
+      "id": "steps-layout",
+      "label": "Steps Layout"
+    },
+    {
+      "id": "table",
+      "label": "Table"
+    },
+    {
+      "id": "team-border",
+      "label": "Team Border"
+    },
+    {
+      "id": "team",
+      "label": "Team"
+    },
+    {
+      "id": "timeline",
+      "label": "Timeline"
+    },
+    {
+      "id": "title-center",
+      "label": "Title Center"
+    },
+    {
+      "id": "title-sandwich",
+      "label": "Title Sandwich"
+    },
+    {
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "id": "toc",
+      "label": "Toc"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "palettes",
+      "label": "可切换色板",
+      "description": "通过 themeConfig.color 选择一致的主题色板。"
+    },
+    {
+      "id": "squircle-frames",
+      "label": "Squircle 框架",
+      "description": "提供多种面板、卡片和章节框架。"
+    },
+    {
+      "id": "structured-layouts",
+      "label": "结构化布局",
+      "description": "覆盖团队、流程、时间线、统计与比较。"
+    }
+  ]
+}

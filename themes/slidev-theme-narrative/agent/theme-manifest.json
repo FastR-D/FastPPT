@@ -1,0 +1,54 @@
+{
+  "id": "slidev-theme-narrative",
+  "packageName": "@ricoapon/slidev-theme-narrative",
+  "displayName": "Narrative",
+  "version": "0.1.2-fastppt.1",
+  "description": "单色加单一强调色、摄影优先的编辑叙事主题。",
+  "repositoryUrl": "https://github.com/ricoapon/slidev-theme-narrative",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-narrative",
+    "sourceDir": "agent",
+    "version": "0.1.2-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "center",
+      "label": "Center"
+    },
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "image-left",
+      "label": "Image Left"
+    },
+    {
+      "id": "image-right",
+      "label": "Image Right"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "photography",
+      "label": "摄影叙事",
+      "description": "以左右图像布局和克制排版构建视觉叙事。"
+    },
+    {
+      "id": "accent-token",
+      "label": "单强调色",
+      "description": "通过 themeConfig.accent 统一全篇强调色。"
+    }
+  ]
+}

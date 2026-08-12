@@ -1,0 +1,79 @@
+{
+  "id": "slidev-theme-nmt",
+  "packageName": "slidev-theme-nmt",
+  "displayName": "NMT",
+  "version": "0.9.10-fastppt.1",
+  "description": "面向教学、公告和通用技术汇报的 16:10 主题。",
+  "repositoryUrl": "https://github.com/adygcode/slidev-theme-nmt",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-nmt",
+    "sourceDir": "agent",
+    "version": "0.9.10-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "about-me",
+      "label": "About Me"
+    },
+    {
+      "id": "center",
+      "label": "Center"
+    },
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "figure-side",
+      "label": "Figure Side"
+    },
+    {
+      "id": "figure",
+      "label": "Figure"
+    },
+    {
+      "id": "grid",
+      "label": "Grid"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "two-cols-2-1",
+      "label": "Two Cols 2 1"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    }
+  ],
+  "defaultAspectRatio": "16/10",
+  "supportedFeatures": [
+    {
+      "id": "announcements",
+      "label": "公告组件",
+      "description": "Announcement 提供多种语义状态。"
+    },
+    {
+      "id": "figure-layouts",
+      "label": "图文布局",
+      "description": "提供 figure、figure-side 与多列布局。"
+    },
+    {
+      "id": "wide-aspect",
+      "label": "16:10 画布",
+      "description": "默认使用适合教学屏幕的 16:10 比例。"
+    }
+  ]
+}

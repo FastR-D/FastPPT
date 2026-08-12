@@ -1,0 +1,74 @@
+{
+  "name": "slidev-theme-tud-db",
+  "version": "0.0.4-fastppt.1",
+  "private": true,
+  "type": "module",
+  "description": "Slidev theme cloning the TU Dresden / Dresden Database Research Group PowerPoint template",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "slidev-theme",
+    "slidev"
+  ],
+  "homepage": "https://github.com/vmelisch/slidev-theme-db",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vmelisch/slidev-theme-db.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vmelisch/slidev-theme-db/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "assets",
+    "components",
+    "global-bottom.vue",
+    "layouts",
+    "scripts",
+    "markdown.ts",
+    "setup",
+    "styles",
+    "vite.config.ts",
+    "README.md"
+  ],
+  "engines": {
+    "slidev": ">=0.48.0",
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "shiki": "^4.2.0",
+    "slidev-addon-gsap": "^0.0.4"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.16.0",
+    "@slidev/parser": "^52.16.0",
+    "vue": "^3.5.38"
+  },
+  "slidev": {
+    "defaults": {
+      "addons": [
+        "gsap"
+      ],
+      "aspectRatio": "16/9",
+      "canvasWidth": 960,
+      "colorSchema": "light",
+      "mdc": true,
+      "comark": true,
+      "presenter": true,
+      "titleTemplate": "%s",
+      "transition": "slide-fade-left | slide-fade-right",
+      "fonts": {
+        "sans": "NotoSans",
+        "mono": "FiraCode",
+        "provider": null
+      }
+    }
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "build": "node ../../scripts/theme-build.mjs .",
+    "dev": "slidev examples/slides.md --remote",
+    "export": "slidev export examples/slides.md"
+  }
+}

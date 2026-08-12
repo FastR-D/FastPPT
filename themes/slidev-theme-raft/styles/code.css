@@ -1,0 +1,24 @@
+.slidev-layout code {
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 0.88em;
+}
+
+.slidev-layout :not(pre) > code {
+  background: var(--raft-white);
+  border: 1.5px solid var(--raft-ink);
+  padding: 0.05em 0.35em;
+  box-shadow: var(--raft-shadow-sm);
+}
+
+.slidev-layout .slidev-code-wrapper {
+  margin: 1rem 0;
+}
+
+.slidev-layout pre.slidev-code {
+  background: var(--raft-white) !important;
+  border: var(--raft-border);
+  border-radius: 0;
+  box-shadow: var(--raft-shadow);
+  padding: 1rem 1.2rem;
+  line-height: 1.55;
+}

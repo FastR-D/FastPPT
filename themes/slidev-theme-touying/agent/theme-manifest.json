@@ -1,0 +1,50 @@
+{
+  "id": "slidev-theme-touying",
+  "packageName": "slidev-theme-touying",
+  "displayName": "Touying",
+  "version": "0.1.10-fastppt.1",
+  "description": "受 Typst Touying 启发、适合正式报告和高校演讲的衬线主题。",
+  "repositoryUrl": "https://github.com/kermanx/slidev-theme-touying",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-touying",
+    "sourceDir": "agent",
+    "version": "0.1.10-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "focus",
+      "label": "Focus"
+    },
+    {
+      "id": "outline",
+      "label": "Outline"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "presets",
+      "label": "主题预设",
+      "description": "支持 dewdrop、university 与 simple 视觉预设。"
+    },
+    {
+      "id": "outline",
+      "label": "结构导航",
+      "description": "通过 outline 和 section 提供演讲结构感。"
+    }
+  ]
+}

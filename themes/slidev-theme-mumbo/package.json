@@ -1,0 +1,62 @@
+{
+  "name": "slidev-theme-mumbo",
+  "version": "0.1.13-fastppt.1",
+  "private": true,
+  "description": "A scrapbook-style Slidev theme with patterned backgrounds, cream chapter cards, and polaroid logo stamps.",
+  "type": "module",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "theme",
+    "scrapbook",
+    "chapter",
+    "cards"
+  ],
+  "author": "Nico Devs <hi@nicodevs.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicodevs/slidev-theme-mumbo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nicodevs/slidev-theme-mumbo/issues"
+  },
+  "homepage": "https://github.com/nicodevs/slidev-theme-mumbo#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "slidev": ">=0.48.0"
+  },
+  "files": [
+    "components",
+    "layouts",
+    "setup",
+    "styles",
+    "types.ts",
+    "example.md"
+  ],
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "build": "node ../../scripts/theme-build.mjs .",
+    "dev": "slidev example.md",
+    "export": "slidev export example.md",
+    "screenshot": "slidev export example.md --format png"
+  },
+  "dependencies": {
+    "@iconify/vue": "^4.3.0",
+    "@slidev/types": "^52.14.1"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.14.1"
+  },
+  "slidev": {
+    "colorSchema": "light",
+    "defaults": {
+      "fonts": {
+        "sans": "Sofia Sans Condensed,Sofia Sans,Boogaloo",
+        "mono": "JetBrains Mono",
+        "weights": "200,400,600,900"
+      },
+      "transition": "none"
+    }
+  }
+}

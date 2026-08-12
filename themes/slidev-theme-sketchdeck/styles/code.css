@@ -1,0 +1,33 @@
+.slidev-layout .slidev-code,
+.slidev-layout pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.45rem;
+  line-height: 1.75;
+  background: var(--slidev-code-background) !important;
+  border: 3px solid var(--sk-ink);
+  border-radius: var(--sk-wobble-a);
+  box-shadow: var(--sk-shadow-lg);
+  padding: 1.4em 1.6em;
+}
+
+/* shiki line focus, drawn as a highlighter stroke */
+.slidev-layout .slidev-code .line.highlighted,
+.slidev-layout .shiki .line.highlighted {
+  background: var(--sk-yellow-bg) !important;
+  box-shadow: -1.6em 0 0 var(--sk-yellow-bg), 1.6em 0 0 var(--sk-yellow-bg);
+}
+
+.slidev-layout .slidev-code .line.dimmed,
+.slidev-layout .shiki .line.dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.6);
+}
+
+.slidev-layout :not(pre) > code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.86em;
+  background: var(--sk-paper-shade);
+  border: 2px solid rgba(30, 30, 30, 0.18);
+  border-radius: var(--sk-wobble-b);
+  padding: 0.05em 0.4em;
+}

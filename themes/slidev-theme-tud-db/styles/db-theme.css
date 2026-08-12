@@ -1,0 +1,395 @@
+/* Dresden Database Research Group — local Slidev theme
+ * Step 1: white slide base + Noto Sans + DB color tokens.
+ * Colors extracted from DB_template.potx (theme1.xml). */
+
+:root {
+  --db-navy: #001450;
+  --db-text: #4c4d4d;
+  --db-text-soft: #171616;
+  --db-gray-light: #e7e6e6;
+
+  --db-accent1: #40b498; /* teal-green */
+  --db-accent2: #b1d285; /* light green */
+  --db-accent3: #1f8299; /* blue-teal (links) */
+  --db-accent4: #f9c611; /* yellow */
+  --db-accent5: #ea4f30; /* red-orange */
+  --db-accent6: #994781; /* purple */
+
+  --db-heading-blue: #2f57b2; /* content sub-headers */
+  --db-footer-bg: #e7e9ed;    /* bottom footer band */
+  --db-table-stripe: #dbdbdb; /* zebra-striped table rows */
+  --db-table-rule: #b9b9b9;   /* table header/footer rule lines */
+
+  /* Slidev theme variables */
+  --slidev-theme-primary: var(--db-accent3);
+}
+
+/* Base: plain white slide, near-black body text.
+ * (--db-text grey is reserved for muted bits: table footer, page number.)
+ * height:100% fills the slide (theme provides this; not inherited from
+ * @slidev/theme-default anymore). */
+.slidev-layout {
+  height: 100%;
+  background: #ffffff;
+  color: var(--db-text-soft);
+  font-family: 'NotoSans', ui-sans-serif, system-ui, sans-serif;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3 {
+  color: var(--db-navy);
+  font-weight: 700;
+}
+
+/* Inline code "pills": slimmer so they don't bloat line height in bullets.
+   (Slidev default is ~2px 6px / 0.9em.) Fenced code (pre > code) is untouched. */
+.slidev-layout.db-default :not(pre) > code {
+  padding: 1px 0;     /* no horizontal padding by default so it sits flush with text */
+  font-size: 0.85em;
+  line-height: 1;
+  background: transparent !important; /* transparent by default */
+}
+/* Opt-in faint background for inline code */
+.slidev-layout.db-default :not(pre) > code.with-bg {
+  padding: 1px 4px;   /* add horizontal padding back for the background box */
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.slidev-layout a {
+  color: var(--db-accent3);
+}
+
+/* Content slides ("Titel und Inhalt").
+ * Canvas is 720px wide (== 720pt real slide), so px values below equal PowerPoint pt. */
+.slidev-layout.db-default {
+  font-size: 13px;    /* bullet / body text = 13pt */
+  line-height: 1.15;  /* tight line spacing */
+  padding: 0;         /* we control spacing via the body wrapper + footer */
+}
+.slidev-layout.db-default h1 {
+  color: var(--db-text-soft); /* black/gray page heading */
+  font-size: 22px;            /* 22pt */
+  line-height: 1.2;
+  margin-bottom: 36px;        /* gap to first sub-header (~36pt in template) */
+}
+.slidev-layout.db-default h2,
+.slidev-layout.db-default h3 {
+  color: var(--db-heading-blue); /* blue sub-headers */
+  font-size: 15px;               /* 15pt */
+  line-height: 1.25;
+  margin-top: 24px;              /* space ABOVE a sub-header, whatever precedes it
+                                    (bullet list, code block, paragraph, …) */
+}
+/* …except a sub-header that is the FIRST content of its area (right under the
+   page title, or the top of a column / grid cell) — the title's margin-bottom
+   or the grid gap already provides that separation.
+   This is wrap-proof: a section wrapped in a <div> (e.g. a GSAP animation
+   anchor) is still treated as "top" when its wrapper is the first child, but a
+   wrapped section that FOLLOWS other content keeps the 24px gap. So adding a
+   wrapper div later does NOT collapse the spacing. (default layout: h1 is a
+   sibling of the content; two-cols-header: .db-grid__col; two-cols-grid:
+   .db-rowgrid cells.) */
+.slidev-layout.db-default :is(h1 + h2, h1 + h3),
+.slidev-layout.db-default h1 + div > :is(h2, h3):first-child,
+.slidev-layout.db-default .db-grid__col > :is(h2, h3):first-child,
+.slidev-layout.db-default .db-grid__col > div:first-child > :is(h2, h3):first-child,
+.slidev-layout.db-default .db-rowgrid > div > :is(h2, h3):first-child,
+.slidev-layout.db-default .db-rowgrid > div > div:first-child > :is(h2, h3):first-child {
+  margin-top: 0;
+}
+
+/* Lists (ul + ol share indentation/spacing): ul level1 = disc, level2 = square;
+ * ol = numbers. margin-left indents markers from the heading; padding-left is
+ * the marker→text gap. */
+.slidev-layout.db-default ul,
+.slidev-layout.db-default ol {
+  margin-left: 0.6em;   /* first-level bullet indentation (nested lists track this) */
+  padding-left: 1.1em;
+}
+.slidev-layout.db-default ul { list-style-type: disc; }
+.slidev-layout.db-default ol { list-style-type: decimal; }
+.slidev-layout.db-default ul ul,
+.slidev-layout.db-default ol ol {
+  margin-left: 0;        /* 2nd-level marker aligns with 1st-level text (no extra indent) */
+  font-size: 12px;       /* 2nd-level text a touch smaller (12pt vs 13pt) */
+}
+.slidev-layout.db-default ul ul { list-style-type: square; }
+/* Tight vertical rhythm (theme defaults to ~1.8 line-height) */
+.slidev-layout.db-default li,
+.slidev-layout.db-default p {
+  line-height: 1.25;
+}
+.slidev-layout.db-default li {
+  margin: 0.15em 0; /* slight spacing between bullets */
+}
+.slidev-layout.db-default p {
+  margin: 0.5em 0; /* tight spacing between paragraphs */
+}
+/* Inside list items Markdown wraps text in <p> when the item also contains a
+   block (e.g. a code block) -> a "loose" list. Zero those margins so such a
+   bullet is as tight as a plain one. */
+.slidev-layout.db-default li p {
+  margin: 0;
+}
+.slidev-layout.db-default li::marker {
+  color: var(--db-text-soft);
+}
+/* Shrink only the bullet glyphs (• ▪); ordered-list numbers keep text size. */
+.slidev-layout.db-default ul li::marker {
+  font-size: 0.8em;
+}
+
+/* Blockquotes -> a muted italic aside with a leading en-dash
+   (the "– …" secondary-note style). */
+.slidev-layout.db-default blockquote {
+  margin: 0.4em 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-style: italic;
+  color: var(--db-text);   /* muted grey */
+}
+.slidev-layout.db-default blockquote p {
+  margin: 0;
+}
+.slidev-layout.db-default blockquote > p:first-child::before {
+  content: '– ';
+}
+.slidev-layout.db-default blockquote code {
+  font-style: normal; /* keep inline code upright inside the italic aside */
+}
+
+/* Rhetorical-question / one-sentence-takeaway callout (<Takeaway> via ::takeaway).
+   "F1" style: a coloured left rule fitted to the text height + a small uppercase
+   eyebrow label, no fill, no symbol. The accent colour is driven by --tk-accent
+   (set inline by the component from its `color` prop), defaulting to brand blue. */
+.slidev-layout.db-default .db-takeaway {
+  margin: 0.6em 0;
+  /* em-based so the rule stays vertically balanced at any `size`. The tiny
+     top/bottom difference offsets the label cap-height vs body baseline insets. */
+  padding: 0.28em 0 0.11em 0.85em;
+  border-left: 3px solid var(--tk-accent, var(--db-heading-blue));
+}
+.slidev-layout.db-default .db-takeaway__label {
+  margin-bottom: 0.3em;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--tk-accent, var(--db-heading-blue));
+}
+.slidev-layout.db-default .db-takeaway__body {
+  font-size: 1em;
+  line-height: 1.2;
+  color: var(--db-text-soft);
+}
+.slidev-layout.db-default .db-takeaway__body p { margin: 0; }
+.slidev-layout.db-default .db-takeaway__body strong { font-weight: 700; }
+.slidev-layout.db-default .db-takeaway__body code { font-weight: 500; }
+
+/* Fenced code blocks: box only as wide as its content, not full slide width.
+   fit-content on the WRAPPER so an optional caption + the code share one width.
+   max-width keeps long lines from overflowing the slide. */
+.slidev-layout.db-default .slidev-code-wrapper {
+  width: fit-content;
+  max-width: 100%;
+}
+/* Default to transparent background for multi-line blocks, overriding Shiki */
+.slidev-layout.db-default pre.slidev-code {
+  background: transparent !important;
+}
+/* Opt-in faint background via ```lang {class:'with-bg'} */
+.slidev-layout.db-default .with-bg pre.slidev-code {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+/* Code sizing (Slidev defaults: 12px / 18px / 8px). Slightly smaller font and
+   tighter vertical padding so the box hugs the code top and bottom. */
+.slidev-layout.db-default {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.3;
+  --slidev-code-padding: 4px 10px;
+}
+
+/* Line numbers (```lang {lines:true}```): tighten the gutter. Slidev's defaults
+   are a wide 24px gap between the number and the code, plus the block's 10px
+   left padding before the number. Both are scoped to line-numbered blocks so
+   plain code blocks keep their normal padding. */
+.slidev-layout.db-default .slidev-code-line-numbers .slidev-code,
+.slidev-layout.db-default .shiki-magic-move-container.slidev-code {
+  /* override the padding *variable* (Slidev applies padding via it, which beats
+     a plain padding-left here). top right bottom left — only the left shrinks.
+     The Magic Move container isn't wrapped in .slidev-code-line-numbers, so it
+     needs the same override to keep its gutter rule aligned with plain blocks. */
+  --slidev-code-padding: 4px 10px 4px 6px;   /* less space left of the numbers (was 10px) */
+}
+.slidev-layout.db-default .slidev-code-line-numbers .slidev-code code .line::before {
+  width: 1ch;          /* was 16px — the wide right-aligned column left a big empty
+                          gap to the LEFT of single-digit numbers */
+  /* separator between numbers and code: each line's ::before carries a right
+     border; stacked, they read as one continuous vertical rule. */
+  padding-right: 10px; /* number → separator */
+  border-right: 1px solid var(--db-table-rule);
+  margin-right: 7px;   /* separator → code (was a plain 8px gap) */
+}
+
+/* Magic Move (```md magic-move```) renders line numbers as real
+   .shiki-magic-move-line-number elements (each with opacity:0.3), not the
+   ::before pseudo the plain blocks use — so the gutter rule above never reaches
+   them and the separator was missing. Re-create the same gutter: recolour the
+   numbers to match plain line-numbered blocks (gray-400, gray-600 in dark) so
+   the border can sit at full opacity instead of the dimmed 0.3. */
+.slidev-layout.db-default .shiki-magic-move-line-number {
+  opacity: 1;
+  color: rgb(156 163 175);
+  /* Mirror the plain block's ::before geometry exactly: a fixed 1ch column,
+     right-aligned, so the digit is pinned against the padding instead of
+     shrink-wrapped and left-aligned. white-space:normal drops the literal
+     trailing spaces Magic Move pads numbers with (e.g. "1  "). */
+  box-sizing: border-box;
+  width: 1ch;
+  text-align: right;
+  overflow: visible;
+  white-space: normal;
+  padding-right: 10px; /* number → separator */
+  border-right: 1px solid var(--db-table-rule);
+  margin-right: 7px;   /* separator → code */
+}
+.dark .slidev-layout.db-default .shiki-magic-move-line-number {
+  color: rgb(75 85 99);
+}
+
+/* Optional caption above a code block.
+   Authoring:  ```python [What this snippet does]  */
+.slidev-layout.db-default .slidev-code-block-title {
+  padding: 3px 10px;
+  background: transparent;        /* drop Slidev's heavy gray title bar */
+  font-size: 11px;
+  font-style: italic;
+  color: var(--db-text);
+  opacity: 0.85;
+}
+
+/* Optional table captions (need Comark, enabled by this theme).
+   ABOVE the table:  [Title]{.table-caption}     -> black, non-italic
+   BELOW the table:  [Note]{.table-footer}       -> small italic, muted */
+.slidev-layout.db-default p:has(.table-caption),
+.slidev-layout.db-default p:has(.table-footer) {
+  display: block;
+}
+.slidev-layout.db-default .table-caption,
+.slidev-layout.db-default p:has(.table-caption),
+.slidev-layout.db-default .table-footer,
+.slidev-layout.db-default p:has(.table-footer) {
+  font-size: 11px;
+  background: transparent !important;
+}
+.slidev-layout.db-default .table-caption,
+.slidev-layout.db-default .table-footer {
+  display: inline !important; /* override UnoCSS table-caption utility */
+}
+.slidev-layout.db-default .table-caption,
+.slidev-layout.db-default p:has(.table-caption) {
+  color: var(--db-text-soft);     /* black, non-italic title above */
+}
+.slidev-layout.db-default .table-footer,
+.slidev-layout.db-default p:has(.table-footer) {
+  font-style: italic;             /* muted note below */
+  color: var(--db-text);
+  opacity: 0.85;
+}
+.slidev-layout.db-default .caption-label {
+  font-weight: bold;
+  font-style: normal;
+}
+/* sit tight against the table */
+.slidev-layout.db-default p:has(.table-caption) {
+  margin: 0 0 2px;
+}
+.slidev-layout.db-default p:has(.table-caption) + table {
+  margin-top: 0;
+}
+.slidev-layout.db-default table:has(+ p .table-footer) {
+  margin-bottom: 2px;
+}
+.slidev-layout.db-default p:has(.table-footer) {
+  margin: 0;
+}
+
+/* Tables: borderless with zebra striping + header/footer rules (template look).
+   Column alignment (e.g. centering `id`) is set per-table in markdown (:---:). */
+.slidev-layout.db-default table {
+  border-collapse: collapse;
+  width: auto;                    /* default: hug content */
+  font-size: 10px;                /* 10pt (canvas 720 => px == pt) */
+}
+/* Width control: tables hug content by default. To pin a width, wrap in
+   <div class="table-w" style="width: …"> — the table then fills that box, so
+   giving two tables the same width makes them equal size.
+     <div class="table-w" style="width: 360px">  -> fixed 360px
+     <div class="table-w w-2/3">                  -> two-thirds of the column
+     <div class="table-w">                        -> full column/slide width   */
+.slidev-layout.db-default .table-w table {
+  width: 100%;
+}
+/* Equal-width group: wrap several tables in <div class="table-equal"> and they
+   all take the width of the widest one (shared max-content grid column). */
+.slidev-layout.db-default .table-equal {
+  display: grid;
+  grid-template-columns: max-content;
+}
+.slidev-layout.db-default .table-equal table {
+  width: 100%;
+}
+/* Reach: let a table in one column spill into the neighbour by a set amount.
+   Wrap it and set --reach to how far it should extend left (toward the other
+   column), giving its columns that much more room.
+     <div class="table-reach" style="--reach: 120px"> … table … </div>
+   Note: it overlaps whatever sits in the neighbour column at that height, so
+   pick a --reach that clears it (best where that area is empty). */
+.slidev-layout.db-default .table-reach {
+  --reach: 0px;
+  width: calc(100% + var(--reach));
+  margin-left: calc(-1 * var(--reach));
+}
+.slidev-layout.db-default .table-reach table {
+  width: 100%;
+}
+.slidev-layout.db-default th,
+.slidev-layout.db-default td {
+  border: none;                   /* no vertical/cell borders */
+  padding: 2px 8px 4px;           /* tight padding; bottom>top optically centers
+                                     single-line text (nudges it up) */
+  vertical-align: middle;         /* center cell text vertically */
+  text-align: center;             /* center by default; :--/--: in markdown override */
+}
+/* Space between stacked tables — top margin on every table after the first.
+   (Equivalent to bottom-margin-on-all-but-last; NOT the same as bottom-margin
+   on all, which would also add a gap after the last table.) */
+.slidev-layout.db-default table:not(:first-of-type) {
+  margin-top: 14px;
+}
+.slidev-layout.db-default thead th {
+  font-weight: 700;
+  color: var(--db-text-soft);
+  background: #fff;
+  border-top: 1px solid var(--db-table-rule);
+  border-bottom: 1px solid var(--db-table-rule);
+}
+.slidev-layout.db-default tbody tr:nth-child(odd) {
+  background: var(--db-table-stripe);   /* shade alternate data rows */
+}
+.slidev-layout.db-default tbody tr:last-child td {
+  border-bottom: 1px solid var(--db-table-rule);
+}
+/* Inline code inside tables AND headings: keep the syntax colors but drop the
+   gray "pill" background/padding so it reads like plain text. */
+.slidev-layout.db-default th code,
+.slidev-layout.db-default td code,
+.slidev-layout.db-default h1 code,
+.slidev-layout.db-default h2 code,
+.slidev-layout.db-default h3 code {
+  background: transparent;
+  padding: 0;
+}

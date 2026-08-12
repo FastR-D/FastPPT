@@ -1,0 +1,120 @@
+.whu-slide {
+  color: #000;
+  color-scheme: light;
+  --whu-flow-space-sm: 0.25rem;
+  --whu-flow-space-md: 0.5rem;
+}
+
+.whu-block,
+.whu-card,
+.whu-col-block,
+.whu-chevron {
+  margin-block: var(--whu-flow-space-sm);
+}
+
+.whu-hint {
+  margin-block: var(--whu-flow-space-md);
+}
+
+.whu-block.h-full,
+.whu-card.h-full,
+.whu-col-block.h-full,
+.whu-chevron.h-full,
+.whu-hint.h-full {
+  margin-block: 0;
+}
+
+.whu-slide > :first-child,
+.whu-slide main > :first-child,
+.whu-slide main > div > :first-child {
+  margin-top: 0;
+}
+
+.whu-slide > :last-child,
+.whu-slide main > :last-child,
+.whu-slide main > div > :last-child {
+  margin-bottom: 0;
+}
+
+.whu-slide ul {
+  list-style: none !important;
+  margin-left: 0;
+  padding-left: 0.25rem;
+}
+
+.whu-slide ul > li {
+  position: relative;
+  min-height: 1rem;
+  padding-left: 1.45rem;
+  text-align: justify;
+  isolation: isolate;
+}
+
+.whu-slide ul > li::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.18em;
+  border-radius: 999px;
+  background: #3b99d4
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z'/%3E%3C/svg%3E")
+    no-repeat center / 72%;
+}
+
+.whu-slide ol {
+  @apply list-none p-0 m-0; /* 清除默认样式 */
+  counter-reset: academic-counter; /* 重置计数器 */
+}
+
+.whu-slide ol > li {
+  position: relative;
+  padding-left: 2.1rem;
+  counter-increment: academic-counter;
+}
+
+.whu-slide ol > li::before {
+  content: counter(academic-counter, decimal-leading-zero);
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.75rem;
+  color: #3b99d4;
+  font-family: 'JetBrains Mono NL', 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: inherit;
+  text-align: left;
+}
+
+/* Paper summary details tabs: fill the column and scale images without scrollbars */
+.paper-summary-tabs {
+  @apply h-full min-h-0 flex flex-col;
+}
+
+.paper-summary-tabs .n-tabs-nav {
+  flex-shrink: 0;
+}
+
+.paper-summary-tabs .n-tab-pane-wrapper,
+.paper-summary-tabs .n-tabs-content,
+.paper-summary-tabs .n-tab-pane {
+  height: 100%;
+  min-height: 0;
+}
+
+.paper-summary-pane {
+  @apply h-full;
+}
+
+.paper-summary-pane-inner {
+  @apply h-full w-full flex items-center justify-center overflow-hidden;
+}
+
+.paper-summary-pane-image {
+  @apply max-h-full max-w-full object-contain;
+}

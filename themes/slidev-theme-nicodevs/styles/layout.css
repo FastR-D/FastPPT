@@ -1,0 +1,248 @@
+:root {
+  --slidev-theme-primary: #EAB308;
+  --slidev-theme-bg: #000000;
+  --slidev-theme-surface: rgba(255, 255, 255, 0.05);
+  --slidev-theme-surface-hover: rgba(255, 255, 255, 0.1);
+  --slidev-theme-border: rgba(234, 179, 8, 0.2);
+  --slidev-theme-text: #ffffff;
+  --slidev-theme-text-muted: rgba(255, 255, 255, 0.5);
+
+  --slidev-code-background: rgba(255, 255, 255, 0.05);
+  --slidev-code-foreground: #e4e4e7;
+}
+
+/* ===== Base ===== */
+
+.slidev-layout {
+  background: var(--slidev-theme-bg);
+  color: var(--slidev-theme-text);
+  padding: 2.5rem 3rem;
+}
+
+.slidev-layout h1 {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--slidev-theme-text);
+}
+
+.slidev-layout h2 {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--slidev-theme-text);
+}
+
+.slidev-layout h3 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.slidev-layout.cover h1 + p,
+.slidev-layout.intro h1 + p {
+  color: var(--slidev-theme-text-muted);
+}
+
+.slidev-layout a {
+  color: var(--slidev-theme-primary);
+  text-decoration: none;
+  border-bottom: 2px solid var(--slidev-theme-primary);
+}
+
+.slidev-layout a:hover {
+  color: #000;
+  background: var(--slidev-theme-primary);
+}
+
+.slidev-layout code:not(pre code) {
+  background: var(--slidev-theme-surface);
+  border: 1px solid var(--slidev-theme-border);
+  padding: 0.15em 0.4em;
+  font-weight: 600;
+}
+
+.slidev-layout blockquote {
+  border-left: 4px solid var(--slidev-theme-primary);
+  padding-left: 1.5rem;
+  color: var(--slidev-theme-text-muted);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.slidev-layout pre {
+  font-size: 1em !important;
+  line-height: 1.8 !important;
+}
+
+.slidev-layout pre code,
+.slidev-layout pre .shiki,
+.slidev-layout pre .shiki code,
+.slidev-layout pre .shiki .line {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.slidev-layout pre {
+  background: var(--slidev-code-background) !important;
+  border: 1px solid var(--slidev-theme-border);
+}
+
+.slidev-layout code:not(pre code) {
+  font-size: 0.9em;
+}
+
+.slidev-layout ul,
+.slidev-layout ol {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.slidev-layout li::marker {
+  color: var(--slidev-theme-primary);
+}
+
+.slidev-layout strong {
+  color: var(--slidev-theme-primary);
+  font-weight: 800;
+}
+
+.slidev-layout em {
+  color: var(--slidev-theme-text-muted);
+}
+
+/* ===== Cover Layout ===== */
+
+.slidev-layout.cover {
+  @apply h-full grid place-content-center text-center;
+  background: var(--slidev-theme-bg);
+}
+
+.slidev-layout.cover h1 {
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.slidev-layout.cover p {
+  color: var(--slidev-theme-text-muted);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+}
+
+/* ===== Intro Layout ===== */
+
+.slidev-layout.intro {
+  @apply h-full grid;
+  align-content: end;
+  padding-bottom: 3rem;
+}
+
+.slidev-layout.intro h1 {
+  font-size: 4rem;
+  border-bottom: 6px solid var(--slidev-theme-primary);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* ===== Section Layout ===== */
+
+.slidev-layout.section {
+  @apply h-full grid place-content-center;
+}
+
+.slidev-layout.section h1 {
+  font-size: 4.5rem;
+  color: var(--slidev-theme-primary);
+}
+
+/* ===== Statement Layout ===== */
+
+.slidev-layout.statement {
+  @apply h-full grid place-content-center text-center;
+}
+
+.slidev-layout.statement p {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  max-width: 20ch;
+}
+
+/* ===== Quote Layout ===== */
+
+.slidev-layout.quote {
+  @apply h-full grid place-content-center;
+}
+
+.slidev-layout.quote blockquote {
+  font-size: 2rem !important;
+  line-height: 1.8 !important;
+  border-left: 6px solid var(--slidev-theme-primary);
+  max-width: 28ch;
+}
+
+.slidev-layout.quote blockquote p {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* ===== Fact Layout ===== */
+
+.slidev-layout.fact {
+  @apply h-full grid place-content-center text-center;
+}
+
+.slidev-layout.fact h1 {
+  font-size: 7rem;
+  color: var(--slidev-theme-primary);
+}
+
+.slidev-layout.fact p {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--slidev-theme-text-muted);
+}
+
+/* ===== End Layout ===== */
+
+.slidev-layout.end {
+  @apply h-full grid place-content-center text-center;
+}
+
+.slidev-layout.end h1 {
+  font-size: 5rem;
+  color: var(--slidev-theme-primary);
+}
+
+/* ===== Two Cols Layout ===== */
+
+.slidev-layout.two-columns {
+  @apply h-full;
+  gap: 3rem;
+}
+
+.slidev-layout.two-columns .col-left {
+  border-right: 2px solid var(--slidev-theme-border);
+  padding-right: 2rem;
+}
+
+/* ===== Default ===== */
+
+.slidev-layout.default h1 {
+  font-size: 2.5rem;
+  border-left: 6px solid var(--slidev-theme-primary);
+  padding-left: 1rem;
+}
+
+/* ===== Page Number ===== */
+
+.slidev-page-number {
+  color: var(--slidev-theme-text-muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

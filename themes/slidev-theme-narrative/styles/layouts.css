@@ -1,0 +1,143 @@
+/* =============================================================================
+   Monolith — layout styling
+   All five style-guide layouts live here so decks never need custom layout CSS.
+   ========================================================================== */
+
+/* ------- default -----------------------------------------------------------
+   Standard content slide: title + body flowing from the top. Fill the full
+   slide height so the theme background covers the whole page instead of
+   stopping at the content and leaving a seam below. */
+.slidev-layout.default {
+  height: 100%;
+}
+
+/* ------- cover -------------------------------------------------------------
+   Title slide, section breaks, mood/transition moments.
+   Full-bleed photo (via `background:` frontmatter) + scrim + one line.
+   Text is always light because it sits over a photo. */
+.slidev-layout.mono-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* The photo lives on its own layer, beneath the scrim and the content. */
+.slidev-layout.mono-cover .mono-cover__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* Scrim so light titles stay readable over any photo. */
+.slidev-layout.mono-cover .mono-cover__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--scrim), var(--scrim));
+  z-index: 0;
+}
+
+.slidev-layout.mono-cover .mono-cover__content {
+  position: relative;
+  z-index: 1;
+  max-width: 60rem;
+}
+
+.slidev-layout.mono-cover h1 {
+  color: #fff;
+  font-size: 4rem;
+}
+
+.slidev-layout.mono-cover h2 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.slidev-layout.mono-cover p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.slidev-layout.mono-cover .kicker {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ------- statement ---------------------------------------------------------
+   One punchy claim: 3–6 words, dead-centre, nothing else. Fully centred text at
+   a size that keeps a short claim on a single line. It differs from `center`
+   (below) by being just the claim — no kicker, no supporting structure. */
+.slidev-layout.mono-statement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 3rem 4rem;
+}
+
+.slidev-layout.mono-statement h1 {
+  font-size: 4.25rem;
+  margin: 0;
+}
+
+/* ------- center ------------------------------------------------------------
+   Lists, steps, structured info, a data/diagram slide. Genuinely centred — the
+   content block is centred both horizontally and vertically, and its lines are
+   centred too. Lists are the exception: they centre *as a block* while their
+   items stay left-aligned, so markers line up instead of going ragged. It
+   differs from `statement` by carrying real structure (kicker + title + list),
+   and from `default` by sitting centred rather than flowing from the top. */
+.slidev-layout.mono-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.slidev-layout.mono-center > * {
+  width: 100%;
+  max-width: 56rem;
+}
+
+/* Centre each list as a block while keeping its items left-aligned. */
+.slidev-layout.mono-center ul,
+.slidev-layout.mono-center ol {
+  display: inline-block;
+  text-align: left;
+}
+
+/* ------- image-left / image-right -----------------------------------------
+   A concept anchored to a photo. Photo one side (full-bleed, full-height),
+   ≤4 short lines the other side, vertically centered. Alternate L/R. */
+.slidev-layout.mono-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.slidev-layout.mono-split .mono-split__media {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
+}
+
+.slidev-layout.mono-split .mono-split__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3.5rem 3rem;
+  min-width: 0;
+}

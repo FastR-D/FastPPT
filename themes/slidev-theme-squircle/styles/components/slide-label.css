@@ -1,0 +1,81 @@
+/* Slide Label component — positions relative to the slide root */
+.slide-label {
+  position: absolute;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--label-bar-gap);
+  color: var(--color-primary-900);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+/* Vertical accent bar (reference: About Me / Theme headers) */
+.frame .slide-label-top-left::before,
+.frame .slide-label-top-right::before,
+.frame .slide-label-top-center::before,
+.frame-header::before {
+  content: '';
+  flex-shrink: 0;
+  width: var(--label-bar-width);
+  height: 1em;
+  border-radius: var(--size-px);
+  background: var(--color-primary-900);
+}
+
+.slide-label-top-left {
+  top: calc(var(--frame) + var(--pad));
+  left: calc(var(--frame) + var(--pad));
+}
+
+.slide-label-top-right {
+  top: calc(var(--frame) + var(--pad));
+  right: calc(var(--frame) + var(--pad));
+}
+
+.slide-label-top-center {
+  top: calc(var(--frame) + var(--pad));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.slide-label-bottom-left {
+  bottom: calc(var(--frame) + var(--pad));
+  left: calc(var(--frame) + var(--pad));
+}
+
+.slide-label-bottom-right {
+  bottom: calc(var(--frame) + var(--pad));
+  right: calc(var(--frame) + var(--pad));
+}
+
+/* Slide Note component — small, muted annotation text */
+.slide-note {
+  position: absolute;
+  z-index: 10;
+  color: var(--color-neutral-500);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-base);
+  line-height: var(--line-height-normal);
+}
+
+.slide-note-top-left {
+  top: calc(var(--frame) + var(--pad));
+  left: calc(var(--frame) + var(--pad));
+}
+
+.slide-note-top-right {
+  top: calc(var(--frame) + var(--pad));
+  right: calc(var(--frame) + var(--pad));
+}
+
+.slide-note-bottom-left {
+  bottom: calc(var(--frame) + var(--pad));
+  left: calc(var(--frame) + var(--pad));
+}
+
+.slide-note-bottom-right {
+  bottom: calc(var(--frame) + var(--pad));
+  right: calc(var(--frame) + var(--pad));
+}

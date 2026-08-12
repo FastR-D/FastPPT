@@ -1,0 +1,51 @@
+{
+  "name": "fastppt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "turbo run build",
+    "test": "node --test scripts/*.test.mjs && turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
+    "npm:publish": "pnpm run npm:publish:slidewave && pnpm run npm:publish:cli",
+    "npm:publish:dry-run": "pnpm run npm:publish:slidewave --dry-run && pnpm run npm:publish:cli --dry-run",
+    "npm:publish:slidewave": "pnpm --filter @fastppt/slidewave publish --access public --tag latest --no-git-checks",
+    "npm:publish:cli": "pnpm --filter @fastppt/cli publish --access public --tag latest --no-git-checks",
+    "vercel:deploy": "pnpm dlx vercel@latest pull --yes --environment=production && pnpm dlx vercel@latest build --prod && pnpm dlx vercel@latest deploy --prebuilt --prod"
+  },
+  "dependencies": {
+    "@fix-webm-duration/fix": "^1.0.1",
+    "@typescript/ata": "^0.9.8",
+    "ansis": "^4.3.1",
+    "file-saver": "^2.0.5",
+    "lz-string": "^1.5.0",
+    "pptxgenjs": "catalog:",
+    "recordrtc": "^5.6.2",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "eslint-plugin-vue": "^10.3.0",
+    "globals": "^17.9.0",
+    "prettier": "^3.6.2",
+    "slidev-theme-academy": "workspace:*",
+    "slidev-theme-landing": "workspace:*",
+    "turbo": "^2.5.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.66.0",
+    "vue-eslint-parser": "^10.2.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "markdown-it": "^14.3.0"
+    }
+  }
+}

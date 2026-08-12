@@ -1,0 +1,31 @@
+{
+  "name": "@fastppt/fastppt-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./cli": "./src/cli.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@fastppt/markdown": "workspace:*",
+    "@fastppt/protocol": "workspace:*",
+    "@fastppt/fastppt-skill": "workspace:*",
+    "@fastppt/icons": "workspace:*",
+    "@fastppt/theme-registry": "workspace:*",
+    "@fastppt/workspace": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

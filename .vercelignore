@@ -1,0 +1,27 @@
+# 构建缓存 / 本地状态
+node_modules/
+.turbo/
+.fastppt/
+.tsbuild/
+.tsbuildinfo
+.theme-build/
+dist/
+coverage/
+
+# 不参与部署的大目录(线上只有静态前端)
+examples/
+themes/
+docs/
+tests/
+scripts/
+.github/
+.claude/
+
+# 文档与计划文件
+findings.md
+progress.md
+task_plan.md
+plan.md
+
+# Vercel 本地配置
+.vercel/

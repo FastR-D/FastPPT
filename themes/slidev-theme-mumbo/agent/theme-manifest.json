@@ -1,0 +1,38 @@
+{
+  "id": "slidev-theme-mumbo",
+  "packageName": "slidev-theme-mumbo",
+  "displayName": "Mumbo",
+  "version": "0.1.13-fastppt.1",
+  "description": "剪贴簿、奶油色卡片与硬阴影构成的活泼叙事主题。",
+  "repositoryUrl": "https://github.com/nicodevs/slidev-theme-mumbo",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-mumbo",
+    "sourceDir": "agent",
+    "version": "0.1.13-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "browser",
+      "label": "Browser"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "scrapbook",
+      "label": "剪贴簿视觉",
+      "description": "提供贴纸、拍立得、图案与章节卡片表达。"
+    },
+    {
+      "id": "browser-frame",
+      "label": "浏览器展示",
+      "description": "browser 布局适合产品界面和网页演示。"
+    }
+  ]
+}

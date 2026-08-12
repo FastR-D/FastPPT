@@ -1,0 +1,72 @@
+{
+  "name": "slidev-theme-academy",
+  "version": "0.1.22-fastppt.2",
+  "private": true,
+  "type": "module",
+  "description": "FastPPT Academy academic Slidev theme",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "academy",
+    "academic"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "vue-tsc --noEmit && node ../../scripts/theme-build.mjs .",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "node ../../scripts/theme-smoke.mjs ."
+  },
+  "files": [
+    "agent",
+    "assets",
+    "components",
+    "layouts",
+    "public",
+    "setup",
+    "styles",
+    "utils",
+    "global-top.vue",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "dependencies": {
+    "@iconify-json/ant-design": "^1.2.8",
+    "@iconify-json/mdi": "^1.2.3",
+    "@myriaddreamin/typst-ts-node-compiler": "^0.7.0",
+    "@slidev/client": "catalog:",
+    "@slidev/types": "catalog:",
+    "katex": "^0.18.1",
+    "markdown-it": "^14.3.0",
+    "plotly.js-dist": "^3.5.0",
+    "qrcode.vue": "^3.9.0",
+    "@fastppt/slidewave": "workspace:*",
+    "vite": "catalog:",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vue-tsc": "^3.0.4"
+  },
+  "slidev": {
+    "colorSchema": "light",
+    "highlighter": "all",
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "lineNumbers": true,
+      "fonts": {
+        "mono": "Fira Code,Noto Sans Mono CJK SC",
+        "sans": "Inter,Noto Sans CJK SC",
+        "local": "Inter,Noto Sans CJK SC,Fira Code,Noto Sans Mono CJK SC"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luocfprime/slidev-theme-ustc.git"
+  }
+}

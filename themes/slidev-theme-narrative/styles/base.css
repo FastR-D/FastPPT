@@ -1,0 +1,199 @@
+/* =============================================================================
+   Monolith — base tokens, typography & utilities
+   -----------------------------------------------------------------------------
+   Two decisions are made per deck and fed in as inputs (see README):
+     1. Mode   — `colorSchema: dark | light` in the headmatter.
+     2. Accent — `themeConfig.accent: '#RRGGBB'`, exposed by Slidev as the CSS
+                 variable `--slidev-theme-accent`.
+   Everything else is fixed here so decks stay near-zero-config.
+   ========================================================================== */
+
+:root {
+  /* Light mode (default). Dark overrides live in the `.dark` block below. */
+  --bg: #ffffff;
+  --bg-alt: #fafafa;
+  --text: #111111;
+  --text-secondary: #666666;
+  --hairline: #e4e4e4;
+
+  /* Scrim strength for text-over-photo (cover). */
+  --scrim: rgba(0, 0, 0, 0.55);
+
+  --mono-radius: 0.75rem;
+
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+}
+
+/* Slidev injects `themeConfig` values (e.g. `accent`) as CSS variables on
+   <body>, not on :root (see @slidev/client's App.vue). Custom properties only
+   inherit downward and <html> is an ancestor of <body>, so deriving --accent on
+   :root would always hit the fallback. Derive it here, at the body scope, where
+   --slidev-theme-accent is actually visible. */
+body {
+  /* One accent per deck. Falls back to the theme default if none is given. */
+  --accent: var(--slidev-theme-accent, #3b82f6);
+
+  /* Wire Slidev's built-in primary hook to our accent. */
+  --slidev-theme-primary: var(--accent);
+}
+
+html.dark {
+  --bg: #0a0a0a;
+  --bg-alt: #0a0a0a;
+  --text: #fafafa;
+  --text-secondary: #a1a1a1;
+  --hairline: #2a2a2a;
+  --scrim: rgba(0, 0, 0, 0.5);
+}
+
+html,
+body,
+#app {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* =============================================================================
+   Layout surface & the type scale
+   The size contrast between title and support IS the design, so it is fixed.
+   No more than two visible sizes on a normal content slide.
+   ========================================================================== */
+
+.slidev-layout {
+  background: var(--bg);
+  color: var(--text);
+  padding: 3.5rem 4rem;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  font-feature-settings: 'ss01', 'cv01';
+  -webkit-font-smoothing: antialiased;
+}
+
+.slidev-layout h1 {
+  font-size: 3.5rem;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: normal;
+  color: var(--text);
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+
+.slidev-layout h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: normal;
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.slidev-layout h3 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+/* Restore list markers (UnoCSS's reset strips them) so plain markdown lists
+   with `-`, `*`, or `1.` render out of the box. Markers use the accent.
+   Slidev's defaults make lists `display: table; margin: … auto`, which silently
+   centers them; force a normal left-aligned block so lists follow the slide's
+   text alignment instead. */
+.slidev-layout ul,
+.slidev-layout ol {
+  display: block;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 1.5rem;
+}
+
+.slidev-layout ul {
+  list-style: disc;
+}
+
+.slidev-layout ol {
+  list-style: decimal;
+}
+
+.slidev-layout li {
+  margin: 0 0 0.5rem;
+}
+
+.slidev-layout li::marker {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* =============================================================================
+   The single accent — emphasis & identity only, never large fills or body text.
+   At most one of these should appear per slide.
+   ========================================================================== */
+
+.slidev-layout strong,
+.slidev-layout .accent {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.slidev-layout u {
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.16em;
+  padding-bottom: 0.05em;
+}
+
+.slidev-layout a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* A hairline rule, used for subtle separation. */
+.slidev-layout hr {
+  border: none;
+  border-top: 1px solid var(--hairline);
+  margin: 1.5rem 0;
+}
+
+/* =============================================================================
+   Utilities (theme-owned, so decks need no per-slide CSS)
+   ========================================================================== */
+
+/* Eyebrow / kicker label — the small uppercase line above a title. */
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+/* Muted secondary text, for asides. */
+.muted {
+  color: var(--text-secondary);
+}
+
+/* Footnote citations — quiet, so a row of source links isn't an accent pile-up. */
+.slidev-layout .citations a {
+  color: var(--text-secondary);
+  text-decoration-color: var(--hairline);
+}

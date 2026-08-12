@@ -1,0 +1,34 @@
+{
+  "id": "slidev-theme-eloc",
+  "packageName": "slidev-theme-eloc",
+  "displayName": "Eloc",
+  "version": "1.1.0-fastppt.1",
+  "description": "强调写作与代码展示的简洁宽画布主题。",
+  "repositoryUrl": "https://github.com/zthxxx/slides/tree/master/packages/slidev-theme-eloc",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-eloc",
+    "sourceDir": "agent",
+    "version": "1.1.0-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "label": "Default"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "wide-canvas",
+      "label": "宽画布",
+      "description": "1580 宽画布适合代码、终端与技术内容。"
+    },
+    {
+      "id": "concise-writing",
+      "label": "简洁写作",
+      "description": "单一默认布局鼓励以内容层级而非装饰组织页面。"
+    }
+  ]
+}
