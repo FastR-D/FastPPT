@@ -1,210 +1,222 @@
 # FastPPT
 
-FastPPT is a local-first presentation Agent workspace. It unifies Claude Code and OpenAI Codex sessions behind a localhost Gateway, lets agents and users edit Slidev decks in one workspace, previews changes through Slidev HMR, and exports editable PPTX files through the existing Slidewave fork.
+FastPPT 是一个本地优先的 AI 演示文稿工作区。它把 Claude Code、OpenAI Codex、Slidev 实时预览、主题 Skill 和可编辑 PPTX 导出整合到同一套工作流中。
 
-## Architecture
+浏览器负责编辑、预览与导出捕获；本地 `fastppt` 命令负责工作区文件、Agent 会话、主题、Skill、MCP、Slidev 进程和 PPTX 转换。
 
 ```text
-Vue 3 SPA (Vercel)
-        │ HTTP + WebSocket over local loopback
-        ▼
-Fastify Gateway (http://127.0.0.1:4317)
-   ├── safe workspace files + SQLite audit state
-   ├── Claude Agent SDK adapter
-   ├── supervised Codex app-server adapter
-   ├── validated theme registry + managed Skills/MCP
-   ├── supervised Slidev preview processes
-   └── serial export queue → Slidewave server runtime → editable PPTX
+FastPPT Web
+    │ HTTP + WebSocket
+    ▼
+本地 Gateway（127.0.0.1:4317）
+    ├── Claude Code / Codex Harness
+    ├── Slidev 实时预览
+    ├── Theme + Skill 管理
+    ├── 工作区文件与 SQLite 状态
+    └── Slidewave 可编辑 PPTX 导出
 ```
 
-Provider-specific protocols stay in their Harness packages. Browser DTOs and events come from `@fastppt/protocol`; theme selection is resolved and snapshotted by the Gateway before a run enters either provider.
+## 功能
 
-## Requirements
+- 在同一个工作区中让用户和 Agent 编辑 Slidev Markdown。
+- 支持 Claude Code 与 OpenAI Codex 会话、审批、恢复和审计。
+- 自动安装基础 Skill、主题 Skill 和 MCP 配置。
+- 提供内置主题，也可以从现有 PPTX 提取并生成新主题。
+- 支持图片、复杂 CSS、背景、透明度、字体嵌入和溢出检查。
+- 将浏览器中的 Slidev 页面导出为可继续编辑的 PPTX。
+- 所有文件、缓存、导出和运行状态默认保留在本地。
 
-- Node.js 22 or newer
-- pnpm 10.33.0
-- A modern browser for the FastPPT UI and iframe capture
-- Claude Code and Codex only when their respective real Harness is needed; tests use deterministic fakes and require no API keys
+## 使用代码
 
-## Install and run
+### 环境要求
 
-For normal local use, install the backend CLI once and run it inside the deck
-workspace. This starts the Gateway and all supervised backend capabilities, but
-does not start a frontend development server:
+- Node.js 22 或更高版本
+- pnpm 10（仅源码开发需要）
+- 现代浏览器
+- Claude Code 或 Codex CLI（只使用对应 Agent 时需要）
+
+### 安装 CLI
+
+全局安装：
 
 ```bash
 pnpm add --global @fastppt/cli
-cd /path/to/deck-workspace
+```
+
+也可以安装到当前项目：
+
+```bash
+pnpm add --save-dev @fastppt/cli
+pnpm exec fastppt --help
+```
+
+安装后，内置主题会同步到 `$HOME/.fastppt/themes`
+
+CLI 升级会刷新内置主题，但不会删除用户导入的额外主题。
+
+### 启动工作区
+
+进入包含 `slides.md` 的目录并启动：
+
+```bash
+cd /path/to/your-deck
+fastppt start --open
+```
+
+也可以在任意目录指定工作区：
+
+```bash
+fastppt start --dir /path/to/your-deck
+```
+
+默认地址：
+
+- Web：<https://fastppt.vercel.app>
+- Gateway：<http://127.0.0.1:4317>
+- 健康检查：<http://127.0.0.1:4317/health>
+- 完整诊断：<http://127.0.0.1:4317/ready>
+
+### 最小演示文稿
+
+在工作区创建 `slides.md`：
+
+```md
+---
+theme: slidev-theme-landing
+title: FastPPT Demo
+---
+
+# 使用 Agent 制作演示文稿
+
+在浏览器中继续编辑、预览并导出 PPTX。
+
+---
+
+## 第二页
+
+- Slidev 实时预览
+- Claude Code / Codex 协作
+- 可编辑 PPTX 导出
+```
+
+然后运行：
+
+```bash
+fastppt start --open
+```
+
+### CLI 命令
+
+```bash
+# 启动当前工作区
 fastppt
 
-# Or keep the CLI local to a project:
-pnpm add --save-dev @fastppt/cli
-pnpm exec fastppt
+# 指定工作区、端口并打开 Web
+fastppt start --dir ./deck --port 4317 --open
+
+# 查看运行状态
+fastppt status --dir ./deck
+
+# 检查主题、Skill、MCP、Slidev、Harness 和导出运行时
+fastppt doctor --dir ./deck
+
+# 输出 JSON，便于脚本处理
+fastppt status --json
+fastppt doctor --json
+
+# 停止当前工作区注册的 Gateway
+fastppt stop --dir ./deck
 ```
 
-Then open `https://fastppt.vercel.app`. Use `fastppt --dir /path/to/deck` when
-starting outside the target workspace. The `--workspace` option remains an
-alias for `--dir`.
-
-The CLI also includes operational commands:
+查看全部参数：
 
 ```bash
-fastppt status --dir /path/to/deck
-fastppt doctor --dir /path/to/deck
-fastppt stop --dir /path/to/deck
-fastppt start --port 4317 --open
+fastppt --help
 ```
 
-Use `--json` with `status`, `doctor`, or `stop` for machine-readable output.
-On first `start` or `doctor`, the CLI installs its bundled themes into
-`~/.fastppt/themes`. CLI upgrades refresh those managed built-in themes while
-preserving additional imported themes in the same directory.
-
-Repository development remains a separate command. It starts both the Gateway
-and the Vite frontend with source watching:
+### 源码开发
 
 ```bash
+git clone https://github.com/FastR-D/FastPPT.git
+cd FastPPT
 pnpm install
-pnpm dev --dir ./examples/demo-deck   # --workspace works as an alias
+pnpm dev --dir ./examples/demo-deck
 ```
 
-Open `https://fastppt.vercel.app` (or `http://127.0.0.1:4318` for the local dev server). The Gateway runs on the loopback at `http://127.0.0.1:4317` with plain HTTP; browsers allow the secure deployed page to reach loopback addresses, so no hosts entry, certificate, or `sudo` is required. FastPPT runtime configuration does not require an `.env` file or session token. The deployed and development SPAs use fixed API locations; there is no endpoint environment variable.
+本地开发地址：
 
-The frontend deploys from `vercel.json`. Link the Vercel project whose production domain is `fastppt.vercel.app`, then configure the repository secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; pushes to `main` run the production deployment workflow.
+- Web：<http://127.0.0.1:4318>
+- Gateway：<http://127.0.0.1:4317>
 
-Publishing a GitHub Release, or manually running the `Publish npm packages` workflow from `main`, verifies, packs, and publishes `@fastppt/slidewave` followed by `@fastppt/cli`. The workflow uses npm trusted publishing with provenance and skips package versions that already exist. Configure both packages on npm with this repository and `.github/workflows/publish-npm.yml` as their trusted publisher; no long-lived npm token is required.
-
-For the initial local npm publication, sign in with `npm login`, run `pnpm npm:publish:dry-run`, then run `pnpm npm:publish`. The root command publishes Slidewave first and the CLI second with public access and the `latest` distribution tag.
-
-For a local production deployment, run `pnpm dlx vercel@latest build --prod` followed by `pnpm dlx vercel@latest deploy --prebuilt --prod --archive=tgz`. Archiving avoids Vercel's per-file upload request limit for this monorepo.
-
-The desktop workspace uses three resizable columns and persists their widths locally. Narrow screens expose explicit workspace, editor and preview panel switches rather than dropping the preview. Chat image attachments are validated, atomically copied to the workspace `assets/` directory, and passed to Claude/Codex through their native image input formats.
-
-The Gateway binds to loopback and accepts browser requests only from the fixed production and local development origins. Its health endpoints are:
-
-- `GET http://127.0.0.1:4317/health`
-- `GET http://127.0.0.1:4317/ready`
-
-`/health` reports process liveness. `/ready` actively probes SQLite, a workspace write/read/delete cycle, Claude, Codex, the Slidev CLI, freshly parsed themes, installed Skill files, MCP configuration files and an in-memory Slidewave PPTX conversion. A single unavailable Harness keeps the endpoint responsive with `status: "degraded"` and component-level diagnostics.
-
-Installed icon collections (`mdi`, `ant-design`) are searchable through `GET /api/v1/icons/search` and the `search_icons` MCP tool, returning canonical identifiers plus inline SVG so Harnesses can pick renderable icons for slides.
-
-## Repository structure
-
-```text
-apps/gateway                 Fastify orchestration daemon
-apps/cli                     Installable backend-only `fastppt` command
-apps/web                     Vue/Pinia/CodeMirror SPA
-packages/config              Startup and workspace configuration
-packages/database            SQLite/Drizzle migrations and audit state
-packages/fastppt-mcp         Shared official-SDK MCP server and stdio CLI
-packages/fastppt-skill       Common Skill, installer, provider config merge
-packages/harness-core        Provider-neutral Harness contract
-packages/harness-claude      Claude Agent SDK adapter
-packages/harness-codex       Codex app-server JSONL/RPC adapter
-packages/markdown            Slidev-aware Prettier integration
-packages/protocol            Browser-safe Zod DTOs and events
-packages/slidev-host         Supervised local Slidev processes
-packages/slidewave           Native core, browser capture and server runtimes
-packages/theme-registry      Validated immutable theme registry
-packages/workspace           Contained file I/O and watcher
-themes/slidev-theme-*           Built-in forks, manifests, rules and theme Skills
-tests/e2e                    Playwright browser workflow with fake Harnesses
-examples/demo-deck           Minimal two-theme workspace
-```
-
-## Claude Code and Codex
-
-FastPPT auto-installs the common and registered theme Skills into the selected workspace and safely merges MCP configuration:
-
-- Claude: `.claude/skills/*` and `.mcp.json`
-- Codex: `.agents/skills/*` and `.codex/config.toml`
-
-Existing user configuration is preserved and backed up before a managed change. Modified managed files become `conflict`; FastPPT does not overwrite them. Provider trust/approval remains a provider action and is reported as `pending-trust` rather than falsely marked complete.
-
-Verified provider ranges:
-
-- Claude Agent SDK `0.3.220`, bundled Claude Code `2.1.220`; supported Claude Code range `>=2.1.215 <2.2.0`
-- Codex CLI/app-server `>=0.144.0 <0.147.0` (including `0.146.x`)
-
-Claude loads project settings, limits each run to its resolved Skills and requests them with documented `/skill-name` syntax. Codex uses `skills/list`, typed Skill inputs and `$skill-name`. If discovery or documented per-run invocation is unavailable, the Gateway rejects the run. If a provider exposes no stable execution observation, the audit status remains `unknown`—never fabricated as completed.
-
-## Skills and themes
-
-The common `fastppt` Skill owns theme-independent workflow, workspace safety, MCP usage, preview validation and export. Visual rules live only in the corresponding theme Skill:
-
-- `slidev-theme-academy` → `fastppt-theme-academy`
-- `slidev-theme-eloc` → `fastppt-theme-eloc`
-- `slidev-theme-landing` → `fastppt-theme-landing`
-- `slidev-theme-ledger` → `fastppt-theme-ledger`
-- `slidev-theme-magazine` → `fastppt-theme-magazine`
-- `slidev-theme-mumbo` → `fastppt-theme-mumbo`
-- `slidev-theme-narrative` → `fastppt-theme-narrative`
-- `slidev-theme-nicodevs` → `fastppt-theme-nicodevs`
-- `slidev-theme-nmt` → `fastppt-theme-nmt`
-- `slidev-theme-nord` → `fastppt-theme-nord`
-- `slidev-theme-practicum` → `fastppt-theme-practicum`
-- `slidev-theme-raft` → `fastppt-theme-raft`
-- `slidev-theme-sketchdeck` → `fastppt-theme-sketchdeck`
-- `slidev-theme-squircle` → `fastppt-theme-squircle`
-- `slidev-theme-strategy` → `fastppt-theme-strategy`
-- `slidev-theme-tahta` → `fastppt-theme-tahta`
-- `slidev-theme-the-unnamed` → `fastppt-theme-the-unnamed`
-- `slidev-theme-touying` → `fastppt-theme-touying`
-- `slidev-theme-tud-db` → `fastppt-theme-tud-db`
-
-Adding a theme requires a workspace package with `package.json`, source notice/license, layouts, examples, `agent/theme-manifest.json`, `agent/theme-rules.md`, and a provider-valid `agent/SKILL.md`. The manifest is the canonical theme/Skill ID and version mapping. Registry loading rejects duplicate IDs, missing Skills, version/name mismatches, absolute or escaping paths, symlink escape and cross-theme ownership.
-
-Every message supplies only a validated `themeId`; clients cannot provide a Skill path, Skill ID or prompt fragment. The Gateway resolves the common Skill plus exactly one theme Skill, snapshots that mapping for the run, verifies installation/capabilities, and persists the resolution status, invocation mechanism and observation evidence. The latest persisted audit for a restored session is loaded into the workspace UI; a provider without stable observation remains explicitly `unknown`.
-
-## Slidewave editable PPTX export
-
-Slidewave is maintained directly as the `@fastppt/slidewave` workspace package, with dependencies owned by the root catalog and composite TypeScript references participating in the Turbo graph. It has explicit `@fastppt/slidewave`, `@fastppt/slidewave/browser`, `@fastppt/slidewave/browser/runtime`, `@fastppt/slidewave/snapshot`, and `@fastppt/slidewave/server` entry points so browser capture and Node conversion cannot accidentally share runtime-only dependencies. The migrated fork keeps one HTML-to-editable-object conversion algorithm; the server entry supplies only its Node PptxGenJS backend. Each built-in theme imports the browser runtime from its Slidev setup entry.
-
-Export capture runs inside a hidden Slidev `/print` iframe in the FastPPT browser. The injected `@fastppt/slidewave/browser/runtime` entry captures the rendered DOM, returns a serializable snapshot through a versioned `postMessage` protocol, and the SPA uploads it through the Gateway snapshot endpoint. `@fastppt/slidewave/server` receives only the validated snapshot and converts it to editable PPTX objects; the Gateway and MCP process never launch Chromium.
-
-Exports are serially queued, persisted to SQLite, streamed on `export:<id>`, cancellable, bounded by a 120-second browser-snapshot timeout, and downloadable only through a completed known job. Names are sanitized and outputs stay under `<workspace>/.fastppt/exports`.
-
-Agent execution is also bounded: Claude and Codex each receive an independent active-run quota of one.
-
-The MCP `inspect_overflow`, `get_preview_status`, and `export_editable_pptx` tools use a workspace-scoped Gateway runtime descriptor. An active SPA claims browser work through the event stream. MCP exports are copied under `.fastppt/exports/mcp`.
-
-## Commands and tests
+常用检查：
 
 ```bash
 pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
-pnpm format
 
-# Browser flow only
+# 浏览器端到端测试
 pnpm --filter @fastppt/e2e test
 ```
 
-The automated suite covers workspace traversal/symlink/revision safety, theme registry invariants, managed installation and config merge, JSONL/RPC failure handling, Claude/Codex session and approval fixtures, all provider × built-in-theme Skill routes, third-theme enumeration, registry reloads, Slidev lifecycle, export queue/cancel/recovery/download, official MCP client calls, and the complete Playwright browser flow.
+## 目录结构
 
-## Security
+```text
+apps/cli                 可发布的 fastppt 命令
+apps/gateway             Fastify 本地服务与任务编排
+apps/web                 Vue 3 工作区界面
+packages/fastppt-mcp     Agent 使用的 MCP 工具
+packages/fastppt-skill   基础 Skill 与托管安装器
+packages/harness-claude  Claude Agent SDK 适配器
+packages/harness-codex   Codex app-server 适配器
+packages/slidev-host     Slidev 预览进程管理
+packages/slidewave       DOM 捕获与可编辑 PPTX 转换
+packages/theme-registry  主题注册、校验与加载
+packages/fonts           浏览器与 PPTX 共用字体
+themes/                  内置 Slidev 主题与主题 Skill
+examples/                示例工作区
+tests/e2e                浏览器端到端测试
+```
 
-- Loopback-only HTTP, preview and WebSocket listeners
-- Fixed trusted SPA-origin CORS and loopback-only service binding
-- Canonical workspace containment, symlink defense, secret-file denylist, size/binary checks and atomic revision writes
-- Image attachment signature, size, extension and workspace-containment validation before either Harness receives a path
-- No provider keys in browser DTOs or logs; structured logger redaction
-- No default provider bypass mode; approvals retain command, cwd, files and risk context
-- Explicit child-process environment allowlists for Slidev, Codex and Claude; Claude receives only system runtime variables plus `ANTHROPIC_*`/`CLAUDE_CODE_*` authentication and configuration
-- Process output is text-redacted before structured logging, in addition to Pino field redaction, and all managed child processes are closed during Gateway shutdown
-- Sanitized export names and root-contained download resolution
-- `.fastppt` state/cache/log/export paths are excluded from Slidev content discovery
+运行时目录：
 
-## Troubleshooting and known limits
+```text
+$HOME/.fastppt/themes             用户主题目录
+<workspace>/.fastppt/runtime      Gateway 连接信息
+<workspace>/.fastppt/state        SQLite 状态
+<workspace>/.fastppt/exports      PPTX 导出结果
+<workspace>/.claude/skills        Claude Skills
+<workspace>/.agents/skills        Codex Skills
+```
 
-- A Harness may be `unavailable` while the rest of the Gateway remains usable; inspect `/ready` and the UI status.
-- `pending-trust` means the MCP config was written but still requires provider confirmation.
-- Skill execution observation remains `unknown` when the current provider protocol offers no stable proof; the invocation request and selected Skill are still auditable.
-- MCP rendered inspection and editable export require an active FastPPT SPA so its Slidev iframe can perform DOM work; Gateway and MCP deliberately do not provide a headless-browser fallback.
-- Slidewave maps supported DOM/text/image/vector elements to editable PowerPoint objects. Unsupported visual constructs may produce explicit export warnings rather than pixel-perfect editable equivalents.
-- The Gateway writes its short-lived local connection descriptor to `.fastppt/runtime/gateway.json` with owner-only permissions and removes it on clean shutdown. It is ignored by version control and never written to Harness MCP configuration.
-- Native SQLite installation requires Node 22 and normal native build support.
+FastPPT 会自动把 `.fastppt/`、`.claude/`、`.codex/`、`.agents/` 和托管 MCP 配置加入工作区 `.gitignore`。
 
-See `docs/architecture/overview.md`, `docs/api/http.md`, and `docs/development/getting-started.md` for detailed contracts and workflows. Third-party fork provenance is retained in each theme's `THIRD_PARTY_NOTICES.md`.
+## 参考项目
+
+FastPPT 在以下项目与工作流基础上进行集成、迁移或参考设计：
+
+- [Slidev](https://sli.dev/)：Markdown 演示文稿、Vue 组件、主题与实时预览基础。
+- [PptxGenJS](https://gitbrent.github.io/PptxGenJS/)：PowerPoint 文件生成基础。
+- [Model Context Protocol](https://modelcontextprotocol.io/)：Agent 与 FastPPT 工具之间的标准协议。
+- [OpenAI Codex](https://github.com/openai/codex)：Codex CLI 与 app-server 会话能力。
+- [Claude Agent SDK](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/sdk)：Claude Harness 能力。
+- [pptx-renderer](https://github.com/aiden0z/pptx-renderer)：PPTX 解析与渲染实现参考。
+- [open-kimi-ppt-skill](https://github.com/Binaryify/open-kimi-ppt-skill)：PPT 生成 Skill、内容组织和设计流程参考。
+- `@fastppt/slidewave`：项目内维护的浏览器捕获与可编辑 PPTX 转换分支。
+
+内置主题可能来自不同的上游 Slidev 主题。每个主题的来源、改动和许可证信息记录在对应目录的 `THIRD_PARTY_NOTICES.md` 与 `UPSTREAM_LICENSE` 中。
+
+## 文档索引
+
+| 文档                                                            | 内容                                         |
+| --------------------------------------------------------------- | -------------------------------------------- |
+| [开发入门](docs/development/getting-started.md)                 | 本地开发、CLI、环境配置与贡献流程            |
+| [系统架构](docs/architecture/overview.md)                       | Gateway、Web、Harness、主题、事件与导出边界  |
+| [HTTP API](docs/api/http.md)                                    | 健康检查、工作区、会话、主题、预览和导出接口 |
+| [FastPPT Skill](packages/fastppt-skill/SKILL.md)                | Agent 制作、检查和导出演示文稿的基础流程     |
+| [Slidewave 说明](packages/slidewave/README.md)                  | 浏览器捕获、快照协议与服务端转换入口         |
+| [可编辑 PPTX](packages/slidewave/SLIDEV_EDITABLE_PPT.md)        | Slidev 到可编辑 PowerPoint 的转换设计        |
+| [pptx-renderer 参考](https://github.com/aiden0z/pptx-renderer)        | PPTX 渲染参考项目                 |
+| [Kimi PPT Skill 参考](https://github.com/Binaryify/open-kimi-ppt-skill) | PPT 生成 Skill 参考项目           |
+
