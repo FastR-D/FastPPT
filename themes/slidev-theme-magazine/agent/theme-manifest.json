@@ -1,0 +1,71 @@
+{
+  "id": "slidev-theme-magazine",
+  "packageName": "slidev-theme-magazine",
+  "displayName": "Magazine",
+  "version": "0.1.0-fastppt.1",
+  "description": "以铜棕强调与纪实摄影为特征的奢华杂志营销主题（silver-gray-luxury-magazine）。",
+  "repositoryUrl": "https://github.com/FastR-D/FastPPT/tree/main/themes/slidev-theme-magazine",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-magazine",
+    "sourceDir": "agent",
+    "version": "0.1.0-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "narrative",
+      "label": "Narrative"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "image-right",
+      "label": "Image Right"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "luxury-editorial",
+      "label": "奢华杂志版式",
+      "description": "全幅纪实摄影 + mist-white 横带 + 发丝线数据页。"
+    },
+    {
+      "id": "gold-badge",
+      "label": "暖金数字徽章",
+      "description": "GoldBadge 财务图上的暖金椭圆数字徽章。"
+    },
+    {
+      "id": "narrative-bands",
+      "label": "叙事横带",
+      "description": "MistBand 图片上的结论横带。"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+/* Strategy shared building blocks: chapter nav, explanation column, so-what bar,
+   signature stripe. Fine lines and whitespace carry structure — not cards. */
+
+.stg-nav {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--stg-muted);
+  margin-bottom: 1.2rem;
+}
+
+.stg-nav .code {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  color: var(--stg-green);
+}
+
+.stg-nav .rule {
+  align-self: center;
+  width: 1px;
+  height: 1em;
+  background: var(--stg-green);
+}
+
+.stg-nav .section {
+  color: var(--stg-text-strong);
+  font-weight: 600;
+}
+
+/* Signature divider: deep-green block fading into fine vertical bars. */
+.stg-stripe {
+  display: flex;
+  align-items: stretch;
+  height: 6px;
+  margin: 1rem 0 1.4rem;
+  overflow: hidden;
+}
+
+.stg-stripe .bar {
+  width: 30%;
+  background: var(--stg-green);
+}
+
+.stg-stripe .ticks {
+  flex: 1;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--stg-green) 0 2px,
+    transparent 2px 7px
+  );
+}
+
+/* Explanation column / panel — light gray or mint, never main text bg. */
+.stg-explain {
+  background: var(--stg-surface);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+}
+
+.stg-explain--mint {
+  background: var(--stg-mint);
+}
+
+.stg-explain :deep(h3) {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+
+/* Bottom synthesis bar (so-what): one line converting evidence to a takeaway. */
+.stg-sowhat {
+  border-left: 4px solid var(--stg-accent);
+  background: var(--stg-surface);
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  color: var(--stg-text-strong);
+}
+
+.stg-sowhat :deep(strong) {
+  color: var(--stg-green);
+}
+
+/* Evidence panel with fine green border — for data, not cards. */
+.stg-evidence {
+  border: var(--stg-rule);
+  padding: 0.9rem 1.1rem;
+}
+
+.stg-pill {
+  display: inline-block;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--stg-green);
+  border-bottom: 2px solid var(--stg-accent);
+  padding-bottom: 0.15rem;
+  margin-bottom: 0.5rem;
+}

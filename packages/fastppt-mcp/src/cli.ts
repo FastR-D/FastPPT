@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { basename, resolve } from 'node:path'
+import { basename, dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { loadThemeRegistry } from '@fastppt/theme-registry'
 import { WorkspaceService } from '@fastppt/workspace'
@@ -32,11 +33,17 @@ const [workspace, registry] = await Promise.all([
   WorkspaceService.create(workspaceRoot),
   loadThemeRegistry(resolve(input.themesRoot)),
 ])
+const extractorPath = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../scripts/extract-theme.mjs',
+)
 const service = new FastPptMcpService({
   workspace,
   workspaceName: basename(workspaceRoot),
   registry,
   commonSkillRoot: resolve(input.commonSkillRoot),
+  themesRoot: resolve(input.themesRoot),
+  extractorPath,
   browserCapture: new GatewayBrowserCaptureDelegate(workspaceRoot),
 })
 const server = createFastPptMcpServer(service)

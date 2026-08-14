@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import JSZip from 'jszip'
 
 import { normalizeSlidevPageNumber } from '../../src/slidev/capture'
 import { htmlDeckToPresentation } from '../../src/slidev/render'
@@ -27,6 +28,28 @@ describe('editable Slidev rendering', () => {
         }),
       ]),
     )
+  })
+
+  it('writes captured image opacity to DrawingML', async () => {
+    const deck = structuredClone(landingContentDeck)
+    deck.slides[0]!.elements.push({
+      id: 'transparent-image',
+      kind: 'image',
+      box: { x: 0, y: 0, width: 100, height: 100 },
+      zIndex: 1,
+      opacity: 0.35,
+      order: 999,
+      source: { tag: 'img', path: 'root/img' },
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+QWc9WQAAAABJRU5ErkJggg==',
+      alt: 'transparent',
+    })
+    const result = htmlDeckToPresentation(deck)
+    const zip = await JSZip.loadAsync(
+      await result.presentation.toArrayBuffer(),
+    )
+    const slide = await zip.file('ppt/slides/slide1.xml')!.async('string')
+
+    expect(slide).toContain('<a:alphaModFix amt="35000"/>')
   })
 
   it('maps measured Landing geometry, typography, alpha, and layers to native objects', async () => {
@@ -174,6 +197,50 @@ describe('editable Slidev rendering', () => {
     if (!operation || operation.kind !== 'text')
       throw new Error('Missing text operation')
     expect(operation.opts.fontFace).toBe('Inter')
+  })
+
+  it('keeps Chinese text in MiSans instead of using its fallback stack', async () => {
+    const deck = structuredClone(landingContentDeck)
+    const text = deck.slides[0]!.elements.find(
+      (element) => element.kind === 'text' && element.text === 'Editable text',
+    )
+    if (!text || text.kind !== 'text') throw new Error('Missing text fixture')
+    text.text = '小米超级电机 V6s'
+    text.style.fontFamily = 'MiSans, "Noto Sans SC", sans-serif'
+    const result = htmlDeckToPresentation(deck)
+    await result.presentation.flush()
+    const operation = result.presentation['_slides'][0]._ops.find(
+      (candidate) =>
+        candidate.kind === 'text' && candidate.text === '小米超级电机 V6s',
+    )
+
+    expect(operation?.kind).toBe('text')
+    if (!operation || operation.kind !== 'text')
+      throw new Error('Missing text operation')
+    expect(operation.opts.fontFace).toBe('MiSans')
+    expect(operation.runs).toBeUndefined()
+  })
+
+  it('preserves MiSans 600 as its real semibold face', async () => {
+    const deck = structuredClone(landingContentDeck)
+    const text = deck.slides[0]!.elements.find(
+      (element) => element.kind === 'text' && element.text === 'Editable text',
+    )
+    if (!text || text.kind !== 'text') throw new Error('Missing text fixture')
+    text.text = 'SU7 673 马力'
+    text.style.fontFamily = 'MiSans, "Noto Sans SC", sans-serif'
+    text.style.fontWeight = 600
+    const result = htmlDeckToPresentation(deck)
+    await result.presentation.flush()
+    const operation = result.presentation['_slides'][0]._ops.find(
+      (candidate) => candidate.kind === 'text' && candidate.text === 'SU7 673 马力',
+    )
+
+    expect(operation?.kind).toBe('text')
+    if (!operation || operation.kind !== 'text')
+      throw new Error('Missing text operation')
+    expect(operation.opts.fontFace).toBe('MiSans Semibold')
+    expect(operation.opts.bold).toBe(false)
   })
 
   it('uses the first preview font instead of a later mapped fallback', async () => {

@@ -1,0 +1,123 @@
+/* Strategy — consulting design language (pine-green-strategy).
+   Deep forest green carries structure, bright green signals key evidence,
+   mint zones give breathing room, magenta marks risk. No cards by default. */
+:root {
+  --stg-bg: #ffffff;
+  --stg-surface: #f1f1f1;
+  --stg-text: #565656;
+  --stg-text-strong: #1f1f1f;
+  --stg-muted: #7e7e7e;
+  --stg-green: #03522c;
+  --stg-green-dark: #04512c;
+  --stg-accent: #29b974;
+  --stg-mint: #d1f5e2;
+  --stg-mint-light: #b8edbc;
+  --stg-olive: #d3df33;
+  --stg-cyan: #2fc1d6;
+  --stg-magenta: #e71c56;
+  --stg-burgundy: #670e30;
+  --stg-line: #dbe6de;
+}
+
+.slidev-layout {
+  height: 100%;
+  background: var(--stg-bg);
+  color: var(--stg-text);
+  font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 2.4rem 3.2rem 2.8rem;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4 {
+  font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--stg-green);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.slidev-layout h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem;
+}
+
+.slidev-layout h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.6rem;
+}
+
+.slidev-layout h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.4rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  font-size: 0.98rem;
+}
+
+.slidev-layout strong {
+  color: var(--stg-text-strong);
+}
+
+.slidev-layout mark {
+  background: var(--stg-mint);
+  color: var(--stg-green-dark);
+  padding: 0 0.2em;
+}
+
+/* Assertion title gets a deep-green underline rule + thin accent tick. */
+.slidev-layout h1 {
+  position: relative;
+  padding-bottom: 0.55rem;
+}
+.slidev-layout h1::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--stg-green);
+}
+.slidev-layout h1::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 2.4rem;
+  height: 6px;
+  background: var(--stg-accent);
+  z-index: 1;
+}
+
+.slidev-layout ul,
+.slidev-layout ol {
+  padding-left: 1.2rem;
+}
+
+.slidev-layout li::marker {
+  color: var(--stg-green);
+}
+
+.slidev-layout table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.slidev-layout th {
+  border-bottom: 2px solid var(--stg-green);
+  color: var(--stg-green);
+  text-align: left;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.slidev-layout td {
+  border-bottom: var(--stg-rule);
+  font-size: 0.9rem;
+  padding: 0.35rem 0.5rem;
+}

@@ -507,13 +507,24 @@ export class McpConfigManager {
     const statuses: McpConfigStatus[] = []
     for (const harness of ['claude', 'codex'] as const) {
       let status = await this.inspect(harness)
-      if (
-        !dryRun &&
-        (status.state === 'missing' ||
-          (status.state === 'conflict' && status.managed))
-      ) {
-        if (harness === 'claude') await this.#writeClaude()
-        else await this.#writeCodex()
+      if (!dryRun) {
+        if (harness === 'claude') {
+          if (
+            status.state === 'missing' ||
+            (status.state === 'conflict' && status.managed)
+          ) {
+            await this.#writeClaude() // writes .mcp.json + auto-enables trust
+          } else if (status.state === 'pending-trust') {
+            // Config already written by an earlier version: backfill the
+            // auto-enable entry so the server connects without a prompt.
+            await this.#ensureClaudeMcpTrust()
+          }
+        } else if (
+          status.state === 'missing' ||
+          (status.state === 'conflict' && status.managed)
+        ) {
+          await this.#writeCodex()
+        }
         status = await this.inspect(harness)
       }
       statuses.push(status)
@@ -555,18 +566,20 @@ export class McpConfigManager {
         legacyManaged.success &&
         legacyManaged.data.command === process.execPath &&
         isLegacyMcpArgs(legacyManaged.data.args, this.#options)
+      const trusted = await this.#claudeMcpTrusted()
+      const message = !matching
+        ? legacy
+          ? 'Legacy managed fastppt MCP entry requires migration.'
+          : 'Existing fastppt MCP entry differs.'
+        : trusted
+          ? undefined
+          : 'fastppt MCP 配置已写入 .mcp.json，等待 Claude Code 信任授权。'
       return McpConfigStatusSchema.parse({
         harness: 'claude',
-        state: matching ? 'pending-trust' : 'conflict',
+        state: matching ? (trusted ? 'configured' : 'pending-trust') : 'conflict',
         configPath,
         managed: matching || legacy,
-        ...(!matching
-          ? {
-              message: legacy
-                ? 'Legacy managed fastppt MCP entry requires migration.'
-                : 'Existing fastppt MCP entry differs.',
-            }
-          : {}),
+        ...(message ? { message } : {}),
       })
     } catch (cause) {
       return McpConfigStatusSchema.parse({
@@ -597,6 +610,55 @@ export class McpConfigManager {
     }
     await backup(configPath)
     await atomicWrite(configPath, `${JSON.stringify(config, null, 2)}\n`)
+    await this.#ensureClaudeMcpTrust()
+  }
+
+  /** Whether the fastppt project MCP server is pre-authorized in Claude Code's
+      `.claude/settings.json` via `enabledMcpjsonServers`. */
+  async #claudeMcpTrusted(): Promise<boolean> {
+    const settingsPath = join(
+      this.#options.workspaceRoot,
+      '.claude',
+      'settings.json',
+    )
+    if (!(await exists(settingsPath))) return false
+    try {
+      const settings = JSON.parse(
+        await readFile(settingsPath, 'utf8'),
+      ) as { enabledMcpjsonServers?: unknown }
+      return (
+        Array.isArray(settings.enabledMcpjsonServers) &&
+        settings.enabledMcpjsonServers.includes('fastppt')
+      )
+    } catch {
+      return false
+    }
+  }
+
+  /** Merge `enabledMcpjsonServers: ["fastppt"]` into the workspace
+      `.claude/settings.json` so the project MCP server is auto-enabled without
+      the first-use "Allow this MCP server?" prompt. Preserves all other keys. */
+  async #ensureClaudeMcpTrust(): Promise<void> {
+    const settingsPath = join(
+      this.#options.workspaceRoot,
+      '.claude',
+      'settings.json',
+    )
+    const settings = (await exists(settingsPath))
+      ? (JSON.parse(await readFile(settingsPath, 'utf8')) as Record<
+          string,
+          unknown
+        >)
+      : {}
+    const enabled = Array.isArray(settings.enabledMcpjsonServers)
+      ? settings.enabledMcpjsonServers.filter(
+          (entry): entry is string => typeof entry === 'string',
+        )
+      : []
+    if (enabled.includes('fastppt')) return
+    settings.enabledMcpjsonServers = [...enabled, 'fastppt']
+    await backup(settingsPath)
+    await atomicWrite(settingsPath, `${JSON.stringify(settings, null, 2)}\n`)
   }
 
   async #inspectCodex(): Promise<McpConfigStatus> {
@@ -620,6 +682,7 @@ export class McpConfigManager {
         state: 'pending-trust',
         configPath,
         managed: true,
+        message: 'fastppt MCP 配置已写入 .codex/config.toml；首次在 Codex 中信任该项目后即启用。',
       })
     const legacyBlock = legacyCodexBlock(source, this.#options)
     if (legacyBlock)

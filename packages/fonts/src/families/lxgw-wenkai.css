@@ -1,0 +1,12 @@
+/*
+ * @fastppt/fonts — self-hosted font catalog.
+ * Import the specific family you need: e.g. `import '@fastppt/fonts/noto-sans-sc'`.
+ * Family names must stay byte-identical to src/registry.mjs keys.
+ */
+@font-face {
+  font-family: 'LXGW WenKai';
+  font-style: normal;
+    font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/lxgw-wenkai-regular.ttf') format('truetype');
+}

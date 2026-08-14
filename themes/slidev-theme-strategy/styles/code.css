@@ -1,0 +1,16 @@
+.slidev-layout code {
+  font-family: 'Fira Code', ui-monospace, monospace;
+  font-size: 0.88em;
+}
+
+.slidev-layout :not(pre) > code {
+  background: var(--stg-mint);
+  color: var(--stg-green-dark);
+  padding: 0.05em 0.35em;
+}
+
+.slidev-layout pre.slidev-code {
+  background: var(--stg-surface) !important;
+  border: 1px solid var(--stg-green);
+  border-radius: 0;
+}

@@ -43,7 +43,8 @@
   },
   "dependencies": {
     "@iconify/vue": "^4.3.0",
-    "@slidev/types": "^52.14.1"
+    "@slidev/types": "^52.14.1",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@slidev/cli": "^52.14.1"
@@ -52,9 +53,10 @@
     "colorSchema": "light",
     "defaults": {
       "fonts": {
-        "sans": "Sofia Sans Condensed,Sofia Sans,Boogaloo",
+        "sans": "MiSans,Sofia Sans,Noto Sans SC",
         "mono": "JetBrains Mono",
-        "weights": "200,400,600,900"
+        "weights": "200,400,600,900",
+        "local": "MiSans,Sofia Sans,Noto Sans SC,JetBrains Mono"
       },
       "transition": "none"
     }

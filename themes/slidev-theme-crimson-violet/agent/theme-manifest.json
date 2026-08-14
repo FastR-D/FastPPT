@@ -1,0 +1,46 @@
+{
+  "id": "slidev-theme-crimson-violet",
+  "packageName": "slidev-theme-crimson-violet",
+  "displayName": "Crimson-violet",
+  "version": "0.1.0-extracted.1",
+  "description": "从现有 PPTX 提取的主题（含主导色与字体分析）。",
+  "repositoryUrl": "https://github.com/FastR-D/FastPPT",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-crimson-violet",
+    "sourceDir": "agent",
+    "version": "0.1.0-extracted.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "extracted-palette",
+      "label": "提取配色",
+      "description": "从源 PPTX 提取的调色板，主导色 #A9B1EE。"
+    },
+    {
+      "id": "extracted-fonts",
+      "label": "提取字体",
+      "description": "正文 Noto Sans SC，标题 Inter。"
+    }
+  ]
+}

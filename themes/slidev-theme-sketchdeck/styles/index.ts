@@ -1,2 +1,6 @@
+import '@fastppt/fonts/shantell-sans'
+import '@fastppt/fonts/caveat'
+import '@fastppt/fonts/lxgw-wenkai'
+import '@fastppt/fonts/jetbrains-mono'
 import './layout.css'
 import './code.css'

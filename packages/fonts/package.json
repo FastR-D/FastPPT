@@ -1,0 +1,93 @@
+{
+  "name": "@fastppt/fonts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Self-hosted font catalog for FastPPT themes and editable PPTX font embedding.",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/index.css"
+    },
+    "./index.css": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/index.css"
+    },
+    "./registry": {
+      "types": "./src/registry.d.mts",
+      "default": "./src/registry.mjs"
+    },
+    "./inter": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/inter.css"
+    },
+    "./space-grotesk": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/space-grotesk.css"
+    },
+    "./fira-code": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/fira-code.css"
+    },
+    "./jetbrains-mono": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/jetbrains-mono.css"
+    },
+    "./space-mono": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/space-mono.css"
+    },
+    "./nunito-sans": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/nunito-sans.css"
+    },
+    "./sofia-sans": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/sofia-sans.css"
+    },
+    "./lexend": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/lexend.css"
+    },
+    "./caveat": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/caveat.css"
+    },
+    "./shantell-sans": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/shantell-sans.css"
+    },
+    "./noto-sans-sc": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/noto-sans-sc.css"
+    },
+    "./noto-serif-sc": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/noto-serif-sc.css"
+    },
+    "./lxgw-wenkai": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/lxgw-wenkai.css"
+    },
+    "./misans": {
+      "types": "./src/index.d.css.ts",
+      "default": "./src/families/misans.css"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --write .",
+    "fetch-fonts": "node scripts/fetch-fonts.mjs"
+  },
+  "files": [
+    "assets",
+    "src"
+  ],
+  "license": "OFL-1.1",
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

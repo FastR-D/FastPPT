@@ -1,0 +1,46 @@
+{
+  "name": "slidev-theme-crimson-violet",
+  "version": "0.1.0-extracted.1",
+  "private": true,
+  "type": "module",
+  "description": "Extracted from an existing PPTX (source.pptx).",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "crimson-violet"
+  ],
+  "license": "MIT",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "global-top.vue",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "transition": "none",
+      "fonts": {
+        "sans": "Noto Sans SC",
+        "serif": "Inter,Noto Serif SC",
+        "mono": "Fira Code",
+        "weights": "400,600,700",
+        "local": "Noto Sans SC,Noto Sans SC,Inter,Noto Serif SC,Fira Code"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*"
+  }
+}

@@ -1,0 +1,25 @@
+/* MiSans — Xiaomi free-for-commercial font. The browser and PPTX exporter
+   share the same complete version 4.1 TTF files for consistent glyphs. */
+@font-face {
+  font-family: 'MiSans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/misans-regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'MiSans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../assets/fonts/misans-semibold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'MiSans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../assets/fonts/misans-bold.ttf') format('truetype');
+}

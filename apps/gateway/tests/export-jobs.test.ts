@@ -1,4 +1,5 @@
-import { access, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
+import { access, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -83,6 +84,7 @@ class FakeExporter implements EditablePptxExporter {
       warnings: [{ code: 'fixture-warning', message: 'Fixture warning' }],
       elementCount: 12,
       slideCount: 2,
+      qa: { ok: true, slideCount: 2, issues: [] },
     }
   }
 }
@@ -266,6 +268,125 @@ describe('ExportJobManager', () => {
     expect(JSON.stringify(failed)).not.toContain('private-token')
     await expect(access(join(outputRoot, job.id))).rejects.toMatchObject({
       code: 'ENOENT',
+    })
+    await manager.dispose()
+  })
+
+  it('holds a review-required export until approved, then publishes', async () => {
+    const outputRoot = await exportRoot()
+    const exporter = new FakeExporter()
+    const manager = new ExportJobManager({ outputRoot, exporter })
+    const job = manager.enqueue({ deckId: 'deck-1', outputName: 'deck.pptx', review: true })
+    manager.submitSnapshot(job.id, snapshot)
+    await vi.waitFor(() => expect(exporter.release).toBeTypeOf('function'))
+    exporter.release?.()
+
+    await vi.waitFor(() => expect(manager.get(job.id)?.status).toBe('review-required'))
+    const held = manager.get(job.id)
+    expect(held?.phase).toBe('awaiting-review')
+    // Partial exists and is not yet published; download is unavailable.
+    await expect(
+      readFile(join(outputRoot, job.id, '.deck.pptx.partial.pptx'), 'utf8'),
+    ).resolves.toBe('fixture pptx')
+
+    const approved = await manager.review(job.id, true)
+    expect(approved.status).toBe('completed')
+    await expect(
+      readFile(join(outputRoot, job.id, 'deck.pptx'), 'utf8'),
+    ).resolves.toBe('fixture pptx')
+    await manager.dispose()
+  })
+
+  it('rejects a review-required export and removes the partial', async () => {
+    const outputRoot = await exportRoot()
+    const exporter = new FakeExporter()
+    const manager = new ExportJobManager({ outputRoot, exporter })
+    const job = manager.enqueue({ deckId: 'deck-1', outputName: 'deck.pptx', review: true })
+    manager.submitSnapshot(job.id, snapshot)
+    await vi.waitFor(() => expect(exporter.release).toBeTypeOf('function'))
+    exporter.release?.()
+    await vi.waitFor(() => expect(manager.get(job.id)?.status).toBe('review-required'))
+
+    const rejected = await manager.review(job.id, false)
+    expect(rejected.status).toBe('failed')
+    expect(rejected.error?.code).toBe('EXPORT_REJECTED')
+    await expect(access(join(outputRoot, job.id))).rejects.toMatchObject({
+      code: 'ENOENT',
+    })
+    await manager.dispose()
+  })
+
+  it('restores a persisted completed export on a new manager instance', async () => {
+    const outputRoot = await exportRoot()
+    const id = randomUUID()
+    await mkdir(join(outputRoot, id), { recursive: true })
+    await writeFile(join(outputRoot, id, 'deck.pptx'), 'fixture pptx')
+    await writeFile(
+      join(outputRoot, id, 'job.json'),
+      JSON.stringify({
+        job: {
+          id,
+          deckId: 'deck-1',
+          format: 'editable-pptx',
+          outputName: 'deck.pptx',
+          status: 'completed',
+          phase: 'completed',
+          progress: 100,
+          createdAt: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          warnings: [],
+          downloadUrl: `/api/v1/exports/${id}/download`,
+        },
+        snapshot,
+        outputPath: join(outputRoot, id, 'deck.pptx'),
+        partialPath: join(outputRoot, id, '.deck.pptx.partial.pptx'),
+        review: false,
+      }),
+    )
+    const manager = new ExportJobManager({ outputRoot, exporter: new FakeExporter() })
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    expect(manager.get(id)?.status).toBe('completed')
+    await expect(manager.download(id)).resolves.toMatchObject({
+      name: 'deck.pptx',
+    })
+    await manager.dispose()
+  })
+
+  it('restores an interrupted export as failed and retries from the snapshot', async () => {
+    const outputRoot = await exportRoot()
+    const id = randomUUID()
+    await mkdir(join(outputRoot, id), { recursive: true })
+    await writeFile(
+      join(outputRoot, id, 'job.json'),
+      JSON.stringify({
+        job: {
+          id,
+          deckId: 'deck-1',
+          format: 'editable-pptx',
+          outputName: 'deck.pptx',
+          status: 'running',
+          phase: 'starting',
+          progress: 35,
+          createdAt: new Date().toISOString(),
+          warnings: [],
+        },
+        snapshot,
+        outputPath: join(outputRoot, id, 'deck.pptx'),
+        partialPath: join(outputRoot, id, '.deck.pptx.partial.pptx'),
+        review: false,
+      }),
+    )
+    const exporter = new FakeExporter()
+    const manager = new ExportJobManager({ outputRoot, exporter })
+    await new Promise((resolve) => setTimeout(resolve, 30))
+    expect(manager.get(id)?.status).toBe('failed')
+    expect(manager.get(id)?.error?.code).toBe('EXPORT_INTERRUPTED')
+    manager.retry(id)
+    await vi.waitFor(() => expect(exporter.release).toBeTypeOf('function'))
+    exporter.release?.()
+    await vi.waitFor(() => expect(manager.get(id)?.status).toBe('completed'))
+    await expect(manager.download(id)).resolves.toMatchObject({
+      name: 'deck.pptx',
     })
     await manager.dispose()
   })

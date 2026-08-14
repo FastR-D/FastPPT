@@ -20,7 +20,8 @@
   "bugs": "https://github.com/captainsafia/slidev-theme-sketchdeck/issues",
   "type": "module",
   "dependencies": {
-    "@slidev/types": "catalog:"
+    "@slidev/types": "catalog:",
+    "@fastppt/fonts": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
@@ -36,10 +37,11 @@
       "transition": "fade-out",
       "highlighter": "shiki",
       "fonts": {
-        "sans": "Shantell Sans",
-        "serif": "Shantell Sans",
+        "sans": "Shantell Sans,LXGW WenKai",
+        "serif": "Shantell Sans,LXGW WenKai",
         "mono": "JetBrains Mono",
-        "handwriting": "Caveat"
+        "handwriting": "Caveat",
+        "local": "Shantell Sans,Caveat,LXGW WenKai,JetBrains Mono"
       }
     }
   },

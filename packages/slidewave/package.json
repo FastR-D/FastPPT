@@ -35,7 +35,10 @@
     "lucide": "catalog:",
     "pptxgenjs": "catalog:",
     "prismjs": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "jszip": "^3.10.1",
+    "subset-font": "^2.5.0",
+    "ttf2eot": "^3.1.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",

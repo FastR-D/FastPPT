@@ -1,3 +1,6 @@
+import '@fastppt/fonts/noto-serif-sc'
+import '@fastppt/fonts/noto-sans-sc'
+import '@fastppt/fonts/fira-code'
 import '@fontsource/libertinus-serif'
 import './base.css'
 import '../themes/dewdrop/styles.css'

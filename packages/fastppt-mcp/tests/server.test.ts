@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -43,6 +43,8 @@ async function fixture(
   options: {
     browserCapture?: BrowserCaptureDelegate
     generatedImagesRoot?: string
+    themesRoot?: string
+    fetch?: typeof fetch
   } = {},
 ) {
   const workspaceRoot = await temporaryDirectory('fastppt-mcp-')
@@ -81,6 +83,8 @@ layout: content
     workspaceName: 'fixture',
     registry,
     commonSkillRoot,
+    themesRoot: options.themesRoot ?? themesRoot,
+    extractorPath: resolve('extract-theme.mjs'),
     ...options,
   })
   return { workspaceRoot, service }
@@ -105,7 +109,7 @@ describe('FastPPT MCP', () => {
     expect(
       z.object({ value: z.array(z.unknown()) }).parse(themes.structuredContent)
         .value,
-    ).toHaveLength(16)
+    ).toHaveLength((await loadThemeRegistry(themesRoot)).themes.length)
     const skill = await client.callTool({
       name: 'get_theme_skill',
       arguments: { themeId: 'slidev-theme-academy', harness: 'claude' },
@@ -146,6 +150,28 @@ describe('FastPPT MCP', () => {
     await expect(service.listAssets()).resolves.toEqual({ assets: [] })
   })
 
+  it('validates workspace assets referenced by native HTML images', async () => {
+    const { workspaceRoot, service } = await fixture()
+    const slides = await service.readSlides()
+    await service.writeSlides({
+      path: 'slides.md',
+      expectedRevision: slides.revision,
+      content: `${slides.content}\n\n<img src="./assets/missing.png" alt="Missing" />\n`,
+    })
+    await expect(service.validateSlides()).resolves.toMatchObject({
+      valid: false,
+      errors: expect.arrayContaining([
+        expect.objectContaining({
+          code: 'ASSET_UNAVAILABLE',
+          message: 'Asset cannot be resolved: ./assets/missing.png',
+        }),
+      ]),
+    })
+    await mkdir(join(workspaceRoot, 'assets'), { recursive: true })
+    await writeFile(join(workspaceRoot, 'assets', 'missing.png'), Buffer.from([0]))
+    await expect(service.validateSlides()).resolves.toMatchObject({ valid: true })
+  })
+
   it('imports Codex-generated images into exact workspace paths safely', async () => {
     const generatedImagesRoot = await temporaryDirectory(
       'codex-generated-images-',
@@ -183,6 +209,47 @@ describe('FastPPT MCP', () => {
     await expect(
       service.importGeneratedImage(source, '../escaped.png'),
     ).rejects.toMatchObject({ code: 'PATH_OUTSIDE_WORKSPACE' })
+  })
+
+  it('downloads public HTTPS images into exact workspace paths safely', async () => {
+    const png = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00,
+    ])
+    const requested: string[] = []
+    const { workspaceRoot, service } = await fixture({
+      fetch: (async (input: string | URL | Request) => {
+        requested.push(String(input))
+        return new Response(png, {
+          headers: { 'content-type': 'image/png' },
+        })
+      }) as typeof fetch,
+    })
+
+    await expect(
+      service.importRemoteImage(
+        'https://images.example.org/chart.png',
+        'assets/sources/slide-02-chart.png',
+      ),
+    ).resolves.toMatchObject({
+      path: 'assets/sources/slide-02-chart.png',
+      mediaType: 'image/png',
+    })
+    expect(requested).toEqual(['https://images.example.org/chart.png'])
+    await expect(
+      readFile(join(workspaceRoot, 'assets/sources/slide-02-chart.png')),
+    ).resolves.toEqual(png)
+    await expect(
+      service.importRemoteImage(
+        'http://images.example.org/chart.png',
+        'assets/sources/insecure.png',
+      ),
+    ).rejects.toThrow('must use HTTPS')
+    await expect(
+      service.importRemoteImage(
+        'https://127.0.0.1/chart.png',
+        'assets/sources/private.png',
+      ),
+    ).rejects.toThrow('private network')
   })
 
   it('inspects rendered slide overflow through a managed preview', async () => {
@@ -327,6 +394,62 @@ describe('FastPPT MCP', () => {
     expect(results[0]?.svg).toContain('<svg')
     await client.close()
     await server.close()
+    await service.dispose()
+  })
+
+  it('import_theme_from_pptx rejects paths outside the workspace', async () => {
+    const { service } = await fixture()
+    await expect(
+      service.importThemeFromPptx('../../outside.pptx', 'blocked'),
+    ).rejects.toThrow(/inside the workspace/)
+    await service.dispose()
+  })
+
+  it('materializes harness-designed layouts and components into a theme', async () => {
+    const fixtureThemes = await temporaryDirectory('fastppt-design-')
+    const themeDir = join(fixtureThemes, 'slidev-theme-test')
+    await mkdir(join(themeDir, 'agent'), { recursive: true })
+    await mkdir(join(themeDir, 'styles'), { recursive: true })
+    await writeFile(
+      join(themeDir, 'package.json'),
+      JSON.stringify({ name: 'slidev-theme-test', version: '0.1.0' }),
+    )
+    await writeFile(
+      join(themeDir, 'styles', 'base.css'),
+      ':root { --ext-primary: #123456; }\n',
+    )
+    await writeFile(
+      join(themeDir, 'agent', 'theme-manifest.json'),
+      JSON.stringify({ id: 'slidev-theme-test', layouts: [] }),
+    )
+    await writeFile(
+      join(themeDir, 'agent', 'SKILL.md'),
+      '---\nname: fastppt-theme-test\ndescription: Test theme.\n---\n\n## Registered layouts\n\n- `default`\n',
+    )
+    const { service } = await fixture({ themesRoot: fixtureThemes })
+    const result = await service.designThemeLayouts(
+      'slidev-theme-test',
+      [
+        { id: 'data', label: '数据页', kind: 'data', hint: 'chart-heavy' },
+        { id: 'metrics', label: '指标页', kind: 'metrics' },
+      ],
+      [{ name: 'StatCard', kind: 'stat' }],
+    )
+    expect(result.layouts.map((layout) => layout.id)).toEqual(['data', 'metrics'])
+    expect(result.components).toEqual(['StatCard'])
+    await expect(
+      readFile(join(themeDir, 'layouts', 'data.vue'), 'utf8'),
+    ).resolves.toContain('<slot />')
+    await expect(
+      readFile(join(themeDir, 'components', 'StatCard.vue'), 'utf8'),
+    ).resolves.toContain('ext-stat-card')
+    const manifest = JSON.parse(
+      await readFile(join(themeDir, 'agent', 'theme-manifest.json'), 'utf8'),
+    ) as { layouts: Array<{ id: string }> }
+    expect(manifest.layouts.map((layout) => layout.id)).toContain('data')
+    await expect(
+      readFile(join(themeDir, 'agent', 'SKILL.md'), 'utf8'),
+    ).resolves.toContain('`data`: chart-heavy')
     await service.dispose()
   })
 })

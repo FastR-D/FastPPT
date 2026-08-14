@@ -38,7 +38,8 @@
     "http-proxy": "^1.18.1",
     "@fastppt/slidewave": "workspace:*",
     "ws": "^8.21.2",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

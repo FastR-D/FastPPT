@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process'
 import { createHash, randomUUID } from 'node:crypto'
 import { createReadStream, watch, type FSWatcher } from 'node:fs'
 import {
@@ -10,7 +11,7 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import { constants } from 'node:fs'
-import { basename, dirname, join, relative, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve, sep } from 'node:path'
 import { Readable } from 'node:stream'
 import { fileURLToPath } from 'node:url'
 
@@ -19,6 +20,7 @@ import websocket from '@fastify/websocket'
 import { createDatabase } from '@fastppt/database'
 import { listCollections, searchIcons } from '@fastppt/icons'
 import { resolveFastPptMcpCliEntry } from '@fastppt/fastppt-mcp'
+import { runThemeExtraction } from '@fastppt/fastppt-mcp'
 import { ManagedSkillInstaller, McpConfigManager } from '@fastppt/fastppt-skill'
 import { ClaudeAdapter, ClaudeAdapterError } from '@fastppt/harness-claude'
 import { CodexAdapter, RpcError } from '@fastppt/harness-codex'
@@ -48,7 +50,10 @@ import {
   ApprovalDecisionRequestSchema,
   ApprovalRequestSchema,
   ApplicationStateSchema,
-  CreateExportRequestSchema,
+  CreateExportRequestSchema, ReviewExportRequestSchema,
+  ImportPptxThemeRequestSchema,
+  ImportPptxThemeResultSchema,
+  ImportPptxThemeStatusSchema,
   CreateSessionRequestSchema,
   HarnessKindSchema,
   HarnessStatusSchema,
@@ -65,6 +70,7 @@ import {
 } from '@fastppt/protocol'
 import { cleanupStaleSlidevCaches, SlidevHost } from '@fastppt/slidev-host'
 import { classifySlidevLogLine } from './slidev-logs.js'
+import { ensureWorkspaceGitignore } from './workspace-gitignore.js'
 import {
   loadThemeRegistry,
   ThemeRegistryError,
@@ -430,6 +436,7 @@ export async function createGateway(
     done()
   })
   await app.register(websocket, { options: { maxPayload: 1024 * 1024 } })
+  await ensureWorkspaceGitignore(config.workspaceRoot)
   const database = createDatabase(
     join(config.workspaceRoot, '.fastppt', 'state', 'fastppt.sqlite'),
   )
@@ -1628,6 +1635,278 @@ export async function createGateway(
 
   app.post('/api/v1/themes/rescan', async () => await reloadThemeRegistry())
 
+  type ThemeImportStatus = z.infer<typeof ImportPptxThemeStatusSchema>
+  const designStatuses = new Map<string, ThemeImportStatus>()
+
+  const readThemeArtifacts = async (themeId: string) => {
+    const themeDir = join(config.themesRoot, themeId)
+    const manifest = JSON.parse(
+      await readFile(join(themeDir, 'agent', 'theme-manifest.json'), 'utf8'),
+    ) as { layouts?: Array<{ id: string }> }
+    const componentEntries = await import('node:fs/promises').then(({ readdir }) =>
+      readdir(join(themeDir, 'components')).catch(() => []),
+    )
+    return {
+      layouts: (manifest.layouts ?? []).map((layout) => layout.id),
+      components: componentEntries
+        .filter((entry) => entry.endsWith('.vue'))
+        .map((entry) => entry.slice(0, -4)),
+    }
+  }
+
+  const setThemeImportStatus = (
+    themeId: string,
+    update: Omit<ThemeImportStatus, 'themeId'>,
+  ): void => {
+    designStatuses.set(
+      themeId,
+      ImportPptxThemeStatusSchema.parse({ themeId, ...update }),
+    )
+  }
+
+  /**
+   * Background enrichment: run a harness design session that proposes
+   * characteristic Slidev layouts + components for the just-imported theme.
+   * The agent reads the extraction analysis and submits a structured design via
+   * the `design_theme_layouts` MCP tool; completion reloads the registry.
+   */
+  async function runThemeDesignSession(
+    harness: 'claude' | 'codex',
+    themeId: string,
+    themeDir: string,
+  ): Promise<void> {
+    const before = await readThemeArtifacts(themeId)
+    setThemeImportStatus(themeId, {
+      stage: 'designing',
+      designing: true,
+      ...before,
+      message: 'Harness 正在根据提取分析设计特色布局与组件。',
+    })
+    const skillStatus = await skillInstaller.themeStatus(harness, themeId)
+    const session = await harnesses[harness].createSession({
+      cwd: workspace.root,
+      title: `Design ${themeId} layouts`,
+    })
+    const content = [
+      `Design characteristic Slidev layouts and components for the just-imported theme ${themeId}.`,
+      `Read the extraction analysis at ${join(themeDir, 'EXTRACTION_ANALYSIS.md')} for the palette, fonts, typography, and suggested layouts/components.`,
+      `Treat slide-level explicit colors and their frequencies as stronger evidence than generic Office accent slots. Do not introduce corporate blue or another fallback hue unless the analyzed slides actually use it.`,
+      `Infer the source deck's visual grammar: whitespace, alignment, image dominance, numeric emphasis, density, and rhythm. Avoid generic card grids unless the source structure supports them.`,
+      `Call the design_theme_layouts MCP tool with a structured list: 3-6 complementary layouts and 1-3 components that cover the source deck's recurring information structures.`,
+      `Use the kinds listed in the tool schema and write a concrete hint per item describing content limits, slot usage, and when the author should choose it. These hints are synchronized into the Theme Skill.`,
+      `After submitting the design, your turn is done — do not continue editing.`,
+    ].join('\n')
+    const stream = harnesses[harness].sendMessage({
+      sessionId: session.sessionId,
+      cwd: workspace.root,
+      content,
+      attachments: [],
+      themeId,
+      themeSkillId: skillStatus.theme.skillId,
+      themeSkillVersion: skillStatus.theme.expectedVersion,
+      skills: [
+        {
+          id: skillStatus.base.skillId,
+          name: skillStatus.base.skillId,
+          path: skillStatus.base.targetPath,
+          version: skillStatus.base.expectedVersion,
+        },
+        {
+          id: skillStatus.theme.skillId,
+          name: skillStatus.theme.skillId,
+          path: skillStatus.theme.targetPath,
+          version: skillStatus.theme.expectedVersion,
+        },
+      ],
+    })
+    // Consume the agent's turn; the design_theme_layouts call materializes files.
+    // Bound the session so a stalled agent cannot dangle the background task.
+    let timedOut = false
+    await Promise.race([
+      (async () => {
+        for await (const event of stream) {
+          void event // progress is intentionally not surfaced for the background enrichment
+        }
+      })(),
+      new Promise<void>((resolve) =>
+        setTimeout(() => {
+          timedOut = true
+          resolve()
+        }, 240_000),
+      ),
+    ])
+    if (timedOut) throw new Error('Theme design session timed out after 240 seconds.')
+    const designed = await readThemeArtifacts(themeId)
+    if (
+      designed.layouts.length <= before.layouts.length &&
+      designed.components.length <= before.components.length
+    )
+      throw new Error('Harness completed without materializing layouts or components.')
+
+    setThemeImportStatus(themeId, {
+      stage: 'syncing',
+      designing: true,
+      ...designed,
+      message: '特色设计已生成，正在同步更新后的 Theme Skill。',
+    })
+    await reloadThemeRegistry()
+    const refreshed = await skillInstaller.reconcile({ cleanStale: true })
+    database.recordManagedInstallations(refreshed.statuses)
+    const unavailable = refreshed.statuses.filter(
+      (status) => status.themeId === themeId && status.state !== 'installed',
+    )
+    if (unavailable.length > 0)
+      throw new Error(`Theme Skill synchronization failed: ${unavailable[0]?.message}`)
+
+    setThemeImportStatus(themeId, {
+      stage: 'validating',
+      designing: true,
+      ...designed,
+      message: 'Theme Skill 已同步，正在校验主题结构与注册信息。',
+    })
+    themeRegistry.resolve(themeId)
+    await Promise.all([
+      access(join(themeDir, 'styles', 'index.ts')),
+      access(join(themeDir, 'agent', 'SKILL.md')),
+      ...designed.layouts.map((layout) =>
+        access(join(themeDir, 'layouts', `${layout}.vue`)),
+      ),
+    ])
+    setThemeImportStatus(themeId, {
+      stage: 'ready',
+      designing: false,
+      ...designed,
+      message: '主题提取、特色设计、Skill 同步与结构校验均已完成。',
+    })
+    app.log.info({ themeId, harness }, 'Theme design session completed; registry reloaded')
+  }
+
+  app.post('/api/v1/imports/pptx-theme', async (request, reply) => {
+    const input = ImportPptxThemeRequestSchema.parse(request.body)
+    const pptx = Buffer.from(input.dataBase64, 'base64')
+    if (pptx.byteLength === 0) {
+      reply.code(400)
+      return { error: 'The uploaded PPTX is empty or could not be decoded.' }
+    }
+    if (pptx.byteLength > 200 * 1024 * 1024) {
+      reply.code(413)
+      return { error: 'The uploaded PPTX exceeds the 200 MiB import limit.' }
+    }
+    if (
+      pptx.byteLength < 4 ||
+      pptx[0] !== 0x50 ||
+      pptx[1] !== 0x4b
+    ) {
+      reply.code(400)
+      return { error: 'The uploaded file is not a valid PPTX/ZIP package.' }
+    }
+    const importsDir = join(config.workspaceRoot, '.fastppt', 'imports')
+    await mkdir(importsDir, { recursive: true })
+    const pptxPath = join(importsDir, `${randomUUID()}.pptx`)
+    await writeFile(pptxPath, pptx)
+    const extractorPath = join(
+      repositoryRoot,
+      'scripts',
+      'extract-theme.mjs',
+    )
+    try {
+      const { slug } = await runThemeExtraction({
+        pptxPath,
+        ...(input.themeName !== undefined ? { themeName: input.themeName } : {}),
+        themesRoot: config.themesRoot,
+        extractorPath,
+      })
+      await reloadThemeRegistry()
+      const theme = themeRegistry.resolve(`slidev-theme-${slug}`)
+      // A newly created theme depends on @fastppt/fonts; in the dev repo the
+      // workspace link needs a `pnpm install`. Best-effort and background so an
+      // unavailable package manager never blocks the import.
+      if (
+        config.themesRoot === repositoryRoot ||
+        config.themesRoot.startsWith(`${repositoryRoot}${sep}`)
+      ) {
+        const install = spawn('pnpm', ['install'], {
+          cwd: repositoryRoot,
+          stdio: 'ignore',
+        })
+        install.on('error', () => undefined)
+      }
+      const themeId = theme.manifest.id
+      const themeDir = join(config.themesRoot, themeId)
+      const extracted = await readThemeArtifacts(themeId)
+      setThemeImportStatus(themeId, {
+        stage: 'designing',
+        designing: true,
+        ...extracted,
+        message: '基础主题已提取，准备启动 harness 特色设计。',
+      })
+      const recentHarness = database.getAppSetting('recentHarness')
+      const designHarness: 'claude' | 'codex' | undefined =
+        recentHarness === 'claude' || recentHarness === 'codex'
+          ? recentHarness
+          : 'claude'
+      if (designHarness) {
+        // Optional background enrichment: a harness session designs characteristic
+        // layouts/components. Completion reloads the registry and publishes
+        // `themes.reloaded`, so the frontend catalog updates automatically.
+        runThemeDesignSession(designHarness, themeId, themeDir)
+          .catch((cause: unknown) => {
+            const message = cause instanceof Error ? cause.message : String(cause)
+            const current = designStatuses.get(themeId)
+            setThemeImportStatus(themeId, {
+              stage: 'failed',
+              designing: false,
+              layouts: current?.layouts ?? extracted.layouts,
+              components: current?.components ?? extracted.components,
+              message: '主题基础提取已保留，但特色设计流程未完成。',
+              error: message,
+            })
+            app.log.warn(
+              { themeId, cause: message },
+              'Theme design session failed; base theme retained',
+            )
+          })
+      } else {
+        setThemeImportStatus(themeId, {
+          stage: 'ready',
+          designing: false,
+          ...extracted,
+          message: '基础主题提取和结构校验已完成。',
+        })
+      }
+      return ImportPptxThemeResultSchema.parse({
+        themeId,
+        displayName: theme.manifest.displayName,
+        packageName: theme.manifest.packageName,
+        skillId: theme.manifest.skill.id,
+        version: theme.manifest.version,
+        slug,
+        designing: designHarness !== undefined,
+      })
+    } catch (cause) {
+      reply.code(400)
+      return { error: cause instanceof Error ? cause.message : String(cause) }
+    } finally {
+      await rm(pptxPath, { force: true }).catch(() => undefined)
+    }
+  })
+
+  app.get('/api/v1/imports/pptx-theme/:themeId', async (request) => {
+    const { themeId } = z
+      .object({ themeId: z.string().min(1) })
+      .parse(request.params)
+    const current = designStatuses.get(themeId)
+    if (current) return current
+    const artifacts = await readThemeArtifacts(themeId)
+    return ImportPptxThemeStatusSchema.parse({
+      themeId,
+      stage: 'ready',
+      designing: false,
+      ...artifacts,
+      message: '主题已就绪。',
+    })
+  })
+
   app.get('/api/v1/icons', async () => {
     const collections = await listCollections()
     return z.array(IconCollectionSummarySchema).parse(collections)
@@ -1932,6 +2211,7 @@ export async function createGateway(
         deckId,
         title: deck.name,
         outputName: input.outputName,
+        review: input.review ?? false,
       }),
     )
   })
@@ -2056,6 +2336,33 @@ export async function createGateway(
         exportId,
       })
     return ExportJobSchema.parse(job)
+  })
+
+  app.post('/api/v1/exports/:exportId/review', async (request, reply) => {
+    const { exportId } = z
+      .object({ exportId: z.string().min(1) })
+      .parse(request.params)
+    const { approved } = ReviewExportRequestSchema.parse(request.body)
+    try {
+      return ExportJobSchema.parse(
+        await exportManager.review(exportId, approved),
+      )
+    } catch (cause) {
+      reply.code(400)
+      return { error: cause instanceof Error ? cause.message : String(cause) }
+    }
+  })
+
+  app.post('/api/v1/exports/:exportId/retry', async (request, reply) => {
+    const { exportId } = z
+      .object({ exportId: z.string().min(1) })
+      .parse(request.params)
+    try {
+      return ExportJobSchema.parse(exportManager.retry(exportId))
+    } catch (cause) {
+      reply.code(400)
+      return { error: cause instanceof Error ? cause.message : String(cause) }
+    }
   })
 
   app.post('/api/v1/exports/:exportId/cancel', (request) => {

@@ -19,6 +19,8 @@ import {
   UnifiedSessionSchema,
   WorkspaceInfoSchema,
   WorkspaceImageAssetSchema,
+  ImportPptxThemeResultSchema,
+  ImportPptxThemeStatusSchema,
 } from '@fastppt/protocol'
 import { z } from 'zod'
 
@@ -44,6 +46,8 @@ import type {
   MarkdownFormatResult,
   ExportJob,
   BrowserInspectionJob,
+  ImportPptxThemeResult,
+  ImportPptxThemeStatus,
 } from '@fastppt/protocol'
 
 // 本地 gateway 固定跑在 http://127.0.0.1:4317(见 @fastppt/config 的 loadGatewayConfig)。
@@ -211,14 +215,55 @@ export function useGatewayClient() {
   function createExport(
     deckId: string,
     outputName: string,
+    review?: boolean,
   ): Promise<ExportJob> {
     return request(
       `/api/v1/decks/${encodeURIComponent(deckId)}/exports`,
       ExportJobSchema,
       {
         method: 'POST',
-        body: JSON.stringify({ format: 'editable-pptx', outputName }),
+        body: JSON.stringify({ format: 'editable-pptx', outputName, review }),
       },
+    )
+  }
+
+  function retryExport(exportId: string): Promise<ExportJob> {
+    return request(
+      `/api/v1/exports/${encodeURIComponent(exportId)}/retry`,
+      ExportJobSchema,
+      { method: 'POST', body: JSON.stringify({}) },
+    )
+  }
+
+  function reviewExport(exportId: string, approved: boolean): Promise<ExportJob> {
+    return request(
+      `/api/v1/exports/${encodeURIComponent(exportId)}/review`,
+      ExportJobSchema,
+      { method: 'POST', body: JSON.stringify({ approved }) },
+    )
+  }
+
+  function importPptxTheme(
+    fileName: string,
+    dataBase64: string,
+    themeName?: string,
+  ): Promise<ImportPptxThemeResult> {
+    return request(
+      '/api/v1/imports/pptx-theme',
+      ImportPptxThemeResultSchema,
+      {
+        method: 'POST',
+        body: JSON.stringify({ fileName, dataBase64, themeName }),
+      },
+    )
+  }
+
+  function getThemeImportStatus(
+    themeId: string,
+  ): Promise<ImportPptxThemeStatus> {
+    return request(
+      `/api/v1/imports/pptx-theme/${encodeURIComponent(themeId)}`,
+      ImportPptxThemeStatusSchema,
     )
   }
 
@@ -496,6 +541,10 @@ export function useGatewayClient() {
     getPreviewStatus,
     formatDeck,
     createExport,
+    reviewExport,
+    retryExport,
+    importPptxTheme,
+    getThemeImportStatus,
     getInspection,
     submitInspectionResult,
     getExport,

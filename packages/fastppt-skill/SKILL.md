@@ -1,9 +1,6 @@
 ---
 name: fastppt
-description: Create, edit, validate, preview, and export Slidev presentation decks inside a FastPPT workspace, including generating raster visuals with Codex imagegen, importing them into workspace assets, and referencing them from slides.md. Use for any FastPPT deck task involving slides.md, Markdown structure, workspace assets, generated images, preview checks, overflow checks, or editable PPTX export; always pair it with the theme-specific Skill resolved by FastPPT.
-metadata:
-  id: fastppt
-  version: 0.2.0
+description: Create, edit, validate, preview, and export Slidev presentation decks inside a FastPPT workspace, including creative page composition with advanced HTML/CSS, researching current facts online, finding reusable visual resources, safely downloading remote images, generating raster visuals with Codex imagegen, and citing sources. Use for any FastPPT deck task involving slides.md, custom visual design, complex CSS, research, web search, workspace assets, remote or generated images, preview checks, overflow checks, or editable PPTX export; always pair it with the theme-specific Skill resolved by FastPPT.
 ---
 
 # FastPPT deck workflow
@@ -20,9 +17,12 @@ snapshot and explicitly invokes the one matching theme Skill for each run.
    `list_assets` before editing.
 3. Follow the simultaneously invoked theme Skill for visual language, layouts,
    components, frontmatter, density, and theme-specific validation.
+   The theme is a design system, not a creativity ceiling: use slide-local HTML
+   and CSS when a registered layout alone cannot express the intended page.
 4. Make the smallest coherent deck change with `write_slides`. Keep image paths
    relative and store images as files; never place large base64 data in Markdown.
-   When the deck needs a new raster visual, follow the image workflow below.
+   When the deck needs a sourced or generated raster visual, follow the asset
+   workflow below.
 5. Run `format_slides`, then `validate_slides`. Fix every syntax, theme, missing
    asset, and unsupported-layout error.
    Slidev frontmatter blocks must have no blank lines immediately inside the
@@ -30,13 +30,58 @@ snapshot and explicitly invokes the one matching theme Skill for each run.
    delimiter.
 6. Check `get_preview_status`. When preview is ready, use `inspect_slide` and
    `inspect_overflow` for affected pages and revise visible clipping or crowding.
+   Treat line wrapping, internal collisions, clipped descendants, and text that
+   exceeds its intended line count as failures even when the outer slide itself
+   reports no overflow.
 7. Summarize changed files and validation results. Call `export_editable_pptx`
    only when the user explicitly requests export.
 
 Read [references/workflow.md](references/workflow.md) for creation versus editing
-decisions and [references/safety.md](references/safety.md) before any file write or
-export. Use [examples/basic-deck.md](examples/basic-deck.md) only as a structural
-example; its styling never replaces the active theme Skill.
+decisions, [references/content.md](references/content.md) for slide-content
+standards, and [references/safety.md](references/safety.md) before any file write
+or export. Use [examples/basic-deck.md](examples/basic-deck.md) only as a
+structural example; its styling never replaces the active theme Skill.
+
+## Creative HTML and CSS
+
+Use sophisticated slide-local HTML/CSS when it materially improves the visual
+argument. Complex composition is explicitly allowed: CSS Grid and Flexbox,
+absolute positioning, layered images, gradients, clipping, masks, filters,
+blend modes, pseudo-elements, typographic treatments, data-driven sizing, and
+responsive `clamp()`/`min()`/`max()` expressions. Combine these tools into
+distinct page compositions instead of repeating generic card grids.
+
+Keep creative CSS subordinate to the active theme: reuse its tokens, fonts,
+palette, spacing character, and component language. Scope every custom rule to
+a unique slide class and place it in `slides.md`; never edit the theme package
+during deck authoring. Prefer semantic HTML and editable text over flattening a
+whole slide into an image. Read [references/creative-css.md](references/creative-css.md)
+before authoring custom HTML or CSS.
+
+## Text fit is a hard gate
+
+Design line breaks before reducing font size. Titles must fit their intended
+line count at preview scale: normally one line for short claims and no more than
+two lines for long claims. For mixed Chinese/Latin text, model names, numbers,
+and units, insert semantic line groups with block spans or an intentional `<br>`;
+do not rely on browser-selected wrap points. Keep values and units together,
+such as `21000 rpm`, `673 PS`, `33.3 m`, and `2026 Q3`.
+
+Never solve text overflow with `overflow: hidden`, clipping, extreme tracking,
+or unreadably small type. First shorten the wording, widen or restructure the
+container, choose a controlled break, and only then make a modest size change.
+Apply the text-fit checklist in [references/creative-css.md](references/creative-css.md)
+to every affected slide before reporting completion.
+
+## Content standards
+
+Write slides a confident analyst would sign, in the user's deck language. Each
+title states a claim, ideally with a number and an outcome; each slide carries
+one claim and its body proves it. Avoid AI phrasing: filler, slogans, triple
+stacking, "not X, but Y" contrast, vague attribution, and hollow optimism. Cite
+verified sources on-slide and never invent them. Apply the checklist in
+[references/content.md](references/content.md) before reporting the deck ready.
+The active theme Skill owns visual rules; this section owns what the words say.
 
 ## Image generation workflow
 
@@ -62,6 +107,25 @@ photo, illustration, texture, mockup, or other generated bitmap:
 
 Read [references/images.md](references/images.md) for prompt, naming, placement,
 replacement, and failure rules.
+
+## Online research and sourced assets
+
+Use the Harness's available web-search or browsing tools whenever the deck needs
+current facts, citations, photographs, illustrations, maps, logos, or other
+external evidence. Search autonomously; do not ask the user to collect ordinary
+public resources. Prefer primary sources and official media libraries. Verify
+the exact page supporting each factual claim rather than citing a search-result
+snippet.
+
+Before using a remote visual, confirm its source page, creator or publisher, and
+reuse terms. Prefer public-domain, Creative Commons, or explicitly reusable
+assets. Then call `import_remote_image` with the direct HTTPS image URL and an
+exact path under `assets/sources/`; never leave remote URLs in the final deck.
+Add a concise on-slide credit and retain the source-page URL in presenter notes.
+
+Read [references/research.md](references/research.md) before online research or
+remote download. Read [references/images.md](references/images.md) for choosing
+between sourced images, generated images, icons, and editable diagrams.
 
 ## Failure rules
 

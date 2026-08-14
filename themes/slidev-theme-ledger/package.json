@@ -1,0 +1,53 @@
+{
+  "name": "slidev-theme-ledger",
+  "version": "0.1.0-fastppt.1",
+  "private": true,
+  "description": "以青绿数据与赤陶结论为特征的机构金融主题（ebony-ledger）。",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "ledger"
+  ],
+  "license": "MIT",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "docs/screenshots",
+    "global-top.vue",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "transition": "none",
+      "fonts": {
+        "serif": "Libertinus Serif,Noto Serif SC",
+        "sans": "Inter,Noto Sans SC",
+        "mono": "Fira Code",
+        "local": "Libertinus Serif,Inter,Noto Sans SC,Noto Serif SC,Fira Code"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "dev": "pnpm --filter slidev-theme-raft-demo dev",
+    "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*",
+    "@fontsource/libertinus-serif": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FastR-D/FastPPT.git",
+    "directory": "themes/slidev-theme-ledger"
+  }
+}

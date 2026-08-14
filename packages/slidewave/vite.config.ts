@@ -21,9 +21,12 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        'jszip',
         'lucide',
         'pptxgenjs',
         'prismjs',
+        'subset-font',
+        'ttf2eot',
         'zod',
         /^node:/,
         /^prismjs\//,

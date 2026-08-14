@@ -144,6 +144,9 @@ importers:
       '@fastify/websocket':
         specifier: ^11.2.0
         version: 11.3.0
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fix-webm-duration/fix':
         specifier: ^1.0.1
         version: 1.0.1
@@ -246,6 +249,9 @@ importers:
       http-proxy:
         specifier: ^1.18.1
         version: 1.18.1
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
       katex:
         specifier: ^0.18.1
         version: 0.18.1
@@ -312,9 +318,15 @@ importers:
       slidev-component-poll:
         specifier: ^3.0.0
         version: 3.0.0(@slidev/client@52.19.0(@modelcontextprotocol/server@2.0.0)(@nuxt/kit@3.21.10)(@oxc-project/types@0.142.0)(@vitejs/devtools-kit@0.4.12(@modelcontextprotocol/server@2.0.0)(cac@7.0.0)(srvx@0.12.5)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0)))(@vue/compiler-sfc@3.5.40)(cac@7.0.0)(esbuild@0.27.7)(lightningcss@1.33.0)(markdown-it-async@2.2.0)(oxc-parser@0.131.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(rolldown@1.2.2)(rollup@4.62.4)(srvx@0.12.5)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0)))(vue@3.5.40(typescript@6.0.3))
+      subset-font:
+        specifier: ^2.5.0
+        version: 2.5.0
       theme-vitesse:
         specifier: ^0.6.2
         version: 0.6.4
+      ttf2eot:
+        specifier: ^3.1.0
+        version: 3.1.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -379,6 +391,9 @@ importers:
       '@fastppt/fastppt-skill':
         specifier: workspace:*
         version: link:../../packages/fastppt-skill
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fastppt/harness-claude':
         specifier: workspace:*
         version: link:../../packages/harness-claude
@@ -596,6 +611,18 @@ importers:
         specifier: 'catalog:'
         version: 4.1.10(@types/node@26.1.2)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
 
+  packages/fonts:
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.1.2
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.10(@types/node@26.1.2)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
+
   packages/harness-claude:
     dependencies:
       '@anthropic-ai/claude-agent-sdk':
@@ -725,6 +752,9 @@ importers:
       '@fastppt/protocol':
         specifier: workspace:*
         version: link:../protocol
+      '@fastppt/slidewave':
+        specifier: workspace:*
+        version: link:../slidewave
       '@slidev/cli':
         specifier: 'catalog:'
         version: 52.19.0(@nuxt/kit@3.21.10)(@types/markdown-it@14.1.2)(@types/node@22.20.1)(@vue/compiler-sfc@3.5.40)(cac@7.0.0)(esbuild@0.28.1)(hono@4.13.0)(lightningcss@1.33.0)(markdown-it-async@2.2.0)(markdown-it@14.3.0)(playwright-chromium@1.62.1)(postcss@8.5.25)(rolldown@1.2.2)(rollup@4.62.4)(srvx@0.12.5)(tsx@4.23.5)
@@ -744,6 +774,9 @@ importers:
       '@chenglou/pretext':
         specifier: 'catalog:'
         version: 0.0.8
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
       lucide:
         specifier: 'catalog:'
         version: 0.544.0
@@ -753,6 +786,12 @@ importers:
       prismjs:
         specifier: 'catalog:'
         version: 1.30.0
+      subset-font:
+        specifier: ^2.5.0
+        version: 2.5.0
+      ttf2eot:
+        specifier: ^3.1.0
+        version: 3.1.0
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -844,6 +883,9 @@ importers:
 
   themes/slidev-theme-academy:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fastppt/slidewave':
         specifier: workspace:*
         version: link:../../packages/slidewave
@@ -894,8 +936,17 @@ importers:
         specifier: ^3.0.4
         version: 3.3.9(typescript@6.0.3)
 
+  themes/slidev-theme-crimson-violet:
+    dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
+
   themes/slidev-theme-eloc:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@slidev/types':
         specifier: ^51.1.1
         version: 51.8.2(@nuxt/kit@3.21.10)(@vue/compiler-sfc@3.5.40)(markdown-it-async@2.2.0)(typescript@5.9.3)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
@@ -936,6 +987,9 @@ importers:
       '@citation-js/plugin-doi':
         specifier: ^0.7.21
         version: 0.7.21(@citation-js/core@0.7.21)
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fastppt/slidewave':
         specifier: workspace:*
         version: link:../../packages/slidewave
@@ -974,8 +1028,29 @@ importers:
         specifier: ^3.0.4
         version: 3.3.9(typescript@6.0.3)
 
+  themes/slidev-theme-ledger:
+    dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
+      '@fontsource/libertinus-serif':
+        specifier: ^5.0.0
+        version: 5.3.0
+
+  themes/slidev-theme-magazine:
+    dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
+      '@fontsource/libertinus-serif':
+        specifier: ^5.0.0
+        version: 5.3.0
+
   themes/slidev-theme-mumbo:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@iconify/vue':
         specifier: ^4.3.0
         version: 4.3.0(vue@3.5.40(typescript@6.0.3))
@@ -989,6 +1064,9 @@ importers:
 
   themes/slidev-theme-narrative:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fontsource/fira-code':
         specifier: ^5.3.0
         version: 5.3.0
@@ -998,6 +1076,9 @@ importers:
 
   themes/slidev-theme-nicodevs:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@slidev/types':
         specifier: ^52.14.1
         version: 52.19.0(@nuxt/kit@3.21.10)(@vue/compiler-sfc@3.5.40)(cac@7.0.0)(esbuild@0.28.1)(markdown-it-async@2.2.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(rolldown@1.2.2)(rollup@4.62.4)(srvx@0.12.5)(typescript@6.0.3)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
@@ -1008,6 +1089,9 @@ importers:
 
   themes/slidev-theme-nmt:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@iconify-json/fa-brands':
         specifier: ^1.2.2
         version: 1.2.2
@@ -1051,6 +1135,9 @@ importers:
 
   themes/slidev-theme-nord:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@slidev/types':
         specifier: ^52.10.1
         version: 52.19.0(@nuxt/kit@3.21.10)(@vue/compiler-sfc@3.5.40)(cac@7.0.0)(esbuild@0.28.1)(markdown-it-async@2.2.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(rolldown@1.2.2)(rollup@4.62.4)(srvx@0.12.5)(typescript@6.0.3)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
@@ -1064,6 +1151,9 @@ importers:
 
   themes/slidev-theme-practicum:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@slidev/parser':
         specifier: ^52.14.2
         version: 52.19.0(@nuxt/kit@3.21.10)(@vue/compiler-sfc@3.5.40)(cac@7.0.0)(esbuild@0.28.1)(markdown-it-async@2.2.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(rolldown@1.2.2)(rollup@4.62.4)(srvx@0.12.5)(typescript@6.0.3)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
@@ -1117,10 +1207,17 @@ importers:
         specifier: ^3.2.7
         version: 3.3.9(typescript@6.0.3)
 
-  themes/slidev-theme-raft: {}
+  themes/slidev-theme-raft:
+    dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
 
   themes/slidev-theme-sketchdeck:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@slidev/types':
         specifier: 'catalog:'
         version: 52.19.0(@nuxt/kit@3.21.10)(@vue/compiler-sfc@3.5.40)(cac@7.0.0)(esbuild@0.28.1)(markdown-it-async@2.2.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(rolldown@1.2.2)(rollup@4.62.4)(srvx@0.12.5)(typescript@6.0.3)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
@@ -1131,6 +1228,9 @@ importers:
 
   themes/slidev-theme-squircle:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.3.0
@@ -1163,8 +1263,17 @@ importers:
         specifier: ^3.114.17
         version: 3.114.17
 
+  themes/slidev-theme-strategy:
+    dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
+
   themes/slidev-theme-tahta:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@iconify-json/lucide':
         specifier: ^1.2.0
         version: 1.2.121
@@ -1187,6 +1296,9 @@ importers:
 
   themes/slidev-theme-the-unnamed:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@slidev/types':
         specifier: ^0.50.0-beta.5
         version: 0.50.0(@nuxt/kit@3.21.10)(@vue/compiler-sfc@3.5.40)(postcss@8.5.25)(rollup@4.62.4)(typescript@6.0.3)(vite@8.2.0(@types/node@18.19.130)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.5)(yaml@2.9.0))
@@ -1212,6 +1324,9 @@ importers:
       '@antfu/utils':
         specifier: ^9.3.0
         version: 9.3.0
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@fontsource/libertinus-serif':
         specifier: ^5.2.1
         version: 5.3.0
@@ -1240,6 +1355,9 @@ importers:
 
   themes/slidev-theme-tud-db:
     dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       shiki:
         specifier: ^4.2.0
         version: 4.4.1
@@ -1256,6 +1374,12 @@ importers:
       vue:
         specifier: ^3.5.38
         version: 3.5.40(typescript@6.0.3)
+
+  themes/slidev-theme-xiaomi:
+    dependencies:
+      '@fastppt/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
 
 packages:
 
@@ -5471,6 +5595,9 @@ packages:
       debug:
         optional: true
 
+  fontverter@2.0.0:
+    resolution: {integrity: sha512-DFVX5hvXuhi1Jven1tbpebYTCT9XYnvx6/Z+HFUPb7ZRMCW+pj2clU9VMhoTPgWKPhAs7JJDSk3CW1jNUvKCZQ==}
+
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
@@ -5626,6 +5753,9 @@ packages:
 
   hachure-fill@0.5.2:
     resolution: {integrity: sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==}
+
+  harfbuzzjs@0.10.3:
+    resolution: {integrity: sha512-GJnLUrgLMadlMYrBGEXwYEimObbysy3prWT4HyPpFQERvgTU/OZ+ReUlEPOum6w4RBtFXzXiCCmECOr4sz3qwQ==}
 
   has-symbols@1.1.0:
     resolution: {integrity: sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==}
@@ -6057,6 +6187,9 @@ packages:
 
   lodash-es@4.18.1:
     resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
+
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -7230,6 +7363,9 @@ packages:
   stylis@4.4.0:
     resolution: {integrity: sha512-5Z9ZpRzfuH6l/UAvCPAPUo3665Nk2wLaZU3x+TLHKVzIz33+sbJqbtrYoC3KD4/uVOr2Zp+L0LySezP9OHV9yA==}
 
+  subset-font@2.5.0:
+    resolution: {integrity: sha512-Vsa8ngQ/ohhUj0an7on49y9jLZ2rK5U+T1FzPM4/ZQY0xUy5mLis6BfFtPGzecTjFgYXQlvY7FlsJF4t3R/6Ug==}
+
   super-regex@0.2.0:
     resolution: {integrity: sha512-WZzIx3rC1CvbMDloLsVw0lkZVKJWbrkJ0k1ghKFmcnPrW1+jWbgTkTEWVtD9lMdmI4jZEz40+naBxl1dCUhXXw==}
     engines: {node: '>=14.16'}
@@ -7330,6 +7466,10 @@ packages:
   tsx@4.23.5:
     resolution: {integrity: sha512-rw55FUaqOoI7RvlQwLbhO4nSDApnQ4/CykPuiQ/EPvtrX3WA9Ig55jIt9VvbBJbzJuj12ueRu4PMZ2SxPVbihg==}
     engines: {node: '>=18.0.0'}
+    hasBin: true
+
+  ttf2eot@3.1.0:
+    resolution: {integrity: sha512-aHTbcYosNHVqb2Qtt9Xfta77ae/5y0VfdwNLUS6sGBeGr22cX2JDMo/i5h3uuOf+FAD3akYOr17+fYd5NK8aXw==}
     hasBin: true
 
   turbo@2.10.8:
@@ -8091,6 +8231,10 @@ packages:
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
 
+  wawoff2@2.0.1:
+    resolution: {integrity: sha512-r0CEmvpH63r4T15ebFqeOjGqU4+EgTx4I510NtK35EMciSdcTxCw3Byy3JnBonz7iyIFZ0AbVo0bbFpEVuhCYA==}
+    hasBin: true
+
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
@@ -8109,6 +8253,9 @@ packages:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
     engines: {node: '>=8'}
     hasBin: true
+
+  woff2sfnt-sfnt2woff@1.0.0:
+    resolution: {integrity: sha512-edK4COc1c1EpRfMqCZO1xJOvdUtM5dbVb9iz97rScvnTevqEB3GllnLWCmMVp1MfQBdF1DFg/11I0rSyAdS4qQ==}
 
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
@@ -16109,6 +16256,11 @@ snapshots:
     optionalDependencies:
       debug: 4.4.3
 
+  fontverter@2.0.0:
+    dependencies:
+      wawoff2: 2.0.1
+      woff2sfnt-sfnt2woff: 1.0.0
+
   foreground-child@3.3.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -16260,6 +16412,8 @@ snapshots:
       crossws: 0.4.10(srvx@0.12.5)
 
   hachure-fill@0.5.2: {}
+
+  harfbuzzjs@0.10.3: {}
 
   has-symbols@1.1.0: {}
 
@@ -16637,6 +16791,8 @@ snapshots:
       p-locate: 5.0.0
 
   lodash-es@4.18.1: {}
+
+  lodash@4.18.1: {}
 
   longest-streak@3.1.0: {}
 
@@ -18169,6 +18325,13 @@ snapshots:
 
   stylis@4.4.0: {}
 
+  subset-font@2.5.0:
+    dependencies:
+      fontverter: 2.0.0
+      harfbuzzjs: 0.10.3
+      lodash: 4.18.1
+      p-limit: 3.1.0
+
   super-regex@0.2.0:
     dependencies:
       clone-regexp: 3.0.0
@@ -18246,6 +18409,10 @@ snapshots:
       esbuild: 0.28.1
     optionalDependencies:
       fsevents: 2.3.3
+
+  ttf2eot@3.1.0:
+    dependencies:
+      argparse: 2.0.1
 
   turbo@2.10.8:
     optionalDependencies:
@@ -20489,6 +20656,10 @@ snapshots:
 
   w3c-keyname@2.2.8: {}
 
+  wawoff2@2.0.1:
+    dependencies:
+      argparse: 2.0.1
+
   webidl-conversions@3.0.1: {}
 
   webpack-virtual-modules@0.6.2: {}
@@ -20506,6 +20677,10 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  woff2sfnt-sfnt2woff@1.0.0:
+    dependencies:
+      pako: 1.0.11
 
   word-wrap@1.2.5: {}
 

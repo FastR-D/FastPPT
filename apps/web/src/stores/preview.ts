@@ -336,11 +336,34 @@ export const usePreviewStore = defineStore('preview', () => {
       exportJob.value = await client.createExport(
         selectedDeckId.value,
         `${selectedDeck.value.name}.pptx`,
+        true,
       )
       eventStream.setTopics([...previewTopics, `export:${exportJob.value.id}`])
       scheduleExportPoll()
     } catch (cause) {
       error.value = cause instanceof Error ? cause.message : '创建导出任务失败'
+    }
+  }
+
+  async function retryExport(): Promise<void> {
+    if (!exportJob.value) return
+    try {
+      exportJob.value = await client.retryExport(exportJob.value.id)
+      scheduleExportPoll()
+    } catch (cause) {
+      error.value =
+        cause instanceof Error ? cause.message : '重试导出失败'
+    }
+  }
+
+  async function reviewExport(exportId: string, approved: boolean): Promise<void> {
+    if (!exportJob.value) return
+    try {
+      exportJob.value = await client.reviewExport(exportId, approved)
+      scheduleExportPoll()
+    } catch (cause) {
+      error.value =
+        cause instanceof Error ? cause.message : '确认导出失败'
     }
   }
 
@@ -420,6 +443,10 @@ export const usePreviewStore = defineStore('preview', () => {
     eventStream.disconnect()
   }
 
+  function connect(): void {
+    eventStream.connect()
+  }
+
   async function formatDeckFile(
     entryFile: string,
     expectedRevision?: string,
@@ -464,6 +491,8 @@ export const usePreviewStore = defineStore('preview', () => {
     stopPreview,
     refreshFrame,
     startExport,
+    reviewExport,
+    retryExport,
     cancelExport,
     submitExportSnapshot,
     reportExportCaptureProgress,
@@ -471,5 +500,6 @@ export const usePreviewStore = defineStore('preview', () => {
     downloadExport,
     formatDeckFile,
     disconnect,
+    connect,
   }
 })

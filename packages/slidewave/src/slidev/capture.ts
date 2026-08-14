@@ -328,7 +328,7 @@ async function visitElement(
       transform,
     )
   } else {
-    capturedBorder = captureBackground(
+    capturedBorder = await captureBackground(
       context,
       element,
       style,
@@ -343,7 +343,7 @@ async function visitElement(
   }
 
   if (context.options.includePseudoElements) {
-    capturePseudo(
+    await capturePseudo(
       context,
       element,
       'before',
@@ -409,7 +409,15 @@ async function visitElement(
   }
 
   if (context.options.includePseudoElements) {
-    capturePseudo(context, element, 'after', source, opacity, zIndex, transform)
+    await capturePseudo(
+      context,
+      element,
+      'after',
+      source,
+      opacity,
+      zIndex,
+      transform,
+    )
   }
 }
 
@@ -467,7 +475,7 @@ async function captureGroupedElement(
   }
 }
 
-function captureBackground(
+async function captureBackground(
   context: CaptureContext,
   element: HTMLElement,
   style: CSSStyleDeclaration,
@@ -475,9 +483,10 @@ function captureBackground(
   opacity: number,
   zIndex: number,
   transform: TransformMetrics,
-): boolean {
+): Promise<boolean> {
   let fill = parseCssColor(style.backgroundColor)
   let gradient: HtmlGradient | undefined
+  let backgroundData: string | undefined
   let cleanTextHighlight = false
   const backgroundImage = style.backgroundImage
   if (backgroundImage && backgroundImage !== 'none') {
@@ -503,12 +512,23 @@ function captureBackground(
         source.path,
       )
     } else {
-      warn(
-        context,
-        'unsupported-background-image',
-        'CSS background image was skipped; use an <img> for editable image output',
-        source.path,
-      )
+      const url = cssBackgroundUrl(backgroundImage)
+      if (url) {
+        try {
+          backgroundData = backgroundImageSvgDataUrl(
+            await resourceToDataUrl(url),
+            style.backgroundSize,
+            style.backgroundPosition,
+          )
+        } catch (error) {
+          warn(
+            context,
+            'image-embed-failed',
+            `CSS background image could not be embedded: ${errorMessage(error)}`,
+            source.path,
+          )
+        }
+      }
     }
   }
 
@@ -524,7 +544,13 @@ function captureBackground(
 
   const shadow = parseBoxShadow(style.boxShadow, opacity, transform)
   const stroke = captureUniformBorder(style, opacity, transform)
-  if ((!fill || fill.alpha <= 0) && !gradient && !shadow && !stroke)
+  if (
+    (!fill || fill.alpha <= 0) &&
+    !gradient &&
+    !backgroundData &&
+    !shadow &&
+    !stroke
+  )
     return false
   if (fill) fill = multiplyAlpha(fill, opacity)
   if (gradient) {
@@ -628,9 +654,47 @@ function captureBackground(
       ...rotationProperty(transform),
       ...(shadow ? { shadow } : {}),
     })
+    if (backgroundData) {
+      emit<HtmlImageElement>(context, {
+        id: `${source.path}:background-image-${index}`,
+        kind: 'image',
+        box,
+        zIndex,
+        opacity,
+        source,
+        data: backgroundData,
+        alt: '',
+        ...rotationProperty(transform),
+      })
+    }
     emittedStroke ||= Boolean(stroke)
   }
   return emittedStroke
+}
+
+function cssBackgroundUrl(backgroundImage: string): string | undefined {
+  const match = /url\(\s*(["']?)(.*?)\1\s*\)/i.exec(backgroundImage)
+  return match?.[2]
+}
+
+function backgroundImageSvgDataUrl(
+  data: string,
+  size: string,
+  position: string,
+): string {
+  const fit = size.includes('contain') ? 'meet' : 'slice'
+  const horizontal = position.includes('left')
+    ? 'xMin'
+    : position.includes('right')
+      ? 'xMax'
+      : 'xMid'
+  const vertical = position.includes('top')
+    ? 'YMin'
+    : position.includes('bottom')
+      ? 'YMax'
+      : 'YMid'
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><image href="${data.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}" width="100" height="100" preserveAspectRatio="${horizontal}${vertical} ${fit}"/></svg>`
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
 }
 
 /** Recreates the rounded top edge that overflow-hidden applies to a full-width header child. */
@@ -1039,7 +1103,7 @@ function captureMask(
   })
 }
 
-function capturePseudo(
+async function capturePseudo(
   context: CaptureContext,
   element: HTMLElement,
   pseudo: 'before' | 'after',
@@ -1047,14 +1111,40 @@ function capturePseudo(
   opacity: number,
   zIndex: number,
   transform: TransformMetrics,
-): void {
+): Promise<void> {
   const style = getComputedStyle(element, `::${pseudo}`)
   const content = pseudoText(style.content, element, pseudo)
   const fill = parseCssColor(style.backgroundColor)
+  const backgroundImage = style.backgroundImage
+  const gradient = /gradient\(/i.test(backgroundImage)
+    ? parseCssLinearGradient(backgroundImage) ?? undefined
+    : undefined
+  let backgroundData: string | undefined
+  if (backgroundImage && backgroundImage !== 'none' && !gradient) {
+    const url = cssBackgroundUrl(backgroundImage)
+    if (url) {
+      try {
+        backgroundData = backgroundImageSvgDataUrl(
+          await resourceToDataUrl(url),
+          style.backgroundSize,
+          style.backgroundPosition,
+        )
+      } catch (error) {
+        warn(
+          context,
+          'image-embed-failed',
+          `Pseudo-element background image could not be embedded: ${errorMessage(error)}`,
+          `${parentSource.path}::${pseudo}`,
+        )
+      }
+    }
+  }
   const maskImage = style.maskImage || style.webkitMaskImage
   if (
     !content &&
     (!fill || fill.alpha <= 0) &&
+    !gradient &&
+    !backgroundData &&
     (!maskImage || maskImage === 'none')
   )
     return
@@ -1088,7 +1178,7 @@ function capturePseudo(
         source.path,
       )
     }
-  } else if (fill && fill.alpha > 0) {
+  } else if ((fill && fill.alpha > 0) || gradient) {
     emit<HtmlShapeElement>(context, {
       id: `${source.path}:background`,
       kind: 'shape',
@@ -1097,8 +1187,32 @@ function capturePseudo(
       zIndex,
       opacity,
       source,
-      fill: multiplyAlpha(fill, opacity),
+      ...(fill ? { fill: multiplyAlpha(fill, opacity) } : {}),
+      ...(gradient
+        ? {
+            gradient: {
+              ...gradient,
+              stops: gradient.stops.map((stop) => ({
+                ...stop,
+                color: multiplyAlpha(stop.color, opacity),
+              })),
+            },
+          }
+        : {}),
       radiusPx: cssPixels(style.borderTopLeftRadius) * averageScale(transform),
+    })
+  }
+
+  if (backgroundData) {
+    emit<HtmlImageElement>(context, {
+      id: `${source.path}:background-image`,
+      kind: 'image',
+      box,
+      zIndex,
+      opacity,
+      source,
+      data: backgroundData,
+      alt: '',
     })
   }
 

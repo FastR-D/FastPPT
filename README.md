@@ -46,6 +46,20 @@ Then open `https://fastppt.vercel.app`. Use `fastppt --dir /path/to/deck` when
 starting outside the target workspace. The `--workspace` option remains an
 alias for `--dir`.
 
+The CLI also includes operational commands:
+
+```bash
+fastppt status --dir /path/to/deck
+fastppt doctor --dir /path/to/deck
+fastppt stop --dir /path/to/deck
+fastppt start --port 4317 --open
+```
+
+Use `--json` with `status`, `doctor`, or `stop` for machine-readable output.
+On first `start` or `doctor`, the CLI installs its bundled themes into
+`~/.fastppt/themes`. CLI upgrades refresh those managed built-in themes while
+preserving additional imported themes in the same directory.
+
 Repository development remains a separate command. It starts both the Gateway
 and the Vite frontend with source watching:
 
@@ -122,6 +136,8 @@ The common `fastppt` Skill owns theme-independent workflow, workspace safety, MC
 - `slidev-theme-academy` → `fastppt-theme-academy`
 - `slidev-theme-eloc` → `fastppt-theme-eloc`
 - `slidev-theme-landing` → `fastppt-theme-landing`
+- `slidev-theme-ledger` → `fastppt-theme-ledger`
+- `slidev-theme-magazine` → `fastppt-theme-magazine`
 - `slidev-theme-mumbo` → `fastppt-theme-mumbo`
 - `slidev-theme-narrative` → `fastppt-theme-narrative`
 - `slidev-theme-nicodevs` → `fastppt-theme-nicodevs`
@@ -131,6 +147,7 @@ The common `fastppt` Skill owns theme-independent workflow, workspace safety, MC
 - `slidev-theme-raft` → `fastppt-theme-raft`
 - `slidev-theme-sketchdeck` → `fastppt-theme-sketchdeck`
 - `slidev-theme-squircle` → `fastppt-theme-squircle`
+- `slidev-theme-strategy` → `fastppt-theme-strategy`
 - `slidev-theme-tahta` → `fastppt-theme-tahta`
 - `slidev-theme-the-unnamed` → `fastppt-theme-the-unnamed`
 - `slidev-theme-touying` → `fastppt-theme-touying`

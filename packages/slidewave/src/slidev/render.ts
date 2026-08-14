@@ -253,7 +253,14 @@ function renderText(
   warnings: HtmlConversionWarning[],
 ): void {
   const box = scaleBox(textRenderBox(element), metrics)
-  const fontFace = resolveFont(element.style.fontFamily, options)
+  const resolvedFontFace = resolveFont(element.style.fontFamily, options)
+  const usesMiSansSemibold =
+    resolvedFontFace === 'MiSans' &&
+    element.style.fontWeight >= 550 &&
+    element.style.fontWeight < 650
+  const fontFace = usesMiSansSemibold
+    ? 'MiSans Semibold'
+    : resolvedFontFace
   if (!fontFace) {
     warnings.push({
       code: 'unresolved-font',
@@ -275,7 +282,7 @@ function renderText(
     fontSize: round(fontSize, metrics),
     color: element.style.color.hex,
     transparency: transparency(element.style.color),
-    bold: element.style.fontWeight >= 600,
+    bold: !usesMiSansSemibold && element.style.fontWeight >= 600,
     italic: element.style.fontStyle === 'italic',
     underline: element.style.decoration.includes('underline'),
     strike: element.style.decoration.includes('line-through'),
@@ -398,10 +405,16 @@ function textRuns(
 ): string | Array<{ text: string; options: { fontFace: string } }> {
   const families = cssFontFamilies(fontFamily)
   const latinFont = resolveFont(fontFamily, options)
-  if (!latinFont || families.length < 2 || !containsCjk(text)) return text
+  if (
+    !latinFont ||
+    families.length < 2 ||
+    !containsCjk(text) ||
+    isCjkFontFamily(families[0]!)
+  )
+    return text
   const cjkFamily = families.find((family, index) => {
     if (index === 0) return false
-    return /(?:cjk|han|hei|song|ming|kai|yahei|gothic|meiryo)/i.test(family)
+    return isCjkFontFamily(family)
   })
   if (!cjkFamily) return text
   const cjkFont = resolveSingleFont(cjkFamily, options)
@@ -414,6 +427,12 @@ function textRuns(
     else runs.push({ text: character, options: { fontFace } })
   }
   return runs
+}
+
+function isCjkFontFamily(family: string): boolean {
+  return /(?:cjk|han|hei|song|ming|kai|yahei|gothic|meiryo|sans sc|serif sc|wenkai|misans|lxgw|source han)/i.test(
+    family,
+  )
 }
 
 function containsCjk(text: string): boolean {

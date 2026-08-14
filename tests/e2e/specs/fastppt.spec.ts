@@ -286,6 +286,10 @@ test('runs the complete local workspace, Harness, editor, preview and export flo
   expect(narrowExportBox!.y).toBeGreaterThanOrEqual(
     narrowPreviewBox!.y + narrowPreviewBox!.height,
   )
+  // The export enters visual review: confirm before it is published.
+  const reviewButton = page.getByRole('button', { name: '确认导出' })
+  await expect(reviewButton).toBeVisible()
+  await reviewButton.click()
   const downloadButton = page.getByRole('button', { name: '下载 PPTX' })
   await expect(downloadButton).toBeVisible()
   await expect(page.locator('.export-status')).toContainText('2 页')

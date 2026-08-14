@@ -1,3 +1,7 @@
+import '@fastppt/fonts/sofia-sans'
+import '@fastppt/fonts/misans'
+import '@fastppt/fonts/noto-sans-sc'
+import '@fastppt/fonts/jetbrains-mono'
 import '@slidev/client/styles/layouts-base.css'
 import './patterns.css'
 import './layout.css'

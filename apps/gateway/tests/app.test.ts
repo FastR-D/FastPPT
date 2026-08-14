@@ -2,6 +2,7 @@ import {
   cpSync,
   mkdtempSync as createTemporaryDirectorySync,
   readFileSync,
+  existsSync,
   writeFileSync,
 } from 'node:fs'
 import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
@@ -26,6 +27,7 @@ import {
   UnifiedAgentEventSchema,
   UnifiedSessionSchema,
   SlidewaveSnapshotSchema,
+  ImportPptxThemeResultSchema,
 } from '@fastppt/protocol'
 import { afterEach, describe, expect, it } from 'vitest'
 import { z } from 'zod'
@@ -266,6 +268,7 @@ class FakeExporter implements EditablePptxExporter {
       warnings: [],
       elementCount: 7,
       slideCount: 2,
+      qa: { ok: true, slideCount: 2, issues: [] },
     }
   }
 }
@@ -1411,6 +1414,67 @@ describe('gateway', () => {
     })
     expect(after.json()).toMatchObject({
       displayName: 'Academy Reloaded',
+    })
+  })
+
+  it('imports a PPTX theme through the upload endpoint and reloads the registry', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-import-'))
+    const fixtureThemes = createThemeFixture()
+    const app = await makeApp(root, undefined, fixtureThemes)
+    openApps.push(app)
+    const sample = resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      '../../../references/pptx-renderer/docs/example/1-chart-and-complex/source.pptx',
+    )
+    const pptx = readFileSync(sample)
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/imports/pptx-theme',
+      payload: {
+        fileName: 'source.pptx',
+        dataBase64: pptx.toString('base64'),
+        themeName: 'import-test',
+      },
+    })
+    expect(response.statusCode).toBe(200)
+    const result = ImportPptxThemeResultSchema.parse(response.json())
+    expect(result.themeId).toBe('slidev-theme-import-test')
+    expect(result.skillId).toBe('fastppt-theme-import-test')
+    expect(
+      existsSync(join(fixtureThemes, 'slidev-theme-import-test', 'package.json')),
+    ).toBe(true)
+    const status = await app.inject({
+      method: 'GET',
+      url: `/api/v1/imports/pptx-theme/${result.themeId}`,
+    })
+    expect(status.statusCode).toBe(200)
+    expect(status.json()).toMatchObject({
+      themeId: result.themeId,
+      stage: expect.stringMatching(/designing|ready|failed/),
+      designing: expect.any(Boolean),
+      layouts: expect.arrayContaining(['cover', 'default', 'section', 'end']),
+      components: expect.any(Array),
+      message: expect.any(String),
+    })
+  })
+
+  it('rejects non-PPTX theme imports before starting extraction', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-import-invalid-'))
+    const app = await makeApp(root)
+    openApps.push(app)
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/imports/pptx-theme',
+      payload: {
+        fileName: 'fake.pptx',
+        dataBase64: Buffer.from('not a zip package').toString('base64'),
+        themeName: 'invalid-import',
+      },
+    })
+
+    expect(response.statusCode).toBe(400)
+    expect(response.json()).toMatchObject({
+      error: expect.stringContaining('valid PPTX/ZIP'),
     })
   })
 

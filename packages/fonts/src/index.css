@@ -1,0 +1,110 @@
+/*
+ * @fastppt/fonts — self-hosted font catalog.
+ * Import the specific family you need: e.g. `import '@fastppt/fonts/noto-sans-sc'`.
+ * Family names must stay byte-identical to src/registry.mjs keys.
+ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/inter-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/space-grotesk-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/fira-code-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/jetbrains-mono-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+    font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/space-mono-regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/nunito-sans-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Sofia Sans';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/sofia-sans-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Lexend';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/lexend-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/caveat-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Shantell Sans';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/shantell-sans-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/noto-sans-sc-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/noto-serif-sc-variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'LXGW WenKai';
+  font-style: normal;
+    font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/lxgw-wenkai-regular.ttf') format('truetype');
+}
+
+@import './families/misans.css';

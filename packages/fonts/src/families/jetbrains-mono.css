@@ -1,0 +1,12 @@
+/*
+ * @fastppt/fonts — self-hosted font catalog.
+ * Import the specific family you need: e.g. `import '@fastppt/fonts/noto-sans-sc'`.
+ * Family names must stay byte-identical to src/registry.mjs keys.
+ */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+    font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/jetbrains-mono-variable.ttf') format('truetype');
+}

@@ -45,6 +45,8 @@ const emit = defineEmits<{
   refresh: []
   export: []
   cancelExport: []
+  reviewExport: [exportId: string, approved: boolean]
+  retryExport: []
   downloadExport: []
   snapshot: [input: { exportId: string; snapshot: unknown }]
   captureProgress: [
@@ -87,10 +89,14 @@ const themeLabel = computed(() =>
 const exporting = computed(() =>
   ['queued', 'running'].includes(props.exportJob?.status ?? ''),
 )
+const reviewing = computed(
+  () => props.exportJob?.status === 'review-required',
+)
 const captureFrame = useTemplateRef<HTMLIFrameElement>('captureFrame')
 const currentPage = shallowRef<number>()
 const captureRequestId = shallowRef<string>()
 const captureError = shallowRef<string>()
+const captureConnected = shallowRef(false)
 const capturedSlides = shallowRef(0)
 const captureSlideCount = shallowRef(0)
 const captureActive = computed(
@@ -116,6 +122,64 @@ const exportProgress = computed(() => {
     return Math.round(5 + (capturedSlides.value / captureSlideCount.value) * 20)
   }
   return props.exportJob?.progress ?? 0
+})
+const exportStages = computed(() => {
+  const phase = props.exportJob?.phase ?? ''
+  const status = props.exportJob?.status ?? ''
+  const failed = status === 'failed'
+  const activeIndex =
+    status === 'completed'
+      ? 5
+      : status === 'review-required'
+        ? 4
+        : phase === 'rendering-pptx'
+          ? 3
+          : phase === 'snapshot-received'
+            ? 2
+            : phase === 'awaiting-browser-capture'
+              ? captureConnected.value
+                ? 1
+                : 0
+              : status === 'running'
+                ? 3
+                : 0
+  const stages = [
+    ['准备捕获', captureConnected.value ? '捕获页面已就绪' : '等待捕获页面加载'],
+    [
+      '逐页捕获',
+      captureSlideCount.value > 0
+        ? `正在捕获 ${capturedSlides.value}/${captureSlideCount.value} 页`
+        : '等待捕获引擎连接',
+    ],
+    ['上传快照', '将页面结构发送到导出服务'],
+    ['生成 PPTX', '转换为可编辑元素并执行质量检查'],
+    ['等待确认', '检查 QA 结果并确认发布'],
+    ['导出完成', 'PPTX 已可下载'],
+  ]
+  return stages.map(([label, description], index) => ({
+    label,
+    description,
+    state:
+      failed && index === activeIndex
+        ? 'failed'
+        : index < activeIndex || status === 'completed'
+          ? 'completed'
+          : index === activeIndex
+            ? 'active'
+            : 'pending',
+  }))
+})
+const exportStage = computed(
+  () => exportStages.value.find((stage) => stage.state === 'failed') ??
+    exportStages.value.find((stage) => stage.state === 'active') ??
+    exportStages.value.at(-1),
+)
+const exportErrorMessage = computed(() => {
+  const message = props.exportJob?.error?.message ?? captureError.value
+  if (!message) return undefined
+  if (message.includes('did not provide a Slidewave snapshot in time'))
+    return '捕获页面未能及时连接 Slidewave 引擎。请重试导出；若仍失败，请重启预览后再试。'
+  return message
 })
 const groupedExportWarnings = computed(() => {
   const groups = new Map<
@@ -215,6 +279,7 @@ function handleCaptureMessage(event: MessageEvent<unknown>): void {
     message.type === 'fastppt.slidewave.capture.ready' &&
     message.version === SLIDEWAVE_CAPTURE_PROTOCOL_VERSION
   ) {
+    captureConnected.value = true
     requestCapture()
     return
   }
@@ -249,6 +314,7 @@ function handleCaptureMessage(event: MessageEvent<unknown>): void {
 watch(captureJobId, () => {
   captureRequestId.value = undefined
   captureError.value = undefined
+  captureConnected.value = false
   capturedSlides.value = 0
   captureSlideCount.value = 0
 })
@@ -356,26 +422,36 @@ async function enterFullscreen(): Promise<void> {
           <span>{{ exportJob.outputName }}</span>
           <strong>{{ exportProgress }}%</strong>
         </div>
+        <div class="export-stage-copy">
+          <strong>{{ exportStage?.label }}</strong>
+          <span>{{ exportStage?.description }}</span>
+        </div>
         <progress :value="exportProgress" max="100">
           {{ exportProgress }}%
         </progress>
+        <ol class="export-timeline" aria-label="导出阶段">
+          <li
+            v-for="stage in exportStages"
+            :key="stage.label"
+            :class="stage.state"
+          >
+            <span class="stage-dot" aria-hidden="true"></span>
+            <span>{{ stage.label }}</span>
+          </li>
+        </ol>
         <div class="export-detail">
-          <span>{{ exportJob.status }} · {{ exportJob.phase }}</span>
+          <span v-if="captureSlideCount > 0">
+            已捕获 {{ capturedSlides }}/{{ captureSlideCount }} 页
+          </span>
           <span v-if="exportJob.slideCount !== undefined">
             {{ exportJob.slideCount }} 页
-          </span>
-          <span v-else-if="captureSlideCount > 0">
-            已捕获 {{ capturedSlides }}/{{ captureSlideCount }} 页
           </span>
           <span v-if="exportJob.elementCount !== undefined">
             {{ exportJob.elementCount }} 个可编辑元素
           </span>
         </div>
-        <p v-if="exportJob.error" class="export-error">
-          {{ exportJob.error.message }}
-        </p>
-        <p v-else-if="captureError" class="export-error">
-          {{ captureError }}
+        <p v-if="exportErrorMessage" class="export-error">
+          {{ exportErrorMessage }}
         </p>
         <details v-if="exportJob.warnings.length" class="export-warnings">
           <summary>
@@ -392,10 +468,42 @@ async function enterFullscreen(): Promise<void> {
             </li>
           </ul>
         </details>
+        <details v-if="exportJob.qa" class="export-qa" :class="{ fail: !exportJob.qa.ok }">
+          <summary>
+            <span :class="exportJob.qa.ok ? 'qa-pass' : 'qa-fail'">
+              {{ exportJob.qa.ok ? '✓ QA 通过' : '⚠ QA 未通过' }}
+            </span>
+            · {{ exportJob.qa.issues.length }} 个问题
+          </summary>
+          <ul>
+            <li v-for="(issue, index) in exportJob.qa.issues" :key="index">
+              <span v-if="issue.slide !== undefined">第 {{ issue.slide }} 页：</span>
+              {{ issue.message }}
+            </li>
+          </ul>
+        </details>
+        <p v-if="reviewing" class="export-review-hint">
+          请核对左侧预览与下方 QA，确认无误后发布导出。
+        </p>
         <div class="export-controls">
           <button v-if="exporting" type="button" @click="$emit('cancelExport')">
             取消导出
           </button>
+          <button
+            v-if="exportJob.status === 'failed'"
+            type="button"
+            @click="$emit('retryExport')"
+          >
+            重试导出
+          </button>
+          <template v-if="reviewing">
+            <button type="button" @click="$emit('reviewExport', exportJob.id, false)">
+              拒绝导出
+            </button>
+            <button type="button" class="primary" @click="$emit('reviewExport', exportJob.id, true)">
+              确认导出
+            </button>
+          </template>
           <button
             v-if="exportJob.status === 'completed'"
             type="button"
@@ -606,6 +714,60 @@ async function enterFullscreen(): Promise<void> {
   height: 5px;
   accent-color: #48b99c;
 }
+.export-stage-copy {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.export-stage-copy strong {
+  color: var(--color-text);
+  font-size: 11px;
+}
+.export-stage-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.export-timeline {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+  list-style: none;
+}
+.export-timeline li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+  color: #66716e;
+}
+.export-timeline li span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stage-dot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+.export-timeline li.completed {
+  color: #75cbb4;
+}
+.export-timeline li.completed .stage-dot,
+.export-timeline li.active .stage-dot {
+  background: currentColor;
+}
+.export-timeline li.active {
+  color: #d7fff3;
+}
+.export-timeline li.failed {
+  color: #ff9f8f;
+}
 .export-error,
 .export-warnings {
   margin: 0;
@@ -626,6 +788,41 @@ async function enterFullscreen(): Promise<void> {
 .export-warnings strong {
   margin-left: 4px;
   color: #f3d98d;
+}
+.export-review-hint {
+  margin: 6px 0 0;
+  color: #e5c46b;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.export-controls .primary {
+  color: #071612;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  font-weight: 600;
+}
+.export-qa {
+  margin: 6px 0 0;
+  color: #8fd3a8;
+  line-height: 1.45;
+}
+.export-qa.fail {
+  color: #ffb08f;
+}
+.export-qa summary {
+  cursor: pointer;
+  user-select: none;
+}
+.export-qa ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--color-muted);
+}
+.export-qa .qa-pass {
+  color: #8fd3a8;
+}
+.export-qa .qa-fail {
+  color: #ffb08f;
 }
 .export-controls {
   justify-content: flex-end;

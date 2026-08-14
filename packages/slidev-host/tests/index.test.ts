@@ -70,6 +70,12 @@ describe('SlidevHost', () => {
     expect(runner).toContain('ignored: shouldIgnoreWatchPath')
     expect(runner).toContain("'@citation-js/core'")
     expect(runner).toContain("'@citation-js/name'")
+    expect(runner).toContain('options.roots.push')
+    const appSetup = readFileSync(
+      new URL('../setup/main.ts', import.meta.url),
+      'utf8',
+    )
+    expect(appSetup).toContain("'@fastppt/slidewave/browser/runtime'")
     expect(runner).not.toContain('force: true')
   })
 

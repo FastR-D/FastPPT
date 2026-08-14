@@ -38,11 +38,17 @@
       "aspectRatio": "16/9",
       "themeConfig": {
         "accent": "#3B82F6"
+      },
+      "fonts": {
+        "sans": "Inter,LXGW WenKai",
+        "mono": "Fira Code",
+        "local": "Inter,LXGW WenKai,Fira Code"
       }
     }
   },
   "dependencies": {
     "@fontsource/fira-code": "^5.3.0",
-    "@fontsource/inter": "^5.3.0"
+    "@fontsource/inter": "^5.3.0",
+    "@fastppt/fonts": "workspace:*"
   }
 }

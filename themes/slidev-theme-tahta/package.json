@@ -68,14 +68,16 @@
     "colorSchema": "dark",
     "highlighter": "shiki",
     "fonts": {
-      "sans": "Hanken Grotesk",
-      "serif": "Fraunces",
-      "mono": "JetBrains Mono"
+      "sans": "Hanken Grotesk,Noto Sans SC",
+      "serif": "Fraunces,Noto Serif SC",
+      "mono": "JetBrains Mono",
+      "local": "Noto Sans SC,Noto Serif SC"
     }
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.0",
-    "@iconify/vue": "^5.0.0"
+    "@iconify/vue": "^5.0.0",
+    "@fastppt/fonts": "workspace:*"
   },
   "optionalDependencies": {
     "yaml": "^2.0.0",

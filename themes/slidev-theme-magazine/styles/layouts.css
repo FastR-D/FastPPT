@@ -1,0 +1,43 @@
+/* Magazine shared blocks: mist-white bands, warm-gold oval badges, hairlines. */
+
+/* Mist-white horizontal band over imagery — max 4 per slide. */
+.mag-mistband {
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--mag-ink);
+  padding: 1.1rem 1.6rem;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+/* Warm-gold oval number badge — above financial charts, max 3 per slide. */
+.mag-goldbadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.6em;
+  height: 1.6em;
+  border-radius: 999px;
+  background: var(--mag-gold-warm);
+  color: #ffffff;
+  font-family: var(--mag-serif);
+  font-size: 0.95rem;
+  padding: 0 0.7em;
+}
+
+/* Hairline rules for data slides: top + bottom. */
+.mag-hairline--top {
+  border-top: 1px solid var(--mag-black);
+}
+.mag-hairline--bottom {
+  border-bottom: 1px solid var(--mag-black);
+}
+
+/* Chapter role label — ALL CAPS, light, tracked. */
+.mag-role {
+  display: block;
+  font-family: var(--mag-sans);
+  font-weight: 300;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--mag-gray);
+}

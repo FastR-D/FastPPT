@@ -7,12 +7,14 @@
     "fastppt": "dist/runtime/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "scripts/postinstall.mjs"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
+    "postinstall": "node scripts/postinstall.mjs",
     "test": "vitest run",
     "format": "prettier --write .",
     "prepack": "pnpm build"
@@ -62,6 +64,7 @@
     "file-saver": "^2.0.5",
     "gen-interface-jp": "^0.6.2",
     "http-proxy": "^1.18.1",
+    "jszip": "^3.10.1",
     "lucide": "catalog:",
     "lucide-static": "^0.576.0",
     "lz-string": "^1.5.0",
@@ -80,6 +83,8 @@
     "recordrtc": "^5.6.2",
     "shiki": "4.4.1",
     "sharp": "^0.33.5",
+    "subset-font": "^2.5.0",
+    "ttf2eot": "^3.1.0",
     "slidev-addon-gsap": "^0.0.4",
     "slidev-addon-sync": "^0.1.0",
     "slidev-component-poll": "^3.0.0",
@@ -92,7 +97,8 @@
     "vue": "^3.5.18",
     "ws": "^8.21.2",
     "yaml": "^2.9.0",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@fastppt/config": "workspace:*",

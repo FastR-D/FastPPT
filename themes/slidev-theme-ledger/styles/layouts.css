@@ -1,0 +1,95 @@
+/* Ledger shared blocks: thick black top rule, three-layer chart head,
+   terracotta conclusion multiplier, light-gray evidence plate, footer. */
+
+.led-toprule {
+  width: 80%;
+  height: 3px;
+  background: var(--led-ink);
+  margin: 0 0 1.4rem;
+}
+
+.led-toprule--cover {
+  width: 31%;
+}
+
+/* Three-layer chart head: number + serif title + basis line. */
+.led-charthead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0 0 0.8rem;
+}
+.led-charthead .no {
+  font-family: var(--led-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--led-ink);
+  letter-spacing: 0.06em;
+}
+.led-charthead .title {
+  font-family: var(--led-serif);
+  font-size: 1.15rem;
+  color: var(--led-ink);
+}
+.led-charthead .basis {
+  font-size: 0.72rem;
+  color: var(--led-gray);
+  border-top: 1px solid var(--led-gray);
+  padding-top: 0.2rem;
+}
+
+/* Terracotta conclusion multiplier — at most once per chart. */
+.led-multiplier {
+  display: inline-block;
+  font-family: var(--led-serif);
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--led-terra);
+  border-bottom: 2px solid var(--led-terra);
+}
+
+/* Light-gray evidence plate. */
+.led-plate {
+  background: var(--led-gray-light);
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Terracotta vertical ticks (cover key-point list). */
+.led-ticks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.led-ticks li {
+  padding-left: 1.1rem;
+  position: relative;
+}
+.led-ticks li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 3px;
+  height: 0.8em;
+  background: var(--led-terra);
+}
+
+/* Footer: running title left, page number right (rendered by global-top). */
+.led-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  left: 3rem;
+  right: 3rem;
+  bottom: 1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--led-gray);
+}
+.led-footer .rule {
+  width: 1px;
+  height: 1em;
+  background: var(--led-gray);
+}

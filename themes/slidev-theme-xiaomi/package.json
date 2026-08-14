@@ -1,0 +1,46 @@
+{
+  "name": "slidev-theme-xiaomi",
+  "version": "0.1.0-extracted.1",
+  "private": true,
+  "type": "module",
+  "description": "Extracted from an existing PPTX (5481a151-521d-4d52-a29e-62c98bf6ec82.pptx).",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "xiaomi"
+  ],
+  "license": "MIT",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "global-top.vue",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "transition": "none",
+      "fonts": {
+        "sans": "MiSans,Noto Sans SC",
+        "serif": "MiSans,Noto Serif SC",
+        "mono": "Fira Code",
+        "weights": "400,600,700",
+        "local": "MiSans,Noto Sans SC,MiSans,Noto Serif SC,Fira Code"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*"
+  }
+}

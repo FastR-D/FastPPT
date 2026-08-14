@@ -10,8 +10,6 @@ import type {
   SessionSummary,
   WorkspaceInfo,
   HarnessKind,
-  SkillInstallStatus,
-  McpConfigStatus,
 } from '@fastppt/protocol'
 import type { DeepReadonly } from 'vue'
 
@@ -33,8 +31,6 @@ const props = defineProps<{
   canForkSession: boolean
   harnessLabel: string
   selectedHarness: HarnessKind
-  skillStatuses: readonly SkillInstallStatus[]
-  mcpStatus: McpConfigStatus | undefined
 }>()
 
 const sessionQuery = shallowRef('')
@@ -141,25 +137,6 @@ const harnessOptions: readonly SelectOption[] = [
           placeholder="搜索会话…"
           aria-label="搜索会话"
         />
-        <div class="managed-status">
-          <div
-            v-for="skill in skillStatuses"
-            :key="skill.skillId"
-            class="managed-row"
-            :title="skill.targetPath"
-          >
-            <span>{{ skill.skillId }}</span>
-            <small :class="`managed-${skill.state}`">
-              {{ skill.expectedVersion }} · {{ skill.state }}
-            </small>
-          </div>
-          <div v-if="mcpStatus" class="managed-row">
-            <span>fastppt MCP</span>
-            <small :class="`managed-${mcpStatus.state}`">
-              {{ mcpStatus.state }}
-            </small>
-          </div>
-        </div>
         <button
           v-for="session in filteredSessions"
           :key="session.id"
@@ -412,42 +389,6 @@ const harnessOptions: readonly SelectOption[] = [
   font-family: var(--font-mono);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.managed-status {
-  display: grid;
-  gap: 4px;
-  padding: 6px 7px 9px;
-  border-bottom: 1px solid var(--color-border);
-}
-.managed-row {
-  display: grid;
-  min-width: 0;
-  gap: 2px;
-}
-.managed-row span,
-.managed-row small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.managed-row span {
-  color: var(--color-text);
-  font-size: 10px;
-}
-.managed-row small {
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 8px;
-}
-.managed-installed,
-.managed-pending-trust,
-.managed-configured {
-  color: var(--color-accent) !important;
-}
-.managed-conflict,
-.managed-missing,
-.managed-update-available {
-  color: #fcd34d !important;
 }
 .session-item {
   display: grid;

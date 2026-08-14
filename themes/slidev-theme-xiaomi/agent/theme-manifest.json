@@ -1,0 +1,58 @@
+{
+  "id": "slidev-theme-xiaomi",
+  "packageName": "slidev-theme-xiaomi",
+  "displayName": "Xiaomi",
+  "version": "0.1.0-extracted.1",
+  "description": "小米产品发布风格：MiSans、小米橙、强产品视觉、关键数字与克制留白。",
+  "repositoryUrl": "https://github.com/FastR-D/FastPPT",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-xiaomi",
+    "sourceDir": "agent",
+    "version": "0.1.0-extracted.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "ending",
+      "label": "Ending"
+    },
+    {
+      "id": "two-col",
+      "label": "Two Column"
+    },
+    {
+      "id": "metrics",
+      "label": "Metrics"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "extracted-palette",
+      "label": "提取配色",
+      "description": "源 PPTX 实际高频品牌色为小米橙 #FF6900，搭配黑白与冷灰。"
+    },
+    {
+      "id": "extracted-fonts",
+      "label": "提取字体",
+      "description": "正文 MiSans，标题 MiSans。"
+    }
+  ]
+}

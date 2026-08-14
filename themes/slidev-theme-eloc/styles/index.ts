@@ -1,3 +1,6 @@
+import '@fastppt/fonts/inter'
+import '@fastppt/fonts/noto-sans-sc'
+import '@fastppt/fonts/fira-code'
 import '@slidev/client/styles/layouts-base.css'
 import './font.css'
 import './layout.css'

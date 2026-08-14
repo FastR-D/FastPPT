@@ -1,0 +1,53 @@
+{
+  "name": "slidev-theme-magazine",
+  "version": "0.1.0-fastppt.1",
+  "private": true,
+  "description": "以铜棕强调与纪实摄影为特征的奢华杂志营销主题（silver-gray-luxury-magazine）。",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "magazine"
+  ],
+  "license": "MIT",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "docs/screenshots",
+    "global-top.vue",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "transition": "none",
+      "fonts": {
+        "serif": "Libertinus Serif,Noto Serif SC",
+        "sans": "Inter,Noto Sans SC",
+        "mono": "Fira Code",
+        "local": "Libertinus Serif,Inter,Noto Sans SC,Noto Serif SC,Fira Code"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "dev": "pnpm --filter slidev-theme-raft-demo dev",
+    "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*",
+    "@fontsource/libertinus-serif": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FastR-D/FastPPT.git",
+    "directory": "themes/slidev-theme-magazine"
+  }
+}

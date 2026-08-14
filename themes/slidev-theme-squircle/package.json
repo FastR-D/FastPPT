@@ -44,7 +44,8 @@
     "@fontsource-variable/noto-sans-jp": "^5.2.10",
     "@slidev/types": "^52.16.0",
     "gen-interface-jp": "^0.6.2",
-    "lucide-static": "^0.576.0"
+    "lucide-static": "^0.576.0",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@slidev/cli": "^52.16.0",
@@ -63,8 +64,9 @@
         "color": "teal"
       },
       "fonts": {
-        "sans": "Gen Interface JP",
-        "mono": "Fira Code"
+        "sans": "Gen Interface JP,Noto Sans SC",
+        "mono": "Fira Code",
+        "local": "Gen Interface JP,Noto Sans SC,Fira Code"
       }
     }
   }

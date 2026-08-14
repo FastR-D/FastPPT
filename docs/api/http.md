@@ -58,6 +58,15 @@ The Gateway limits active runs independently for Claude and Codex. The fixed def
 | POST   | `/api/v1/themes/rescan`                         |
 | GET    | `/api/v1/themes/:themeId/skill-status?harness=` |
 | GET    | `/api/v1/managed/status`                        |
+| POST   | `/api/v1/imports/pptx-theme`                    |
+| GET    | `/api/v1/imports/pptx-theme/:themeId`           |
+
+PPTX theme import runs as a staged pipeline: deterministic extraction, harness
+layout/component design, managed Skill synchronization, then structural theme
+validation. The status endpoint returns `stage` (`extracting`, `designing`,
+`syncing`, `validating`, `ready`, or `failed`), materialized layouts/components,
+a user-facing message, and an optional error. Consumers must wait for `ready`;
+`designing: false` alone does not indicate success.
 
 ## Deck and preview
 

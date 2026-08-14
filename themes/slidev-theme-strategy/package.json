@@ -1,0 +1,52 @@
+{
+  "name": "slidev-theme-strategy",
+  "version": "0.1.0-fastppt.1",
+  "private": true,
+  "description": "以深森林绿与高密度双栏证据为特征的咨询策略主题（pine-green-strategy）。",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "strategy"
+  ],
+  "license": "MIT",
+  "files": [
+    "layouts",
+    "components",
+    "styles",
+    "docs/screenshots",
+    "global-top.vue",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "transition": "none",
+      "fonts": {
+        "sans": "Inter,Noto Sans SC",
+        "serif": "Noto Serif SC",
+        "mono": "Fira Code",
+        "local": "Inter,Noto Sans SC,Noto Serif SC,Fira Code"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs .",
+    "dev": "pnpm --filter slidev-theme-raft-demo dev",
+    "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FastR-D/FastPPT.git",
+    "directory": "themes/slidev-theme-strategy"
+  }
+}

@@ -1,3 +1,6 @@
+import '@fastppt/fonts/space-grotesk'
+import '@fastppt/fonts/space-mono'
+import '@fastppt/fonts/noto-sans-sc'
 import './base.css'
 import './code.css'
 import './layouts.css'

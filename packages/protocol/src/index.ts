@@ -252,8 +252,54 @@ export type DeckSummary = z.infer<typeof DeckSummarySchema>
 export const CreateExportRequestSchema = z.object({
   format: z.literal('editable-pptx'),
   outputName: z.string().min(1).max(160),
+  /** Require an explicit visual confirmation before the export is published. */
+  review: z.boolean().optional(),
 })
 export type CreateExportRequest = z.infer<typeof CreateExportRequestSchema>
+
+export const ReviewExportRequestSchema = z.object({
+  approved: z.boolean(),
+})
+
+export const ImportPptxThemeRequestSchema = z.object({
+  fileName: z.string().min(1).max(200),
+  dataBase64: z.string().min(1),
+  themeName: z.string().min(1).max(64).optional(),
+})
+export type ImportPptxThemeRequest = z.infer<typeof ImportPptxThemeRequestSchema>
+
+export const ImportPptxThemeResultSchema = z.object({
+  themeId: z.string().min(1),
+  displayName: z.string().min(1),
+  packageName: z.string().min(1),
+  skillId: z.string().min(1),
+  version: z.string().min(1),
+  slug: z.string().min(1),
+  /** True when a harness design session is enriching the theme in the background. */
+  designing: z.boolean(),
+})
+export type ImportPptxThemeResult = z.infer<typeof ImportPptxThemeResultSchema>
+
+export const ImportPptxThemeStageSchema = z.enum([
+  'extracting',
+  'designing',
+  'syncing',
+  'validating',
+  'ready',
+  'failed',
+])
+export type ImportPptxThemeStage = z.infer<typeof ImportPptxThemeStageSchema>
+
+export const ImportPptxThemeStatusSchema = z.object({
+  themeId: z.string().min(1),
+  stage: ImportPptxThemeStageSchema,
+  designing: z.boolean(),
+  layouts: z.array(z.string()),
+  components: z.array(z.string()),
+  message: z.string().min(1),
+  error: z.string().optional(),
+})
+export type ImportPptxThemeStatus = z.infer<typeof ImportPptxThemeStatusSchema>
 
 export const ExportWarningSchema = z.object({
   code: z.string().min(1),
@@ -265,11 +311,26 @@ export type ExportWarning = z.infer<typeof ExportWarningSchema>
 export const ExportJobStateSchema = z.enum([
   'queued',
   'running',
+  'review-required',
   'completed',
   'failed',
   'cancelled',
 ])
 export type ExportJobState = z.infer<typeof ExportJobStateSchema>
+
+export const ExportQaIssueSchema = z.object({
+  code: z.string().min(1),
+  message: z.string().min(1),
+  slide: z.number().int().positive().optional(),
+})
+export type ExportQaIssue = z.infer<typeof ExportQaIssueSchema>
+
+export const ExportQaReportSchema = z.object({
+  ok: z.boolean(),
+  slideCount: z.number().int().nonnegative(),
+  issues: z.array(ExportQaIssueSchema),
+})
+export type ExportQaReport = z.infer<typeof ExportQaReportSchema>
 
 export const ExportJobSchema = z.object({
   id: z.string().min(1),
@@ -294,6 +355,7 @@ export const ExportJobSchema = z.object({
     })
     .optional(),
   downloadUrl: z.string().min(1).optional(),
+  qa: ExportQaReportSchema.optional(),
 })
 export type ExportJob = z.infer<typeof ExportJobSchema>
 

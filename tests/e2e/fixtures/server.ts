@@ -257,6 +257,7 @@ class BrowserFixtureExporter implements EditablePptxExporter {
         0,
       ),
       slideCount: input.snapshot.slides.length,
+      qa: { ok: true, slideCount: input.snapshot.slides.length, issues: [] },
     }
   }
 }

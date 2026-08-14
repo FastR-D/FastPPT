@@ -32,10 +32,10 @@
       "aspectRatio": "16/9",
       "fonts": {
         "serif": "Libertinus Serif, Linux Libertine, Noto Serif SC, Source Han Serif SC, Noto Serif CJK SC, Georgia, serif",
-        "sans": "Fira Sans",
+        "sans": "Fira Sans,Noto Sans SC",
         "mono": "Fira Code",
         "weights": "400,600",
-        "local": "Libertinus Serif, Linux Libertine, Source Han Serif SC, Noto Serif CJK SC, Georgia, serif"
+        "local": "Libertinus Serif,Noto Serif SC,Noto Sans SC,Fira Code"
       }
     }
   },
@@ -63,7 +63,8 @@
     "@antfu/utils": "^9.3.0",
     "@fontsource/libertinus-serif": "^5.2.1",
     "@vueuse/core": "^14.2.1",
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "@fastppt/fonts": "workspace:*"
   },
   "scripts": {
     "test": "node ../../scripts/theme-smoke.mjs .",

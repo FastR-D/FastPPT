@@ -22,7 +22,8 @@
     "prism-theme-vars": "^0.2.4",
     "slidev-addon-sync": "^0.1.0",
     "slidev-component-poll": "^3.0.0",
-    "theme-vitesse": "^0.6.2"
+    "theme-vitesse": "^0.6.2",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@slidev/cli": "^0.50.0-beta.5",
@@ -33,11 +34,10 @@
     "colorSchema": "both",
     "defaults": {
       "fonts": {
-        "provider": "coollabs",
-        "mono": "Fira Code,consolas",
+        "sans": "Lexend,Noto Sans SC",
         "serif": "Roboto Serif,Georgia",
-        "sans": "Lexend,Avenir Next.Arial",
-        "local": "Lexend,Avenir Next,Arial",
+        "mono": "Fira Code,consolas",
+        "local": "Lexend,Noto Sans SC,Fira Code",
         "italic": false
       },
       "transition": "fade",

@@ -36,7 +36,8 @@
   "dependencies": {
     "@slidev/types": "^51.1.1",
     "@vueuse/core": "^12.7.0",
-    "@vueuse/math": "^12.7.0"
+    "@vueuse/math": "^12.7.0",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@slidev/cli": "51.1.1",
@@ -59,7 +60,9 @@
       "canvasWidth": 1580,
       "selectable": true,
       "fonts": {
-        "mono": "Fira Code"
+        "sans": "Inter,Noto Sans SC",
+        "mono": "Fira Code",
+        "local": "Inter,Noto Sans SC,Fira Code"
       }
     }
   }

@@ -1,5 +1,8 @@
 // Self-hosted fonts — bundled so the deck works fully offline (no Google Fonts
 // request at present-time). Inter is the typeface; Fira Code is used for code.
+import '@fastppt/fonts/inter'
+import '@fastppt/fonts/fira-code'
+import '@fastppt/fonts/lxgw-wenkai'
 import '@fontsource/inter/400.css'
 import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'

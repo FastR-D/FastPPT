@@ -69,6 +69,9 @@ describe('ManagedSkillInstaller', () => {
         'codex:fastppt',
         'codex:fastppt-theme-academy',
         'codex:fastppt-theme-landing',
+        'claude:fastppt-theme-strategy',
+        'claude:fastppt-theme-ledger',
+        'claude:fastppt-theme-magazine',
       ]),
     )
     await expect(
@@ -265,7 +268,7 @@ describe('McpConfigManager', () => {
     const statuses = await manager.reconcile()
     expect(statuses).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ harness: 'claude', state: 'pending-trust' }),
+        expect.objectContaining({ harness: 'claude', state: 'configured' }),
         expect.objectContaining({ harness: 'codex', state: 'pending-trust' }),
       ]),
     )
@@ -283,6 +286,10 @@ describe('McpConfigManager', () => {
         '/stable/fastppt-mcp.ts',
       ]),
     )
+    const settings = JSON.parse(
+      await readFile(join(workspaceRoot, '.claude', 'settings.json'), 'utf8'),
+    ) as { enabledMcpjsonServers?: string[] }
+    expect(settings.enabledMcpjsonServers).toContain('fastppt')
     const codex = await readFile(
       join(workspaceRoot, '.codex', 'config.toml'),
       'utf8',
@@ -361,8 +368,11 @@ describe('McpConfigManager', () => {
       expect.objectContaining({ state: 'conflict', managed: true }),
     ])
     const statuses = await manager.reconcile()
-    expect(statuses.every((status) => status.state === 'pending-trust')).toBe(
-      true,
+    expect(statuses).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ state: 'configured', managed: true }),
+        expect.objectContaining({ state: 'pending-trust', managed: true }),
+      ]),
     )
 
     const claudeSource = await readFile(
@@ -457,7 +467,7 @@ describe('McpConfigManager', () => {
     const statuses = await manager.reconcile()
 
     expect(statuses).toEqual([
-      expect.objectContaining({ state: 'pending-trust', managed: true }),
+      expect.objectContaining({ state: 'configured', managed: true }),
       expect.objectContaining({ state: 'pending-trust', managed: true }),
     ])
     await expect(

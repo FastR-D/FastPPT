@@ -30,9 +30,10 @@
       "canvasWidth": 980,
       "transition": "none",
       "fonts": {
-        "sans": "Space Grotesk",
+        "sans": "Space Grotesk,Noto Sans SC",
         "mono": "Space Mono",
-        "weights": "400,500,700"
+        "weights": "400,500,700",
+        "local": "Space Grotesk,Noto Sans SC,Space Mono"
       }
     },
     "colorSchema": "light"
@@ -41,5 +42,8 @@
     "test": "node ../../scripts/theme-smoke.mjs .",
     "dev": "pnpm --filter slidev-theme-raft-demo dev",
     "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*"
   }
 }

@@ -40,7 +40,7 @@ html:not(.dark) {
   padding: 5.2% 6.25%;
   background: var(--sk-paper);
   color: var(--sk-ink);
-  font-family: 'Shantell Sans', var(--slidev-theme-fonts-sans), system-ui, sans-serif;
+  font-family: 'Shantell Sans', 'LXGW WenKai', var(--slidev-theme-fonts-sans), system-ui, sans-serif;
   font-size: 1.9rem;
   line-height: 1.45;
   text-wrap: pretty;

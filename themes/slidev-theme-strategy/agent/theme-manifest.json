@@ -1,0 +1,67 @@
+{
+  "id": "slidev-theme-strategy",
+  "packageName": "slidev-theme-strategy",
+  "displayName": "Strategy",
+  "version": "0.1.0-fastppt.1",
+  "description": "以深森林绿与高密度双栏证据为特征的咨询策略主题（pine-green-strategy）。",
+  "repositoryUrl": "https://github.com/FastR-D/FastPPT/tree/main/themes/slidev-theme-strategy",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-strategy",
+    "sourceDir": "agent",
+    "version": "0.1.0-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "image-right",
+      "label": "Image Right"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "consulting-evidence",
+      "label": "高密度咨询版式",
+      "description": "断言标题、双栏证据、细绿线分隔、侧栏解读。"
+    },
+    {
+      "id": "chapter-nav",
+      "label": "章节导航",
+      "description": "ChapterBar 章节码 + 竖线 + 章节名导航。"
+    },
+    {
+      "id": "sowhat",
+      "label": "底部结论条",
+      "description": "SoWhatBar 每页底部一句 so-what 合成。"
+    }
+  ]
+}

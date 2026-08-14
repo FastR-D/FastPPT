@@ -44,6 +44,10 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
+  {
+    ...tseslint.configs.disableTypeChecked,
+    files: ['**/*.d.ts', '**/*.d.mts', '**/*.d.css.ts'],
+  },
   ...vue.configs['flat/recommended'],
   {
     files: ['**/*.vue'],

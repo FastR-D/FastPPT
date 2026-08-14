@@ -18,6 +18,8 @@
     "src/slidev/render-svg.ts",
     "src/slidev/render-types.ts",
     "src/slidev/render.ts",
+    "src/export/**/*.ts",
+    "src/fonts/**/*.ts",
     "src/snapshot-types.ts",
     "src/types.ts"
   ]

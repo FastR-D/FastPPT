@@ -9,6 +9,8 @@ const repositoryRoot = resolve(packageRoot, '../..')
 const outputRoot = join(packageRoot, 'dist')
 const runtimeRoot = join(outputRoot, 'runtime')
 const external = [
+  '@fastppt/fonts',
+  '@fastppt/slidewave',
   '@anthropic-ai/claude-agent-sdk',
   '@chenglou/pretext',
   '@fastify/cors',
@@ -22,6 +24,7 @@ const external = [
   'drizzle-orm',
   'fastify',
   'http-proxy',
+  'jszip',
   'lucide',
   'picomatch',
   'pino',
@@ -30,6 +33,8 @@ const external = [
   'prettier',
   'prettier-plugin-slidev',
   'prismjs',
+  'subset-font',
+  'ttf2eot',
   'ws',
   'yaml',
   'zod',
@@ -40,6 +45,7 @@ await mkdir(runtimeRoot, { recursive: true })
 await build({
   entryPoints: {
     cli: join(packageRoot, 'src/cli.ts'),
+    'install-themes': join(packageRoot, 'src/install-themes.ts'),
     'mcp-server': join(packageRoot, 'src/mcp-server.ts'),
   },
   outdir: runtimeRoot,
@@ -53,6 +59,10 @@ await build({
 })
 
 await Promise.all([
+  cp(
+    join(repositoryRoot, 'scripts', 'extract-theme.mjs'),
+    join(outputRoot, 'scripts', 'extract-theme.mjs'),
+  ),
   cp(join(repositoryRoot, 'themes'), join(outputRoot, 'themes'), {
     recursive: true,
     filter: (source) =>
@@ -81,6 +91,19 @@ await Promise.all([
     join(repositoryRoot, 'packages/slidewave/dist'),
     join(outputRoot, 'node_modules/@fastppt/slidewave/dist'),
     { recursive: true },
+  ),
+  cp(
+    join(repositoryRoot, 'packages/fonts'),
+    join(outputRoot, 'node_modules/@fastppt/fonts'),
+    {
+      recursive: true,
+      filter: (source) =>
+        !source.includes(`${join('node_modules', '')}`) &&
+        !source.includes(`${join('.turbo', '')}`) &&
+        !source.includes(`${join('scripts', '')}`) &&
+        !source.includes(`${join('tests', '')}`) &&
+        !source.includes(`${join('dist', '')}`),
+    },
   ),
   cp(
     join(repositoryRoot, 'packages/slidev-host/runner.mjs'),
@@ -117,5 +140,6 @@ await writeFile(
 )
 await Promise.all([
   chmod(join(runtimeRoot, 'cli.js'), 0o755),
+  chmod(join(runtimeRoot, 'install-themes.js'), 0o755),
   chmod(join(runtimeRoot, 'mcp-server.js'), 0o755),
 ])

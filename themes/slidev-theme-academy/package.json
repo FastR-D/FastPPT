@@ -43,7 +43,8 @@
     "qrcode.vue": "^3.9.0",
     "@fastppt/slidewave": "workspace:*",
     "vite": "catalog:",
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
@@ -59,9 +60,9 @@
       "canvasWidth": 1280,
       "lineNumbers": true,
       "fonts": {
-        "mono": "Fira Code,Noto Sans Mono CJK SC",
-        "sans": "Inter,Noto Sans CJK SC",
-        "local": "Inter,Noto Sans CJK SC,Fira Code,Noto Sans Mono CJK SC"
+        "mono": "Fira Code",
+        "sans": "Inter,Noto Serif SC",
+        "local": "Inter,Noto Serif SC,Fira Code"
       }
     }
   },

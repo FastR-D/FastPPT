@@ -15,10 +15,12 @@
   },
   "files": [
     "src",
+    "setup",
     "runner.mjs"
   ],
   "dependencies": {
     "@fastppt/protocol": "workspace:*",
+    "@fastppt/slidewave": "workspace:*",
     "@slidev/cli": "catalog:",
     "@slidev/theme-default": "catalog:"
   },

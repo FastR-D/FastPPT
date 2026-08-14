@@ -2,8 +2,10 @@
 import { computed, onMounted, onUnmounted, shallowRef } from 'vue'
 
 import AgentWorkspace from '../components/workspace/AgentWorkspace.vue'
+import ManagedStatusBadge from '../components/workspace/ManagedStatusBadge.vue'
 import PreviewPanel from '../components/workspace/PreviewPanel.vue'
 import ThemeCatalog from '../components/themes/ThemeCatalog.vue'
+import ThemeImport from '../components/workspace/ThemeImport.vue'
 import WorkspaceSidebar from '../components/workspace/WorkspaceSidebar.vue'
 import { useFilesStore } from '../stores/files.js'
 import { usePreviewStore } from '../stores/preview.js'
@@ -16,7 +18,7 @@ const previewStore = usePreviewStore()
 const sessionsStore = useSessionsStore()
 const controller = new AbortController()
 const shell = shallowRef<HTMLElement>()
-const workspaceMode = shallowRef<'chat' | 'files' | 'themes'>('chat')
+const workspaceMode = shallowRef<'chat' | 'files' | 'themes' | 'import'>('chat')
 const compactPanel = shallowRef<'workbench' | 'preview'>('workbench')
 
 const LAYOUT_STORAGE_KEY = 'fastppt.workspace-layout.v1'
@@ -39,6 +41,11 @@ const workspaceLabel = computed(
   () =>
     workspaceStore.workspace?.name ??
     (workspaceStore.loading ? '连接中…' : '未连接'),
+)
+const harnessLabel = computed(() =>
+  sessionsStore.selectedHarnessStatus?.status === 'available'
+    ? (sessionsStore.selectedHarnessStatus.version ?? 'ready')
+    : 'unavailable',
 )
 const sendDisabledReason = computed(() => {
   const theme = previewStore.selectedTheme
@@ -90,8 +97,15 @@ function persistLayout(): void {
   localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(layout.value))
 }
 
-function selectWorkspaceMode(mode: 'chat' | 'files' | 'themes'): void {
+function selectWorkspaceMode(mode: 'chat' | 'files' | 'themes' | 'import'): void {
   workspaceMode.value = mode
+  compactPanel.value = 'workbench'
+}
+
+function onThemeImported(): void {
+  // Return to the conversation workspace; the imported theme appears in the
+  // theme catalog after the harness design session completes.
+  workspaceMode.value = 'chat'
   compactPanel.value = 'workbench'
 }
 
@@ -177,7 +191,14 @@ async function sendMessage(): Promise<void> {
       <div class="brand-block">
         <div class="brand-mark">F</div>
         <div class="brand-copy">
-          <strong>FastPPT</strong>
+          <div class="brand-title-row">
+            <strong>FastPPT</strong>
+            <ManagedStatusBadge
+              :skill-statuses="sessionsStore.selectedSkillStatuses"
+              :mcp-status="sessionsStore.selectedMcpStatus"
+              :harness-label="harnessLabel"
+            />
+          </div>
           <span class="workspace-identity">
             <i
               class="workspace-signal"
@@ -222,10 +243,16 @@ async function sendMessage(): Promise<void> {
         >
           主题
         </button>
+        <button
+          type="button"
+          role="tab"
+          :aria-selected="workspaceMode === 'import'"
+          :class="{ active: workspaceMode === 'import' }"
+          @click="selectWorkspaceMode('import')"
+        >
+          导入
+        </button>
       </nav>
-      <div class="header-status" :title="workspaceStore.workspace?.root">
-        {{ workspaceStore.workspace?.root ?? workspaceStore.error ?? '' }}
-      </div>
     </header>
     <nav
       v-if="workspaceMode !== 'themes'"
@@ -253,6 +280,11 @@ async function sendMessage(): Promise<void> {
       :themes="previewStore.themes"
       :loading="previewStore.loading"
       :error="previewStore.error"
+    />
+    <ThemeImport
+      v-else-if="workspaceMode === 'import'"
+      class="theme-catalog-page"
+      @imported="onThemeImported"
     />
     <div
       v-else
@@ -284,8 +316,6 @@ async function sendMessage(): Promise<void> {
             : 'unavailable'
         "
         :selected-harness="sessionsStore.selectedHarness"
-        :skill-statuses="sessionsStore.selectedSkillStatuses"
-        :mcp-status="sessionsStore.selectedMcpStatus"
         @retry-workspace="workspaceStore.load()"
         @retry-files="filesStore.loadTree()"
         @select-file="filesStore.openFile($event)"
@@ -388,6 +418,8 @@ async function sendMessage(): Promise<void> {
         previewStore.submitInspectionResult($event.inspectionId, $event.result)
       "
       @cancel-export="previewStore.cancelExport"
+      @review-export="previewStore.reviewExport"
+      @retry-export="previewStore.retryExport"
       @download-export="previewStore.downloadExport"
     />
   </main>
@@ -443,6 +475,12 @@ async function sendMessage(): Promise<void> {
   display: grid;
   gap: 2px;
 }
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
 .workspace-identity {
   display: flex;
   align-items: center;
@@ -478,17 +516,6 @@ async function sendMessage(): Promise<void> {
 .workspace-tabs button.active {
   border-bottom-color: var(--color-accent);
   color: var(--color-text);
-}
-.header-status {
-  overflow: hidden;
-  margin-left: auto;
-  padding: 0 18px;
-  align-self: center;
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .workbench {
   display: grid;
@@ -616,10 +643,7 @@ async function sendMessage(): Promise<void> {
 }
 
 @media (max-width: 720px) {
-  .header-status {
-    display: none;
-  }
-  .brand-block {
+    .brand-block {
     padding-right: 4px;
   }
   .workspace-tabs button {

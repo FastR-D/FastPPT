@@ -1,0 +1,67 @@
+{
+  "id": "slidev-theme-ledger",
+  "packageName": "slidev-theme-ledger",
+  "displayName": "Ledger",
+  "version": "0.1.0-fastppt.1",
+  "description": "以青绿数据与赤陶结论为特征的机构金融主题（ebony-ledger）。",
+  "repositoryUrl": "https://github.com/FastR-D/FastPPT/tree/main/themes/slidev-theme-ledger",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "skill": {
+    "id": "fastppt-theme-ledger",
+    "sourceDir": "agent",
+    "version": "0.1.0-fastppt.1"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "Cover"
+    },
+    {
+      "id": "default",
+      "label": "Default"
+    },
+    {
+      "id": "end",
+      "label": "End"
+    },
+    {
+      "id": "image-right",
+      "label": "Image Right"
+    },
+    {
+      "id": "quote",
+      "label": "Quote"
+    },
+    {
+      "id": "section",
+      "label": "Section"
+    },
+    {
+      "id": "statement",
+      "label": "Statement"
+    },
+    {
+      "id": "two-cols",
+      "label": "Two Cols"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "institutional-finance",
+      "label": "机构金融版式",
+      "description": "断言标题、黑骨架、serif/sans 双字体、图表直标。"
+    },
+    {
+      "id": "chart-head",
+      "label": "三层图表头",
+      "description": "ChartHead 图表号 + serif 标题 + 基准行。"
+    },
+    {
+      "id": "conclusion-multiplier",
+      "label": "赤陶结论乘数",
+      "description": "Multiplier 每图一次的变化幅度标记。"
+    }
+  ]
+}

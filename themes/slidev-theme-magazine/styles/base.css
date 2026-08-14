@@ -1,0 +1,93 @@
+/* Magazine — austere luxury editorial design language (silver-gray-luxury-magazine).
+   Cool white, deep black, desaturated photography, narrow copper-brown + warm-gold
+   accents. Narrative pages are full-bleed; data pages are white with hairlines. */
+:root {
+  --mag-bg: #ffffff;
+  --mag-ink: #252525;
+  --mag-black: #000000;
+  --mag-copper: #9d5a37;       /* primary accent — never floods a slide */
+  --mag-gray: #a6a6a6;
+  --mag-gray-light: #e7e6e6;
+  --mag-gold: #cc9900;         /* small highlights */
+  --mag-gold-warm: #d79740;
+  --mag-appendix: #cce4ff;     /* appendix row bands only */
+  --mag-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  --mag-serif: 'Libertinus Serif', 'Noto Serif SC', Georgia, serif;
+}
+
+.slidev-layout {
+  height: 100%;
+  background: var(--mag-bg);
+  color: var(--mag-ink);
+  font-family: var(--mag-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 2.2rem 3rem 2.6rem;
+}
+
+.slidev-layout h1,
+.slidev-layout h2 {
+  font-family: var(--mag-serif);
+  font-weight: 400;
+  color: var(--mag-black);
+  line-height: 1.25;
+}
+
+.slidev-layout h1 {
+  font-size: 2.1rem;
+  margin: 0 0 1rem;
+}
+
+.slidev-layout h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.6rem;
+}
+
+.slidev-layout h3 {
+  font-family: var(--mag-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.4rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  font-size: 0.97rem;
+}
+
+/* Key numerals in copper; only the primary series / one conclusion. */
+.slidev-layout .mag-num {
+  font-family: var(--mag-serif);
+  color: var(--mag-copper);
+}
+.slidev-layout .mag-num--gold {
+  color: var(--mag-gold);
+}
+
+.slidev-layout mark {
+  background: var(--mag-gray-light);
+  color: var(--mag-ink);
+}
+
+.slidev-layout table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.slidev-layout th {
+  border-bottom: 1px solid var(--mag-black);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+.slidev-layout td {
+  border-bottom: 1px solid var(--mag-gray-light);
+  font-size: 0.9rem;
+  padding: 0.3rem 0.5rem;
+}
+/* Appendix-style alternating rows only where the deck marks it. */
+.slidev-layout .mag-appendix tbody tr:nth-child(even) {
+  background: var(--mag-appendix);
+}

@@ -16,6 +16,15 @@ For a project-local dependency, use `pnpm add --save-dev @fastppt/cli` and
 `fastppt --dir <path>` and `fastppt --workspace <path>` select another one.
 Open the deployed frontend at `https://fastppt.vercel.app`.
 
+Use `fastppt status`, `fastppt doctor`, and `fastppt stop` to inspect or stop
+the Gateway registered for the current workspace. `fastppt start --open`
+opens the deployed frontend after the local service starts; `--json` provides
+machine-readable diagnostics.
+
+The packaged theme bundle is synchronized to `~/.fastppt/themes` on the first
+`start` or `doctor` invocation and whenever the CLI version changes. Imported
+themes remain in that user directory across CLI upgrades.
+
 Use the repository development command only when changing FastPPT itself. It
 starts both backend and frontend development processes with source watching:
 

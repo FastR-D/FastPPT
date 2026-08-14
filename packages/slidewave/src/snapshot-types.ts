@@ -27,6 +27,8 @@ export type HtmlWarningCode =
   | 'unsupported-transform'
   | 'unsupported-border-style'
   | 'unresolved-font'
+  | 'unembedded-font'
+  | 'font-subset-failed'
   | 'invalid-snapshot'
 
 export interface HtmlConversionWarning {

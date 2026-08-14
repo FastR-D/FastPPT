@@ -40,7 +40,7 @@
   --cat-5: oklch(from var(--accent) calc(l - 0.10) c calc(h + 80));
 
   --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --w-display: 600; --tr-display: -0.02em; --w-strong: 650;
@@ -109,7 +109,7 @@
   --accent-base: #c8f135; --accent-l-lo: 0.84; --accent-l-hi: 0.96; --accent-c-hi: 0.25; --on-accent: #000;
   --cat-1: #c8f135; --cat-2: #35e0f1; --cat-3: #ff5ca8; --cat-4: #ffd23f; --cat-5: #9d7bff; /* neon on dark — distinct roles */
   --font-display: 'Space Mono', monospace;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Space Mono', monospace;
   --w-display: 700; --tr-display: -0.01em; --w-strong: 700;
   --radius: 0; --radius-sm: 0; --rule-w: 2px;
@@ -202,7 +202,7 @@
   --accent-base: #8590ff; --accent-l-lo: 0.64; --accent-l-hi: 0.76; --accent-c-hi: 0.2; --on-accent: #0b0d14;
   --cat-1: #8590ff; --cat-2: #5fd0e0; --cat-3: #c4a0ff; --cat-4: #7fdca8; --cat-5: #f3a0c0; /* Lagoon-cool pastels on dark */
   --font-display: 'Hanken Grotesk', system-ui, sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 800; --tr-display: -0.03em; --w-strong: 700;
   --radius: 10px; --radius-sm: 8px; --rule-w: 1px;
@@ -224,7 +224,7 @@
   --accent-base: #2546c7; --accent-l-lo: 0.4; --accent-l-hi: 0.52; --accent-c-hi: 0.24; --on-accent: #fff;
   --cat-1: #2546c7; --cat-2: #e5484d; --cat-3: #f2b705; --cat-4: #2e9e6b; --cat-5: #8b5cf6; /* highlighter primaries on white paper */
   --font-display: 'Hanken Grotesk', system-ui, sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 800; --tr-display: -0.02em; --w-strong: 700;
   --radius: 6px; --radius-sm: 5px; --rule-w: 1px;
@@ -249,7 +249,7 @@
   --accent-base: #58cabb; --accent-l-lo: 0.71; --accent-l-hi: 0.83; --accent-c-hi: 0.14; --on-accent: #07211d;
   --cat-1: #58cabb; --cat-2: #f3a0c0; --cat-3: #8fc7e0; --cat-4: #e8d48a; --cat-5: #7fcf9f; /* pale teal, pink, sky, cream-yellow, sage */
   --font-display: 'Hanken Grotesk', system-ui, sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 800; --tr-display: -0.035em; --w-strong: 700;
   --radius: 16px; --radius-sm: 11px; --rule-w: 1px;
@@ -272,7 +272,7 @@
   --accent-base: #b0241c; --accent-l-lo: 0.44; --accent-l-hi: 0.56; --accent-c-hi: 0.21; --on-accent: #fff;
   --cat-1: #14110b; --cat-2: #b0241c; --cat-3: #4c483f; --cat-4: #2b4d8a; --cat-5: #8a5e16; /* ink, red spot, deep-gray, slate, ochre */
   --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 600; --tr-display: -0.025em; --w-strong: 700;
   --radius: 0px; --radius-sm: 0px; --rule-w: 1.5px;
@@ -295,7 +295,7 @@
   --accent-base: #f08a3c; --accent-l-lo: 0.67; --accent-l-hi: 0.79; --accent-c-hi: 0.19; --on-accent: #0e1b2e;
   --cat-1: #f08a3c; --cat-2: #5b9bd5; --cat-3: #46c0b0; --cat-4: #e8c861; --cat-5: #8a9bc4; /* orange, steel-blue, teal, gold, slate */
   --font-display: 'Hanken Grotesk', system-ui, sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 700; --tr-display: -0.02em; --w-strong: 700;
   --radius: 7px; --radius-sm: 5px; --rule-w: 1px;
@@ -318,7 +318,7 @@
   --accent-base: #1fe3d2; --accent-l-lo: 0.77; --accent-l-hi: 0.89; --accent-c-hi: 0.18; --on-accent: #04100f;
   --cat-1: #1fe3d2; --cat-2: #ff5d8a; --cat-3: #9b7bff; --cat-4: #ffd23f; --cat-5: #4ad0ff; /* electric set on black */
   --font-display: 'Hanken Grotesk', system-ui, sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 800; --tr-display: -0.04em; --w-strong: 700;
   --radius: 12px; --radius-sm: 9px; --rule-w: 1px;
@@ -341,7 +341,7 @@
   --accent-base: #46592f; --accent-l-lo: 0.38; --accent-l-hi: 0.5; --accent-c-hi: 0.1; --on-accent: #f2ecdb;
   --cat-1: #46592f; --cat-2: #9c5a2c; --cat-3: #6f6a3a; --cat-4: #7a5236; --cat-5: #45607a; /* olive, rust, ochre, clay, slate-blue */
   --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 700; --tr-display: -0.02em; --w-strong: 700;
   --radius: 4px; --radius-sm: 3px; --rule-w: 1px;
@@ -364,7 +364,7 @@
   --accent-base: #e23c1e; --accent-l-lo: 0.54; --accent-l-hi: 0.66; --accent-c-hi: 0.25; --on-accent: #fff;
   --cat-1: #e23c1e; --cat-2: #14304f; --cat-3: #1f8a7a; --cat-4: #e0a519; --cat-5: #7a3b6e; /* red, navy, teal, gold, plum */
   --font-display: 'Anton', 'Archivo', sans-serif;
-  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', 'Noto Sans SC', system-ui, sans-serif;
   --font-serif: 'Fraunces', Georgia, serif;
   --w-display: 400; --tr-display: 0.005em; --w-strong: 700;
   --radius: 2px; --radius-sm: 2px; --rule-w: 2px;

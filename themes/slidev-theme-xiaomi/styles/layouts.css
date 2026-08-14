@@ -1,0 +1,13 @@
+.ext-rule {
+  width: 40px;
+  border-bottom: 5px solid var(--ext-primary);
+  margin: 0 0 28px;
+}
+.ext-pill {
+  display: inline-block;
+  color: var(--ext-primary);
+  margin-bottom: 18px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}

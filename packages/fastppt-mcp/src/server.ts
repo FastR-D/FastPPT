@@ -1,9 +1,12 @@
-import { readFile, realpath, stat } from 'node:fs/promises'
+import { access, readFile, realpath, stat } from 'node:fs/promises'
+import { isIP } from 'node:net'
 import { basename, extname, join, posix, resolve } from 'node:path'
 
 import { listCollections, searchIcons } from '@fastppt/icons'
 import { ManagedSkillInstaller } from '@fastppt/fastppt-skill'
 import { formatSlidevMarkdown } from '@fastppt/markdown'
+import { runThemeExtraction } from './theme-extraction.js'
+import { designThemeLayouts } from './theme-design.js'
 import { isContained, resolveExistingPath } from '@fastppt/workspace'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
@@ -17,12 +20,15 @@ export const FASTPPT_MCP_TOOL_NAMES = [
   'get_theme_manifest',
   'get_theme_rules',
   'get_theme_skill',
+  'import_theme_from_pptx',
+  'design_theme_layouts',
   'read_slides',
   'write_slides',
   'format_slides',
   'validate_slides',
   'list_assets',
   'import_generated_image',
+  'import_remote_image',
   'inspect_slide',
   'inspect_overflow',
   'get_preview_status',
@@ -60,6 +66,12 @@ const ImportGeneratedImageInputSchema = z.object({
   sourcePath: z.string().min(1),
   destinationPath: z.string().min(1),
 })
+const ImportRemoteImageInputSchema = z.object({
+  url: z.string().url(),
+  destinationPath: z.string().min(1),
+})
+
+const MAX_REMOTE_IMAGE_BYTES = 10 * 1024 * 1024
 
 const IMAGE_MEDIA_TYPES = {
   '.gif': 'image/gif',
@@ -68,6 +80,11 @@ const IMAGE_MEDIA_TYPES = {
   '.png': 'image/png',
   '.webp': 'image/webp',
 } as const
+type ImageMediaType = (typeof IMAGE_MEDIA_TYPES)[keyof typeof IMAGE_MEDIA_TYPES]
+
+function isImageMediaType(value: string): value is ImageMediaType {
+  return (Object.values(IMAGE_MEDIA_TYPES) as readonly string[]).includes(value)
+}
 
 export interface BrowserCaptureDelegate {
   inspectOverflow(input: {
@@ -86,8 +103,37 @@ export interface FastPptMcpServiceOptions {
   workspaceName: string
   registry: ThemeRegistry
   commonSkillRoot: string
+  /** Directory that receives generated `slidev-theme-<slug>` packages. */
+  themesRoot: string
+  /** Absolute path to `scripts/extract-theme.mjs`. */
+  extractorPath: string
   browserCapture?: BrowserCaptureDelegate
   generatedImagesRoot?: string
+  fetch?: typeof fetch
+}
+
+function assertPublicHttpsUrl(value: string): URL {
+  const url = new URL(value)
+  if (url.protocol !== 'https:')
+    throw new Error('Remote images must use HTTPS.')
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, '')
+  if (
+    hostname === 'localhost' ||
+    hostname.endsWith('.localhost') ||
+    hostname.endsWith('.local')
+  )
+    throw new Error('Local and private network image URLs are not allowed.')
+  const version = isIP(hostname)
+  if (
+    (version === 4 &&
+      /^(?:10\.|127\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(
+        hostname,
+      )) ||
+    (version === 6 &&
+      /^(?:::1|fe[89ab][0-9a-f]:|f[cd][0-9a-f]{2}:)/i.test(hostname))
+  )
+    throw new Error('Local and private network image URLs are not allowed.')
+  return url
 }
 
 function result(data: unknown) {
@@ -121,7 +167,9 @@ function slideChunks(source: string): string[] {
 }
 
 function imagePaths(source: string): string[] {
-  return [...source.matchAll(/!\[[^\]]*\]\(([^)\s]+)(?:\s+['"][^'"]*['"])?\)/g)]
+  const markdown = [...source.matchAll(/!\[[^\]]*\]\(([^)\s]+)(?:\s+['"][^'"]*['"])?\)/g)]
+  const html = [...source.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)]
+  return [...markdown, ...html]
     .map((match) => match[1] ?? '')
     .filter((path) => path && !/^(?:https?:|data:)/.test(path))
 }
@@ -131,9 +179,13 @@ export class FastPptMcpService {
   readonly #installer: ManagedSkillInstaller
   readonly #browserCapture: BrowserCaptureDelegate | undefined
   readonly #generatedImagesRoot: string | undefined
+  readonly #themesRoot: string
+  readonly #extractorPath: string
 
   constructor(options: FastPptMcpServiceOptions) {
     this.#options = options
+    this.#themesRoot = options.themesRoot
+    this.#extractorPath = options.extractorPath
     this.#installer = new ManagedSkillInstaller({
       workspaceRoot: options.workspace.root,
       commonSkillRoot: options.commonSkillRoot,
@@ -206,6 +258,41 @@ export class FastPptMcpService {
       source: theme.skillSourceDir,
       installation: await this.#installer.themeStatus(harness, themeId),
     }
+  }
+
+  /** Extract a theme from a workspace PPTX and create a Slidev theme package. */
+  async importThemeFromPptx(filePath: string, themeName?: string) {
+    const absolute = resolve(this.#options.workspace.root, filePath)
+    if (!isContained(this.#options.workspace.root, absolute)) {
+      throw new Error('The PPTX file must be inside the workspace')
+    }
+    await stat(absolute)
+    const { slug, themeDir } = await runThemeExtraction({
+      pptxPath: absolute,
+      ...(themeName !== undefined ? { themeName } : {}),
+      themesRoot: this.#themesRoot,
+      extractorPath: this.#extractorPath,
+    })
+    return {
+      themeId: `slidev-theme-${slug}`,
+      displayName: slug.charAt(0).toUpperCase() + slug.slice(1),
+      packageName: `slidev-theme-${slug}`,
+      skillId: `fastppt-theme-${slug}`,
+      version: '0.1.0-extracted.1',
+      slug,
+      themeDir,
+    }
+  }
+
+  /** Materialize a harness-designed set of layouts + components into a theme. */
+  async designThemeLayouts(
+    themeId: string,
+    layouts: Array<{ id: string; label: string; kind: string; hint?: string | undefined }>,
+    components: Array<{ name: string; kind: string; hint?: string | undefined }>,
+  ) {
+    const themeDir = join(this.#themesRoot, themeId)
+    await access(join(themeDir, 'package.json'))
+    return designThemeLayouts({ themeDir, layouts, components })
   }
 
   readSlides(path = 'slides.md') {
@@ -336,6 +423,33 @@ export class FastPptMcpService {
     })
   }
 
+  async importRemoteImage(url: string, destinationPath: string) {
+    assertPublicHttpsUrl(url)
+    const response = await (this.#options.fetch ?? fetch)(url, {
+      redirect: 'follow',
+      signal: AbortSignal.timeout(20_000),
+      headers: { accept: 'image/png,image/jpeg,image/gif,image/webp' },
+    })
+    if (!response.ok)
+      throw new Error(`Remote image request failed with HTTP ${response.status}.`)
+    assertPublicHttpsUrl(response.url || url)
+    const contentLength = Number(response.headers.get('content-length'))
+    if (Number.isFinite(contentLength) && contentLength > MAX_REMOTE_IMAGE_BYTES)
+      throw new Error('Remote image exceeds the 10 MiB limit.')
+    const mediaType = response.headers.get('content-type')?.split(';', 1)[0]
+    if (!mediaType || !isImageMediaType(mediaType))
+      throw new Error('Remote URL did not return a supported raster image.')
+    const bytes = Buffer.from(await response.arrayBuffer())
+    if (bytes.byteLength > MAX_REMOTE_IMAGE_BYTES)
+      throw new Error('Remote image exceeds the 10 MiB limit.')
+    return await this.#options.workspace.writeImageAsset({
+      name: basename(destinationPath),
+      mediaType,
+      bytes,
+      destinationPath,
+    })
+  }
+
   async inspectSlide(path: string, slide: number) {
     const file = await this.#options.workspace.readTextFile(path)
     const chunks = slideChunks(file.content)
@@ -435,6 +549,55 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
       result(await service.getThemeSkill(themeId, harness)),
   )
   server.registerTool(
+    'import_theme_from_pptx',
+    {
+      description:
+        'Extract a visual theme (palette, fonts, typography) from a workspace PPTX and create a Slidev theme under the themes folder.',
+      inputSchema: {
+        filePath: z.string().describe('Workspace-relative path to the .pptx file'),
+        themeName: z.string().optional().describe('Optional theme name; a slug is derived from it'),
+      },
+    },
+    async ({ filePath, themeName }) =>
+      result(await service.importThemeFromPptx(filePath, themeName)),
+  )
+  server.registerTool(
+    'design_theme_layouts',
+    {
+      description:
+        'Materialize a designed set of characteristic Slidev layouts and components into an imported theme. Use after importing a theme to add on-palette layouts and components.',
+      inputSchema: {
+        themeId: z.string().describe('The imported theme id, e.g. slidev-theme-<slug>'),
+        layouts: z.array(
+          z.object({
+            id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+            label: z.string(),
+            kind: z.enum([
+              'cover', 'section', 'two-col', 'data', 'statement', 'image-right',
+              'quote', 'grid', 'metrics', 'agenda', 'ending',
+            ]),
+            hint: z.string().optional(),
+          }),
+        ).optional().describe('Characteristic layouts to add'),
+        components: z.array(
+          z.object({
+            name: z.string().regex(/^[A-Z][A-Za-z0-9]*$/),
+            kind: z.enum(['stat', 'callout', 'badge', 'pill', 'chip']),
+            hint: z.string().optional(),
+          }),
+        ).optional().describe('Signature components to add'),
+      },
+    },
+    async ({ themeId, layouts, components }) =>
+      result(
+        await service.designThemeLayouts(
+          themeId,
+          layouts ?? [],
+          components ?? [],
+        ),
+      ),
+  )
+  server.registerTool(
     'read_slides',
     {
       description: 'Read a workspace Slidev deck.',
@@ -481,6 +644,16 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
     },
     async ({ sourcePath, destinationPath }) =>
       result(await service.importGeneratedImage(sourcePath, destinationPath)),
+  )
+  server.registerTool(
+    'import_remote_image',
+    {
+      description:
+        'Download one publicly reachable HTTPS raster image into an exact workspace-relative path. Supports PNG, JPEG, GIF and WebP up to 10 MiB; existing files are never overwritten.',
+      inputSchema: ImportRemoteImageInputSchema,
+    },
+    async ({ url, destinationPath }) =>
+      result(await service.importRemoteImage(url, destinationPath)),
   )
   server.registerTool(
     'inspect_slide',

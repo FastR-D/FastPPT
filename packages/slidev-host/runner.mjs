@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module'
 import { lstat, readdir, rmdir, unlink } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
 process.argv[1] = require.resolve('@slidev/cli/bin/slidev.mjs')
@@ -103,6 +104,7 @@ if (
     },
     'dev',
   )
+  options.roots.push(dirname(fileURLToPath(import.meta.url)))
   const server = await createServer(
     options,
     {

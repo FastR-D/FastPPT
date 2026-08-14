@@ -1,0 +1,106 @@
+/* Ledger — institutional finance design language (ebony-ledger).
+   White ground, black skeleton, teal-green current data, terracotta conclusions.
+   Serif for assertions, sans for body and every numeral. */
+:root {
+  --led-bg: #ffffff;
+  --led-ink: #000000;
+  --led-teal: #4c9f8b;       /* current values / main scenario */
+  --led-teal-dark: #1b5e5c;  /* secondary series / starting values */
+  --led-terra: #a95228;      /* conclusions, multipliers, arrows — never "negative" */
+  --led-gray: #cacED7;       /* historical values */
+  --led-gray-light: #e4e4e4; /* annotation plates, range bands */
+  --led-neg: #c39d78;        /* negative values */
+  --led-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  --led-serif: 'Libertinus Serif', 'Noto Serif SC', Georgia, serif;
+}
+
+.slidev-layout {
+  height: 100%;
+  background: var(--led-bg);
+  color: var(--led-ink);
+  font-family: var(--led-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  padding: 1.6rem 3rem 2.4rem;
+}
+
+.slidev-layout h1,
+.slidev-layout h2 {
+  font-family: var(--led-serif);
+  font-weight: 400;
+  color: var(--led-ink);
+  line-height: 1.25;
+}
+
+.slidev-layout h1 {
+  font-size: 2.1rem;
+  margin: 0.4rem 0 1rem;
+}
+
+.slidev-layout h2 {
+  font-size: 1.45rem;
+  margin: 0 0 0.6rem;
+}
+
+.slidev-layout h3,
+.slidev-layout h4 {
+  font-family: var(--led-sans);
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  font-size: 0.97rem;
+}
+
+/* Key numerals: teal for current/positive, terracotta only for a conclusion
+   multiplier, gray for historical. */
+.slidev-layout .led-num {
+  font-family: var(--led-serif);
+  color: var(--led-teal);
+  font-weight: 600;
+}
+.slidev-layout .led-num--terra {
+  color: var(--led-terra);
+}
+.slidev-layout .led-num--gray {
+  color: var(--led-gray);
+}
+.slidev-layout .led-num--neg {
+  color: var(--led-neg);
+}
+
+.slidev-layout strong {
+  color: var(--led-ink);
+}
+
+.slidev-layout mark {
+  background: var(--led-gray-light);
+  color: var(--led-ink);
+}
+
+/* Thin baseline under assertions. */
+.slidev-layout h1 {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--led-ink);
+}
+
+.slidev-layout table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.slidev-layout th {
+  border-bottom: 1.5px solid var(--led-ink);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+.slidev-layout td {
+  border-bottom: 1px solid var(--led-gray);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.3rem 0.5rem;
+}

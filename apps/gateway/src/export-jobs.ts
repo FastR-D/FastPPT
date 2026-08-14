@@ -11,6 +11,7 @@ import {
 } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 
+import { resolveFontDescriptor } from '@fastppt/fonts/registry'
 import { redactSensitiveText } from '@fastppt/logger'
 import { ExportJobSchema } from '@fastppt/protocol'
 import {
@@ -18,7 +19,7 @@ import {
   writeEditablePptx,
 } from '@fastppt/slidewave/server'
 
-import type { ExportJob, SlidewaveSnapshot } from '@fastppt/protocol'
+import type { ExportJob, ExportQaReport, SlidewaveSnapshot } from '@fastppt/protocol'
 
 export interface ExportProgress {
   phase: string
@@ -38,6 +39,7 @@ export interface ExportDeckResult {
   warnings: Array<{ code: string; message: string; elementId?: string }>
   elementCount: number
   slideCount: number
+  qa: ExportQaReport
 }
 
 export interface ExporterStatus {
@@ -85,7 +87,10 @@ class WorkspaceSlidewaveExporter implements EditablePptxExporter {
       const result = await writeEditablePptx(
         input.snapshot,
         input.outputPath,
-        input.title ? { title: input.title } : {},
+        {
+          ...(input.title ? { title: input.title } : {}),
+          resolveFont: resolveFontDescriptor,
+        },
       )
       input.signal.throwIfAborted()
       return { ...result, outputPath: input.outputPath }
@@ -109,6 +114,8 @@ export interface QueueExportInput {
   deckId: string
   title?: string
   outputName: string
+  /** Require an explicit review confirmation before the export is published. */
+  review?: boolean
 }
 
 interface QueuedExport {
@@ -129,6 +136,7 @@ export interface ExportJobManagerOptions {
 }
 
 const EXPORT_OWNER_FILE = '.fastppt-export-owner.json'
+const JOB_STATE_FILE = 'job.json'
 
 function processExists(pid: number): boolean {
   try {
@@ -235,6 +243,7 @@ export class ExportJobManager {
     this.#exporter = options.exporter ?? new WorkspaceSlidewaveExporter()
     this.#captureTimeoutMs = options.captureTimeoutMs ?? 120_000
     this.#onUpdate = options.onUpdate
+    void this.#restore()
   }
 
   getStatus() {
@@ -338,6 +347,37 @@ export class ExportJobManager {
     return { path: queued.outputPath, name: queued.job.outputName }
   }
 
+  async review(exportId: string, approved: boolean): Promise<ExportJob> {
+    const queued = this.#jobs.get(exportId)
+    if (!queued || queued.job.status !== 'review-required')
+      throw new Error('Export is not awaiting review')
+    if (!approved) {
+      await rm(dirname(queued.partialPath), { recursive: true, force: true })
+      this.#update(queued, {
+        status: 'failed',
+        phase: 'rejected',
+        completedAt: new Date().toISOString(),
+        error: {
+          code: 'EXPORT_REJECTED',
+          message: 'The export was rejected during visual review.',
+        },
+      })
+      return queued.job
+    }
+    await rename(queued.partialPath, queued.outputPath)
+    await rm(join(dirname(queued.outputPath), EXPORT_OWNER_FILE), {
+      force: true,
+    })
+    this.#update(queued, {
+      status: 'completed',
+      phase: 'completed',
+      progress: 100,
+      completedAt: new Date().toISOString(),
+      downloadUrl: `/api/v1/exports/${queued.job.id}/download`,
+    })
+    return queued.job
+  }
+
   cancel(exportId: string): ExportJob | undefined {
     const queued = this.#jobs.get(exportId)
     if (!queued) return undefined
@@ -347,6 +387,15 @@ export class ExportJobManager {
       const index = this.#queue.indexOf(exportId)
       if (index >= 0) this.#queue.splice(index, 1)
       queued.controller.abort()
+      this.#update(queued, {
+        status: 'cancelled',
+        phase: 'cancelled',
+        completedAt: new Date().toISOString(),
+      })
+    } else if (queued.job.status === 'review-required') {
+      void rm(dirname(queued.partialPath), { recursive: true, force: true }).catch(
+        () => undefined,
+      )
       this.#update(queued, {
         status: 'cancelled',
         phase: 'cancelled',
@@ -433,6 +482,21 @@ export class ExportJobManager {
         onProgress: ({ phase, progress }) =>
           this.#update(queued, { phase, progress }),
       })
+      this.#update(queued, {
+        warnings: result.warnings,
+        slideCount: result.slideCount,
+        elementCount: result.elementCount,
+        qa: result.qa,
+      })
+      if (queued.input.review) {
+        // Visual confirmation gate: keep the partial, wait for explicit approval.
+        this.#update(queued, {
+          status: 'review-required',
+          phase: 'awaiting-review',
+          progress: 92,
+        })
+        return
+      }
       await rename(queued.partialPath, queued.outputPath)
       await rm(join(outputDirectory, EXPORT_OWNER_FILE), { force: true })
       this.#update(queued, {
@@ -440,9 +504,6 @@ export class ExportJobManager {
         phase: 'completed',
         progress: 100,
         completedAt: new Date().toISOString(),
-        warnings: result.warnings,
-        slideCount: result.slideCount,
-        elementCount: result.elementCount,
         downloadUrl: `/api/v1/exports/${queued.job.id}/download`,
       })
     } catch (cause) {
@@ -473,7 +534,124 @@ export class ExportJobManager {
 
   #update(queued: QueuedExport, patch: Partial<ExportJob>): ExportJob {
     queued.job = ExportJobSchema.parse({ ...queued.job, ...patch })
+    void this.#persist(queued)
     this.#emit(queued)
+    return queued.job
+  }
+
+  #persist(queued: QueuedExport): Promise<void> {
+    const directory = join(this.#outputRoot, queued.job.id)
+    return writeFile(
+      join(directory, JOB_STATE_FILE),
+      `${JSON.stringify(
+        {
+          job: queued.job,
+          snapshot: queued.snapshot,
+          outputPath: queued.outputPath,
+          partialPath: queued.partialPath,
+          review: queued.input.review ?? false,
+        },
+        null,
+        2,
+      )}\n`,
+      { mode: 0o600 },
+    ).catch(() => undefined)
+  }
+
+  /** Rebuild in-memory jobs from persisted `job.json` state after a restart. */
+  async #restore(): Promise<void> {
+    let entries: string[]
+    try {
+      entries = await readdir(this.#outputRoot, { withFileTypes: true }).then(
+        (list) => list.filter((e) => e.isDirectory()).map((e) => e.name),
+      )
+    } catch {
+      return
+    }
+    for (const id of entries) {
+      const directory = join(this.#outputRoot, id)
+      let persisted: {
+        job?: unknown
+        snapshot?: SlidewaveSnapshot
+        outputPath?: string
+        partialPath?: string
+        review?: boolean
+      }
+      try {
+        persisted = JSON.parse(
+          await readFile(join(directory, JOB_STATE_FILE), 'utf8'),
+        ) as {
+          job?: unknown
+          snapshot?: SlidewaveSnapshot
+          outputPath?: string
+          partialPath?: string
+          review?: boolean
+        }
+      } catch {
+        continue
+      }
+      const job = ExportJobSchema.safeParse(persisted.job)
+      if (!job.success) continue
+      const queued: QueuedExport = {
+        input: {
+          deckId: job.data.deckId,
+          outputName: job.data.outputName,
+          review: persisted.review ?? false,
+        },
+        outputPath: persisted.outputPath ?? join(directory, job.data.outputName),
+        partialPath:
+          persisted.partialPath ??
+          join(directory, `.${job.data.outputName}.partial.pptx`),
+        controller: new AbortController(),
+        captureTimer: undefined,
+        ...(persisted.snapshot !== undefined
+          ? { snapshot: persisted.snapshot }
+          : {}),
+        job: job.data,
+      }
+      // A job interrupted mid-capture or mid-run cannot resume the browser, so it
+      // is recorded as failed with a retry available from the persisted snapshot.
+      if (
+        job.data.status === 'queued' ||
+        job.data.status === 'running'
+      ) {
+        void rm(join(directory, EXPORT_OWNER_FILE), { force: true })
+        this.#update(queued, {
+          status: 'failed',
+          phase: 'interrupted',
+          completedAt: new Date().toISOString(),
+          error: {
+            code: 'EXPORT_INTERRUPTED',
+            message:
+              '导出在网关重启时中断，可从已保存快照重试。',
+          },
+        })
+      }
+      this.#jobs.set(id, queued)
+      this.#emit(queued)
+    }
+  }
+
+  /**
+   * Resume a failed/interrupted export from its persisted snapshot: re-run the
+   * conversion (and review gate if enabled) without a fresh browser capture.
+   */
+  retry(exportId: string): ExportJob {
+    const queued = this.#jobs.get(exportId)
+    if (!queued) throw new Error('Export job was not found')
+    if (!queued.snapshot)
+      throw new Error('Export has no persisted snapshot to resume from')
+    if (queued.job.status !== 'failed' && queued.job.status !== 'cancelled')
+      throw new Error('Export is not in a resumable state')
+    this.#update(queued, {
+      status: 'queued',
+      phase: 'resuming',
+      progress: 25,
+      error: undefined,
+      completedAt: undefined,
+    })
+    this.#queue.push(exportId)
+    this.#pump()
     return queued.job
   }
 
