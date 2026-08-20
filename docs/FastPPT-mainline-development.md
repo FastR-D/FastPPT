@@ -29,13 +29,9 @@
 
 它保存原有 Skill 实验、`skill` 分支和历史内容，仅作为历史归档与参考。不要把它的 `skill` 分支推送到本仓库，也不要把其中尚未达到主线质量的代码直接合入 `main`。
 
-本地旧 Skill 工作区仍位于：
+学生项目参考版本保留在旧归档仓库的 `slidev` 分支：
 
-`D:/Users/吴昊/Desktop/PPT图片/fastppt`
-
-另一个学生项目参考副本位于：
-
-`D:/Users/吴昊/Desktop/PPT图片/FastPPT-slidev`
+<https://github.com/FastR-D/FastPPT-legacy/tree/slidev>
 
 学生项目只用于借鉴浏览器工作台、Slidev HMR 和交互设计；不得把它的本地 Gateway、Codex/Claude Harness、MCP 或 `127.0.0.1` 依赖作为线上生产架构。
 
@@ -122,6 +118,8 @@ tests/                         # 单元、集成、浏览器和 Golden Deck 测�
 - 服务器模式：认证、项目隔离、API、队列、对象存储、模型中转站和 PowerPoint Render Worker。
 
 两种模式必须共用页面模型、编辑计划、FastPPT Core、ppt-master Adapter、预览协议和 QA。差异通过配置、依赖注入和部署文件表达。浏览器不得持有模型 API Key、PowerPoint 凭证或中转站密钥。
+
+仓库代码、配置、测试和文档不得硬编码任何开发者的盘符、用户目录或个人工作区路径。文件位置必须通过仓库相对路径、环境变量、配置项或部署挂载点表达；示例配置只提交脱敏的 `.env.example`，真实密钥和运行数据必须由 `.gitignore` 排除。
 
 ## 8. 推荐实施顺序
 

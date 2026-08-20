@@ -72,12 +72,18 @@ tramp
 *.swo
 *~.nib
 *.log
+*.pid
+*.pid.lock
 
 # Project Specific
-# Generated SVG files (uncomment if you don't want to commit generated files)
-# output/
-# generated/
-# *.svg
+# Generated application output. Source-controlled fixtures belong under tests/.
+/output/
+/generated/
+/artifacts/
+/exports/
+/uploads/
+/runtime-data/
+/.local-storage/
 
 # Working drafts and notes (root-level only — project notes/ subdirs are tracked)
 /drafts/
@@ -88,6 +94,9 @@ tramp
 # Test files
 test_output/
 temp_files/
+test-results/
+playwright-report/
+coverage/
 
 # Playwright (both MCP-side and visual-review script outputs)
 # MCP server auto-creates .playwright-mcp/ at CWD for snapshot/console logs
@@ -125,9 +134,17 @@ __pycache__/
 *$py.class
 *.so
 .Python
+.venv/
 env/
 venv/
 ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
 build/
 develop-eggs/
 dist/
@@ -152,15 +169,31 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
+pnpm-debug.log*
+.pnpm-store/
 .npm
 .eslintcache
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.vite/
+.turbo/
+*.tsbuildinfo
+
+# Keep npm/yarn/pnpm/bun lock files tracked for reproducible installs.
 
 # Environment variables
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example
+
+# Local credentials and service state
+.secrets/
+credentials/
+services/*/.data/
+deploy/*/.data/
 
 # Database files
 *.db

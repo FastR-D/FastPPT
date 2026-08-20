@@ -18,8 +18,6 @@ editing, versioning, and PowerPoint rendering around the upstream kernel.
 
 - Legacy Skill repository: https://github.com/FastR-D/FastPPT-legacy
 - Student project reference: https://github.com/FastR-D/FastPPT-legacy/tree/slidev
-- Local Skill workspace: `D:/Users/吴昊/Desktop/PPT图片/fastppt`
-- Local student reference: `D:/Users/吴昊/Desktop/PPT图片/FastPPT-slidev`
 
 These projects are reference-only for this initial mainline commit. Their
 source code, local Gateway, Harness, MCP configuration, and Skill runtime are
