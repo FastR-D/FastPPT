@@ -22,7 +22,7 @@ jobs:
           cache: npm
           cache-dependency-path: packages/agent-harness/package-lock.json
       - run: python -m venv .venv
-      - run: .\.venv\Scripts\python.exe -m pip install -e ".[kernel]"
+      - run: .\.venv\Scripts\python.exe -m pip install -e ".[kernel,agents]"
       - run: npm ci --prefix packages/agent-harness --ignore-scripts --no-audit --no-fund
       - run: .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -v
       - run: .\.venv\Scripts\python.exe tools/check_repo_hygiene.py

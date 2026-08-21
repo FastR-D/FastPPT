@@ -27,6 +27,7 @@ class DeploymentContractTests(TestCase):
 
     def test_ci_runs_real_postgres_s3_multi_instance_integration(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        self.assertIn('pip install -e ".[kernel,agents]"', workflow)
         self.assertIn("server-integration:", workflow)
         self.assertIn("postgres:17-alpine", workflow)
         self.assertIn("minio/minio:", workflow)
