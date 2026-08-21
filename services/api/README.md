@@ -1,5 +1,7 @@
 # API Service
 
-Server-side authentication, project/page/version APIs, chat orchestration,
-WebSocket events, permissions, and object-storage access. Secrets stay on the
-server.
+The dependency-light `/api/v1` service exposes projects, immutable source
+snapshots, sessions, confirmed plans, page versions, scoped operations,
+rollback, exports, authenticated artifact downloads, and replayable events.
+Local trusted identity is limited to loopback mode. Server mode uses HttpOnly
+SameSite session cookies, strict origin checks, and project ownership checks.

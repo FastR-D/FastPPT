@@ -1,0 +1,12 @@
+{
+  "name": "@fastr-d/fastppt-agent-harness",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@openai/codex-sdk": "0.149.0"
+  }
+}

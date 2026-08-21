@@ -1,0 +1,120 @@
+import os
+import time
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest import TestCase, skipUnless
+
+from fastppt_runtime.bootstrap import build_runtime
+from fastppt_runtime.config import RuntimeSettings
+from fastppt_worker.worker import Worker
+
+
+@skipUnless(os.environ.get("FASTPPT_SERVER_INTEGRATION") == "1", "requires PostgreSQL and S3 integration services")
+class ServerBackendIntegrationTests(TestCase):
+    def test_postgres_s3_recovery_and_multi_instance_export(self) -> None:
+        import boto3
+
+        endpoint = os.environ["FASTPPT_TEST_S3_ENDPOINT"]
+        bucket = os.environ.get("FASTPPT_TEST_S3_BUCKET", "fastppt-ci")
+        access_key = os.environ["FASTPPT_TEST_S3_ACCESS_KEY"]
+        secret_key = os.environ["FASTPPT_TEST_S3_SECRET_KEY"]
+        s3 = boto3.client(
+            "s3",
+            endpoint_url=endpoint,
+            region_name="us-east-1",
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+        )
+        for attempt in range(60):
+            try:
+                s3.list_buckets()
+                break
+            except Exception:
+                if attempt == 59:
+                    raise
+                time.sleep(0.5)
+        if bucket not in {item["Name"] for item in s3.list_buckets().get("Buckets", [])}:
+            s3.create_bucket(Bucket=bucket)
+
+        with TemporaryDirectory(prefix="fastppt-server-integration-") as temp_name:
+            root = Path(temp_name)
+
+            def settings(instance: str) -> RuntimeSettings:
+                return RuntimeSettings.load(
+                    {
+                        "FASTPPT_DEPLOYMENT_MODE": "server",
+                        "FASTPPT_DATA_DIR": str(root / instance / "data"),
+                        "FASTPPT_TEMP_DIR": str(root / instance / "tmp"),
+                        "FASTPPT_EXPORT_DIR": str(root / instance / "exports"),
+                        "FASTPPT_DATABASE_URL": os.environ["FASTPPT_TEST_DATABASE_URL"],
+                        "FASTPPT_S3_ENDPOINT": endpoint,
+                        "FASTPPT_ALLOW_INSECURE_S3": "1",
+                        "FASTPPT_S3_BUCKET": bucket,
+                        "FASTPPT_S3_REGION": "us-east-1",
+                        "FASTPPT_S3_ACCESS_KEY": access_key,
+                        "FASTPPT_S3_SECRET_KEY": secret_key,
+                        "FASTPPT_SESSION_SECRET": "server-integration-session-secret-32-chars",
+                        "FASTPPT_ADMIN_EMAIL": "admin@fastppt.invalid",
+                        "FASTPPT_ADMIN_PASSWORD": "server-integration-password",
+                        "FASTPPT_CORS_ORIGINS": "https://fastppt.example",
+                        "FASTPPT_AGENT_BACKEND": "codex",
+                        "FASTPPT_MODEL": "gpt-5.2",
+                        "FASTPPT_MODEL_API_KEY": "integration-placeholder-key",
+                        "FASTPPT_RENDER_BACKEND": "unavailable",
+                    }
+                )
+
+            runtime_a = build_runtime(settings("instance-a"))
+            runtime_b = build_runtime(settings("instance-b"))
+            owner = runtime_a.store.user_by_email("admin@fastppt.invalid")
+            self.assertIsNotNone(owner)
+            project = runtime_a.service.create_project(owner["user_id"], "Server integration")
+            document = runtime_a.service.ingest_document(
+                owner["user_id"], project["project_id"], "source.md", b"# Server path\nPostgreSQL and S3 are verified in 2026."
+            )
+            self.assertEqual(document["parse_status"], "queued")
+
+            worker_b = Worker(runtime_b, "integration-worker-b")
+            self.assertTrue(worker_b.run_once())
+            parsed = runtime_a.store.get_document(project["project_id"], document["document_id"])
+            self.assertEqual(parsed["parse_status"], "ready")
+
+            recovery = runtime_a.store.enqueue_job(
+                project["project_id"],
+                "parse_document",
+                {"owner_id": owner["user_id"], "document_id": document["document_id"]},
+                "integration-expired-lease",
+            )
+            claimed = runtime_a.store.claim_job("crashed-worker", lease_seconds=0, kinds=("parse_document",))
+            self.assertEqual(claimed["job_id"], recovery["job_id"])
+            self.assertTrue(worker_b.run_once())
+            self.assertEqual(runtime_a.store.get_job(recovery["job_id"])["status"], "completed")
+
+            session = runtime_a.service.create_session(
+                owner["user_id"], project["project_id"], "document_create", [document["document_id"]]
+            )
+            plan = runtime_a.service.create_generation_plan(owner["user_id"], project["project_id"], session["session_id"])
+            samples = runtime_a.service.confirm_generation_plan(owner["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(samples["status"], "awaiting_sample_confirmation")
+            generated = runtime_a.service.confirm_generation_samples(owner["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(generated["status"], "completed")
+
+            page_from_b = runtime_b.store.list_pages(project["project_id"])[0]
+            preview_from_b, preview_type = runtime_b.service.artifact_download(
+                owner["user_id"], project["project_id"], page_from_b["visual_preview_artifact_id"]
+            )
+            self.assertEqual(preview_type, "image/png")
+            self.assertTrue(preview_from_b.startswith(b"\x89PNG\r\n\x1a\n"))
+
+            queued_export = runtime_a.service.export_project(owner["user_id"], project["project_id"])
+            self.assertEqual(queued_export["status"], "queued")
+            self.assertTrue(worker_b.run_once())
+            completed_export = runtime_a.store.get_export(project["project_id"], queued_export["export_id"])
+            self.assertEqual(completed_export["status"], "degraded")
+            self.assertEqual(completed_export["qa"]["svg_qa_status"], "passed")
+            self.assertRegex(completed_export["qa"]["svg_qa_sha256"], r"^[0-9a-f]{64}$")
+            pptx_from_b, media_type = runtime_b.service.artifact_download(
+                owner["user_id"], project["project_id"], completed_export["artifact_id"]
+            )
+            self.assertEqual(media_type, "application/vnd.openxmlformats-officedocument.presentationml.presentation")
+            self.assertTrue(pptx_from_b.startswith(b"PK"))
