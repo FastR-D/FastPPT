@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
 import shutil
 import subprocess
 import tempfile
+import ipaddress
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -16,6 +18,7 @@ from urllib.parse import urlparse
 
 
 class AgentBackend(StrEnum):
+    UNCONFIGURED = "unconfigured"
     CODEX = "codex"
     CLAUDE_CODE = "claude_code"
     DETERMINISTIC_TEST = "deterministic_test"
@@ -27,7 +30,18 @@ class EndpointMode(StrEnum):
 
 
 class AgentError(RuntimeError):
-    pass
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str = "provider_protocol_error",
+        retryable: bool = False,
+        submission_unknown: bool = False,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.retryable = retryable
+        self.submission_unknown = submission_unknown
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,6 +55,8 @@ class AgentSettings:
     timeout_seconds: int = 180
 
     def validate(self, *, production: bool) -> None:
+        if self.backend == AgentBackend.UNCONFIGURED:
+            raise AgentError("No Agent provider is configured", code="profile_unavailable")
         if not self.model.strip():
             raise AgentError("A model name is required")
         if self.endpoint_mode == EndpointMode.RELAY and not self.base_url:
@@ -51,6 +67,13 @@ class AgentSettings:
             parsed = urlparse(self.base_url)
             if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
                 raise AgentError("Model base URL must be an HTTPS origin without credentials")
+            host = parsed.hostname or ""
+            try:
+                address = ipaddress.ip_address(host)
+            except ValueError:
+                address = None
+            if host.lower() in {"localhost", "ip6-localhost"} or address and (address.is_private or address.is_loopback or address.is_link_local):
+                raise AgentError("Model base URL cannot target a private or loopback address")
         if production and self.backend == AgentBackend.DETERMINISTIC_TEST:
             raise AgentError("The deterministic test agent is disabled in production")
         if production and not self.api_key:
@@ -58,6 +81,7 @@ class AgentSettings:
         if not 1 <= self.timeout_seconds <= 3600:
             raise AgentError("Agent timeout must be between 1 and 3600 seconds")
         efforts = {
+            AgentBackend.UNCONFIGURED: set(),
             AgentBackend.CODEX: {"minimal", "low", "medium", "high", "xhigh", "max", "ultra"},
             AgentBackend.CLAUDE_CODE: {"low", "medium", "high", "xhigh", "max"},
             AgentBackend.DETERMINISTIC_TEST: {"low", "medium", "high"},
@@ -80,6 +104,42 @@ class AgentResult:
     model: str
     thread_id: str | None = None
     usage: dict[str, Any] | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class AgentContext:
+    """Minimal context envelope passed to one logical role invocation."""
+
+    role: str
+    task_id: str
+    artifact_ids: tuple[str, ...] = ()
+    facts: tuple[dict[str, Any], ...] = ()
+    page_contracts: tuple[dict[str, Any], ...] = ()
+    summary: str = ""
+
+    def digest(self) -> str:
+        payload = json.dumps({
+            "role": self.role,
+            "task_id": self.task_id,
+            "artifact_ids": self.artifact_ids,
+            "facts": self.facts,
+            "page_contracts": self.page_contracts,
+            "summary": self.summary,
+        }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
+    def to_metadata(self) -> dict[str, Any]:
+        # A child receives only its role-scoped fields.  In particular, no
+        # conversation history or binary image bytes are copied into prompts.
+        return {
+            "role": self.role,
+            "task_id": self.task_id,
+            "artifact_ids": list(self.artifact_ids),
+            "facts": [dict(item) for item in self.facts],
+            "page_contracts": [dict(item) for item in self.page_contracts],
+            "summary": self.summary[:4000],
+            "context_digest": self.digest(),
+        }
 
 
 class Adapter(Protocol):
@@ -146,14 +206,22 @@ class CodexSdkAdapter:
             except TimeoutError as exc:
                 process.kill()
                 await process.wait()
-                raise AgentError("Codex SDK request timed out") from exc
+                raise AgentError(
+                    "Codex SDK request timed out",
+                    code="provider_timeout",
+                    retryable=True,
+                    submission_unknown=True,
+                ) from exc
         try:
             envelope = json.loads(stdout.decode("utf-8"))
         except json.JSONDecodeError as exc:
             message = stderr.decode("utf-8", errors="replace").strip()
-            raise AgentError(message or "Codex SDK returned invalid JSON") from exc
+            raise AgentError(message or "Codex SDK returned invalid JSON", code="provider_protocol_error") from exc
         if process.returncode or not envelope.get("ok"):
-            raise AgentError(str(envelope.get("error") or "Codex SDK request failed"))
+            message = str(envelope.get("error") or "Codex SDK request failed")
+            lowered = message.casefold()
+            code = "provider_auth_failed" if any(token in lowered for token in ("401", "403", "unauthorized", "api key", "authentication")) else "provider_protocol_error"
+            raise AgentError(message, code=code, retryable=code != "provider_auth_failed")
         try:
             output = json.loads(envelope["output"])
         except (KeyError, TypeError, json.JSONDecodeError) as exc:
@@ -208,7 +276,12 @@ class ClaudeCodeSdkAdapter:
                             usage = message.usage
                             session_id = message.session_id
             except TimeoutError as exc:
-                raise AgentError("Claude Code SDK request timed out") from exc
+                raise AgentError(
+                    "Claude Code SDK request timed out",
+                    code="provider_timeout",
+                    retryable=True,
+                    submission_unknown=True,
+                ) from exc
         if isinstance(structured_output, dict):
             output = structured_output
         else:
@@ -241,6 +314,29 @@ class AgentHarness:
         if not adapter:
             raise AgentError(f"Unsupported agent backend: {settings.backend}")
         return await adapter.run(settings, request)
+
+    @staticmethod
+    def isolate_context(context: dict[str, Any], *, role: str, task_id: str, allowed_keys: set[str] | None = None) -> AgentContext:
+        """Create a bounded role context from a coordinator context.
+
+        This is intentionally deterministic and testable without a provider.
+        Callers must explicitly opt into keys; unknown data is discarded.
+        """
+        allowed = allowed_keys or {"artifact_ids", "facts", "page_contracts", "summary"}
+        values = {key: context.get(key) for key in allowed}
+        return AgentContext(
+            role=role,
+            task_id=task_id,
+            artifact_ids=tuple(str(item) for item in (values.get("artifact_ids") or []) if isinstance(item, str)),
+            facts=tuple(dict(item) for item in (values.get("facts") or []) if isinstance(item, dict)),
+            page_contracts=tuple(dict(item) for item in (values.get("page_contracts") or []) if isinstance(item, dict)),
+            summary=str(values.get("summary") or "")[:4000],
+        )
+
+    async def run_isolated(self, settings: AgentSettings, *, role: str, task_id: str, prompt: str, output_schema: dict[str, Any], context: dict[str, Any], production: bool, allowed_keys: set[str] | None = None) -> tuple[AgentResult, AgentContext]:
+        scoped = self.isolate_context(context, role=role, task_id=task_id, allowed_keys=allowed_keys)
+        request = AgentRequest(prompt, output_schema, scoped.to_metadata())
+        return await self.run(settings, request, production=production), scoped
 
     def probe(self, settings: AgentSettings, *, production: bool) -> dict[str, Any]:
         try:

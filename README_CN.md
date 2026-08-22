@@ -1,4 +1,4 @@
-# FastPPT v1.0.0
+# FastPPT v1.1.0
 
 FastPPT 是一个同时支持本机部署和服务器部署的 AI 演示文稿生产与修改系统。
 它通过页面合同、事实来源、不可变版本、任务和 QA 记录保证过程可追溯，并通过
@@ -40,8 +40,8 @@ Windows Worker 提供；未连接该 Worker 时，界面和导出报告会明确
 保留在 `kernel/ppt-master/upstream-repository`，不再散落在产品根目录。
 
 项目只在 <https://github.com/FastR-D/FastPPT> 的 `main` 开发。产品版本统一为
-`v1.0.0`，技术清单版本统一为 `1.0.0`。
+`v1.1.0`，技术清单版本统一为 `1.1.0`。
 
 CI 使用真实 PostgreSQL 和 MinIO 启动两个独立 Runtime，验证跨实例元数据、S3
 Artifact、过期任务租约恢复、异步文档解析、代表页确认、异步导出和严格 SVG QA。
-发布门禁与本机验证证据见 [`docs/release-v1.0.0.md`](docs/release-v1.0.0.md)。
+发布门禁与本机验证证据沿用 v1.0.0 基线；v1.1.0 另增加 Agent/Image 合同、React 工作台和 macOS 实验性脚本。

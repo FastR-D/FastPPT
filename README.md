@@ -1,4 +1,4 @@
-# FastPPT v1.0.0
+# FastPPT v1.1.0
 
 FastPPT is a portable AI presentation production and editing system. It runs
 locally or as a small multi-user server deployment, keeps page facts and
@@ -74,5 +74,6 @@ The release workflow also runs a Linux integration job with real PostgreSQL
 and MinIO services. It starts two independent Runtime instances and verifies
 cross-instance metadata, S3 artifacts, expired job-lease recovery, asynchronous
 document parsing, representative-page confirmation, export, and strict SVG QA.
-See [`docs/release-v1.0.0.md`](docs/release-v1.0.0.md) for the release gates and
-local verification evidence.
+The v1.0.0 release document remains the historical baseline; v1.1.0 adds the
+Agent/Image contracts, React workspace, and cross-platform deployment scripts
+described in the product specification.

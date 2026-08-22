@@ -10,11 +10,39 @@ from fastppt_runtime.store import SQLiteMetadataStore
 
 
 class LocalFlowTests(TestCase):
+    @staticmethod
+    def _complete_generation(service, store, owner_id: str, project_id: str, plan_id: str) -> dict:
+        design = service.confirm_generation_design(owner_id, project_id, plan_id)
+        pages = store.list_pages(project_id)
+        for page in pages:
+            visual = store.get_artifact(project_id, page["visual_preview_artifact_id"])
+            service.approve_visual(owner_id, project_id, page["page_id"], {
+                "contract_revision": 1,
+                "visual_artifact_id": visual["artifact_id"],
+                "visual_sha256": visual["sha256"],
+                "comment": "approved in test",
+            })
+        for page in pages:
+            preflight = service.reconstruction_preflight(owner_id, project_id, page["page_id"])
+            service.request_reconstruction(owner_id, project_id, page["page_id"], {
+                "disclosure_sha256": preflight["disclosure_sha256"],
+                "accept_wait_time": True,
+                "accept_supplier_fee_risk": True,
+                "accept_visual_difference": True,
+                "accept_editable_boundary": True,
+                "accepted_unsupported_object_ids": [item["object_id"] for item in preflight["unsupported_items"]],
+                "idempotency_key": f"test-reconstruct:{page['page_id']}",
+            })
+            service.execute_reconstruction(owner_id, project_id, page["page_id"], preflight["disclosure_sha256"])
+        return service.store.get_plan(project_id, plan_id)
+
     def test_chinese_document_to_versioned_editable_pptx_and_rollback(self) -> None:
         with TemporaryDirectory(prefix="FastPPT 中文 空格 ") as temp_name:
             root = Path(temp_name)
             settings = RuntimeSettings.load(
                 {
+                    "FASTPPT_ENABLE_TEST_FIXTURES": "1",
+                    "FASTPPT_AGENT_BACKEND": "deterministic_test",
                     "FASTPPT_DATA_DIR": str(root / "data"),
                     "FASTPPT_TEMP_DIR": str(root / "tmp"),
                     "FASTPPT_EXPORT_DIR": str(root / "exports"),
@@ -35,15 +63,10 @@ class LocalFlowTests(TestCase):
             session = service.create_session(user["user_id"], project["project_id"], "document_create", [document["document_id"]])
             plan = service.create_generation_plan(user["user_id"], project["project_id"], session["session_id"])
             self.assertTrue(plan["confirmation_required"])
-            samples = service.confirm_generation_plan(user["user_id"], project["project_id"], plan["plan_id"])
-            self.assertEqual(samples["status"], "awaiting_sample_confirmation")
-            self.assertEqual(len(samples["sample_pages"]), 2)
-            for sample in store.list_pages(project["project_id"]):
-                self.assertEqual(sample["version_status"], "previewing")
-                self.assertIsNone(sample["svg_artifact_id"])
-                self.assertEqual(store.get_artifact(project["project_id"], sample["visual_preview_artifact_id"])["media_type"], "image/png")
-            materialized = service.confirm_generation_samples(user["user_id"], project["project_id"], plan["plan_id"])
-            self.assertEqual(len(materialized["pages"]), 2)
+            content = service.confirm_generation_plan(user["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(content["status"], "awaiting_design_confirmation")
+            completed_plan = self._complete_generation(service, store, user["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(completed_plan["status"], "completed")
 
             pages_before = store.list_pages(project["project_id"])
             first_contract = service._page_contract(project["project_id"], pages_before[0])
@@ -66,9 +89,9 @@ class LocalFlowTests(TestCase):
 
             exported = service.export_project(user["user_id"], project["project_id"])
             self.assertEqual(exported["status"], "degraded")
-            self.assertEqual(exported["qa"]["product_version"], "v1.0.0")
-            self.assertEqual(exported["qa"]["technical_version"], "1.0.0")
-            self.assertEqual(exported["qa"]["schema_version"], "1.0.0")
+            self.assertEqual(exported["qa"]["product_version"], "v1.1.0")
+            self.assertEqual(exported["qa"]["technical_version"], "1.1.0")
+            self.assertEqual(exported["qa"]["schema_version"], "1.1.0")
             content, _ = service.artifact_download(user["user_id"], project["project_id"], exported["artifact_id"])
             pptx_path = root / "result.pptx"
             pptx_path.write_bytes(content)
@@ -83,6 +106,8 @@ class LocalFlowTests(TestCase):
             root = Path(temp_name)
             settings = RuntimeSettings.load(
                 {
+                    "FASTPPT_ENABLE_TEST_FIXTURES": "1",
+                    "FASTPPT_AGENT_BACKEND": "deterministic_test",
                     "FASTPPT_DATA_DIR": str(root / "data"),
                     "FASTPPT_TEMP_DIR": str(root / "tmp"),
                     "FASTPPT_EXPORT_DIR": str(root / "exports"),
@@ -126,11 +151,9 @@ class LocalFlowTests(TestCase):
             samples = service.confirm_generation_plan(
                 user["user_id"], project["project_id"], plan["plan_id"]
             )
-            self.assertEqual(samples["status"], "awaiting_sample_confirmation")
-            materialized = service.confirm_generation_samples(
-                user["user_id"], project["project_id"], plan["plan_id"]
-            )
-            self.assertEqual(len(materialized["pages"]), 2)
+            self.assertEqual(samples["status"], "awaiting_design_confirmation")
+            completed_plan = self._complete_generation(service, store, user["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(completed_plan["status"], "completed")
 
             pages = store.list_pages(project["project_id"])
             operation = service.create_edit_operation(

@@ -69,17 +69,18 @@ def start(settings: RuntimeSettings, *, foreground: bool) -> int:
         return 0
     already_running = _health(settings).get("api", {}).get("status") == "ready"
     api_pid = _read_pid(settings) if already_running else _spawn(settings, "api", "fastppt_api.server", "runtime.log")
+    worker_pid = _spawn(settings, "worker", "fastppt_worker.cli", "worker.log")
     render_pid = None
     if settings.render_backend == "powerpoint":
         render_pid = _spawn(settings, "render", "fastppt_render.cli", "render-worker.log")
-    print(json.dumps({"status": "already_running" if already_running else "started", "pid": api_pid, "render_pid": render_pid, "url": f"http://{settings.host}:{settings.port}"}))
+    print(json.dumps({"status": "already_running" if already_running else "started", "pid": api_pid, "worker_pid": worker_pid, "render_pid": render_pid, "url": f"http://{settings.host}:{settings.port}"}))
     return 0
 
 
 def stop(settings: RuntimeSettings) -> int:
     stopped: dict[str, int] = {}
     failed = False
-    for service in ("render", "api"):
+    for service in ("render", "worker", "api"):
         pid = _read_pid(settings, service)
         if not pid:
             continue

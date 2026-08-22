@@ -75,7 +75,7 @@ services:
     build:
       context: ../..
       dockerfile: deploy/server/Dockerfile
-    image: fastppt:1.0.0
+    image: fastppt:1.1.0
     restart: unless-stopped
     environment: *fastppt-environment
     depends_on:
@@ -87,7 +87,7 @@ services:
       - "43110"
 
   worker:
-    image: fastppt:1.0.0
+    image: fastppt:1.1.0
     restart: unless-stopped
     command: ["fastppt-worker"]
     environment: *fastppt-environment

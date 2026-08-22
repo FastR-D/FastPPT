@@ -3,6 +3,14 @@ WORKDIR /build/agent-harness
 COPY packages/agent-harness/package.json packages/agent-harness/package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 
+FROM node:24-bookworm-slim AS web-build
+WORKDIR /build/web
+COPY apps/web/package.json ./
+RUN npm install --ignore-scripts --no-audit --no-fund
+COPY apps/web/index.html apps/web/tsconfig.json apps/web/vite.config.ts ./
+COPY apps/web/src ./src
+RUN npm run build
+
 FROM python:3.13-slim-bookworm
 ENV PYTHONUNBUFFERED=1 \
     PYTHONUTF8=1 \
@@ -11,6 +19,7 @@ WORKDIR /opt/fastppt
 RUN useradd --create-home --uid 10001 fastppt
 COPY . .
 COPY --from=node-deps /build/agent-harness/node_modules packages/agent-harness/node_modules
+COPY --from=web-build /build/web/dist apps/web/dist
 RUN python -m pip install --no-cache-dir ".[server,kernel,agents]"
 RUN mkdir -p /var/lib/fastppt/data /var/lib/fastppt/tmp /var/lib/fastppt/exports && chown -R fastppt:fastppt /var/lib/fastppt
 USER fastppt

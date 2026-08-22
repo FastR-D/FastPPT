@@ -12,7 +12,7 @@ class DeploymentContractTests(TestCase):
         compose = yaml.safe_load((ROOT / "deploy" / "server" / "compose.yml").read_text(encoding="utf-8"))
         services = compose["services"]
         self.assertTrue({"postgres", "minio", "minio-init", "api", "worker", "caddy"}.issubset(services))
-        self.assertEqual(services["api"]["image"], "fastppt:1.0.0")
+        self.assertEqual(services["api"]["image"], "fastppt:1.1.0")
         self.assertEqual(services["worker"]["image"], services["api"]["image"])
         self.assertEqual(services["api"]["environment"]["FASTPPT_DEPLOYMENT_MODE"], "server")
         self.assertEqual(services["worker"]["environment"], services["api"]["environment"])

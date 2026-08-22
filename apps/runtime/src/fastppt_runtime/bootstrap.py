@@ -55,5 +55,7 @@ def build_runtime(settings: RuntimeSettings | None = None) -> Runtime:
     elif configured.admin_email and configured.admin_password:
         existing = store.user_by_email(configured.admin_email)
         if not existing:
-            store.create_user(configured.admin_email, "FastPPT Administrator", hash_password(configured.admin_password))
+            store.create_user(configured.admin_email, "FastPPT Administrator", hash_password(configured.admin_password), role="admin")
+    if configured.admin_bootstrap_token:
+        store.ensure_admin_bootstrap_token(configured.admin_bootstrap_token)
     return Runtime(configured, store, artifacts, ApplicationService(configured, store, artifacts), local_user)

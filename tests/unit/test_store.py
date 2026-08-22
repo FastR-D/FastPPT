@@ -6,6 +6,21 @@ from fastppt_runtime.store import SQLiteMetadataStore
 
 
 class StoreTests(TestCase):
+    def test_initialize_migrates_legacy_work_session_options(self) -> None:
+        with TemporaryDirectory() as temp_name:
+            path = Path(temp_name) / "metadata.sqlite3"
+            store = SQLiteMetadataStore(path)
+            store.initialize()
+            with store.connection() as connection:
+                connection.execute("ALTER TABLE work_sessions DROP COLUMN options_json")
+                connection.execute("ALTER TABLE reconstruction_manifests DROP COLUMN artifact_id")
+            store.initialize()
+            with store.connection() as connection:
+                session_columns = {row[1] for row in connection.execute("PRAGMA table_info(work_sessions)").fetchall()}
+                manifest_columns = {row[1] for row in connection.execute("PRAGMA table_info(reconstruction_manifests)").fetchall()}
+            self.assertIn("options_json", session_columns)
+            self.assertIn("artifact_id", manifest_columns)
+
     def test_queue_is_persistent_and_idempotent(self) -> None:
         with TemporaryDirectory() as temp_name:
             store = SQLiteMetadataStore(Path(temp_name) / "metadata.sqlite3")

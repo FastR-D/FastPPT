@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Mapping
 
 from fastppt_agent_harness.harness import AgentBackend, AgentSettings, EndpointMode
+from fastppt_agent_harness.image import ImageEndpointMode, ImageProtocol, ImageSettings
 from fastppt_core.paths import repository_root
 
 
@@ -60,6 +61,7 @@ class RuntimeSettings:
     session_secret: str | None = field(default=None, repr=False)
     admin_email: str | None = None
     admin_password: str | None = field(default=None, repr=False)
+    admin_bootstrap_token: str | None = field(default=None, repr=False)
     cors_origins: tuple[str, ...] = ()
     s3_endpoint: str | None = None
     s3_bucket: str | None = None
@@ -67,12 +69,15 @@ class RuntimeSettings:
     s3_access_key: str | None = field(default=None, repr=False)
     s3_secret_key: str | None = field(default=None, repr=False)
     render_backend: str = "unavailable"
+    billing_mode: str = "disabled"
+    test_fixtures_enabled: bool = False
     agent: AgentSettings = field(
         default_factory=lambda: AgentSettings(
-            backend=AgentBackend.DETERMINISTIC_TEST,
-            model="fastppt-deterministic",
+            backend=AgentBackend.UNCONFIGURED,
+            model="unconfigured",
         )
     )
+    image: ImageSettings = field(default_factory=ImageSettings)
 
     @property
     def production(self) -> bool:
@@ -117,6 +122,7 @@ class RuntimeSettings:
             session_secret = env.get("FASTPPT_SESSION_SECRET")
             admin_email = None
             admin_password = None
+            admin_bootstrap_token = None
             s3_values = (None,) * 5
         else:
             metadata_store = "postgres"
@@ -129,10 +135,13 @@ class RuntimeSettings:
             session_secret = _required(env, "FASTPPT_SESSION_SECRET")
             if len(session_secret) < 32:
                 raise ConfigurationError("FASTPPT_SESSION_SECRET must contain at least 32 characters")
-            admin_email = _required(env, "FASTPPT_ADMIN_EMAIL")
-            admin_password = _required(env, "FASTPPT_ADMIN_PASSWORD")
-            if len(admin_password) < 12:
-                raise ConfigurationError("FASTPPT_ADMIN_PASSWORD must contain at least 12 characters")
+            admin_email = env.get("FASTPPT_ADMIN_EMAIL") or None
+            admin_password = env.get("FASTPPT_ADMIN_PASSWORD") or None
+            admin_bootstrap_token = env.get("FASTPPT_ADMIN_BOOTSTRAP_TOKEN") or None
+            if admin_password and (not admin_email or len(admin_password) < 12):
+                raise ConfigurationError("FASTPPT_ADMIN_EMAIL and an administrator password of at least 12 characters must be provided together")
+            if not admin_password and (not admin_bootstrap_token or len(admin_bootstrap_token) < 24):
+                raise ConfigurationError("Server mode requires FASTPPT_ADMIN_BOOTSTRAP_TOKEN when no initial administrator password is configured")
             s3_values = (
                 _required(env, "FASTPPT_S3_ENDPOINT"),
                 _required(env, "FASTPPT_S3_BUCKET"),
@@ -144,22 +153,27 @@ class RuntimeSettings:
                 raise ConfigurationError("Server S3 endpoint must use HTTPS")
 
         try:
-            backend = AgentBackend(env.get("FASTPPT_AGENT_BACKEND", "deterministic_test").strip().lower())
+            backend = AgentBackend(env.get("FASTPPT_AGENT_BACKEND", "unconfigured").strip().lower())
             endpoint_mode = EndpointMode(env.get("FASTPPT_MODEL_ENDPOINT_MODE", "official").strip().lower())
         except ValueError as exc:
             raise ConfigurationError("Agent backend or endpoint mode is invalid") from exc
         try:
             timeout_seconds = int(env.get("FASTPPT_MODEL_TIMEOUT_SECONDS", "180"))
+            default_model = "unconfigured" if backend == AgentBackend.UNCONFIGURED else ("fastppt-deterministic" if backend == AgentBackend.DETERMINISTIC_TEST else "")
             agent = AgentSettings(
                 backend=backend,
-                model=env.get("FASTPPT_MODEL", "fastppt-deterministic").strip(),
+                model=env.get("FASTPPT_MODEL", default_model).strip(),
                 endpoint_mode=endpoint_mode,
                 base_url=env.get("FASTPPT_MODEL_BASE_URL") or None,
                 api_key=env.get("FASTPPT_MODEL_API_KEY") or None,
                 reasoning_effort=env.get("FASTPPT_MODEL_REASONING_EFFORT", "medium").strip(),
                 timeout_seconds=timeout_seconds,
             )
-            agent.validate(production=mode == DeploymentMode.SERVER)
+            test_fixtures_enabled = env.get("FASTPPT_ENABLE_TEST_FIXTURES") == "1"
+            if backend == AgentBackend.DETERMINISTIC_TEST and not test_fixtures_enabled:
+                raise ConfigurationError("The deterministic Agent requires FASTPPT_ENABLE_TEST_FIXTURES=1")
+            if backend != AgentBackend.UNCONFIGURED:
+                agent.validate(production=mode == DeploymentMode.SERVER)
         except Exception as exc:
             raise ConfigurationError(str(exc)) from exc
 
@@ -170,6 +184,20 @@ class RuntimeSettings:
         )
         if mode == DeploymentMode.SERVER and not cors:
             raise ConfigurationError("FASTPPT_CORS_ORIGINS is required in server mode")
+        try:
+            image_endpoint_mode = ImageEndpointMode(env.get("FASTPPT_IMAGE_ENDPOINT_MODE", "official").strip().lower())
+            image_protocol = ImageProtocol(env.get("FASTPPT_IMAGE_PROTOCOL", "openai_images").strip().lower())
+            image = ImageSettings(
+                model=env.get("FASTPPT_IMAGE_MODEL", "gpt-image-2").strip(),
+                endpoint_mode=image_endpoint_mode,
+                protocol=image_protocol,
+                base_url=env.get("FASTPPT_IMAGE_BASE_URL") or None,
+                api_key=env.get("FASTPPT_IMAGE_API_KEY") or env.get("FASTPPT_MODEL_API_KEY") or None,
+                timeout_seconds=int(env.get("FASTPPT_IMAGE_TIMEOUT_SECONDS", "180")),
+            )
+            image.validate(production=mode == DeploymentMode.SERVER)
+        except Exception as exc:
+            raise ConfigurationError(str(exc)) from exc
         return cls(
             deployment_mode=mode,
             host=host,
@@ -186,6 +214,7 @@ class RuntimeSettings:
             session_secret=session_secret,
             admin_email=admin_email,
             admin_password=admin_password,
+            admin_bootstrap_token=admin_bootstrap_token,
             cors_origins=cors,
             s3_endpoint=s3_values[0],
             s3_bucket=s3_values[1],
@@ -193,7 +222,10 @@ class RuntimeSettings:
             s3_access_key=s3_values[3],
             s3_secret_key=s3_values[4],
             render_backend=render_backend,
+            billing_mode="disabled",
+            test_fixtures_enabled=test_fixtures_enabled,
             agent=agent,
+            image=image,
         )
 
     def prepare_directories(self) -> None:
@@ -211,6 +243,11 @@ class RuntimeSettings:
             "auth_mode": self.auth_mode,
             "render_backend": self.render_backend,
             "agent_backend": self.agent.backend.value,
+            "agent_configured": self.agent.backend != AgentBackend.UNCONFIGURED,
             "model": self.agent.model,
             "model_endpoint_mode": self.agent.endpoint_mode.value,
+            "image_model": self.image.model,
+            "image_endpoint_mode": self.image.endpoint_mode.value,
+            "image_configured": bool(self.image.api_key),
+            "billing_mode": self.billing_mode,
         }

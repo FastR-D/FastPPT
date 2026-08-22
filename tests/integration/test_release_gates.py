@@ -16,6 +16,8 @@ class ReleaseGateTests(TestCase):
     def _service(self, root: Path) -> tuple[ApplicationService, SQLiteMetadataStore, str, str]:
         settings = RuntimeSettings.load(
             {
+                "FASTPPT_ENABLE_TEST_FIXTURES": "1",
+                "FASTPPT_AGENT_BACKEND": "deterministic_test",
                 "FASTPPT_DATA_DIR": str(root / "data"),
                 "FASTPPT_TEMP_DIR": str(root / "tmp"),
                 "FASTPPT_EXPORT_DIR": str(root / "exports"),
@@ -28,6 +30,16 @@ class ReleaseGateTests(TestCase):
         user = store.ensure_local_user()
         project = service.create_project(user["user_id"], "Release gates")
         return service, store, user["user_id"], project["project_id"]
+
+    @staticmethod
+    def _approve_page(service, store, owner_id: str, project_id: str, page: dict) -> None:
+        visual = store.get_artifact(project_id, page["visual_preview_artifact_id"])
+        service.approve_visual(owner_id, project_id, page["page_id"], {
+            "contract_revision": 1,
+            "visual_artifact_id": visual["artifact_id"],
+            "visual_sha256": visual["sha256"],
+            "comment": "approved in test",
+        })
 
     @staticmethod
     def _plan(page_ids: list[str], changes: list[dict], *, confirmation: bool = True) -> dict:
@@ -147,6 +159,9 @@ class ReleaseGateTests(TestCase):
                 owner_id, project_id, session["session_id"], [{"title": "Approved", "body": "Sample", "page_type": "cover"}],
             )
             service.confirm_generation_plan(owner_id, project_id, plan["plan_id"])
+            service.confirm_generation_design(owner_id, project_id, plan["plan_id"], {"representative_preflight": True})
+            representative = next(page for page in store.list_pages(project_id) if page["operation_id"] == plan["plan_id"])
+            self._approve_page(service, store, owner_id, project_id, representative)
             service.confirm_generation_samples(owner_id, project_id, plan["plan_id"])
             self.assertEqual(store.get_page(project_id, unrelated["page_id"])["version_status"], "previewing")
 
@@ -158,6 +173,7 @@ class ReleaseGateTests(TestCase):
                 owner_id, project_id, session["session_id"], [{"title": "Reject", "body": "Sample", "page_type": "cover"}],
             )
             service.confirm_generation_plan(owner_id, project_id, plan["plan_id"])
+            service.confirm_generation_design(owner_id, project_id, plan["plan_id"])
             self.assertEqual(len(store.list_pages(project_id)), 1)
             cancelled = service.cancel_plan(owner_id, project_id, plan["plan_id"])
             self.assertEqual(cancelled["archived_page_count"], 1)
@@ -194,7 +210,40 @@ class ReleaseGateTests(TestCase):
                 session["session_id"],
                 [{"title": "Preview", "body": "Sample", "page_type": "cover"}],
             )
-            sample = service.confirm_generation_plan(owner_id, project_id, plan["plan_id"])
-            page_id = sample["sample_pages"][0]["page_id"]
+            service.confirm_generation_plan(owner_id, project_id, plan["plan_id"])
+            service.confirm_generation_design(owner_id, project_id, plan["plan_id"], {"representative_preflight": True})
+            page_id = store.list_pages(project_id)[0]["page_id"]
             with self.assertRaises(ConflictError):
                 service.create_edit_operation(owner_id, project_id, "Change title", "single", [page_id])
+
+    def test_completed_reconstruction_is_idempotent(self) -> None:
+        with TemporaryDirectory() as temp_name:
+            service, store, owner_id, project_id = self._service(Path(temp_name))
+            session = service.create_session(owner_id, project_id, "page_entry", [])
+            plan = service.create_generation_plan(
+                owner_id,
+                project_id,
+                session["session_id"],
+                [{"title": "Idempotent", "body": "Editable body", "page_type": "content"}],
+            )
+            service.confirm_generation_plan(owner_id, project_id, plan["plan_id"])
+            service.confirm_generation_design(owner_id, project_id, plan["plan_id"])
+            page = store.list_pages(project_id)[0]
+            self._approve_page(service, store, owner_id, project_id, page)
+            preflight = service.reconstruction_preflight(owner_id, project_id, page["page_id"])
+            service.execute_reconstruction(owner_id, project_id, page["page_id"], preflight["disclosure_sha256"])
+            values = {
+                "disclosure_sha256": preflight["disclosure_sha256"],
+                "accept_wait_time": True,
+                "accept_supplier_fee_risk": True,
+                "accept_visual_difference": True,
+                "accept_editable_boundary": True,
+                "accepted_unsupported_object_ids": [],
+                "idempotency_key": "reconstruction-idempotency-test",
+            }
+            first = service.request_reconstruction(owner_id, project_id, page["page_id"], values)
+            second = service.request_reconstruction(owner_id, project_id, page["page_id"], values)
+            self.assertEqual(first["job_id"], second["job_id"])
+            before = store.get_page(project_id, page["page_id"])["current_version_id"]
+            service.execute_reconstruction(owner_id, project_id, page["page_id"], preflight["disclosure_sha256"])
+            self.assertEqual(store.get_page(project_id, page["page_id"])["current_version_id"], before)
