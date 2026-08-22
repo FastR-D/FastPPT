@@ -21,6 +21,7 @@ import {
   WorkspaceImageAssetSchema,
   ImportPptxThemeResultSchema,
   ImportPptxThemeStatusSchema,
+  SessionProfileRecordSchema,
 } from '@fastppt/protocol'
 import { z } from 'zod'
 
@@ -48,6 +49,8 @@ import type {
   BrowserInspectionJob,
   ImportPptxThemeResult,
   ImportPptxThemeStatus,
+  SessionDeckProfile,
+  SessionProfileRecord,
 } from '@fastppt/protocol'
 
 // 本地 gateway 固定跑在 http://127.0.0.1:4317(见 @fastppt/config 的 loadGatewayConfig)。
@@ -274,6 +277,17 @@ export function useGatewayClient() {
     )
   }
 
+  function createQualityInspection(
+    deckId: string,
+    slide: number,
+  ): Promise<BrowserInspectionJob> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/inspections/quality`,
+      BrowserInspectionJobSchema,
+      { method: 'POST', body: JSON.stringify({ slide, policy: 'standard' }) },
+    )
+  }
+
   function submitInspectionResult(
     inspectionId: string,
     result: unknown,
@@ -402,6 +416,7 @@ export function useGatewayClient() {
 
   function createSession(
     harness: HarnessKind,
+    profile: SessionDeckProfile,
     title?: string,
   ): Promise<{ sessionId: string }> {
     return request(
@@ -411,10 +426,21 @@ export function useGatewayClient() {
         method: 'POST',
         body: JSON.stringify({
           harness,
+          profile,
           ...(title ? { title } : {}),
           cwd: '/',
         }),
       },
+    )
+  }
+
+  function getSessionProfile(
+    harness: HarnessKind,
+    sessionId: string,
+  ): Promise<SessionProfileRecord> {
+    return request(
+      `/api/v1/sessions/${harness}/${encodeURIComponent(sessionId)}/profile`,
+      SessionProfileRecordSchema,
     )
   }
 
@@ -547,6 +573,7 @@ export function useGatewayClient() {
     getThemeImportStatus,
     getInspection,
     submitInspectionResult,
+    createQualityInspection,
     getExport,
     submitExportSnapshot,
     reportExportCaptureProgress,
@@ -557,6 +584,7 @@ export function useGatewayClient() {
     listSessions,
     getSession,
     createSession,
+    getSessionProfile,
     updateSessionAlias,
     resumeSession,
     forkSession,

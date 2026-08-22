@@ -65,6 +65,24 @@ import type {
   ExportDeckInput,
 } from '../src/export-jobs.js'
 
+const configuredSessionProfile = {
+  version: 1 as const,
+  artifactRoute: 'generate' as const,
+  audience: 'Test audience',
+  communicationIntent: 'briefing' as const,
+  narrativeMode: 'briefing' as const,
+  language: 'en-US' as const,
+  durationMinutes: 10,
+  theme: { mode: 'registered' as const, themeId: 'slidev-theme-academy' },
+  preservation: {
+    wording: 'free' as const,
+    pageCount: 'free' as const,
+    pageOrder: 'free' as const,
+    visualStructure: 'free' as const,
+  },
+  reviewPolicy: 'standard' as const,
+}
+
 const exportSnapshot = SlidewaveSnapshotSchema.parse({
   version: 1,
   source: 'slidev',
@@ -2126,7 +2144,12 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
       method: 'POST',
       url: '/api/v1/sessions',
       headers,
-      payload: { harness: 'codex', cwd: root, title: 'Deck' },
+      payload: {
+        harness: 'codex',
+        cwd: root,
+        title: 'Deck',
+        profile: configuredSessionProfile,
+      },
     })
     expect(created.json()).toEqual({
       harness: 'codex',
@@ -2412,7 +2435,12 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
       method: 'POST',
       url: '/api/v1/sessions',
       headers,
-      payload: { harness: 'claude', cwd: root, title: 'Claude deck' },
+      payload: {
+        harness: 'claude',
+        cwd: root,
+        title: 'Claude deck',
+        profile: configuredSessionProfile,
+      },
     })
     expect(created.json()).toEqual({
       harness: 'claude',

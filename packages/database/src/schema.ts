@@ -31,6 +31,19 @@ export const sessionAliases = sqliteTable('session_aliases', {
   updatedAt: text('updated_at').notNull(),
 })
 
+export const sessionProfiles = sqliteTable('session_profiles', {
+  id: text('id').primaryKey(),
+  harness: text('harness').notNull(),
+  sessionId: text('session_id').notNull(),
+  profile: text('profile').notNull(),
+  profileDigest: text('profile_digest').notNull(),
+  registryVersion: text('registry_version').notNull(),
+  themeSkillId: text('theme_skill_id'),
+  themeSkillVersion: text('theme_skill_version'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+})
+
 export const approvals = sqliteTable('approvals', {
   approvalId: text('approval_id').primaryKey(),
   harness: text('harness').notNull(),
@@ -69,6 +82,8 @@ export const runs = sqliteTable('runs', {
   invocationStatus: text('invocation_status').notNull(),
   invocationMechanism: text('invocation_mechanism'),
   observationEvidence: text('observation_evidence'),
+  sessionProfile: text('session_profile'),
+  profileDigest: text('profile_digest'),
   startedAt: text('started_at').notNull(),
   completedAt: text('completed_at'),
 })
@@ -93,4 +108,11 @@ export const exports = sqliteTable('exports', {
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   payload: text('payload').notNull(),
+})
+
+export const qualityReports = sqliteTable('quality_reports', {
+  deckId: text('deck_id').primaryKey(),
+  revision: text('revision').notNull(),
+  report: text('report').notNull(),
+  updatedAt: text('updated_at').notNull(),
 })

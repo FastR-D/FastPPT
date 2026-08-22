@@ -2,7 +2,10 @@
 import { computed, onMounted, onUnmounted, shallowRef } from 'vue'
 
 import AgentWorkspace from '../components/workspace/AgentWorkspace.vue'
+import EditorNavigation from '../components/workspace/EditorNavigation.vue'
 import ManagedStatusBadge from '../components/workspace/ManagedStatusBadge.vue'
+import NewSessionDialog from '../components/workspace/NewSessionDialog.vue'
+import PageEditDialog from '../components/workspace/PageEditDialog.vue'
 import PreviewPanel from '../components/workspace/PreviewPanel.vue'
 import ThemeCatalog from '../components/themes/ThemeCatalog.vue'
 import ThemeImport from '../components/workspace/ThemeImport.vue'
@@ -12,6 +15,8 @@ import { usePreviewStore } from '../stores/preview.js'
 import { useSessionsStore } from '../stores/sessions.js'
 import { useWorkspaceStore } from '../stores/workspace.js'
 
+import type { FileNode, SessionDeckProfile } from '@fastppt/protocol'
+
 const workspaceStore = useWorkspaceStore()
 const filesStore = useFilesStore()
 const previewStore = usePreviewStore()
@@ -20,6 +25,54 @@ const controller = new AbortController()
 const shell = shallowRef<HTMLElement>()
 const workspaceMode = shallowRef<'chat' | 'files' | 'themes' | 'import'>('chat')
 const compactPanel = shallowRef<'workbench' | 'preview'>('workbench')
+const newSessionOpen = shallowRef(false)
+const newSessionSubmitting = shallowRef(false)
+const editorActivity = shallowRef<'files' | 'slidev'>('files')
+const selectedPage = shallowRef(1)
+const pageEditOpen = shallowRef(false)
+const pageEditPage = shallowRef(1)
+
+function flattenMarkdownPaths(
+  nodes: readonly FileNode[],
+): string[] {
+  return nodes.flatMap((node) =>
+    node.type === 'directory'
+      ? flattenMarkdownPaths(node.children ?? [])
+      : node.path.toLowerCase().endsWith('.md')
+        ? [node.path]
+        : [],
+  )
+}
+
+const markdownPaths = computed(() => flattenMarkdownPaths(filesStore.files))
+
+function slideChunks(source: string): string[] {
+  const delimiter = /\r?\n---\r?\n/g
+  const chunks: string[] = []
+  let start = 0
+  let match: RegExpExecArray | null
+  let frontmatter = source.startsWith('---\n') || source.startsWith('---\r\n')
+  while ((match = delimiter.exec(source))) {
+    if (frontmatter) {
+      frontmatter = false
+      continue
+    }
+    chunks.push(source.slice(start, match.index).trim())
+    start = match.index + match[0].length
+    const lineEnd = source.indexOf('\n', start)
+    const next = source.slice(start, lineEnd < 0 ? source.length : lineEnd).trim()
+    frontmatter = /^(layout|class|clicks|background|transition):/.test(next)
+  }
+  chunks.push(source.slice(start).trim())
+  return chunks.filter(Boolean)
+}
+
+const selectedDeckPageCount = computed(() => {
+  const selectedFile = filesStore.selectedFile
+  const selectedDeck = previewStore.selectedDeck
+  if (!selectedFile || selectedFile.path !== selectedDeck?.entryFile) return undefined
+  return slideChunks(filesStore.draft).length || undefined
+})
 
 const LAYOUT_STORAGE_KEY = 'fastppt.workspace-layout.v1'
 const MIN_SIDEBAR_WIDTH = 240
@@ -48,8 +101,14 @@ const harnessLabel = computed(() =>
     : 'unavailable',
 )
 const sendDisabledReason = computed(() => {
-  const theme = previewStore.selectedTheme
-  if (!theme) return '当前没有可用的已注册主题'
+  const configuredTheme = sessionsStore.selectedProfile?.profile.theme
+  const theme =
+    configuredTheme?.mode === 'registered'
+      ? previewStore.themes.find(
+          (candidate) => candidate.themeId === configuredTheme.themeId,
+        )
+      : previewStore.selectedTheme
+  if (!theme) return '当前会话没有可用的已注册主题'
   const requiredSkills = sessionsStore.selectedSkillStatuses.filter(
     (status) => status.kind === 'base' || status.themeId === theme.themeId,
   )
@@ -171,12 +230,82 @@ async function formatSelectedDeck(): Promise<void> {
   if (formatted) await filesStore.openFile(formatted.path)
 }
 
+async function selectEditorFile(path: string): Promise<void> {
+  await filesStore.openFile(path)
+  const deck = previewStore.decks.find(
+    (candidate) => candidate.entryFile === path,
+  )
+  if (deck) await previewStore.selectDeck(deck.id)
+}
+
+function openPageEdit(page: number): void {
+  if (!filesStore.selectedFile?.path.toLowerCase().endsWith('.md')) return
+  pageEditPage.value = page
+  pageEditOpen.value = true
+}
+
+async function submitPageEdit(instruction: string): Promise<void> {
+  const path = filesStore.selectedFile?.path
+  const theme = previewStore.selectedTheme
+  if (!path || !theme) return
+  const pageSource = slideChunks(filesStore.draft)[pageEditPage.value - 1]
+  if (!pageSource) return
+  await sessionsStore.createSession({
+      title: `${path} · 第 ${pageEditPage.value} 页临时修改`,
+      profile: {
+        version: 1,
+        conversationMode: 'edit-page',
+        target: { markdownPath: path, slide: pageEditPage.value },
+        artifactRoute: 'edit-slidev',
+        audience: '沿用当前演示文稿受众',
+        communicationIntent: 'instruction',
+        narrativeMode: 'instructional',
+        language: 'source',
+        theme: { mode: 'registered', themeId: theme.themeId },
+        preservation: {
+          wording: 'free',
+          pageCount: 'preserve',
+          pageOrder: 'preserve',
+          visualStructure: 'free',
+        },
+        reviewPolicy: 'standard',
+      },
+  })
+  if (sessionsStore.error) return
+  pageEditOpen.value = false
+  workspaceMode.value = 'chat'
+  compactPanel.value = 'workbench'
+  sessionsStore.draft = `只修改 ${path} 的第 ${pageEditPage.value} 页，其他页面必须保持不变。
+
+修改要求：${instruction}
+
+<fastppt-target-page path="${path}" slide="${pageEditPage.value}">
+${pageSource}
+</fastppt-target-page>
+
+上面的目标页内容是创建对话时的版本。修改前先与当前文档对应页核对；完成后运行格式化、验证和该页质量检查。`
+  await sendMessage()
+}
+
 async function sendMessage(): Promise<void> {
   if (sendDisabledReason.value) {
     sessionsStore.error = `发送已禁用：${sendDisabledReason.value}`
     return
   }
-  await sessionsStore.send(previewStore.activeThemeId)
+  await sessionsStore.send()
+}
+
+async function createConfiguredSession(input: {
+  title: string
+  profile: SessionDeckProfile
+}): Promise<void> {
+  newSessionSubmitting.value = true
+  try {
+    await sessionsStore.createSession(input)
+    if (!sessionsStore.error) newSessionOpen.value = false
+  } finally {
+    newSessionSubmitting.value = false
+  }
 }
 </script>
 
@@ -232,7 +361,7 @@ async function sendMessage(): Promise<void> {
           :class="{ active: workspaceMode === 'files' }"
           @click="selectWorkspaceMode('files')"
         >
-          文件
+          编辑
         </button>
         <button
           type="button"
@@ -292,8 +421,9 @@ async function sendMessage(): Promise<void> {
       :class="{ 'compact-hidden': compactPanel !== 'workbench' }"
     >
       <WorkspaceSidebar
+        v-if="workspaceMode === 'chat'"
         class="workspace-sidebar"
-        :mode="workspaceMode"
+        mode="chat"
         :workspace="workspaceStore.workspace"
         :workspace-loading="workspaceStore.loading"
         :workspace-error="workspaceStore.error"
@@ -320,12 +450,31 @@ async function sendMessage(): Promise<void> {
         @retry-files="filesStore.loadTree()"
         @select-file="filesStore.openFile($event)"
         @select-session="sessionsStore.selectSession"
-        @create-session="sessionsStore.createSession"
+        @create-session="newSessionOpen = true"
         @rename-session="sessionsStore.renameSelectedSession"
         @fork-session="sessionsStore.forkSelectedSession"
         @retry-sessions="sessionsStore.load()"
         @load-more-sessions="sessionsStore.loadMore()"
         @select-harness="sessionsStore.selectHarness"
+      />
+      <EditorNavigation
+        v-else
+        class="workspace-sidebar"
+        :activity="editorActivity"
+        :files="filesStore.files"
+        :selected-path="filesStore.selectedFile?.path"
+        :markdown="
+          filesStore.selectedFile?.path.toLowerCase().endsWith('.md')
+            ? filesStore.draft
+            : ''
+        "
+        :selected-page="selectedPage"
+        :loading="filesStore.loading"
+        @select-activity="editorActivity = $event"
+        @select-file="selectEditorFile"
+        @retry-files="filesStore.loadTree()"
+        @select-page="selectedPage = $event"
+        @edit-page="openPageEdit"
       />
       <div
         class="workspace-resizer"
@@ -398,12 +547,15 @@ async function sendMessage(): Promise<void> {
       :frame-revision="previewStore.frameRevision"
       :export-job="previewStore.exportJob"
       :inspection-job="previewStore.inspectionJob"
+      :requested-page="workspaceMode === 'files' ? selectedPage : undefined"
+      :max-page="selectedDeckPageCount"
       @select-deck="previewStore.selectDeck"
       @start="previewStore.startPreview"
       @restart="previewStore.restartPreview"
       @stop="previewStore.stopPreview"
       @refresh="previewStore.refreshFrame"
       @export="previewStore.startExport"
+      @inspect-quality="previewStore.inspectQuality"
       @snapshot="
         previewStore.submitExportSnapshot($event.exportId, $event.snapshot)
       "
@@ -417,10 +569,28 @@ async function sendMessage(): Promise<void> {
       @inspection-result="
         previewStore.submitInspectionResult($event.inspectionId, $event.result)
       "
+      @page-change="selectedPage = $event"
       @cancel-export="previewStore.cancelExport"
       @review-export="previewStore.reviewExport"
       @retry-export="previewStore.retryExport"
       @download-export="previewStore.downloadExport"
+    />
+    <NewSessionDialog
+      :open="newSessionOpen"
+      :harness="sessionsStore.selectedHarness"
+      :themes="previewStore.themes"
+      :submitting="newSessionSubmitting"
+      :markdown-paths="markdownPaths"
+      @close="newSessionOpen = false"
+      @submit="createConfiguredSession"
+    />
+    <PageEditDialog
+      :open="pageEditOpen"
+      :path="filesStore.selectedFile?.path ?? ''"
+      :page="pageEditPage"
+      :sending="sessionsStore.sending"
+      @close="pageEditOpen = false"
+      @submit="submitPageEdit"
     />
   </main>
 </template>

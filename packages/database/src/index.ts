@@ -3,12 +3,22 @@ import { mkdirSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 
 import BetterSqlite3 from 'better-sqlite3'
-import { ExportJobSchema } from '@fastppt/protocol'
+import {
+  DeckQualityReportSchema,
+  ExportJobSchema,
+  SessionDeckProfileSchema,
+  SessionProfileRecordSchema,
+} from '@fastppt/protocol'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 
 import type Database from 'better-sqlite3'
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
-import type { ExportJob } from '@fastppt/protocol'
+import type {
+  DeckQualityReport,
+  ExportJob,
+  SessionDeckProfile,
+  SessionProfileRecord,
+} from '@fastppt/protocol'
 
 import * as schema from './schema.js'
 
@@ -75,6 +85,8 @@ export interface RunAuditRecord {
   invocationStatus: string
   invocationMechanism: string | null
   observationEvidence: unknown
+  sessionProfile: SessionDeckProfile | null
+  profileDigest: string | null
   startedAt: string
   completedAt: string | null
   events: PersistedAgentEvent[]
@@ -93,6 +105,8 @@ interface RunRow {
   invocation_status: string
   invocation_mechanism: string | null
   observation_evidence: string | null
+  session_profile: string | null
+  profile_digest: string | null
   started_at: string
   completed_at: string | null
 }
@@ -120,6 +134,11 @@ export interface FastPptDatabase {
   ): void
   recordSessionAlias(harness: string, sessionId: string, alias: string): void
   getSessionAlias(harness: string, sessionId: string): string | undefined
+  recordSessionProfile(record: SessionProfileRecord): void
+  getSessionProfile(
+    harness: string,
+    sessionId: string,
+  ): SessionProfileRecord | undefined
   setAppSetting(key: string, value: string): void
   getAppSetting(key: string): string | undefined
   recordApproval(input: {
@@ -160,6 +179,8 @@ export interface FastPptDatabase {
     exportId: string,
   ): { job: ExportJob; outputPath: string } | undefined
   recoverInterruptedExports(): ExportJob[]
+  recordQualityReport(report: DeckQualityReport): void
+  getQualityReport(deckId: string): DeckQualityReport | undefined
   close(): void
 }
 
@@ -174,10 +195,12 @@ export function createDatabase(filename: string): FastPptDatabase {
       run_id, harness, session_id, theme_id, theme_skill_id,
       theme_skill_version, registry_version, resolution_status, status, invocation_status,
       invocation_mechanism, observation_evidence, started_at, completed_at
+      , session_profile, profile_digest
     ) VALUES (
       @runId, @harness, @sessionId, @themeId, @themeSkillId,
       @themeSkillVersion, @registryVersion, @resolutionStatus, @status, @invocationStatus,
       @invocationMechanism, @observationEvidence, @startedAt, @completedAt
+      , @sessionProfile, @profileDigest
     )
     ON CONFLICT(run_id) DO UPDATE SET
       theme_id = COALESCE(excluded.theme_id, runs.theme_id),
@@ -194,6 +217,8 @@ export function createDatabase(filename: string): FastPptDatabase {
       END,
       invocation_mechanism = COALESCE(excluded.invocation_mechanism, runs.invocation_mechanism),
       observation_evidence = COALESCE(excluded.observation_evidence, runs.observation_evidence),
+      session_profile = COALESCE(excluded.session_profile, runs.session_profile),
+      profile_digest = COALESCE(excluded.profile_digest, runs.profile_digest),
       completed_at = COALESCE(excluded.completed_at, runs.completed_at)
   `)
   const insertEvent = sqlite.prepare(`
@@ -242,6 +267,12 @@ export function createDatabase(filename: string): FastPptDatabase {
           typeof data.mechanism === 'string' ? data.mechanism : null,
         observationEvidence:
           evidence === undefined ? null : JSON.stringify(evidence),
+        sessionProfile:
+          typeof data.sessionProfile === 'object' && data.sessionProfile !== null
+            ? JSON.stringify(data.sessionProfile)
+            : null,
+        profileDigest:
+          typeof data.profileDigest === 'string' ? data.profileDigest : null,
         startedAt: event.timestamp,
         completedAt: terminalStatus === 'running' ? null : event.timestamp,
       })
@@ -301,6 +332,11 @@ export function createDatabase(filename: string): FastPptDatabase {
         run.observation_evidence === null
           ? null
           : (JSON.parse(run.observation_evidence) as unknown),
+      sessionProfile:
+        run.session_profile === null
+          ? null
+          : SessionDeckProfileSchema.parse(JSON.parse(run.session_profile)),
+      profileDigest: run.profile_digest,
       startedAt: run.started_at,
       completedAt: run.completed_at,
       events: events.map(
@@ -327,6 +363,25 @@ export function createDatabase(filename: string): FastPptDatabase {
   const selectAlias = sqlite.prepare(`
     SELECT alias FROM session_aliases
     WHERE harness = ? AND session_id = ?
+  `)
+  const upsertSessionProfile = sqlite.prepare(`
+    INSERT INTO session_profiles (
+      id, harness, session_id, profile, profile_digest, registry_version,
+      theme_skill_id, theme_skill_version, created_at, updated_at
+    ) VALUES (
+      @id, @harness, @sessionId, @profile, @profileDigest, @registryVersion,
+      @themeSkillId, @themeSkillVersion, @createdAt, @updatedAt
+    )
+    ON CONFLICT(id) DO UPDATE SET
+      profile = excluded.profile,
+      profile_digest = excluded.profile_digest,
+      registry_version = excluded.registry_version,
+      theme_skill_id = excluded.theme_skill_id,
+      theme_skill_version = excluded.theme_skill_version,
+      updated_at = excluded.updated_at
+  `)
+  const selectSessionProfile = sqlite.prepare(`
+    SELECT * FROM session_profiles WHERE harness = ? AND session_id = ?
   `)
   const upsertSetting = sqlite.prepare(`
     INSERT INTO app_settings (key, value, updated_at)
@@ -377,6 +432,17 @@ export function createDatabase(filename: string): FastPptDatabase {
       managed = excluded.managed,
       updated_at = excluded.updated_at
   `)
+  const upsertQualityReport = sqlite.prepare(`
+    INSERT INTO quality_reports (deck_id, revision, report, updated_at)
+    VALUES (@deckId, @revision, @report, @updatedAt)
+    ON CONFLICT(deck_id) DO UPDATE SET
+      revision = excluded.revision,
+      report = excluded.report,
+      updated_at = excluded.updated_at
+  `)
+  const selectQualityReport = sqlite.prepare(
+    'SELECT report FROM quality_reports WHERE deck_id = ?',
+  )
 
   return {
     db,
@@ -410,6 +476,42 @@ export function createDatabase(filename: string): FastPptDatabase {
       return (
         selectAlias.get(harness, sessionId) as { alias: string } | undefined
       )?.alias
+    },
+    recordSessionProfile(record): void {
+      const parsed = SessionProfileRecordSchema.parse(record)
+      upsertSessionProfile.run({
+        ...parsed,
+        id: `${parsed.harness}:${parsed.sessionId}`,
+        profile: JSON.stringify(parsed.profile),
+      })
+    },
+    getSessionProfile(harness, sessionId): SessionProfileRecord | undefined {
+      const row = selectSessionProfile.get(harness, sessionId) as
+        | {
+            harness: string
+            session_id: string
+            profile: string
+            profile_digest: string
+            registry_version: string
+            theme_skill_id: string | null
+            theme_skill_version: string | null
+            created_at: string
+            updated_at: string
+          }
+        | undefined
+      return row
+        ? SessionProfileRecordSchema.parse({
+            harness: row.harness,
+            sessionId: row.session_id,
+            profile: JSON.parse(row.profile),
+            profileDigest: row.profile_digest,
+            registryVersion: row.registry_version,
+            themeSkillId: row.theme_skill_id,
+            themeSkillVersion: row.theme_skill_version,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+          })
+        : undefined
     },
     setAppSetting(key, value): void {
       upsertSetting.run({ key, value, updatedAt: Date.now() })
@@ -533,6 +635,23 @@ export function createDatabase(filename: string): FastPptDatabase {
         })
         return job
       })
+    },
+    recordQualityReport(report): void {
+      const parsed = DeckQualityReportSchema.parse(report)
+      upsertQualityReport.run({
+        deckId: parsed.deckId,
+        revision: parsed.revision,
+        report: JSON.stringify(parsed),
+        updatedAt: new Date().toISOString(),
+      })
+    },
+    getQualityReport(deckId): DeckQualityReport | undefined {
+      const row = selectQualityReport.get(deckId) as
+        | { report: string }
+        | undefined
+      return row
+        ? DeckQualityReportSchema.parse(JSON.parse(row.report))
+        : undefined
     },
     close(): void {
       sqlite.close()

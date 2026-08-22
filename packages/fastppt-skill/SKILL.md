@@ -8,37 +8,48 @@ description: Create, edit, validate, preview, and export Slidev presentation dec
 Use the FastPPT MCP tools for workspace access. Never bypass them with arbitrary
 paths, and never infer a theme from prose. FastPPT supplies an immutable theme
 snapshot and explicitly invokes the one matching theme Skill for each run.
+The tagged FastPPT Session Brief is authoritative for audience, intent,
+narrative mode, language, duration, review policy, artifact route, and theme.
+Do not ask for these fields again unless the user explicitly changes the task.
 
 ## Required workflow
 
 1. Call `get_workspace`, then `get_theme_manifest` and `get_theme_skill` for the
    supplied theme ID. Stop if the theme or its managed Skill is unavailable.
-2. Read `slides.md` with `read_slides` and inspect existing assets with
+2. Translate the Session Brief into a lightweight `deck-plan.json` containing
+   the communication goal, argument spine, slide jobs, evidence needs, and
+   chosen narrative mode. Read [references/modes.md](references/modes.md).
+3. Read `slides.md` with `read_slides` and inspect existing assets with
    `list_assets` before editing.
-3. Follow the simultaneously invoked theme Skill for visual language, layouts,
+4. Follow the simultaneously invoked theme Skill for visual language, layouts,
    components, frontmatter, density, and theme-specific validation.
    The theme is a design system, not a creativity ceiling: use slide-local HTML
    and CSS when a registered layout alone cannot express the intended page.
-4. Make the smallest coherent deck change with `write_slides`. Keep image paths
+5. Make the smallest coherent deck change with `write_slides`. Keep image paths
    relative and store images as files; never place large base64 data in Markdown.
    When the deck needs a sourced or generated raster visual, follow the asset
    workflow below.
-5. Run `format_slides`, then `validate_slides`. Fix every syntax, theme, missing
+6. Run `format_slides`, then `validate_slides`. Fix every syntax, theme, missing
    asset, and unsupported-layout error.
    Slidev frontmatter blocks must have no blank lines immediately inside the
    `---` delimiters; keep metadata directly between the opening and closing
    delimiter.
-6. Check `get_preview_status`. When preview is ready, use `inspect_slide` and
-   `inspect_overflow` for affected pages and revise visible clipping or crowding.
+7. Check `get_preview_status`. Inspect the first representative page early with
+   `inspect_quality`, then inspect every affected page after the final edit.
+   Use `inspect_slide` and `inspect_overflow` for focused diagnosis.
    Treat line wrapping, internal collisions, clipped descendants, and text that
    exceeds its intended line count as failures even when the outer slide itself
    reports no overflow.
-7. Summarize changed files and validation results. Call `export_editable_pptx`
+8. Apply the active review policy and quality gates in
+   [references/quality.md](references/quality.md). Summarize changed files and
+   validation results. Call `export_editable_pptx`
    only when the user explicitly requests export.
 
 Read [references/workflow.md](references/workflow.md) for creation versus editing
 decisions, [references/content.md](references/content.md) for slide-content
-standards, and [references/safety.md](references/safety.md) before any file write
+standards, [references/modes.md](references/modes.md) for narrative movement,
+[references/quality.md](references/quality.md) for review layers, and
+[references/safety.md](references/safety.md) before any file write
 or export. Use [examples/basic-deck.md](examples/basic-deck.md) only as a
 structural example; its styling never replaces the active theme Skill.
 

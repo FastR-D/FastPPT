@@ -177,6 +177,27 @@ export class WorkspaceService {
     }
   }
 
+  async assertFileAvailable(requestedPath: string): Promise<void> {
+    const relativePath = normalizeRelativePath(requestedPath)
+    assertNonSecretPath(relativePath)
+    if (this.isIgnored(relativePath)) {
+      throw new WorkspaceError(
+        'PATH_OUTSIDE_WORKSPACE',
+        'The path is ignored.',
+        403,
+      )
+    }
+    const absolutePath = await resolveExistingPath(this.root, relativePath)
+    const metadata = await stat(absolutePath)
+    if (!metadata.isFile()) {
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'The requested path is not a file.',
+        400,
+      )
+    }
+  }
+
   async resolveImageAttachment(requestedPath: string): Promise<string> {
     const relativePath = normalizeRelativePath(requestedPath)
     assertNonSecretPath(relativePath)

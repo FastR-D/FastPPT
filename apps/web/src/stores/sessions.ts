@@ -25,6 +25,8 @@ import type {
   McpConfigStatus,
   WorkspaceImageAsset,
   RunAuditRecord,
+  SessionDeckProfile,
+  SessionProfileRecord,
 } from '@fastppt/protocol'
 
 export const useSessionsStore = defineStore('sessions', () => {
@@ -43,6 +45,7 @@ export const useSessionsStore = defineStore('sessions', () => {
   ])
   const events = shallowRef<readonly UnifiedAgentEvent[]>([])
   const runAudit = shallowRef<RunAuditRecord>()
+  const selectedProfile = shallowRef<SessionProfileRecord>()
   const approvals = shallowRef<readonly ApprovalRequest[]>([])
   const draft = shallowRef('')
   const attachments = shallowRef<readonly WorkspaceImageAsset[]>([])
@@ -426,11 +429,15 @@ export const useSessionsStore = defineStore('sessions', () => {
     error.value = undefined
     try {
       await client.resumeSession(selectedHarness.value, sessionId)
-      const [session, applicationState, latestRunAudit] = await Promise.all([
+      const [session, applicationState, latestRunAudit, profile] = await Promise.all([
         client.getSession(selectedHarness.value, sessionId),
         client.getApplicationState(),
         client.getLatestRunAudit(selectedHarness.value, sessionId),
+        client
+          .getSessionProfile(selectedHarness.value, sessionId)
+          .catch(() => undefined),
       ])
+      selectedProfile.value = profile
       setPersistedMessages(session.messages)
       runAudit.value = latestRunAudit
       approvals.value = applicationState.pendingApprovals.filter(
@@ -449,12 +456,16 @@ export const useSessionsStore = defineStore('sessions', () => {
     }
   }
 
-  async function createSession(): Promise<void> {
+  async function createSession(input: {
+    title: string
+    profile: SessionDeckProfile
+  }): Promise<void> {
     error.value = undefined
     try {
       const created = await client.createSession(
         selectedHarness.value,
-        'FastPPT deck session',
+        input.profile,
+        input.title,
       )
       await load()
       await selectSession(created.sessionId)
@@ -497,7 +508,11 @@ export const useSessionsStore = defineStore('sessions', () => {
     const content = draft.value.trim()
     const sessionId = selectedSessionId.value
     if (!content || !sessionId || sending.value) return
-    if (!themeId) {
+    const configuredThemeId =
+      selectedProfile.value?.profile.theme.mode === 'registered'
+        ? selectedProfile.value.profile.theme.themeId
+        : themeId
+    if (!configuredThemeId) {
       error.value = '当前没有可用的已注册主题。'
       return
     }
@@ -510,7 +525,7 @@ export const useSessionsStore = defineStore('sessions', () => {
         selectedHarness.value,
         sessionId,
         content,
-        themeId,
+        configuredThemeId,
         attachments.value,
       )
       const runId = result.runId
@@ -643,6 +658,7 @@ export const useSessionsStore = defineStore('sessions', () => {
     messages,
     events,
     runAudit,
+    selectedProfile,
     approvals,
     draft,
     attachments,

@@ -345,6 +345,19 @@ export const usePreviewStore = defineStore('preview', () => {
     }
   }
 
+  async function inspectQuality(slide: number): Promise<void> {
+    if (!selectedDeckId.value) return
+    error.value = undefined
+    try {
+      inspectionJob.value = await client.createQualityInspection(
+        selectedDeckId.value,
+        slide,
+      )
+    } catch (cause) {
+      error.value = cause instanceof Error ? cause.message : '创建质量检查失败'
+    }
+  }
+
   async function retryExport(): Promise<void> {
     if (!exportJob.value) return
     try {
@@ -491,6 +504,7 @@ export const usePreviewStore = defineStore('preview', () => {
     stopPreview,
     refreshFrame,
     startExport,
+    inspectQuality,
     reviewExport,
     retryExport,
     cancelExport,

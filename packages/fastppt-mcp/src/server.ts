@@ -31,6 +31,8 @@ export const FASTPPT_MCP_TOOL_NAMES = [
   'import_remote_image',
   'inspect_slide',
   'inspect_overflow',
+  'inspect_quality',
+  'get_quality_report',
   'get_preview_status',
   'export_editable_pptx',
   'list_icon_collections',
@@ -91,6 +93,11 @@ export interface BrowserCaptureDelegate {
     path: string
     slide: number
   }): Promise<Record<string, unknown>>
+  inspectQuality?(input: {
+    path: string
+    slide: number
+  }): Promise<Record<string, unknown>>
+  getQualityReport?(path: string): Promise<Record<string, unknown>>
   exportEditablePptx(input: {
     path: string
     outputName: string
@@ -362,14 +369,12 @@ export class FastPptMcpService {
         posix.join(posix.dirname(path.replaceAll('\\', '/')), asset),
       )
       try {
-        await this.#options.workspace.readTextFile(relativeAsset)
-      } catch (cause) {
-        const message = cause instanceof Error ? cause.message : String(cause)
-        if (!message.includes('Binary files cannot be read as text'))
-          errors.push({
-            code: 'ASSET_UNAVAILABLE',
-            message: `Asset cannot be resolved: ${asset}`,
-          })
+        await this.#options.workspace.assertFileAvailable(relativeAsset)
+      } catch {
+        errors.push({
+          code: 'ASSET_UNAVAILABLE',
+          message: `Asset cannot be resolved: ${asset}`,
+        })
       }
     }
     return {
@@ -481,6 +486,28 @@ export class FastPptMcpService {
       ...inspection,
       ...(await this.#browserCapture.inspectOverflow({ path, slide })),
     }
+  }
+
+  async inspectQuality(path: string, slide: number) {
+    const inspection = await this.inspectSlide(path, slide)
+    const inspectQuality = this.#browserCapture?.inspectQuality
+    if (!inspectQuality)
+      return {
+        ...inspection,
+        inspectionAvailable: false,
+        message: 'Rendered quality inspection requires an active FastPPT browser preview.',
+      }
+    return {
+      ...inspection,
+      ...(await inspectQuality.call(this.#browserCapture, { path, slide })),
+    }
+  }
+
+  async getQualityReport(path: string) {
+    const getQualityReport = this.#browserCapture?.getQualityReport
+    if (!getQualityReport)
+      return { path, inspectionAvailable: false }
+    return await getQualityReport.call(this.#browserCapture, path)
   }
 
   async getPreviewStatus(path = 'slides.md') {
@@ -671,6 +698,22 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
     },
     async ({ path, slide }) =>
       result(await service.inspectOverflow(path, slide)),
+  )
+  server.registerTool(
+    'inspect_quality',
+    {
+      description: 'Run deterministic Pretext and DOM quality checks for one slide.',
+      inputSchema: SlideInputSchema,
+    },
+    async ({ path, slide }) => result(await service.inspectQuality(path, slide)),
+  )
+  server.registerTool(
+    'get_quality_report',
+    {
+      description: 'Get the latest persisted quality report for a deck.',
+      inputSchema: DeckPathSchema,
+    },
+    async ({ path }) => result(await service.getQualityReport(path)),
   )
   server.registerTool(
     'get_preview_status',

@@ -33,6 +33,8 @@ const props = defineProps<{
   loading: boolean
   error: string | undefined
   frameRevision: number
+  requestedPage: number | undefined
+  maxPage: number | undefined
   exportJob: DeepReadonly<ExportJob> | undefined
   inspectionJob: DeepReadonly<BrowserInspectionJob> | undefined
 }>()
@@ -44,6 +46,7 @@ const emit = defineEmits<{
   stop: []
   refresh: []
   export: []
+  inspectQuality: [slide: number]
   cancelExport: []
   reviewExport: [exportId: string, approved: boolean]
   retryExport: []
@@ -53,6 +56,7 @@ const emit = defineEmits<{
     input: { exportId: string; completed: number; total: number },
   ]
   inspectionResult: [input: { inspectionId: string; result: unknown }]
+  pageChange: [page: number]
 }>()
 
 const frame = useTemplateRef<HTMLIFrameElement>('frame')
@@ -94,6 +98,7 @@ const reviewing = computed(
 )
 const captureFrame = useTemplateRef<HTMLIFrameElement>('captureFrame')
 const currentPage = shallowRef<number>()
+const pageInput = shallowRef('')
 const captureRequestId = shallowRef<string>()
 const captureError = shallowRef<string>()
 const captureConnected = shallowRef(false)
@@ -220,7 +225,10 @@ function requestCapture(): void {
   const message =
     props.inspectionJob?.status === 'queued'
       ? {
-          type: 'fastppt.slidewave.overflow.request',
+          type:
+            props.inspectionJob.kind === 'quality'
+              ? 'fastppt.slidewave.quality.request'
+              : 'fastppt.slidewave.overflow.request',
           version: SLIDEWAVE_CAPTURE_PROTOCOL_VERSION,
           requestId,
           slide: props.inspectionJob.slide,
@@ -247,6 +255,22 @@ function navigatePreview(direction: 'previous' | 'next'): void {
   )
 }
 
+function navigateToPage(): void {
+  const requested = Number.parseInt(pageInput.value, 10)
+  if (!Number.isInteger(requested) || requested < 1) {
+    pageInput.value = currentPage.value ? String(currentPage.value) : ''
+    return
+  }
+  const page = props.maxPage ? Math.min(requested, props.maxPage) : requested
+  pageInput.value = String(page)
+  frame.value?.contentWindow?.postMessage(
+    { target: 'slidev', type: 'navigate', no: page, clicks: 999999 },
+    proxiedPreviewUrl.value
+      ? new URL(proxiedPreviewUrl.value).origin
+      : window.location.origin,
+  )
+}
+
 function handlePreviewKey(event: KeyboardEvent): void {
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
   if (event.altKey || event.ctrlKey || event.metaKey) return
@@ -267,6 +291,7 @@ function handleCaptureMessage(event: MessageEvent<unknown>): void {
     event.data.type === 'fastppt.slidewave.preview.state'
   ) {
     currentPage.value = event.data.page ?? undefined
+    if (event.data.page) emit('pageChange', event.data.page)
     return
   }
   const frameWindow = captureFrame.value?.contentWindow
@@ -305,6 +330,11 @@ function handleCaptureMessage(event: MessageEvent<unknown>): void {
     if (props.inspectionJob?.status === 'queued' && inspectionId)
       emit('inspectionResult', { inspectionId, result: message.result })
     captureRequestId.value = undefined
+  } else if (message.type === 'fastppt.slidewave.quality.completed') {
+    const inspectionId = props.inspectionJob?.id
+    if (props.inspectionJob?.status === 'queued' && inspectionId)
+      emit('inspectionResult', { inspectionId, result: message.result })
+    captureRequestId.value = undefined
   } else if (message.type === 'fastppt.slidewave.capture.failed') {
     captureError.value = message.error
     captureRequestId.value = undefined
@@ -318,6 +348,21 @@ watch(captureJobId, () => {
   capturedSlides.value = 0
   captureSlideCount.value = 0
 })
+watch(currentPage, (page) => {
+  pageInput.value = page ? String(page) : ''
+})
+watch(
+  () => props.requestedPage,
+  (page) => {
+    if (!page || page === currentPage.value) return
+    frame.value?.contentWindow?.postMessage(
+      { target: 'slidev', type: 'navigate', no: page, clicks: 999999 },
+      proxiedPreviewUrl.value
+        ? new URL(proxiedPreviewUrl.value).origin
+        : window.location.origin,
+    )
+  },
+)
 onMounted(() => window.addEventListener('message', handleCaptureMessage))
 onUnmounted(() => window.removeEventListener('message', handleCaptureMessage))
 
@@ -354,9 +399,23 @@ async function enterFullscreen(): Promise<void> {
         />
       </div>
       <div class="preview-actions">
-        <span class="page-indicator">
-          {{ currentPage ? `第 ${currentPage} 页` : '页码待同步' }}
-        </span>
+        <label class="page-indicator">
+          <span>第</span>
+          <input
+            v-model="pageInput"
+            type="number"
+            min="1"
+            :max="maxPage"
+            inputmode="numeric"
+            :disabled="!ready"
+            aria-label="跳转到页码"
+            placeholder="—"
+            @focus="($event.target as HTMLInputElement).select()"
+            @keydown.enter.prevent="navigateToPage"
+            @change="navigateToPage"
+          />
+          <span>页</span>
+        </label>
         <button type="button" :disabled="!ready" @click="$emit('refresh')">
           刷新
         </button>
@@ -368,6 +427,13 @@ async function enterFullscreen(): Promise<void> {
         </button>
         <button type="button" :disabled="!ready" @click="openPreview">
           新窗口
+        </button>
+        <button
+          type="button"
+          :disabled="!ready || inspectionJob?.status === 'queued'"
+          @click="$emit('inspectQuality', currentPage ?? 1)"
+        >
+          {{ inspectionJob?.status === 'queued' ? '检查中…' : '质量检查' }}
         </button>
         <button
           class="export-button"
@@ -417,6 +483,24 @@ async function enterFullscreen(): Promise<void> {
           </button>
         </div>
       </div>
+      <section
+        v-if="inspectionJob?.kind === 'quality' && inspectionJob.status === 'completed'"
+        class="export-status"
+        aria-live="polite"
+      >
+        <div class="export-summary">
+          <span>第 {{ inspectionJob.slide }} 页质量报告</span>
+          <strong>
+            {{ 'issues' in inspectionJob.result! ? inspectionJob.result.issues.length : 0 }} 项
+          </strong>
+        </div>
+        <ul v-if="'issues' in inspectionJob.result! && inspectionJob.result.issues.length">
+          <li v-for="issue in inspectionJob.result.issues" :key="`${issue.code}-${issue.selector}`">
+            {{ issue.code }} · {{ issue.message }}
+          </li>
+        </ul>
+        <p v-else>确定性文本与几何检查通过。</p>
+      </section>
       <section v-if="exportJob" class="export-status" aria-live="polite">
         <div class="export-summary">
           <span>{{ exportJob.outputName }}</span>
@@ -541,10 +625,34 @@ async function enterFullscreen(): Promise<void> {
   align-items: center;
 }
 .page-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: 10px;
   white-space: nowrap;
+}
+.page-indicator input {
+  width: 38px;
+  height: 26px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 7px;
+  outline: none;
+  background: var(--color-panel-raised);
+  color: var(--color-text);
+  font: inherit;
+  text-align: center;
+  appearance: textfield;
+}
+.page-indicator input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.page-indicator input::-webkit-inner-spin-button,
+.page-indicator input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
 }
 .preview-header {
   justify-content: space-between;

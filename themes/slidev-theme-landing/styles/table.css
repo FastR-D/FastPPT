@@ -1,0 +1,70 @@
+/* ── Academic default tables ──────────────────────────────────────────────
+   Header row and first column use the theme blue with white bold text;
+   remaining cells keep black text. Font size adapts to the slide width
+   (container-query units) so dense tables scale without overflowing. */
+
+.whu-slide {
+  container-type: inline-size;
+}
+
+.whu-slide table {
+  width: 100%;
+  max-width: 100%;
+  margin-block: 0.6rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: #000;
+  font-size: 14px; /* fallback for browsers without container-query units */
+  font-size: clamp(9px, 1.45cqw, 16px);
+  line-height: 1.4;
+}
+
+.whu-slide th,
+.whu-slide td {
+  padding: 0.32rem 0.55rem;
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: break-word;
+}
+
+.whu-slide thead th {
+  background: #3b99d4;
+  color: #fff;
+  font-weight: 700;
+  border-bottom: 2px solid #2f7fb3;
+}
+
+.whu-slide tbody th,
+.whu-slide tbody td:first-child {
+  background: #3b99d4;
+  color: #fff;
+  font-weight: 700;
+}
+
+.whu-slide tbody td {
+  color: #000;
+  font-weight: 400;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.whu-slide tbody tr:last-child td,
+.whu-slide tbody tr:last-child th {
+  border-bottom: none;
+}
+
+.whu-slide thead th:first-child {
+  border-radius: 6px 0 0 0;
+}
+
+.whu-slide thead th:last-child {
+  border-radius: 0 6px 0 0;
+}
+
+.whu-slide tbody tr:last-child td:first-child,
+.whu-slide tbody tr:last-child th:first-child {
+  border-radius: 0 0 0 6px;
+}
+
+.whu-slide tbody tr:last-child td:last-child {
+  border-radius: 0 0 6px 0;
+}

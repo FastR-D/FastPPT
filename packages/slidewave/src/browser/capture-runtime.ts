@@ -1,5 +1,6 @@
 import { captureSlidevOverview } from '../slidev/capture.js'
 import { SLIDEV_OVERVIEW_ROOT_SELECTOR } from '../slidev/slidev.js'
+import { measureTextAdvance, textGraphemeRanges } from '../slidev/text-layout.js'
 import {
   SLIDEWAVE_CAPTURE_PROTOCOL_VERSION,
   isSlidewaveCaptureMessage,
@@ -13,6 +14,8 @@ import type {
   SlidewaveCaptureRequest,
   SlidewaveOverflowRequest,
   SlidewaveOverflowResult,
+  SlidewaveQualityRequest,
+  SlidewaveQualityResult,
 } from './protocol.js'
 
 let parentOrigin: string | undefined
@@ -69,6 +72,13 @@ function isOverflowRequest(value: unknown): value is SlidewaveOverflowRequest {
   return (
     isSlidewaveCaptureMessage(value) &&
     value.type === 'fastppt.slidewave.overflow.request'
+  )
+}
+
+function isQualityRequest(value: unknown): value is SlidewaveQualityRequest {
+  return (
+    isSlidewaveCaptureMessage(value) &&
+    value.type === 'fastppt.slidewave.quality.request'
   )
 }
 
@@ -142,6 +152,99 @@ function inspectOverflow(
     overflowBy,
     elements,
   }
+}
+
+function renderedLineCount(element: HTMLElement): number {
+  const tops = new Set<number>()
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+  while (walker.nextNode()) {
+    const node = walker.currentNode
+    const text = node.textContent ?? ''
+    for (const grapheme of textGraphemeRanges(text)) {
+      if (!grapheme.text.trim()) continue
+      const range = document.createRange()
+      range.setStart(node, grapheme.start)
+      range.setEnd(node, grapheme.end)
+      for (const rect of range.getClientRects()) tops.add(Math.round(rect.top * 2) / 2)
+    }
+  }
+  return tops.size
+}
+
+function inspectQuality(
+  request: SlidewaveQualityRequest,
+): SlidewaveQualityResult {
+  const pages = [...document.querySelectorAll<HTMLElement>('.slidev-page')]
+  const root = pages[request.slide - 1]
+  if (!root) throw new Error(`Slide ${request.slide} did not render.`)
+  const rootRect = root.getBoundingClientRect()
+  const issues: SlidewaveQualityResult['issues'] = []
+  const candidates = [...root.querySelectorAll<HTMLElement>('h1,h2,h3,p,li,blockquote,[data-fastppt-role]')]
+  for (const element of candidates) {
+    const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? ''
+    if (!text) continue
+    const style = getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    const selector = selectorFor(element)
+    const box = {
+      x: rect.x - rootRect.x,
+      y: rect.y - rootRect.y,
+      width: rect.width,
+      height: rect.height,
+    }
+    const naturalWidth = measureTextAdvance(text, style)
+    if (rect.width > 0 && naturalWidth > rect.width * 1.8)
+      issues.push({
+        layer: 'pretext', severity: 'warning', code: 'TEXT_NATURAL_WIDTH_RISK',
+        message: 'Text requires aggressive wrapping for the available width.',
+        slide: request.slide, selector, box,
+        metric: { actual: naturalWidth, expected: rect.width * 1.8, unit: 'px' },
+        suggestedFix: 'Shorten the copy, widen the text box, or reduce font size.',
+      })
+    const role = element.dataset.fastpptRole ?? (element.matches('h1,h2') ? 'title' : 'body')
+    const configuredMax = Number.parseInt(element.dataset.fastpptMaxLines ?? '', 10)
+    const maxLines = Number.isFinite(configuredMax) ? configuredMax : role === 'title' ? 2 : 6
+    const lineCount = renderedLineCount(element)
+    if (lineCount > maxLines)
+      issues.push({
+        layer: 'geometry', severity: 'error', code: 'TEXT_LINE_LIMIT_EXCEEDED',
+        message: `${role} text renders on ${lineCount} lines; limit is ${maxLines}.`,
+        slide: request.slide, selector, box,
+        metric: { actual: lineCount, expected: maxLines, unit: 'lines' },
+        suggestedFix: 'Reduce copy or choose a layout with more text capacity.',
+      })
+    if (element.scrollWidth > element.clientWidth + 0.5 || element.scrollHeight > element.clientHeight + 0.5)
+      issues.push({
+        layer: 'geometry', severity: 'error', code: 'TEXT_CLIPPED',
+        message: 'Rendered text is clipped by its container.', slide: request.slide,
+        selector, box, suggestedFix: 'Increase the container size or reduce the text.',
+      })
+    const letterSpacing = Number.parseFloat(style.letterSpacing)
+    if (/\p{Script=Han}/u.test(text) && Number.isFinite(letterSpacing) && letterSpacing > Number.parseFloat(style.fontSize) * 0.12)
+      issues.push({
+        layer: 'pretext', severity: 'warning', code: 'CJK_TRACKING_EXCESSIVE',
+        message: 'CJK tracking exceeds 12% of the font size.', slide: request.slide,
+        selector, box, metric: { actual: letterSpacing, expected: Number.parseFloat(style.fontSize) * 0.12, unit: 'px' },
+      })
+    if (!document.fonts.check(`${style.fontSize} ${style.fontFamily}`, text.slice(0, 32)))
+      issues.push({
+        layer: 'pretext', severity: 'warning', code: 'FONT_UNRESOLVED',
+        message: 'The requested font is not fully resolved.', slide: request.slide,
+        selector, box, suggestedFix: 'Wait for fonts to load or use an available fallback.',
+      })
+  }
+  for (const element of [root, ...root.querySelectorAll<HTMLElement>('*')]) {
+    const rect = element.getBoundingClientRect()
+    if (rect.left < rootRect.left - 0.5 || rect.top < rootRect.top - 0.5 || rect.right > rootRect.right + 0.5 || rect.bottom > rootRect.bottom + 0.5)
+      issues.push({
+        layer: 'geometry', severity: 'error', code: 'ELEMENT_OUT_OF_BOUNDS',
+        message: 'An element extends beyond the slide canvas.', slide: request.slide,
+        selector: selectorFor(element),
+        box: { x: rect.x - rootRect.x, y: rect.y - rootRect.y, width: rect.width, height: rect.height },
+        suggestedFix: 'Move or resize the element inside the slide bounds.',
+      })
+  }
+  return { inspectionAvailable: true, slide: request.slide, slideCount: pages.length, issues }
 }
 
 async function waitForOverview(): Promise<void> {
@@ -286,6 +389,39 @@ window.addEventListener('message', (event) => {
         },
         event.origin,
       )
+    },
+  )
+})
+
+window.addEventListener('message', (event) => {
+  if (
+    event.source !== window.parent ||
+    (parentOrigin !== undefined && event.origin !== parentOrigin) ||
+    !isQualityRequest(event.data)
+  ) return
+  parentOrigin = event.origin
+  const request = event.data
+  if (activeRequests.has(request.requestId)) return
+  activeRequests.add(request.requestId)
+  window.clearInterval(readyTimer)
+  void waitForOverview().then(
+    () => {
+      activeRequests.delete(request.requestId)
+      window.parent.postMessage({
+        type: 'fastppt.slidewave.quality.completed',
+        version: SLIDEWAVE_CAPTURE_PROTOCOL_VERSION,
+        requestId: request.requestId,
+        result: inspectQuality(request),
+      }, event.origin)
+    },
+    (cause: unknown) => {
+      activeRequests.delete(request.requestId)
+      window.parent.postMessage({
+        type: 'fastppt.slidewave.capture.failed',
+        version: SLIDEWAVE_CAPTURE_PROTOCOL_VERSION,
+        requestId: request.requestId,
+        error: captureErrorMessage(cause, 'Slidewave quality inspection failed unexpectedly.'),
+      }, event.origin)
     },
   )
 })

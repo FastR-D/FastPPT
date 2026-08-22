@@ -114,6 +114,9 @@ await Promise.all([
 const manifest = JSON.parse(
   await readFile(join(packageRoot, 'package.json'), 'utf8'),
 )
+const slidewaveManifest = JSON.parse(
+  await readFile(join(repositoryRoot, 'packages/slidewave/package.json'), 'utf8'),
+)
 await writeFile(
   join(outputRoot, 'package.json'),
   `${JSON.stringify({ name: manifest.name, version: manifest.version, type: 'module' }, null, 2)}\n`,
@@ -123,7 +126,7 @@ await writeFile(
   `${JSON.stringify(
     {
       name: '@fastppt/slidewave',
-      version: '0.6.1-fastppt.1',
+      version: slidewaveManifest.version,
       type: 'module',
       exports: {
         '.': './dist/core.js',

@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import {
   BrowserInspectionJobSchema,
+  DeckQualityReportSchema,
   DeckSummarySchema,
   ExportJobSchema,
   SlidevProcessStateSchema,
@@ -49,6 +50,31 @@ export class GatewayBrowserCaptureDelegate implements BrowserCaptureDelegate {
     if (completed.status !== 'completed' || !completed.result)
       throw new Error(completed.error ?? 'Browser overflow inspection failed.')
     return completed.result
+  }
+
+  async inspectQuality(input: { path: string; slide: number }) {
+    const deck = await this.#resolveDeck(input.path)
+    const job = await this.#request(
+      `/api/v1/decks/${encodeURIComponent(deck.id)}/inspections/quality`,
+      BrowserInspectionJobSchema,
+      { method: 'POST', body: JSON.stringify({ slide: input.slide, policy: 'standard' }) },
+    )
+    const completed = await this.#wait(
+      `/api/v1/inspections/${encodeURIComponent(job.id)}`,
+      BrowserInspectionJobSchema,
+      (candidate) => candidate.status !== 'queued',
+    )
+    if (completed.status !== 'completed' || !completed.result)
+      throw new Error(completed.error ?? 'Browser quality inspection failed.')
+    return completed.result
+  }
+
+  async getQualityReport(path: string) {
+    const deck = await this.#resolveDeck(path)
+    return await this.#request(
+      `/api/v1/decks/${encodeURIComponent(deck.id)}/quality-report`,
+      DeckQualityReportSchema,
+    )
   }
 
   async getPreviewStatus(path: string) {

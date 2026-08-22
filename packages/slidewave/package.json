@@ -1,6 +1,6 @@
 {
   "name": "@fastppt/slidewave",
-  "version": "0.6.1-fastppt.1",
+  "version": "0.6.2",
   "description": "FastPPT-native Slidewave conversion package for editable PowerPoint generation",
   "type": "module",
   "exports": {

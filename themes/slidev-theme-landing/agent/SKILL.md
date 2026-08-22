@@ -55,7 +55,8 @@ Produce Slidev pages that fit the Landing theme, use the custom components corre
 7. When using citations, prefer DOI values and let the references plugin format the bibliography automatically.
 8. Keep image paths relative to the slide file so exported decks stay portable.
 9. Use theme colors and utility classes such as `bg-primary`, `text-whu-blue`, `text-whu-green`, and UnoCSS spacing/layout utilities.
-10. Avoid adding layout logic that fights the base layout’s scroll handling or page numbering.
+10. Use native Markdown tables for tabular data and let the theme's academic default table format style them (blue header row and first column with white bold text, black body cells, width-adaptive font size); do not restyle tables with ad hoc cell backgrounds.
+11. Avoid adding layout logic that fights the base layout’s scroll handling or page numbering.
 
 ## Common patterns from this repo
 

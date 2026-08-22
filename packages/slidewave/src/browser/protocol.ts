@@ -72,6 +72,39 @@ export interface SlidewaveOverflowCompleted {
   result: SlidewaveOverflowResult
 }
 
+export interface SlidewaveQualityIssue {
+  layer: 'pretext' | 'geometry' | 'visual'
+  severity: 'error' | 'warning' | 'needs-human'
+  code: string
+  message: string
+  slide: number
+  selector?: string
+  box?: { x: number; y: number; width: number; height: number }
+  metric?: { actual: number; expected: number; unit: string }
+  suggestedFix?: string
+}
+
+export interface SlidewaveQualityResult {
+  inspectionAvailable: true
+  slide: number
+  slideCount: number
+  issues: SlidewaveQualityIssue[]
+}
+
+export interface SlidewaveQualityRequest {
+  type: 'fastppt.slidewave.quality.request'
+  version: typeof SLIDEWAVE_CAPTURE_PROTOCOL_VERSION
+  requestId: string
+  slide: number
+}
+
+export interface SlidewaveQualityCompleted {
+  type: 'fastppt.slidewave.quality.completed'
+  version: typeof SLIDEWAVE_CAPTURE_PROTOCOL_VERSION
+  requestId: string
+  result: SlidewaveQualityResult
+}
+
 export type SlidewaveCaptureMessage =
   | SlidewaveCaptureReady
   | SlidewavePreviewState
@@ -81,6 +114,8 @@ export type SlidewaveCaptureMessage =
   | SlidewaveCaptureFailed
   | SlidewaveOverflowRequest
   | SlidewaveOverflowCompleted
+  | SlidewaveQualityRequest
+  | SlidewaveQualityCompleted
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -147,6 +182,7 @@ export function isSlidewaveCaptureMessage(
         value.error.length > 0
       )
     case 'fastppt.slidewave.overflow.request':
+    case 'fastppt.slidewave.quality.request':
       return (
         typeof value.requestId === 'string' &&
         value.requestId.length > 0 &&
@@ -162,6 +198,14 @@ export function isSlidewaveCaptureMessage(
         value.result.inspectionAvailable === true &&
         typeof value.result.overflow === 'boolean' &&
         Array.isArray(value.result.elements)
+      )
+    case 'fastppt.slidewave.quality.completed':
+      return (
+        typeof value.requestId === 'string' &&
+        value.requestId.length > 0 &&
+        isRecord(value.result) &&
+        value.result.inspectionAvailable === true &&
+        Array.isArray(value.result.issues)
       )
     default:
       return false

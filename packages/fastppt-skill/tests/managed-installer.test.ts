@@ -48,7 +48,7 @@ describe('ManagedSkillInstaller', () => {
       registry,
     })
     const dryRun = await installer.reconcile({ dryRun: true })
-    const expectedStatusCount = (registry.themes.length + 1) * 2
+    const expectedStatusCount = (registry.themes.length + 2) * 2
     expect(dryRun.statuses).toHaveLength(expectedStatusCount)
     expect(dryRun.statuses.every((status) => status.state === 'missing')).toBe(
       true,
@@ -64,9 +64,11 @@ describe('ManagedSkillInstaller', () => {
     ).toEqual(
       expect.arrayContaining([
         'claude:fastppt',
+        'claude:fastppt-page-edit',
         'claude:fastppt-theme-academy',
         'claude:fastppt-theme-landing',
         'codex:fastppt',
+        'codex:fastppt-page-edit',
         'codex:fastppt-theme-academy',
         'codex:fastppt-theme-landing',
         'claude:fastppt-theme-strategy',

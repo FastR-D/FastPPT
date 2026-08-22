@@ -55,6 +55,8 @@ import {
   ImportPptxThemeResultSchema,
   ImportPptxThemeStatusSchema,
   CreateSessionRequestSchema,
+  SessionDeckProfileSchema,
+  SessionProfileRecordSchema,
   HarnessKindSchema,
   HarnessStatusSchema,
   SendMessageRequestSchema,
@@ -64,9 +66,12 @@ import {
   UpdateSessionAliasRequestSchema,
   ExportJobSchema,
   BrowserInspectionJobSchema,
+  BrowserQualityResultSchema,
+  DeckQualityReportSchema,
   SlidewaveSnapshotSchema,
   type ApiErrorBody,
   type WorkspaceInfo,
+  type SessionDeckProfile,
 } from '@fastppt/protocol'
 import { cleanupStaleSlidevCaches, SlidevHost } from '@fastppt/slidev-host'
 import { classifySlidevLogLine } from './slidev-logs.js'
@@ -127,6 +132,35 @@ export interface GatewayOptions {
 }
 
 type ComponentHealth = z.infer<typeof ComponentHealthSchema>
+
+function profileDigest(profile: SessionDeckProfile): string {
+  return createHash('sha256')
+    .update(JSON.stringify(profile))
+    .digest('base64url')
+}
+
+function sessionBrief(profile: SessionDeckProfile): string {
+  return [
+    '<fastppt-session-brief>',
+    `conversation_mode: ${profile.conversationMode}`,
+    `target: ${profile.target ? JSON.stringify(profile.target) : 'none'}`,
+    `artifact_route: ${profile.artifactRoute}`,
+    `audience: ${profile.audience}`,
+    `communication_intent: ${profile.communicationIntent}`,
+    `narrative_mode: ${profile.narrativeMode}`,
+    `language: ${profile.language}`,
+    `duration_minutes: ${profile.durationMinutes ?? 'unspecified'}`,
+    `theme: ${
+      profile.theme.mode === 'registered'
+        ? profile.theme.themeId
+        : 'preserve-source'
+    }`,
+    `preservation: ${JSON.stringify(profile.preservation)}`,
+    `review_policy: ${profile.reviewPolicy}`,
+    'Treat this brief as confirmed session configuration. Do not ask the user to repeat it unless the current request conflicts with it.',
+    '</fastppt-session-brief>',
+  ].join('\n')
+}
 
 const ADAPTER_NOT_FOUND_CODES = new Set([
   'APPROVAL_NOT_FOUND',
@@ -1356,10 +1390,50 @@ export async function createGateway(
 
   app.post('/api/v1/sessions', async (request) => {
     const input = CreateSessionRequestSchema.parse(request.body)
+    let themeSkillId: string | null = null
+    let themeSkillVersion: string | null = null
+    if (input.profile.theme.mode === 'registered') {
+      const theme = themeRegistry.resolve(input.profile.theme.themeId).manifest
+      const status = await skillInstaller.themeStatus(
+        input.harness,
+        theme.id,
+      )
+      if (!status.available)
+        throw new RpcError(
+          'The selected theme and its managed Skills are not available',
+          'SKILL_INSTALL_UNAVAILABLE',
+          status,
+        )
+      themeSkillId = theme.skill.id
+      themeSkillVersion = theme.skill.version
+    } else if (
+      !['fill-native-pptx', 'enhance-native-pptx'].includes(
+        input.profile.artifactRoute,
+      )
+    ) {
+      throw new RpcError(
+        'Only native PPTX fill or enhancement sessions may preserve the source theme',
+        'INVALID_REQUEST',
+      )
+    }
     const session = await harnesses[input.harness].createSession({
       cwd: workspace.root,
       ...(input.title ? { title: input.title } : {}),
     })
+    const timestamp = new Date().toISOString()
+    database.recordSessionProfile(
+      SessionProfileRecordSchema.parse({
+        harness: input.harness,
+        sessionId: session.sessionId,
+        profile: input.profile,
+        profileDigest: profileDigest(input.profile),
+        registryVersion: themeRegistry.version,
+        themeSkillId,
+        themeSkillVersion,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }),
+    )
     if (input.title)
       database.recordSessionAlias(input.harness, session.sessionId, input.title)
     database.setAppSetting('recentHarness', input.harness)
@@ -1368,6 +1442,57 @@ export async function createGateway(
       JSON.stringify({ harness: input.harness, sessionId: session.sessionId }),
     )
     return session
+  })
+
+  app.get('/api/v1/sessions/:harness/:sessionId/profile', (request) => {
+    const { harness, sessionId } = z
+      .object({ harness: HarnessKindSchema, sessionId: z.string().min(1) })
+      .parse(request.params)
+    const profile = database.getSessionProfile(harness, sessionId)
+    if (!profile)
+      throw new RpcError(
+        'Session profile was not found',
+        'SESSION_NOT_FOUND',
+        { harness, sessionId },
+      )
+    return profile
+  })
+
+  app.put('/api/v1/sessions/:harness/:sessionId/profile', async (request) => {
+    const { harness, sessionId } = z
+      .object({ harness: HarnessKindSchema, sessionId: z.string().min(1) })
+      .parse(request.params)
+    const profile = SessionDeckProfileSchema.parse(request.body)
+    await harnesses[harness].getSession({ sessionId })
+    const current = database.getSessionProfile(harness, sessionId)
+    let themeSkillId: string | null = null
+    let themeSkillVersion: string | null = null
+    if (profile.theme.mode === 'registered') {
+      const theme = themeRegistry.resolve(profile.theme.themeId).manifest
+      const status = await skillInstaller.themeStatus(harness, theme.id)
+      if (!status.available)
+        throw new RpcError(
+          'The selected theme and its managed Skills are not available',
+          'SKILL_INSTALL_UNAVAILABLE',
+          status,
+        )
+      themeSkillId = theme.skill.id
+      themeSkillVersion = theme.skill.version
+    }
+    const timestamp = new Date().toISOString()
+    const record = SessionProfileRecordSchema.parse({
+      harness,
+      sessionId,
+      profile,
+      profileDigest: profileDigest(profile),
+      registryVersion: themeRegistry.version,
+      themeSkillId,
+      themeSkillVersion,
+      createdAt: current?.createdAt ?? timestamp,
+      updatedAt: timestamp,
+    })
+    database.recordSessionProfile(record)
+    return record
   })
 
   app.post('/api/v1/sessions/:harness/:sessionId/resume', async (request) => {
@@ -1400,6 +1525,16 @@ export async function createGateway(
       sessionId,
       cwd: workspace.root,
     })
+    const sourceProfile = database.getSessionProfile(harness, sessionId)
+    if (sourceProfile) {
+      const timestamp = new Date().toISOString()
+      database.recordSessionProfile({
+        ...sourceProfile,
+        sessionId: forked.sessionId,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      })
+    }
     database.setAppSetting('recentHarness', harness)
     database.setAppSetting(
       'recentSession',
@@ -1423,6 +1558,13 @@ export async function createGateway(
         .object({ harness: HarnessKindSchema, sessionId: z.string().min(1) })
         .parse(request.params)
       const input = SendMessageRequestSchema.parse(request.body)
+      const sessionProfile = database.getSessionProfile(harness, sessionId)
+      if (!sessionProfile && !input.themeId)
+        throw new RpcError(
+          'This legacy session has no FastPPT configuration. Configure it before sending a message.',
+          'INVALID_REQUEST',
+          { harness, sessionId },
+        )
       const attachments = await Promise.all(
         input.attachments.map(async (attachment) => ({
           type: attachment.type,
@@ -1437,10 +1579,32 @@ export async function createGateway(
         releaseThemeState = await themeStateLock.acquireRead()
         const registrySnapshot = themeRegistry
         const installerSnapshot = skillInstaller
+        const configuredThemeId =
+          sessionProfile?.profile.theme.mode === 'registered'
+            ? sessionProfile.profile.theme.themeId
+            : input.themeId
+        if (
+          sessionProfile?.profile.theme.mode === 'registered' &&
+          input.themeId &&
+          input.themeId !== sessionProfile.profile.theme.themeId
+        )
+          throw new RpcError(
+            'Message theme does not match the configured session theme',
+            'THEME_SKILL_MAPPING_INVALID',
+            {
+              configuredThemeId: sessionProfile.profile.theme.themeId,
+              requestedThemeId: input.themeId,
+            },
+          )
+        if (!configuredThemeId)
+          throw new RpcError(
+            'Native source-preserving routes are not yet supported by the Slidev generation runtime',
+            'UNSUPPORTED',
+          )
         const requestedThemeId = themeIdMentionedInPrompt(
           registrySnapshot,
           input.content,
-          input.themeId,
+          configuredThemeId,
         )
         const registeredTheme = registrySnapshot.resolve(requestedThemeId)
         const capabilities = await adapter.getCapabilities()
@@ -1460,6 +1624,18 @@ export async function createGateway(
             'SKILL_INSTALL_UNAVAILABLE',
             skillStatus,
           )
+        const pageEditSkill =
+          sessionProfile?.profile.conversationMode === 'edit-page'
+            ? (await installerSnapshot.inspect(harness)).find(
+                (status) => status.skillId === 'fastppt-page-edit',
+              )
+            : undefined
+        if (pageEditSkill && pageEditSkill.state !== 'installed')
+          throw new RpcError(
+            'The managed single-page editing Skill is not available',
+            'SKILL_INSTALL_UNAVAILABLE',
+            pageEditSkill,
+          )
         database.setAppSetting('recentHarness', harness)
         database.setAppSetting(
           'recentSession',
@@ -1469,7 +1645,9 @@ export async function createGateway(
         const eventStream = adapter.sendMessage({
           sessionId,
           cwd: workspace.root,
-          content: input.content,
+          content: sessionProfile
+            ? `${sessionBrief(sessionProfile.profile)}\n\n${input.content}`
+            : input.content,
           attachments,
           themeId: registeredTheme.manifest.id,
           themeSkillId: registeredTheme.manifest.skill.id,
@@ -1487,6 +1665,16 @@ export async function createGateway(
               path: skillStatus.theme.targetPath,
               version: skillStatus.theme.expectedVersion,
             },
+            ...(pageEditSkill
+              ? [
+                  {
+                    id: pageEditSkill.skillId,
+                    name: pageEditSkill.skillId,
+                    path: pageEditSkill.targetPath,
+                    version: pageEditSkill.expectedVersion,
+                  },
+                ]
+              : []),
           ],
         })
         const iterator = eventStream[Symbol.asyncIterator]()
@@ -1510,12 +1698,26 @@ export async function createGateway(
             payload: approval,
           })
         }
+        const auditedFirstEvent = sessionProfile
+          ? UnifiedAgentEventSchema.parse({
+              ...firstEvent,
+              data: {
+                ...(firstEvent.data &&
+                typeof firstEvent.data === 'object' &&
+                !Array.isArray(firstEvent.data)
+                  ? firstEvent.data
+                  : {}),
+                sessionProfile: sessionProfile.profile,
+                profileDigest: sessionProfile.profileDigest,
+              },
+            })
+          : firstEvent
         database.recordAgentEvent(
-          firstEvent,
+          auditedFirstEvent,
           registrySnapshot.version,
           'resolved',
         )
-        publishAgentEvent(firstEvent)
+        publishAgentEvent(auditedFirstEvent)
         slotOwnedByBackgroundStream = true
         void (async () => {
           try {
@@ -2190,6 +2392,22 @@ export async function createGateway(
       .parse(request.params)
     const input = CreateExportRequestSchema.parse(request.body)
     const deck = await resolveDeck(deckId)
+    const policy = input.reviewPolicy ?? 'fast'
+    if (policy !== 'fast') {
+      const report = database.getQualityReport(deckId)
+      const stale =
+        !report ||
+        report.revision !== deck.revision ||
+        report.profileDigest !== (input.profileDigest ?? null)
+      if (stale || !report?.ok)
+        throw new RpcError(
+          stale
+            ? 'A current quality inspection is required before export.'
+            : 'Quality inspection found blocking issues. Fix them before export.',
+          stale ? 'QUALITY_REPORT_REQUIRED' : 'QUALITY_GATE_FAILED',
+          { deckId, revision: deck.revision, policy },
+        )
+    }
     const themePackageRoot = deck.themeId
       ? themeRegistry.resolve(deck.themeId).packageRoot
       : undefined
@@ -2245,6 +2463,50 @@ export async function createGateway(
     )
   })
 
+  app.post('/api/v1/decks/:deckId/inspections/quality', async (request) => {
+    const { deckId } = z.object({ deckId: z.string().min(1) }).parse(request.params)
+    const input = z.object({
+      slide: z.number().int().positive(),
+      policy: z.enum(['fast', 'standard', 'strict']).default('standard'),
+      profileDigest: z.string().min(1).nullable().default(null),
+    }).parse(request.body)
+    const deck = await resolveDeck(deckId)
+    const themeDigest = deck.themeId
+      ? createHash('sha256').update(deck.themeId).digest('hex')
+      : null
+    const themePackageRoot = deck.themeId
+      ? themeRegistry.resolve(deck.themeId).packageRoot
+      : undefined
+    const current = slidevHost.getState(deckId)
+    const state = current.status === 'ready' ? current : await slidevHost.start({
+      deckId,
+      entryFile: await resolveExistingPath(workspaceFiles.root, deck.entryFile),
+      ...(themePackageRoot ? { themePackageRoot } : {}),
+    })
+    requireSlidevReady(state, 'inspection')
+    return BrowserInspectionJobSchema.parse(inspectionManager.enqueue(
+      deckId,
+      input.slide,
+      'quality',
+      {
+        revision: deck.revision,
+        themeId: deck.themeId ?? null,
+        themeDigest,
+        profileDigest: input.profileDigest,
+        policy: input.policy,
+      },
+    ))
+  })
+
+  app.get('/api/v1/decks/:deckId/quality-report', async (request) => {
+    const { deckId } = z.object({ deckId: z.string().min(1) }).parse(request.params)
+    await resolveDeck(deckId)
+    const report = database.getQualityReport(deckId)
+    if (!report)
+      throw new RpcError('Quality report was not found.', 'QUALITY_REPORT_NOT_FOUND', { deckId })
+    return DeckQualityReportSchema.parse(report)
+  })
+
   app.get('/api/v1/inspections/:inspectionId', (request) => {
     const { inspectionId } = z
       .object({ inspectionId: z.string().uuid() })
@@ -2278,9 +2540,23 @@ export async function createGateway(
         'INSPECTION_NOT_READY',
         { inspectionId, status: inspection.status },
       )
-    return BrowserInspectionJobSchema.parse(
-      inspectionManager.submitResult(inspectionId, request.body),
-    )
+    const completed = inspectionManager.submitResult(inspectionId, request.body)
+    if (completed.kind === 'quality' && completed.status === 'completed') {
+      const result = BrowserQualityResultSchema.parse(completed.result)
+      database.recordQualityReport(DeckQualityReportSchema.parse({
+        version: 1,
+        deckId: completed.deckId,
+        revision: completed.revision,
+        themeId: completed.themeId ?? null,
+        themeDigest: completed.themeDigest ?? null,
+        profileDigest: completed.profileDigest ?? null,
+        checkedAt: new Date().toISOString(),
+        policy: completed.policy ?? 'standard',
+        ok: !result.issues.some((issue) => issue.severity === 'error'),
+        issues: result.issues,
+      }))
+    }
+    return BrowserInspectionJobSchema.parse(completed)
   })
 
   app.post('/api/v1/exports/:exportId/snapshot', (request) => {

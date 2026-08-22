@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import {
   BrowserInspectionJobSchema,
   BrowserOverflowResultSchema,
+  BrowserQualityResultSchema,
 } from '@fastppt/protocol'
 
 import type {
@@ -28,11 +29,18 @@ export class BrowserInspectionManager {
     this.#options = options
   }
 
-  enqueue(deckId: string, slide: number): BrowserInspectionJob {
+  enqueue(
+    deckId: string,
+    slide: number,
+    kind: BrowserInspectionJob['kind'] = 'overflow',
+    context: Pick<BrowserInspectionJob, 'revision' | 'themeId' | 'themeDigest' | 'profileDigest' | 'policy'> = {},
+  ): BrowserInspectionJob {
     const job = BrowserInspectionJobSchema.parse({
       id: randomUUID(),
       deckId,
       slide,
+      kind,
+      ...context,
       status: 'queued',
       createdAt: new Date().toISOString(),
     })
@@ -56,7 +64,10 @@ export class BrowserInspectionManager {
       return this.#finish({
         ...pending.job,
         status: 'completed',
-        result: BrowserOverflowResultSchema.parse(input),
+        result:
+          pending.job.kind === 'quality'
+            ? BrowserQualityResultSchema.parse(input)
+            : BrowserOverflowResultSchema.parse(input),
       })
     } catch (cause) {
       return this.#finish({

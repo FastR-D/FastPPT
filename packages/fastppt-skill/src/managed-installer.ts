@@ -260,6 +260,13 @@ export class ManagedSkillInstaller {
         entries: COMMON_ENTRIES,
         registryVersion: this.#registry.version,
       },
+      {
+        id: 'fastppt-page-edit',
+        kind: 'base',
+        version: '0.1.0',
+        sourceDir: join(this.#commonSkillRoot, 'page-edit'),
+        registryVersion: this.#registry.version,
+      },
       ...this.#registry.themes.map((theme) => ({
         id: theme.manifest.skill.id,
         kind: 'theme' as const,

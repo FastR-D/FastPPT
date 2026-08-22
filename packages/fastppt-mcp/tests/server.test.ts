@@ -172,6 +172,26 @@ describe('FastPPT MCP', () => {
     await expect(service.validateSlides()).resolves.toMatchObject({ valid: true })
   })
 
+  it('validates referenced images larger than the text read limit', async () => {
+    const { workspaceRoot, service } = await fixture()
+    const slides = await service.readSlides()
+    await mkdir(join(workspaceRoot, 'assets'), { recursive: true })
+    await writeFile(
+      join(workspaceRoot, 'assets', 'large.jpg'),
+      Buffer.alloc(2 * 1024 * 1024 + 1, 0xff),
+    )
+    await service.writeSlides({
+      path: 'slides.md',
+      expectedRevision: slides.revision,
+      content: `${slides.content}\n\n![Large](./assets/large.jpg)\n`,
+    })
+
+    await expect(service.validateSlides()).resolves.toMatchObject({
+      valid: true,
+      errors: [],
+    })
+  })
+
   it('imports Codex-generated images into exact workspace paths safely', async () => {
     const generatedImagesRoot = await temporaryDirectory(
       'codex-generated-images-',

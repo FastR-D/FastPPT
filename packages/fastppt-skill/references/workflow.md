@@ -2,8 +2,8 @@
 
 ## New deck
 
-1. Confirm the user goal, audience, duration, language, and active theme snapshot.
-2. Form one argument spine and a short slide outline before writing full pages.
+1. Read the confirmed Session Brief; do not re-ask its required fields.
+2. Write `deck-plan.json` with one argument spine and a short slide outline.
 3. Create a valid global frontmatter block with the registered theme package.
    Keep every Slidev frontmatter block compact: do not leave blank lines after
    the opening `---` or before the closing `---`.

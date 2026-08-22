@@ -196,6 +196,79 @@ export type ThemeSkillDocument = z.infer<typeof ThemeSkillDocumentSchema>
 export const HarnessKindSchema = z.enum(['claude', 'codex'])
 export type HarnessKind = z.infer<typeof HarnessKindSchema>
 
+export const ArtifactRouteSchema = z.enum([
+  'generate',
+  'edit-slidev',
+  'create-template',
+  'fill-native-pptx',
+  'enhance-native-pptx',
+])
+export type ArtifactRoute = z.infer<typeof ArtifactRouteSchema>
+
+export const CommunicationIntentSchema = z.enum([
+  'decision',
+  'instruction',
+  'persuasion',
+  'showcase',
+  'briefing',
+])
+export type CommunicationIntent = z.infer<typeof CommunicationIntentSchema>
+
+export const NarrativeModeSchema = z.enum([
+  'pyramid',
+  'instructional',
+  'narrative',
+  'showcase',
+  'briefing',
+])
+export type NarrativeMode = z.infer<typeof NarrativeModeSchema>
+
+export const ReviewPolicySchema = z.enum(['fast', 'standard', 'strict'])
+export type ReviewPolicy = z.infer<typeof ReviewPolicySchema>
+
+export const SessionConversationModeSchema = z.enum([
+  'general',
+  'create-slide',
+  'edit-deck',
+  'edit-page',
+])
+export type SessionConversationMode = z.infer<typeof SessionConversationModeSchema>
+
+export const SessionThemeSelectionSchema = z.discriminatedUnion('mode', [
+  z.object({ mode: z.literal('registered'), themeId: z.string().min(1) }),
+  z.object({ mode: z.literal('preserve-source') }),
+])
+export type SessionThemeSelection = z.infer<
+  typeof SessionThemeSelectionSchema
+>
+
+export const PreservationPolicySchema = z.object({
+  wording: z.enum(['free', 'preserve']).default('free'),
+  pageCount: z.enum(['free', 'preserve']).default('free'),
+  pageOrder: z.enum(['free', 'preserve']).default('free'),
+  visualStructure: z.enum(['free', 'preserve']).default('free'),
+})
+export type PreservationPolicy = z.infer<typeof PreservationPolicySchema>
+
+export const SessionDeckProfileSchema = z.object({
+  version: z.literal(1),
+  conversationMode: SessionConversationModeSchema.default('create-slide'),
+  target: z.object({
+    markdownPath: z.string().min(1).optional(),
+    slide: z.number().int().positive().optional(),
+  }).optional(),
+  artifactRoute: ArtifactRouteSchema,
+  audience: z.string().trim().min(1).max(160),
+  communicationIntent: CommunicationIntentSchema,
+  narrativeMode: NarrativeModeSchema,
+  language: z.enum(['zh-CN', 'en-US', 'source']),
+  durationMinutes: z.number().int().min(1).max(240).optional(),
+  theme: SessionThemeSelectionSchema,
+  preservation: PreservationPolicySchema,
+  reviewPolicy: ReviewPolicySchema,
+})
+export type SessionDeckProfile = z.infer<typeof SessionDeckProfileSchema>
+
 export const ManagedInstallStateSchema = z.enum([
   'missing',
   'installed',
@@ -254,6 +327,8 @@ export const CreateExportRequestSchema = z.object({
   outputName: z.string().min(1).max(160),
   /** Require an explicit visual confirmation before the export is published. */
   review: z.boolean().optional(),
+  reviewPolicy: ReviewPolicySchema.optional(),
+  profileDigest: z.string().min(1).nullable().optional(),
 })
 export type CreateExportRequest = z.infer<typeof CreateExportRequestSchema>
 
@@ -389,13 +464,30 @@ export const BrowserOverflowResultSchema = z.object({
 })
 export type BrowserOverflowResult = z.infer<typeof BrowserOverflowResultSchema>
 
+export const BrowserQualityResultSchema = z.object({
+  inspectionAvailable: z.literal(true),
+  slide: z.number().int().positive(),
+  slideCount: z.number().int().nonnegative(),
+  issues: z.array(z.lazy(() => DeckQualityIssueSchema)),
+})
+export type BrowserQualityResult = z.infer<typeof BrowserQualityResultSchema>
+
+export const BrowserInspectionKindSchema = z.enum(['overflow', 'quality'])
+export type BrowserInspectionKind = z.infer<typeof BrowserInspectionKindSchema>
+
 export const BrowserInspectionJobSchema = z.object({
   id: z.string().uuid(),
   deckId: z.string().min(1),
   slide: z.number().int().positive(),
+  kind: BrowserInspectionKindSchema.default('overflow'),
+  revision: z.string().min(1).optional(),
+  themeId: z.string().min(1).nullable().optional(),
+  themeDigest: z.string().min(1).nullable().optional(),
+  profileDigest: z.string().min(1).nullable().optional(),
+  policy: ReviewPolicySchema.optional(),
   status: z.enum(['queued', 'completed', 'failed']),
   createdAt: z.iso.datetime(),
-  result: BrowserOverflowResultSchema.optional(),
+  result: z.union([BrowserOverflowResultSchema, BrowserQualityResultSchema]).optional(),
   error: z.string().optional(),
 })
 export type BrowserInspectionJob = z.infer<typeof BrowserInspectionJobSchema>
@@ -520,6 +612,8 @@ export const RunAuditRecordSchema = z.object({
   ]),
   invocationMechanism: z.string().nullable(),
   observationEvidence: z.unknown().nullable(),
+  sessionProfile: SessionDeckProfileSchema.nullable().default(null),
+  profileDigest: z.string().nullable().default(null),
   startedAt: z.iso.datetime(),
   completedAt: z.iso.datetime().nullable(),
   events: z.array(UnifiedAgentEventSchema),
@@ -567,7 +661,21 @@ export const CreateSessionRequestSchema = z.object({
   harness: HarnessKindSchema,
   cwd: z.string().min(1),
   title: z.string().min(1).optional(),
+  profile: SessionDeckProfileSchema,
 })
+
+export const SessionProfileRecordSchema = z.object({
+  harness: HarnessKindSchema,
+  sessionId: z.string().min(1),
+  profile: SessionDeckProfileSchema,
+  profileDigest: z.string().min(1),
+  registryVersion: z.string().min(1),
+  themeSkillId: z.string().nullable(),
+  themeSkillVersion: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+})
+export type SessionProfileRecord = z.infer<typeof SessionProfileRecordSchema>
 
 export const UpdateSessionAliasRequestSchema = z.object({
   alias: z.string().trim().min(1).max(120),
@@ -575,7 +683,7 @@ export const UpdateSessionAliasRequestSchema = z.object({
 
 export const SendMessageRequestSchema = z.object({
   content: z.string().min(1),
-  themeId: z.string().min(1),
+  themeId: z.string().min(1).optional(),
   attachments: z
     .array(
       z.object({
@@ -585,6 +693,47 @@ export const SendMessageRequestSchema = z.object({
     )
     .default([]),
 })
+
+export const DeckQualityIssueSchema = z.object({
+  layer: z.enum(['schema', 'pretext', 'geometry', 'visual', 'pptx']),
+  severity: z.enum(['error', 'warning', 'needs-human']),
+  code: z.string().min(1),
+  message: z.string().min(1),
+  slide: z.number().int().positive().optional(),
+  elementId: z.string().min(1).optional(),
+  selector: z.string().min(1).optional(),
+  box: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      width: z.number().nonnegative(),
+      height: z.number().nonnegative(),
+    })
+    .optional(),
+  metric: z
+    .object({
+      actual: z.number(),
+      expected: z.number(),
+      unit: z.string().min(1),
+    })
+    .optional(),
+  suggestedFix: z.string().min(1).optional(),
+})
+export type DeckQualityIssue = z.infer<typeof DeckQualityIssueSchema>
+
+export const DeckQualityReportSchema = z.object({
+  version: z.literal(1),
+  deckId: z.string().min(1),
+  revision: z.string().min(1),
+  themeId: z.string().nullable(),
+  themeDigest: z.string().nullable(),
+  profileDigest: z.string().nullable(),
+  checkedAt: z.iso.datetime(),
+  policy: ReviewPolicySchema,
+  ok: z.boolean(),
+  issues: z.array(DeckQualityIssueSchema),
+})
+export type DeckQualityReport = z.infer<typeof DeckQualityReportSchema>
 
 export const ApprovalDecisionRequestSchema = z.object({
   decision: ApprovalDecisionSchema,
