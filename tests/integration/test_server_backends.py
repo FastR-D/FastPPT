@@ -97,10 +97,45 @@ class ServerBackendIntegrationTests(TestCase):
                 owner["user_id"], project["project_id"], "document_create", [document["document_id"]]
             )
             plan = runtime_a.service.create_generation_plan(owner["user_id"], project["project_id"], session["session_id"])
-            samples = runtime_a.service.confirm_generation_plan(owner["user_id"], project["project_id"], plan["plan_id"])
-            self.assertEqual(samples["status"], "awaiting_sample_confirmation")
-            generated = runtime_a.service.confirm_generation_samples(owner["user_id"], project["project_id"], plan["plan_id"])
-            self.assertEqual(generated["status"], "completed")
+            content = runtime_a.service.confirm_generation_plan(owner["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(content["status"], "awaiting_design_confirmation")
+            visuals = runtime_a.service.confirm_generation_design(owner["user_id"], project["project_id"], plan["plan_id"])
+            self.assertEqual(visuals["status"], "awaiting_visual_confirmation")
+            for page in runtime_b.store.list_pages(project["project_id"]):
+                visual = runtime_b.store.get_artifact(project["project_id"], page["visual_preview_artifact_id"])
+                runtime_a.service.approve_visual(
+                    owner["user_id"],
+                    project["project_id"],
+                    page["page_id"],
+                    {
+                        "contract_revision": 1,
+                        "visual_artifact_id": visual["artifact_id"],
+                        "visual_sha256": visual["sha256"],
+                        "comment": "approved in server integration",
+                    },
+                )
+                preflight = runtime_a.service.reconstruction_preflight(
+                    owner["user_id"], project["project_id"], page["page_id"]
+                )
+                reconstruction = runtime_a.service.request_reconstruction(
+                    owner["user_id"],
+                    project["project_id"],
+                    page["page_id"],
+                    {
+                        "disclosure_sha256": preflight["disclosure_sha256"],
+                        "accept_wait_time": True,
+                        "accept_supplier_fee_risk": True,
+                        "accept_visual_difference": True,
+                        "accept_editable_boundary": True,
+                        "accepted_unsupported_object_ids": [
+                            item["object_id"] for item in preflight["unsupported_items"]
+                        ],
+                        "idempotency_key": f"server-integration-reconstruct:{page['page_id']}",
+                    },
+                )
+                self.assertTrue(worker_b.run_once())
+                self.assertEqual(runtime_a.store.get_job(reconstruction["job_id"])["status"], "completed")
+            self.assertEqual(runtime_a.store.get_plan(project["project_id"], plan["plan_id"])["status"], "completed")
 
             page_from_b = runtime_b.store.list_pages(project["project_id"])[0]
             preview_from_b, preview_type = runtime_b.service.artifact_download(
