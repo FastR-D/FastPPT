@@ -83,6 +83,13 @@ class RuntimeSettings:
     def production(self) -> bool:
         return self.deployment_mode == DeploymentMode.SERVER
 
+    @property
+    def agent_production(self) -> bool:
+        """Whether Agent calls must satisfy production-provider requirements."""
+        return self.production and not (
+            self.test_fixtures_enabled and self.agent.backend == AgentBackend.DETERMINISTIC_TEST
+        )
+
     @classmethod
     def load(
         cls,
@@ -170,10 +177,20 @@ class RuntimeSettings:
                 timeout_seconds=timeout_seconds,
             )
             test_fixtures_enabled = env.get("FASTPPT_ENABLE_TEST_FIXTURES") == "1"
+            server_integration_fixtures = (
+                mode == DeploymentMode.SERVER
+                and test_fixtures_enabled
+                and env.get("FASTPPT_SERVER_INTEGRATION") == "1"
+            )
+            deterministic_test_agent = backend == AgentBackend.DETERMINISTIC_TEST and test_fixtures_enabled
+            if mode == DeploymentMode.SERVER and deterministic_test_agent and env.get("FASTPPT_SERVER_INTEGRATION") != "1":
+                raise ConfigurationError(
+                    "The deterministic Agent is only allowed for explicit server integration runs"
+                )
             if backend == AgentBackend.DETERMINISTIC_TEST and not test_fixtures_enabled:
                 raise ConfigurationError("The deterministic Agent requires FASTPPT_ENABLE_TEST_FIXTURES=1")
             if backend != AgentBackend.UNCONFIGURED:
-                agent.validate(production=mode == DeploymentMode.SERVER)
+                agent.validate(production=mode == DeploymentMode.SERVER and not deterministic_test_agent)
         except Exception as exc:
             raise ConfigurationError(str(exc)) from exc
 
@@ -195,7 +212,7 @@ class RuntimeSettings:
                 api_key=env.get("FASTPPT_IMAGE_API_KEY") or env.get("FASTPPT_MODEL_API_KEY") or None,
                 timeout_seconds=int(env.get("FASTPPT_IMAGE_TIMEOUT_SECONDS", "180")),
             )
-            image.validate(production=mode == DeploymentMode.SERVER)
+            image.validate(production=mode == DeploymentMode.SERVER and not server_integration_fixtures)
         except Exception as exc:
             raise ConfigurationError(str(exc)) from exc
         return cls(

@@ -47,6 +47,51 @@ class RuntimeConfigTests(TestCase):
         self.assertEqual(settings.auth_mode, "session")
         self.assertEqual(settings.cors_origins, ("https://fastppt.example.com",))
 
+    def test_server_mode_rejects_unscoped_deterministic_agent(self) -> None:
+        with TemporaryDirectory() as temp_name, self.assertRaises(ConfigurationError):
+            RuntimeSettings.load(
+                {
+                    "FASTPPT_DEPLOYMENT_MODE": "server",
+                    "FASTPPT_DATABASE_URL": "postgresql://fastppt:password@postgres/fastppt",
+                    "FASTPPT_SESSION_SECRET": "s" * 32,
+                    "FASTPPT_S3_ENDPOINT": "https://objects.example.com",
+                    "FASTPPT_S3_BUCKET": "fastppt",
+                    "FASTPPT_S3_ACCESS_KEY": "access-key",
+                    "FASTPPT_S3_SECRET_KEY": "secret-key",
+                    "FASTPPT_ADMIN_EMAIL": "admin@example.com",
+                    "FASTPPT_ADMIN_PASSWORD": "correct-horse-battery-staple",
+                    "FASTPPT_CORS_ORIGINS": "https://fastppt.example.com",
+                    "FASTPPT_ENABLE_TEST_FIXTURES": "1",
+                    "FASTPPT_AGENT_BACKEND": "deterministic_test",
+                },
+                root=Path(temp_name),
+            )
+
+    def test_server_mode_allows_scoped_deterministic_fixture(self) -> None:
+        with TemporaryDirectory() as temp_name:
+            settings = RuntimeSettings.load(
+                {
+                    "FASTPPT_DEPLOYMENT_MODE": "server",
+                    "FASTPPT_SERVER_INTEGRATION": "1",
+                    "FASTPPT_ENABLE_TEST_FIXTURES": "1",
+                    "FASTPPT_AGENT_BACKEND": "deterministic_test",
+                    "FASTPPT_DATABASE_URL": "postgresql://fastppt:password@postgres/fastppt",
+                    "FASTPPT_SESSION_SECRET": "s" * 32,
+                    "FASTPPT_S3_ENDPOINT": "http://127.0.0.1:9000",
+                    "FASTPPT_ALLOW_INSECURE_S3": "1",
+                    "FASTPPT_S3_BUCKET": "fastppt",
+                    "FASTPPT_S3_ACCESS_KEY": "access-key",
+                    "FASTPPT_S3_SECRET_KEY": "secret-key",
+                    "FASTPPT_ADMIN_EMAIL": "admin@example.com",
+                    "FASTPPT_ADMIN_PASSWORD": "correct-horse-battery-staple",
+                    "FASTPPT_CORS_ORIGINS": "https://fastppt.example.com",
+                },
+                root=Path(temp_name),
+            )
+        self.assertTrue(settings.production)
+        self.assertFalse(settings.agent_production)
+        self.assertEqual(settings.agent.backend.value, "deterministic_test")
+
     def test_relay_requires_https_base_url(self) -> None:
         with TemporaryDirectory() as temp_name, self.assertRaises(ConfigurationError):
             RuntimeSettings.load(

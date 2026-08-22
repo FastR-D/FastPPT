@@ -177,7 +177,7 @@ class ApplicationService:
     async def _run_agent(self, project_id: str, request: AgentRequest) -> tuple[Any, str]:
         if self.settings.agent.backend == AgentBackend.UNCONFIGURED:
             raise ConflictError("No Agent provider is configured")
-        self.settings.agent.validate(production=self.settings.production)
+        self.settings.agent.validate(production=self.settings.agent_production)
         request_id = new_id("request")
         price, reserved = self._usage_reservation(self.settings)
         self.store.reserve_usage(
@@ -191,7 +191,7 @@ class ApplicationService:
         )
         self.store.update_usage(request_id, "submitted")
         try:
-            result = await self.harness.run(self.settings.agent, request, production=self.settings.production)
+            result = await self.harness.run(self.settings.agent, request, production=self.settings.agent_production)
         except AgentError as exc:
             state = "submission_unknown" if exc.submission_unknown else "failed"
             self.store.update_usage(request_id, state, error=exc.code)
@@ -291,7 +291,7 @@ class ApplicationService:
                 reasoning_effort=str(capability.get("reasoning_effort") or self.settings.agent.reasoning_effort),
                 timeout_seconds=int(capability.get("timeout_seconds") or self.settings.agent.timeout_seconds),
             )
-            settings.validate(production=self.settings.production)
+            settings.validate(production=self.settings.agent_production)
         except Exception as exc:
             raise ConflictError(f"Agent provider profile is unavailable: {exc}") from exc
         return settings, str(profile["profile_id"]), {"backend": settings.backend.value, "endpoint_mode": settings.endpoint_mode.value, "model": settings.model}
@@ -434,7 +434,7 @@ class ApplicationService:
                         PLAN_OUTPUT_SCHEMA,
                         {"role": role, "session_id": session_id, "summary": summary or {}},
                     ),
-                    production=self.settings.production,
+                    production=self.settings.agent_production,
                 )
             )
         except AgentError as exc:
@@ -460,7 +460,7 @@ class ApplicationService:
         self.store.update_agent_run(project_id, agent_run_id, status="running")
         try:
             # Worker jobs are synchronous; run the async SDK only here.
-            result = asyncio.run(self.harness.run(agent_settings, AgentRequest(str(payload.get("prompt", "")), dict(payload.get("output_schema") or PLAN_OUTPUT_SCHEMA), dict(payload.get("metadata") or {})), production=self.settings.production))
+            result = asyncio.run(self.harness.run(agent_settings, AgentRequest(str(payload.get("prompt", "")), dict(payload.get("output_schema") or PLAN_OUTPUT_SCHEMA), dict(payload.get("metadata") or {})), production=self.settings.agent_production))
             output_artifact = self._record_artifact(project_id, "agent_output", json.dumps(result.output, ensure_ascii=False, sort_keys=True).encode("utf-8"), "application/json")
             settled = {"usage": result.usage or {}, "amount": 0, "currency": "CNY"}
             self.store.update_usage(run["usage_request_id"], "settled", settled=settled)
@@ -1954,7 +1954,7 @@ class ApplicationService:
             "metadata_store": self.store.health(),
             "artifact_store": self.artifacts.health(),
             "queue": {"status": "ready", "backend": self.settings.queue_backend, "worker": self.store.worker_health("worker")},
-            "model": self.harness.probe(self.settings.agent, production=self.settings.production),
+            "model": self.harness.probe(self.settings.agent, production=self.settings.agent_production),
             "render_worker": self.store.worker_health("render") | {"backend": self.settings.render_backend},
             "kernel": self.adapter.probe(),
             "deployment": self.settings.public_summary(),

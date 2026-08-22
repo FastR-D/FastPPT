@@ -57,9 +57,12 @@ class ServerBackendIntegrationTests(TestCase):
                         "FASTPPT_ADMIN_EMAIL": "admin@fastppt.invalid",
                         "FASTPPT_ADMIN_PASSWORD": "server-integration-password",
                         "FASTPPT_CORS_ORIGINS": "https://fastppt.example",
-                        "FASTPPT_AGENT_BACKEND": "codex",
-                        "FASTPPT_MODEL": "gpt-5.2",
-                        "FASTPPT_MODEL_API_KEY": "integration-placeholder-key",
+                        # Server storage and queue paths are real; provider calls stay
+                        # deterministic so CI never treats a placeholder key as evidence.
+                        "FASTPPT_SERVER_INTEGRATION": "1",
+                        "FASTPPT_ENABLE_TEST_FIXTURES": "1",
+                        "FASTPPT_AGENT_BACKEND": "deterministic_test",
+                        "FASTPPT_MODEL": "fastppt-deterministic",
                         "FASTPPT_RENDER_BACKEND": "unavailable",
                     }
                 )
