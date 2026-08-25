@@ -1078,6 +1078,256 @@ describe('gateway', () => {
     })
   })
 
+  it('tracks image candidates until an explicit acceptance decision', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-image-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    await mkdir(join(root, 'assets', 'generated'), { recursive: true })
+    writeFileSync(
+      join(root, 'assets', 'generated', 'slide-01-visual.png'),
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    )
+    const app = await makeApp(root)
+    const decks = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )
+    const deckId = decks[0]?.id
+    expect(deckId).toBeTruthy()
+    const run = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-runs`,
+      payload: {
+        slide: 1,
+        purpose: 'generate',
+        prompt: 'An abstract blue mechanism with open space for editable text.',
+      },
+    })
+    expect(run.statusCode).toBe(200)
+    const imageRun = run.json()
+    expect(imageRun.status).toBe('draft')
+
+    const candidate = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: {
+        path: 'assets/generated/slide-01-visual.png',
+        runId: imageRun.id,
+        source: 'generated',
+      },
+    })
+    expect(candidate.statusCode).toBe(200)
+    const imageAsset = candidate.json()
+    expect(imageAsset).toMatchObject({ accepted: false, source: 'generated' })
+
+    const candidateReady = await app.inject({
+      method: 'GET',
+      url: `/api/v1/image-runs/${imageRun.id}`,
+    })
+    expect(candidateReady.json()).toMatchObject({ status: 'candidate-ready' })
+
+    const accepted = await app.inject({
+      method: 'POST',
+      url: `/api/v1/image-assets/${imageAsset.id}/decision`,
+      payload: { accepted: true },
+    })
+    expect(accepted.statusCode).toBe(200)
+    expect(accepted.json()).toMatchObject({ accepted: true })
+    expect(
+      (
+        await app.inject({
+          method: 'GET',
+          url: `/api/v1/decks/${String(deckId)}/image-runs`,
+        })
+      ).json(),
+    ).toEqual([expect.objectContaining({ status: 'accepted' })])
+
+    const repeatedDecision = await app.inject({
+      method: 'POST',
+      url: `/api/v1/image-assets/${imageAsset.id}/decision`,
+      payload: { accepted: false },
+    })
+    expect(repeatedDecision.statusCode).toBe(409)
+  })
+
+  it('keeps an image run open after rejecting a candidate', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-image-retry-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    await mkdir(join(root, 'assets', 'generated'), { recursive: true })
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    writeFileSync(join(root, 'assets', 'generated', 'candidate-a.png'), png)
+    writeFileSync(
+      join(root, 'assets', 'generated', 'candidate-b.png'),
+      Buffer.concat([png, Buffer.from([1])]),
+    )
+    const app = await makeApp(root)
+    const deckId = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]?.id
+    const run = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-runs`,
+      payload: { slide: 1, purpose: 'variation', prompt: 'A revised visual.' },
+    })
+    const imageRun = run.json()
+    const first = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: {
+        path: 'assets/generated/candidate-a.png',
+        runId: imageRun.id,
+        source: 'generated',
+      },
+    })
+    const rejected = await app.inject({
+      method: 'POST',
+      url: `/api/v1/image-assets/${first.json().id}/decision`,
+      payload: { accepted: false },
+    })
+    expect(rejected.json()).toMatchObject({
+      status: 'rejected',
+      accepted: false,
+    })
+    const second = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: {
+        path: 'assets/generated/candidate-b.png',
+        runId: imageRun.id,
+        source: 'generated',
+      },
+    })
+    expect(second.statusCode).toBe(200)
+    expect(
+      (
+        await app.inject({
+          method: 'GET',
+          url: `/api/v1/image-runs/${imageRun.id}`,
+        })
+      ).json(),
+    ).toMatchObject({ status: 'candidate-ready' })
+  })
+
+  it('requires registered image assets to be accepted and unchanged', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-image-link-'))
+    const imagePath = 'assets/generated/visual.png'
+    writeFileSync(
+      join(root, 'slides.md'),
+      `---\ntheme: slidev-theme-academy\n---\n# Test\n\n![Visual](./${imagePath})\n`,
+    )
+    await mkdir(join(root, 'assets', 'generated'), { recursive: true })
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    writeFileSync(join(root, imagePath), png)
+    const app = await makeApp(root)
+    const deckId = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]?.id
+    const candidate = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: { path: imagePath, source: 'manual' },
+    })
+    const imageAsset = candidate.json()
+    const unaccepted = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/validate`,
+    })
+    expect(unaccepted.json()).toMatchObject({
+      valid: false,
+      errors: expect.arrayContaining([
+        expect.objectContaining({ code: 'IMAGE_ASSET_UNACCEPTED' }),
+      ]),
+    })
+    const blockedExport = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/exports`,
+      payload: { format: 'editable-pptx', outputName: 'blocked.pptx' },
+    })
+    expect(blockedExport.statusCode).toBe(400)
+    expect(blockedExport.json()).toMatchObject({
+      error: { code: 'DECK_VALIDATION_FAILED' },
+    })
+    await app.inject({
+      method: 'POST',
+      url: `/api/v1/image-assets/${imageAsset.id}/decision`,
+      payload: { accepted: true },
+    })
+    expect(
+      (
+        await app.inject({
+          method: 'POST',
+          url: `/api/v1/decks/${String(deckId)}/validate`,
+        })
+      ).json(),
+    ).toMatchObject({ valid: true })
+    writeFileSync(join(root, imagePath), Buffer.concat([png, Buffer.from([1])]))
+    const changed = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/validate`,
+    })
+    expect(changed.json()).toMatchObject({
+      valid: false,
+      errors: expect.arrayContaining([
+        expect.objectContaining({ code: 'IMAGE_ASSET_CHANGED' }),
+      ]),
+    })
+  })
+
+  it('requires provenance for remotely sourced image assets', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-image-origin-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    await mkdir(join(root, 'assets', 'sources'), { recursive: true })
+    writeFileSync(
+      join(root, 'assets', 'sources', 'photo.png'),
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    )
+    const app = await makeApp(root)
+    const deckId = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]?.id
+    const missingProvenance = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: { path: 'assets/sources/photo.png', source: 'remote' },
+    })
+    expect(missingProvenance.statusCode).toBe(400)
+    const insecureProvenance = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: {
+        path: 'assets/sources/photo.png',
+        source: 'remote',
+        sourceUrl: 'http://images.example.org/photo.png',
+        license: 'CC BY 4.0',
+      },
+    })
+    expect(insecureProvenance.statusCode).toBe(400)
+    const registered = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/image-assets`,
+      payload: {
+        path: 'assets/sources/photo.png',
+        source: 'remote',
+        sourceUrl: 'https://images.example.org/photo.png',
+        license: 'CC BY 4.0',
+        attribution: 'Example photographer',
+      },
+    })
+    expect(registered.statusCode).toBe(200)
+    expect(registered.json()).toMatchObject({
+      sourceUrl: 'https://images.example.org/photo.png',
+      license: 'CC BY 4.0',
+      attribution: 'Example photographer',
+    })
+  })
+
   it('dry-runs formatting and reports invalid frontmatter without writing', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const source = '---\ntheme: slidev-theme-academy\n---\n#  Title\n'
@@ -1459,7 +1709,9 @@ describe('gateway', () => {
     expect(result.themeId).toBe('slidev-theme-import-test')
     expect(result.skillId).toBe('fastppt-theme-import-test')
     expect(
-      existsSync(join(fixtureThemes, 'slidev-theme-import-test', 'package.json')),
+      existsSync(
+        join(fixtureThemes, 'slidev-theme-import-test', 'package.json'),
+      ),
     ).toBe(true)
     const status = await app.inject({
       method: 'GET',

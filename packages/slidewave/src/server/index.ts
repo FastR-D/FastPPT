@@ -92,6 +92,16 @@ export async function writeEditablePptx(
       buffer = result.buffer
     }
     const qa = await validateEditablePptx(buffer, snapshot.slides.length)
+    if (!qa.ok) {
+      const detail = qa.issues
+        .map((issue) =>
+          issue.slide === undefined
+            ? `${issue.code}: ${issue.message}`
+            : `slide ${issue.slide} ${issue.code}: ${issue.message}`,
+        )
+        .join('; ')
+      throw new Error(`Editable PPTX quality gate failed: ${detail}`)
+    }
     await writeFile(outputPath, Buffer.from(buffer))
     return {
       warnings,

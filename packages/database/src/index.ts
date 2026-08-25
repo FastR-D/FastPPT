@@ -6,6 +6,8 @@ import BetterSqlite3 from 'better-sqlite3'
 import {
   DeckQualityReportSchema,
   ExportJobSchema,
+  ImageAssetSchema,
+  ImageRunSchema,
   SessionDeckProfileSchema,
   SessionProfileRecordSchema,
 } from '@fastppt/protocol'
@@ -16,6 +18,8 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import type {
   DeckQualityReport,
   ExportJob,
+  ImageAsset,
+  ImageRun,
   SessionDeckProfile,
   SessionProfileRecord,
 } from '@fastppt/protocol'
@@ -181,6 +185,12 @@ export interface FastPptDatabase {
   recoverInterruptedExports(): ExportJob[]
   recordQualityReport(report: DeckQualityReport): void
   getQualityReport(deckId: string): DeckQualityReport | undefined
+  recordImageRun(run: ImageRun): void
+  getImageRun(imageRunId: string): ImageRun | undefined
+  listImageRuns(deckId: string): ImageRun[]
+  recordImageAsset(asset: ImageAsset): void
+  getImageAsset(imageAssetId: string): ImageAsset | undefined
+  listImageAssets(deckId: string): ImageAsset[]
   close(): void
 }
 
@@ -268,7 +278,8 @@ export function createDatabase(filename: string): FastPptDatabase {
         observationEvidence:
           evidence === undefined ? null : JSON.stringify(evidence),
         sessionProfile:
-          typeof data.sessionProfile === 'object' && data.sessionProfile !== null
+          typeof data.sessionProfile === 'object' &&
+          data.sessionProfile !== null
             ? JSON.stringify(data.sessionProfile)
             : null,
         profileDigest:
@@ -443,6 +454,52 @@ export function createDatabase(filename: string): FastPptDatabase {
   const selectQualityReport = sqlite.prepare(
     'SELECT report FROM quality_reports WHERE deck_id = ?',
   )
+  const upsertImageRun = sqlite.prepare(`
+    INSERT INTO image_runs (
+      image_run_id, deck_id, deck_revision, slide_number, status,
+      created_at, updated_at, payload
+    ) VALUES (
+      @id, @deckId, @deckRevision, @slide, @status,
+      @createdAt, @updatedAt, @payload
+    )
+    ON CONFLICT(image_run_id) DO UPDATE SET
+      status = excluded.status,
+      updated_at = excluded.updated_at,
+      payload = excluded.payload
+  `)
+  const selectImageRun = sqlite.prepare(
+    'SELECT payload FROM image_runs WHERE image_run_id = ?',
+  )
+  const selectImageRuns = sqlite.prepare(
+    'SELECT payload FROM image_runs WHERE deck_id = ? ORDER BY created_at DESC',
+  )
+  const upsertImageAsset = sqlite.prepare(`
+    INSERT INTO image_assets (
+      image_asset_id, deck_id, image_run_id, path, sha256, media_type,
+      source, source_url, license, attribution, status, accepted, created_at, payload
+    ) VALUES (
+      @id, @deckId, @runId, @path, @sha256, @mediaType,
+      @source, @sourceUrl, @license, @attribution, @status, @accepted, @createdAt, @payload
+    )
+    ON CONFLICT(image_asset_id) DO UPDATE SET
+      image_run_id = excluded.image_run_id,
+      path = excluded.path,
+      sha256 = excluded.sha256,
+      media_type = excluded.media_type,
+      source = excluded.source,
+      source_url = excluded.source_url,
+      license = excluded.license,
+      attribution = excluded.attribution,
+      status = excluded.status,
+      accepted = excluded.accepted,
+      payload = excluded.payload
+  `)
+  const selectImageAsset = sqlite.prepare(
+    'SELECT payload FROM image_assets WHERE image_asset_id = ?',
+  )
+  const selectImageAssets = sqlite.prepare(
+    'SELECT payload FROM image_assets WHERE deck_id = ? ORDER BY created_at DESC',
+  )
 
   return {
     db,
@@ -530,10 +587,8 @@ export function createDatabase(filename: string): FastPptDatabase {
       updateApproval.run(decision, new Date().toISOString(), approvalId)
     },
     expirePendingApprovals(decision): number {
-      return expirePendingApprovals.run(
-        decision,
-        new Date().toISOString(),
-      ).changes
+      return expirePendingApprovals.run(decision, new Date().toISOString())
+        .changes
     },
     getPendingApprovals(): Array<{ harness: string; payload: unknown }> {
       return (
@@ -647,11 +702,51 @@ export function createDatabase(filename: string): FastPptDatabase {
     },
     getQualityReport(deckId): DeckQualityReport | undefined {
       const row = selectQualityReport.get(deckId) as
-        | { report: string }
-        | undefined
+        { report: string } | undefined
       return row
         ? DeckQualityReportSchema.parse(JSON.parse(row.report))
         : undefined
+    },
+    recordImageRun(run): void {
+      const parsed = ImageRunSchema.parse(run)
+      upsertImageRun.run({ ...parsed, payload: JSON.stringify(parsed) })
+    },
+    getImageRun(imageRunId): ImageRun | undefined {
+      const row = selectImageRun.get(imageRunId) as
+        { payload: string } | undefined
+      return row
+        ? ImageRunSchema.parse(JSON.parse(row.payload) as unknown)
+        : undefined
+    },
+    listImageRuns(deckId): ImageRun[] {
+      return (selectImageRuns.all(deckId) as Array<{ payload: string }>).map(
+        (row) => ImageRunSchema.parse(JSON.parse(row.payload) as unknown),
+      )
+    },
+    recordImageAsset(asset): void {
+      const parsed = ImageAssetSchema.parse(asset)
+      upsertImageAsset.run({
+        ...parsed,
+        runId: parsed.runId ?? null,
+        sourceUrl: parsed.sourceUrl ?? null,
+        license: parsed.license ?? null,
+        attribution: parsed.attribution ?? null,
+        status: parsed.status,
+        accepted: parsed.accepted ? 1 : 0,
+        payload: JSON.stringify(parsed),
+      })
+    },
+    getImageAsset(imageAssetId): ImageAsset | undefined {
+      const row = selectImageAsset.get(imageAssetId) as
+        { payload: string } | undefined
+      return row
+        ? ImageAssetSchema.parse(JSON.parse(row.payload) as unknown)
+        : undefined
+    },
+    listImageAssets(deckId): ImageAsset[] {
+      return (selectImageAssets.all(deckId) as Array<{ payload: string }>).map(
+        (row) => ImageAssetSchema.parse(JSON.parse(row.payload) as unknown),
+      )
     },
     close(): void {
       sqlite.close()

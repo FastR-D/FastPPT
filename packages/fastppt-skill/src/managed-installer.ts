@@ -50,7 +50,7 @@ type Marker = z.infer<typeof MarkerSchema>
 
 interface SkillArtifact {
   id: string
-  kind: 'base' | 'theme'
+  kind: 'base' | 'capability' | 'theme'
   themeId?: string
   version: string
   sourceDir: string
@@ -265,6 +265,20 @@ export class ManagedSkillInstaller {
         kind: 'base',
         version: '0.1.0',
         sourceDir: join(this.#commonSkillRoot, 'page-edit'),
+        registryVersion: this.#registry.version,
+      },
+      {
+        id: 'fastppt-image-production',
+        kind: 'capability',
+        version: '0.1.0',
+        sourceDir: join(this.#commonSkillRoot, 'image-production'),
+        registryVersion: this.#registry.version,
+      },
+      {
+        id: 'fastppt-editable-visuals',
+        kind: 'capability',
+        version: '0.1.0',
+        sourceDir: join(this.#commonSkillRoot, 'editable-visuals'),
         registryVersion: this.#registry.version,
       },
       ...this.#registry.themes.map((theme) => ({
@@ -583,7 +597,11 @@ export class McpConfigManager {
           : 'fastppt MCP 配置已写入 .mcp.json，等待 Claude Code 信任授权。'
       return McpConfigStatusSchema.parse({
         harness: 'claude',
-        state: matching ? (trusted ? 'configured' : 'pending-trust') : 'conflict',
+        state: matching
+          ? trusted
+            ? 'configured'
+            : 'pending-trust'
+          : 'conflict',
         configPath,
         managed: matching || legacy,
         ...(message ? { message } : {}),
@@ -630,9 +648,9 @@ export class McpConfigManager {
     )
     if (!(await exists(settingsPath))) return false
     try {
-      const settings = JSON.parse(
-        await readFile(settingsPath, 'utf8'),
-      ) as { enabledMcpjsonServers?: unknown }
+      const settings = JSON.parse(await readFile(settingsPath, 'utf8')) as {
+        enabledMcpjsonServers?: unknown
+      }
       return (
         Array.isArray(settings.enabledMcpjsonServers) &&
         settings.enabledMcpjsonServers.includes('fastppt')
@@ -689,7 +707,8 @@ export class McpConfigManager {
         state: 'pending-trust',
         configPath,
         managed: true,
-        message: 'fastppt MCP 配置已写入 .codex/config.toml；首次在 Codex 中信任该项目后即启用。',
+        message:
+          'fastppt MCP 配置已写入 .codex/config.toml；首次在 Codex 中信任该项目后即启用。',
       })
     const legacyBlock = legacyCodexBlock(source, this.#options)
     if (legacyBlock)

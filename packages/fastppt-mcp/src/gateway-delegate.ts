@@ -6,11 +6,16 @@ import {
   DeckQualityReportSchema,
   DeckSummarySchema,
   ExportJobSchema,
+  ImageAssetSchema,
+  ImageRunSchema,
   SlidevProcessStateSchema,
 } from '@fastppt/protocol'
 import { z } from 'zod'
 
-import type { BrowserCaptureDelegate } from './server.js'
+import type {
+  BrowserCaptureDelegate,
+  ImageProductionDelegate,
+} from './server.js'
 
 const RuntimeSchema = z.object({
   version: z.literal(1),
@@ -28,7 +33,9 @@ const RuntimeSchema = z.object({
 
 const WAIT_INTERVAL_MS = 250
 
-export class GatewayBrowserCaptureDelegate implements BrowserCaptureDelegate {
+export class GatewayBrowserCaptureDelegate
+  implements BrowserCaptureDelegate, ImageProductionDelegate
+{
   readonly #workspaceRoot: string
 
   constructor(workspaceRoot: string) {
@@ -57,7 +64,10 @@ export class GatewayBrowserCaptureDelegate implements BrowserCaptureDelegate {
     const job = await this.#request(
       `/api/v1/decks/${encodeURIComponent(deck.id)}/inspections/quality`,
       BrowserInspectionJobSchema,
-      { method: 'POST', body: JSON.stringify({ slide: input.slide, policy: 'standard' }) },
+      {
+        method: 'POST',
+        body: JSON.stringify({ slide: input.slide, policy: 'standard' }),
+      },
     )
     const completed = await this.#wait(
       `/api/v1/inspections/${encodeURIComponent(job.id)}`,
@@ -129,6 +139,83 @@ export class GatewayBrowserCaptureDelegate implements BrowserCaptureDelegate {
       ...completed,
       path: outputPath,
     }
+  }
+
+  async createImageRun(input: {
+    path: string
+    slide: number
+    purpose: 'generate' | 'edit' | 'variation'
+    prompt: string
+    inputAssetIds: string[]
+  }) {
+    const deck = await this.#resolveDeck(input.path)
+    return await this.#request(
+      `/api/v1/decks/${encodeURIComponent(deck.id)}/image-runs`,
+      ImageRunSchema,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          slide: input.slide,
+          purpose: input.purpose,
+          prompt: input.prompt,
+          inputAssetIds: input.inputAssetIds,
+        }),
+      },
+    )
+  }
+
+  async listImageRuns(path: string) {
+    const deck = await this.#resolveDeck(path)
+    return await this.#request(
+      `/api/v1/decks/${encodeURIComponent(deck.id)}/image-runs`,
+      z.array(ImageRunSchema),
+    )
+  }
+
+  async listImageAssets(path: string) {
+    const deck = await this.#resolveDeck(path)
+    return await this.#request(
+      `/api/v1/decks/${encodeURIComponent(deck.id)}/image-assets`,
+      z.array(ImageAssetSchema),
+    )
+  }
+
+  async registerImageAsset(input: {
+    path: string
+    destinationPath: string
+    runId?: string | undefined
+    source: 'generated' | 'remote'
+    sourceUrl?: string | undefined
+    license?: string | undefined
+    attribution?: string | undefined
+  }) {
+    const deck = await this.#resolveDeck(input.path)
+    return await this.#request(
+      `/api/v1/decks/${encodeURIComponent(deck.id)}/image-assets`,
+      ImageAssetSchema,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          path: input.destinationPath,
+          ...(input.runId ? { runId: input.runId } : {}),
+          source: input.source,
+          ...(input.sourceUrl ? { sourceUrl: input.sourceUrl } : {}),
+          ...(input.license ? { license: input.license } : {}),
+          ...(input.attribution ? { attribution: input.attribution } : {}),
+        }),
+      },
+    )
+  }
+
+  async decideImageCandidate(input: {
+    imageAssetId: string
+    accepted: boolean
+  }) {
+    return await this.#request(
+      `/api/v1/image-assets/${encodeURIComponent(input.imageAssetId)}/decision`,
+      ImageAssetSchema,
+      { method: 'POST', body: JSON.stringify({ accepted: input.accepted }) },
+    )
   }
 
   async #resolveDeck(path: string) {

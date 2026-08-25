@@ -37,6 +37,7 @@ const extractorPath = resolve(
   dirname(fileURLToPath(import.meta.url)),
   '../../../scripts/extract-theme.mjs',
 )
+const gatewayDelegate = new GatewayBrowserCaptureDelegate(workspaceRoot)
 const service = new FastPptMcpService({
   workspace,
   workspaceName: basename(workspaceRoot),
@@ -44,7 +45,8 @@ const service = new FastPptMcpService({
   commonSkillRoot: resolve(input.commonSkillRoot),
   themesRoot: resolve(input.themesRoot),
   extractorPath,
-  browserCapture: new GatewayBrowserCaptureDelegate(workspaceRoot),
+  browserCapture: gatewayDelegate,
+  imageProduction: gatewayDelegate,
 })
 const server = createFastPptMcpServer(service)
 await server.connect(new StdioServerTransport())

@@ -34,6 +34,10 @@ describe('database', () => {
       { name: '0000_initial.sql' },
       { name: '0001_application_state.sql' },
       { name: '0002_run_resolution_status.sql' },
+      { name: '0003_session_profiles_and_quality.sql' },
+      { name: '0004_image_production.sql' },
+      { name: '0005_image_asset_status.sql' },
+      { name: '0006_image_asset_provenance.sql' },
     ])
     first.recordWorkspace({
       id: 'workspace-1',
@@ -51,8 +55,56 @@ describe('database', () => {
       reopened.sqlite
         .prepare('SELECT COUNT(*) AS count FROM schema_migrations')
         .get(),
-    ).toEqual({ count: 3 })
+    ).toEqual({ count: 7 })
     reopened.close()
+  })
+
+  it('persists image runs and candidate assets by deck', () => {
+    const database = createDatabase(':memory:')
+    const imageRun = {
+      id: 'b81dac69-e1b4-4c42-8d87-645ef3d8a0e5',
+      deckId: 'deck-1',
+      deckRevision: 'revision-1',
+      slide: 4,
+      purpose: 'generate' as const,
+      prompt: 'A blue abstract mechanism with space for editable text.',
+      status: 'candidate-ready' as const,
+      inputAssetIds: [],
+      createdAt: '2026-08-22T00:00:00.000Z',
+      updatedAt: '2026-08-22T00:01:00.000Z',
+    }
+    const imageAsset = {
+      id: '1afd8b75-4f42-4eb8-b92f-0ee4e6f4b2f1',
+      deckId: 'deck-1',
+      runId: imageRun.id,
+      path: 'assets/generated/slide-04-mechanism-v1.png',
+      sha256: 'a'.repeat(64),
+      mediaType: 'image/png' as const,
+      source: 'generated' as const,
+      sourceUrl: 'https://images.example.org/visual.png',
+      license: 'CC BY 4.0',
+      attribution: 'Example Studio',
+      status: 'candidate' as const,
+      accepted: false,
+      createdAt: '2026-08-22T00:01:00.000Z',
+    }
+    database.recordImageRun(imageRun)
+    database.recordImageAsset(imageAsset)
+    expect(database.getImageRun(imageRun.id)).toEqual(imageRun)
+    expect(database.listImageRuns('deck-1')).toEqual([imageRun])
+    expect(database.getImageAsset(imageAsset.id)).toEqual(imageAsset)
+    expect(database.listImageAssets('deck-1')).toEqual([imageAsset])
+
+    database.recordImageAsset({
+      ...imageAsset,
+      status: 'accepted',
+      accepted: true,
+    })
+    expect(database.getImageAsset(imageAsset.id)).toMatchObject({
+      status: 'accepted',
+      accepted: true,
+    })
+    database.close()
   })
 
   it('persists an auditable Skill invocation timeline for a run', () => {

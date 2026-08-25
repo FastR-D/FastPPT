@@ -27,8 +27,13 @@ export const FASTPPT_MCP_TOOL_NAMES = [
   'format_slides',
   'validate_slides',
   'list_assets',
+  'inspect_svg_asset',
+  'create_image_run',
+  'list_image_runs',
+  'list_image_assets',
   'import_generated_image',
   'import_remote_image',
+  'decide_image_candidate',
   'inspect_slide',
   'inspect_overflow',
   'inspect_quality',
@@ -65,12 +70,31 @@ const IconSearchInputSchema = z.object({
   prefix: z.string().min(1).optional(),
 })
 const ImportGeneratedImageInputSchema = z.object({
+  deckPath: z.string().min(1).default('slides.md'),
   sourcePath: z.string().min(1),
   destinationPath: z.string().min(1),
+  runId: z.string().uuid().optional(),
 })
 const ImportRemoteImageInputSchema = z.object({
+  deckPath: z.string().min(1).default('slides.md'),
   url: z.string().url(),
   destinationPath: z.string().min(1),
+  runId: z.string().uuid().optional(),
+  license: z.string().trim().min(1).max(300),
+  attribution: z.string().trim().min(1).max(1_000).optional(),
+})
+const CreateImageRunInputSchema = DeckPathSchema.extend({
+  slide: z.number().int().positive(),
+  purpose: z.enum(['generate', 'edit', 'variation']),
+  prompt: z.string().trim().min(1).max(8_000),
+  inputAssetIds: z.array(z.string().uuid()).max(8).optional(),
+})
+const ImageCandidateDecisionInputSchema = z.object({
+  imageAssetId: z.string().uuid(),
+  accepted: z.boolean(),
+})
+const SvgAssetInputSchema = z.object({
+  path: z.string().min(1),
 })
 
 const MAX_REMOTE_IMAGE_BYTES = 10 * 1024 * 1024
@@ -84,8 +108,94 @@ const IMAGE_MEDIA_TYPES = {
 } as const
 type ImageMediaType = (typeof IMAGE_MEDIA_TYPES)[keyof typeof IMAGE_MEDIA_TYPES]
 
+const SVG_NATIVE_ELEMENTS = [
+  'circle',
+  'ellipse',
+  'line',
+  'path',
+  'polygon',
+  'polyline',
+  'rect',
+  'text',
+] as const
+
+export interface SvgAssetInspection {
+  path: string
+  valid: boolean
+  safeForWorkspace: boolean
+  recommendation: 'embed-vector' | 'rebuild-natively' | 'blocked'
+  elements: Record<string, number>
+  blockers: string[]
+  warnings: string[]
+  nativeRebuildCandidates: string[]
+}
+
 function isImageMediaType(value: string): value is ImageMediaType {
   return (Object.values(IMAGE_MEDIA_TYPES) as readonly string[]).includes(value)
+}
+
+function svgElementCount(svg: string, name: string): number {
+  return (svg.match(new RegExp(`<${name}(?:\\s|/|>)`, 'gi')) ?? []).length
+}
+
+function inspectSvgMarkup(path: string, svg: string): SvgAssetInspection {
+  const blockers: string[] = []
+  const warnings: string[] = []
+  const elements: Record<(typeof SVG_NATIVE_ELEMENTS)[number], number> = {
+    circle: svgElementCount(svg, 'circle'),
+    ellipse: svgElementCount(svg, 'ellipse'),
+    line: svgElementCount(svg, 'line'),
+    path: svgElementCount(svg, 'path'),
+    polygon: svgElementCount(svg, 'polygon'),
+    polyline: svgElementCount(svg, 'polyline'),
+    rect: svgElementCount(svg, 'rect'),
+    text: svgElementCount(svg, 'text'),
+  }
+  const valid = /^\s*<svg(?:\s|>)/i.test(svg) && /<\/svg>\s*$/i.test(svg)
+  if (!valid) blockers.push('The file must contain one complete SVG document.')
+  if (/<(?:script|iframe|object|embed)\b/i.test(svg))
+    blockers.push(
+      'Active or embedded HTML content is not permitted in SVG assets.',
+    )
+  if (/\son[a-z]+\s*=/i.test(svg))
+    blockers.push('SVG event-handler attributes are not permitted.')
+  if (/\b(?:href|xlink:href)\s*=\s*["'](?:https?:)?\/\//i.test(svg))
+    blockers.push('External SVG resources are not portable.')
+  if (/\b(?:href|xlink:href)\s*=\s*["'](?:file:|\/)/i.test(svg))
+    blockers.push('Absolute filesystem SVG resources are not permitted.')
+  if (/<foreignObject\b/i.test(svg))
+    warnings.push(
+      'foreignObject is browser-specific; rebuild this content with native HTML or Slidev components.',
+    )
+  if (/<(?:animate|animateMotion|animateTransform|set)\b/i.test(svg))
+    warnings.push('SVG animation is not preserved in editable PPTX export.')
+  if (/<(?:filter|mask|clipPath|pattern)\b/i.test(svg))
+    warnings.push(
+      'SVG effects may not match PowerPoint; use a simpler vector or native Slidev composition.',
+    )
+  if (/<(?:image|use)\b/i.test(svg))
+    warnings.push(
+      'Referenced SVG content may not become editable PowerPoint objects.',
+    )
+
+  const nativeRebuildCandidates = SVG_NATIVE_ELEMENTS.filter(
+    (name) => elements[name] > 0,
+  )
+  const safeForWorkspace = blockers.length === 0
+  return {
+    path,
+    valid,
+    safeForWorkspace,
+    recommendation: !safeForWorkspace
+      ? 'blocked'
+      : warnings.length > 0
+        ? 'rebuild-natively'
+        : 'embed-vector',
+    elements,
+    blockers,
+    warnings,
+    nativeRebuildCandidates,
+  }
 }
 
 export interface BrowserCaptureDelegate {
@@ -105,6 +215,31 @@ export interface BrowserCaptureDelegate {
   getPreviewStatus(path: string): Promise<Record<string, unknown>>
 }
 
+export interface ImageProductionDelegate {
+  createImageRun(input: {
+    path: string
+    slide: number
+    purpose: 'generate' | 'edit' | 'variation'
+    prompt: string
+    inputAssetIds: string[]
+  }): Promise<Record<string, unknown>>
+  listImageRuns(path: string): Promise<Record<string, unknown>[]>
+  listImageAssets(path: string): Promise<Record<string, unknown>[]>
+  registerImageAsset(input: {
+    path: string
+    destinationPath: string
+    runId?: string | undefined
+    source: 'generated' | 'remote'
+    sourceUrl?: string | undefined
+    license?: string | undefined
+    attribution?: string | undefined
+  }): Promise<Record<string, unknown>>
+  decideImageCandidate(input: {
+    imageAssetId: string
+    accepted: boolean
+  }): Promise<Record<string, unknown>>
+}
+
 export interface FastPptMcpServiceOptions {
   workspace: WorkspaceService
   workspaceName: string
@@ -115,6 +250,7 @@ export interface FastPptMcpServiceOptions {
   /** Absolute path to `scripts/extract-theme.mjs`. */
   extractorPath: string
   browserCapture?: BrowserCaptureDelegate
+  imageProduction?: ImageProductionDelegate
   generatedImagesRoot?: string
   fetch?: typeof fetch
 }
@@ -174,7 +310,9 @@ function slideChunks(source: string): string[] {
 }
 
 function imagePaths(source: string): string[] {
-  const markdown = [...source.matchAll(/!\[[^\]]*\]\(([^)\s]+)(?:\s+['"][^'"]*['"])?\)/g)]
+  const markdown = [
+    ...source.matchAll(/!\[[^\]]*\]\(([^)\s]+)(?:\s+['"][^'"]*['"])?\)/g),
+  ]
   const html = [...source.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)]
   return [...markdown, ...html]
     .map((match) => match[1] ?? '')
@@ -185,6 +323,7 @@ export class FastPptMcpService {
   readonly #options: FastPptMcpServiceOptions
   readonly #installer: ManagedSkillInstaller
   readonly #browserCapture: BrowserCaptureDelegate | undefined
+  readonly #imageProduction: ImageProductionDelegate | undefined
   readonly #generatedImagesRoot: string | undefined
   readonly #themesRoot: string
   readonly #extractorPath: string
@@ -199,6 +338,7 @@ export class FastPptMcpService {
       registry: options.registry,
     })
     this.#browserCapture = options.browserCapture
+    this.#imageProduction = options.imageProduction
     this.#generatedImagesRoot = options.generatedImagesRoot
       ? resolve(options.generatedImagesRoot)
       : process.env.CODEX_HOME
@@ -294,8 +434,17 @@ export class FastPptMcpService {
   /** Materialize a harness-designed set of layouts + components into a theme. */
   async designThemeLayouts(
     themeId: string,
-    layouts: Array<{ id: string; label: string; kind: string; hint?: string | undefined }>,
-    components: Array<{ name: string; kind: string; hint?: string | undefined }>,
+    layouts: Array<{
+      id: string
+      label: string
+      kind: string
+      hint?: string | undefined
+    }>,
+    components: Array<{
+      name: string
+      kind: string
+      hint?: string | undefined
+    }>,
   ) {
     const themeDir = join(this.#themesRoot, themeId)
     await access(join(themeDir, 'package.json'))
@@ -370,6 +519,14 @@ export class FastPptMcpService {
       )
       try {
         await this.#options.workspace.assertFileAvailable(relativeAsset)
+        if (/\.svg$/i.test(relativeAsset)) {
+          const inspection = await this.inspectSvgAsset(relativeAsset)
+          for (const blocker of inspection.blockers)
+            errors.push({
+              code: 'SVG_ASSET_UNSAFE',
+              message: `SVG asset cannot be used: ${asset}. ${blocker}`,
+            })
+        }
       } catch {
         errors.push({
           code: 'ASSET_UNAVAILABLE',
@@ -401,7 +558,43 @@ export class FastPptMcpService {
     return { assets: flatten(nodes) }
   }
 
-  async importGeneratedImage(sourcePath: string, destinationPath: string) {
+  async inspectSvgAsset(path: string): Promise<SvgAssetInspection> {
+    if (!/\.svg$/i.test(path))
+      throw new Error('SVG asset inspection requires a .svg workspace file.')
+    const file = await this.#options.workspace.readTextFile(path)
+    return inspectSvgMarkup(file.path, file.content)
+  }
+
+  async createImageRun(input: z.infer<typeof CreateImageRunInputSchema>) {
+    if (!this.#imageProduction)
+      throw new Error('Image production requires an active FastPPT Gateway.')
+    return await this.#imageProduction.createImageRun({
+      path: input.path,
+      slide: input.slide,
+      purpose: input.purpose,
+      prompt: input.prompt,
+      inputAssetIds: input.inputAssetIds ?? [],
+    })
+  }
+
+  async listImageRuns(path = 'slides.md') {
+    if (!this.#imageProduction)
+      throw new Error('Image production requires an active FastPPT Gateway.')
+    return { imageRuns: await this.#imageProduction.listImageRuns(path) }
+  }
+
+  async listImageAssets(path = 'slides.md') {
+    if (!this.#imageProduction)
+      throw new Error('Image production requires an active FastPPT Gateway.')
+    return { imageAssets: await this.#imageProduction.listImageAssets(path) }
+  }
+
+  async importGeneratedImage(
+    sourcePath: string,
+    destinationPath: string,
+    runId?: string,
+    deckPath = 'slides.md',
+  ) {
     if (!this.#generatedImagesRoot)
       throw new Error(
         'Codex generated image storage is unavailable; images cannot be imported.',
@@ -420,15 +613,31 @@ export class FastPptMcpService {
       IMAGE_MEDIA_TYPES[extension as keyof typeof IMAGE_MEDIA_TYPES]
     if (!mediaType)
       throw new Error('The generated image format is not supported.')
-    return await this.#options.workspace.writeImageAsset({
+    const workspaceAsset = await this.#options.workspace.writeImageAsset({
       name: basename(destinationPath),
       mediaType,
       bytes: await readFile(source),
       destinationPath,
     })
+    const imageAsset = this.#imageProduction
+      ? await this.#imageProduction.registerImageAsset({
+          path: deckPath,
+          destinationPath: workspaceAsset.path,
+          ...(runId ? { runId } : {}),
+          source: 'generated',
+        })
+      : undefined
+    return { ...workspaceAsset, ...(imageAsset ? { imageAsset } : {}) }
   }
 
-  async importRemoteImage(url: string, destinationPath: string) {
+  async importRemoteImage(
+    url: string,
+    destinationPath: string,
+    runId?: string,
+    deckPath = 'slides.md',
+    license?: string,
+    attribution?: string,
+  ) {
     assertPublicHttpsUrl(url)
     const response = await (this.#options.fetch ?? fetch)(url, {
       redirect: 'follow',
@@ -436,10 +645,15 @@ export class FastPptMcpService {
       headers: { accept: 'image/png,image/jpeg,image/gif,image/webp' },
     })
     if (!response.ok)
-      throw new Error(`Remote image request failed with HTTP ${response.status}.`)
+      throw new Error(
+        `Remote image request failed with HTTP ${response.status}.`,
+      )
     assertPublicHttpsUrl(response.url || url)
     const contentLength = Number(response.headers.get('content-length'))
-    if (Number.isFinite(contentLength) && contentLength > MAX_REMOTE_IMAGE_BYTES)
+    if (
+      Number.isFinite(contentLength) &&
+      contentLength > MAX_REMOTE_IMAGE_BYTES
+    )
       throw new Error('Remote image exceeds the 10 MiB limit.')
     const mediaType = response.headers.get('content-type')?.split(';', 1)[0]
     if (!mediaType || !isImageMediaType(mediaType))
@@ -447,12 +661,32 @@ export class FastPptMcpService {
     const bytes = Buffer.from(await response.arrayBuffer())
     if (bytes.byteLength > MAX_REMOTE_IMAGE_BYTES)
       throw new Error('Remote image exceeds the 10 MiB limit.')
-    return await this.#options.workspace.writeImageAsset({
+    const workspaceAsset = await this.#options.workspace.writeImageAsset({
       name: basename(destinationPath),
       mediaType,
       bytes,
       destinationPath,
     })
+    const imageAsset = this.#imageProduction
+      ? await this.#imageProduction.registerImageAsset({
+          path: deckPath,
+          destinationPath: workspaceAsset.path,
+          ...(runId ? { runId } : {}),
+          source: 'remote',
+          sourceUrl: response.url || url,
+          license,
+          ...(attribution ? { attribution } : {}),
+        })
+      : undefined
+    return { ...workspaceAsset, ...(imageAsset ? { imageAsset } : {}) }
+  }
+
+  async decideImageCandidate(
+    input: z.infer<typeof ImageCandidateDecisionInputSchema>,
+  ) {
+    if (!this.#imageProduction)
+      throw new Error('Image production requires an active FastPPT Gateway.')
+    return await this.#imageProduction.decideImageCandidate(input)
   }
 
   async inspectSlide(path: string, slide: number) {
@@ -490,24 +724,25 @@ export class FastPptMcpService {
 
   async inspectQuality(path: string, slide: number) {
     const inspection = await this.inspectSlide(path, slide)
-    const inspectQuality = this.#browserCapture?.inspectQuality
-    if (!inspectQuality)
+    const browserCapture = this.#browserCapture
+    if (!browserCapture?.inspectQuality)
       return {
         ...inspection,
         inspectionAvailable: false,
-        message: 'Rendered quality inspection requires an active FastPPT browser preview.',
+        message:
+          'Rendered quality inspection requires an active FastPPT browser preview.',
       }
     return {
       ...inspection,
-      ...(await inspectQuality.call(this.#browserCapture, { path, slide })),
+      ...(await browserCapture.inspectQuality({ path, slide })),
     }
   }
 
   async getQualityReport(path: string) {
-    const getQualityReport = this.#browserCapture?.getQualityReport
-    if (!getQualityReport)
+    const browserCapture = this.#browserCapture
+    if (!browserCapture?.getQualityReport)
       return { path, inspectionAvailable: false }
-    return await getQualityReport.call(this.#browserCapture, path)
+    return await browserCapture.getQualityReport(path)
   }
 
   async getPreviewStatus(path = 'slides.md') {
@@ -581,8 +816,13 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
       description:
         'Extract a visual theme (palette, fonts, typography) from a workspace PPTX and create a Slidev theme under the themes folder.',
       inputSchema: {
-        filePath: z.string().describe('Workspace-relative path to the .pptx file'),
-        themeName: z.string().optional().describe('Optional theme name; a slug is derived from it'),
+        filePath: z
+          .string()
+          .describe('Workspace-relative path to the .pptx file'),
+        themeName: z
+          .string()
+          .optional()
+          .describe('Optional theme name; a slug is derived from it'),
       },
     },
     async ({ filePath, themeName }) =>
@@ -594,25 +834,42 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
       description:
         'Materialize a designed set of characteristic Slidev layouts and components into an imported theme. Use after importing a theme to add on-palette layouts and components.',
       inputSchema: {
-        themeId: z.string().describe('The imported theme id, e.g. slidev-theme-<slug>'),
-        layouts: z.array(
-          z.object({
-            id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
-            label: z.string(),
-            kind: z.enum([
-              'cover', 'section', 'two-col', 'data', 'statement', 'image-right',
-              'quote', 'grid', 'metrics', 'agenda', 'ending',
-            ]),
-            hint: z.string().optional(),
-          }),
-        ).optional().describe('Characteristic layouts to add'),
-        components: z.array(
-          z.object({
-            name: z.string().regex(/^[A-Z][A-Za-z0-9]*$/),
-            kind: z.enum(['stat', 'callout', 'badge', 'pill', 'chip']),
-            hint: z.string().optional(),
-          }),
-        ).optional().describe('Signature components to add'),
+        themeId: z
+          .string()
+          .describe('The imported theme id, e.g. slidev-theme-<slug>'),
+        layouts: z
+          .array(
+            z.object({
+              id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+              label: z.string(),
+              kind: z.enum([
+                'cover',
+                'section',
+                'two-col',
+                'data',
+                'statement',
+                'image-right',
+                'quote',
+                'grid',
+                'metrics',
+                'agenda',
+                'ending',
+              ]),
+              hint: z.string().optional(),
+            }),
+          )
+          .optional()
+          .describe('Characteristic layouts to add'),
+        components: z
+          .array(
+            z.object({
+              name: z.string().regex(/^[A-Z][A-Za-z0-9]*$/),
+              kind: z.enum(['stat', 'callout', 'badge', 'pill', 'chip']),
+              hint: z.string().optional(),
+            }),
+          )
+          .optional()
+          .describe('Signature components to add'),
       },
     },
     async ({ themeId, layouts, components }) =>
@@ -663,14 +920,56 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
     async () => result(await service.listAssets()),
   )
   server.registerTool(
+    'inspect_svg_asset',
+    {
+      description:
+        'Audit a workspace SVG for portable vector embedding versus a native Slidev rebuild. This does not claim SVG shapes are editable in PowerPoint.',
+      inputSchema: SvgAssetInputSchema,
+    },
+    async ({ path }) => result(await service.inspectSvgAsset(path)),
+  )
+  server.registerTool(
+    'create_image_run',
+    {
+      description:
+        'Register the visual brief for one generated, edited, or varied image before producing a candidate.',
+      inputSchema: CreateImageRunInputSchema,
+    },
+    async (input) => result(await service.createImageRun(input)),
+  )
+  server.registerTool(
+    'list_image_runs',
+    {
+      description: 'List persistent image-production runs for a deck.',
+      inputSchema: DeckPathSchema,
+    },
+    async ({ path }) => result(await service.listImageRuns(path)),
+  )
+  server.registerTool(
+    'list_image_assets',
+    {
+      description:
+        'List persistent generated and sourced image assets for a deck.',
+      inputSchema: DeckPathSchema,
+    },
+    async ({ path }) => result(await service.listImageAssets(path)),
+  )
+  server.registerTool(
     'import_generated_image',
     {
       description:
         'Copy an image produced by Codex image_gen from its managed generated_images directory into an exact workspace-relative path. Existing files are never overwritten.',
       inputSchema: ImportGeneratedImageInputSchema,
     },
-    async ({ sourcePath, destinationPath }) =>
-      result(await service.importGeneratedImage(sourcePath, destinationPath)),
+    async ({ deckPath, sourcePath, destinationPath, runId }) =>
+      result(
+        await service.importGeneratedImage(
+          sourcePath,
+          destinationPath,
+          runId,
+          deckPath,
+        ),
+      ),
   )
   server.registerTool(
     'import_remote_image',
@@ -679,8 +978,26 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
         'Download one publicly reachable HTTPS raster image into an exact workspace-relative path. Supports PNG, JPEG, GIF and WebP up to 10 MiB; existing files are never overwritten.',
       inputSchema: ImportRemoteImageInputSchema,
     },
-    async ({ url, destinationPath }) =>
-      result(await service.importRemoteImage(url, destinationPath)),
+    async ({ deckPath, url, destinationPath, runId, license, attribution }) =>
+      result(
+        await service.importRemoteImage(
+          url,
+          destinationPath,
+          runId,
+          deckPath,
+          license,
+          attribution,
+        ),
+      ),
+  )
+  server.registerTool(
+    'decide_image_candidate',
+    {
+      description:
+        'Accept or reject a registered image candidate. Only accepted candidates may be applied to the deck.',
+      inputSchema: ImageCandidateDecisionInputSchema,
+    },
+    async (input) => result(await service.decideImageCandidate(input)),
   )
   server.registerTool(
     'inspect_slide',
@@ -702,10 +1019,12 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
   server.registerTool(
     'inspect_quality',
     {
-      description: 'Run deterministic Pretext and DOM quality checks for one slide.',
+      description:
+        'Run deterministic Pretext and DOM quality checks for one slide.',
       inputSchema: SlideInputSchema,
     },
-    async ({ path, slide }) => result(await service.inspectQuality(path, slide)),
+    async ({ path, slide }) =>
+      result(await service.inspectQuality(path, slide)),
   )
   server.registerTool(
     'get_quality_report',

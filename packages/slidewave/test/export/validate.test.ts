@@ -92,7 +92,7 @@ describe('validateEditablePptx', () => {
     )
   })
 
-  it('allows full-bleed photography behind native editable text', async () => {
+  it('rejects a full-slide raster even when editable text is present', async () => {
     const rendered = htmlDeckToPresentation(
       deckWith([textElement('t1', 'Editable title over a photo')]),
     )
@@ -101,7 +101,8 @@ describe('validateEditablePptx', () => {
     )
     const report = await validateEditablePptx(pptx, 1)
 
-    expect(report.issues).not.toEqual(
+    expect(report.ok).toBe(false)
+    expect(report.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ code: 'full-slide-raster' }),
       ]),

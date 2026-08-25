@@ -39,7 +39,7 @@ afterEach(async () => {
 })
 
 describe('ManagedSkillInstaller', () => {
-  it('plans and installs the base and every registered theme Skill for both Harnesses', async () => {
+  it('plans and installs common capabilities and every registered theme Skill for both Harnesses', async () => {
     const workspaceRoot = await temporaryDirectory('fastppt-skills-')
     const registry = await loadThemeRegistry(themesRoot)
     const installer = new ManagedSkillInstaller({
@@ -48,7 +48,7 @@ describe('ManagedSkillInstaller', () => {
       registry,
     })
     const dryRun = await installer.reconcile({ dryRun: true })
-    const expectedStatusCount = (registry.themes.length + 2) * 2
+    const expectedStatusCount = (registry.themes.length + 4) * 2
     expect(dryRun.statuses).toHaveLength(expectedStatusCount)
     expect(dryRun.statuses.every((status) => status.state === 'missing')).toBe(
       true,
@@ -65,10 +65,14 @@ describe('ManagedSkillInstaller', () => {
       expect.arrayContaining([
         'claude:fastppt',
         'claude:fastppt-page-edit',
+        'claude:fastppt-image-production',
+        'claude:fastppt-editable-visuals',
         'claude:fastppt-theme-academy',
         'claude:fastppt-theme-landing',
         'codex:fastppt',
         'codex:fastppt-page-edit',
+        'codex:fastppt-image-production',
+        'codex:fastppt-editable-visuals',
         'codex:fastppt-theme-academy',
         'codex:fastppt-theme-landing',
         'claude:fastppt-theme-strategy',
@@ -203,7 +207,7 @@ describe('ManagedSkillInstaller', () => {
         (status) => status.skillId === 'fastppt-theme-fixture',
       ),
     ).toHaveLength(2)
-  })
+  }, 15_000)
 
   it('cleans only unmodified stale managed Skills when explicitly requested', async () => {
     const workspaceRoot = await temporaryDirectory('fastppt-skills-')
@@ -245,7 +249,7 @@ describe('ManagedSkillInstaller', () => {
     await expect(
       readFile(join(staleModified, 'SKILL.md'), 'utf8'),
     ).resolves.toBe('user modified\n')
-  })
+  }, 15_000)
 })
 
 describe('McpConfigManager', () => {

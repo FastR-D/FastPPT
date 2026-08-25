@@ -1,0 +1,4 @@
+interface:
+  display_name: 'FastPPT Image Production'
+  short_description: 'Generate and apply reviewed visuals for a Slidev deck'
+  default_prompt: 'Use $fastppt-image-production to create a reviewed visual asset for the requested FastPPT slide.'

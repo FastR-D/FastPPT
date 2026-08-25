@@ -27,8 +27,12 @@ Do not ask for these fields again unless the user explicitly changes the task.
    and CSS when a registered layout alone cannot express the intended page.
 5. Make the smallest coherent deck change with `write_slides`. Keep image paths
    relative and store images as files; never place large base64 data in Markdown.
-   When the deck needs a sourced or generated raster visual, follow the asset
-   workflow below.
+   When the deck needs a generated or edited raster visual, invoke
+   `$fastppt-image-production` and follow its result and acceptance workflow.
+   When the deck needs a diagram, chart, table, formula, or portable SVG visual
+   for editable PPTX delivery, invoke `$fastppt-editable-visuals` before adding
+   the visual.
+   Use the asset workflow below only to place an accepted image in the deck.
 6. Run `format_slides`, then `validate_slides`. Fix every syntax, theme, missing
    asset, and unsupported-layout error.
    Slidev frontmatter blocks must have no blank lines immediately inside the
@@ -94,30 +98,14 @@ verified sources on-slide and never invent them. Apply the checklist in
 [references/content.md](references/content.md) before reporting the deck ready.
 The active theme Skill owns visual rules; this section owns what the words say.
 
-## Image generation workflow
+## Generated and edited images
 
-FastPPT invokes the Codex `imagegen` Skill together with this Skill. For a new
-photo, illustration, texture, mockup, or other generated bitmap:
-
-1. Use the platform-managed `image_gen` tool. Do not request or configure an API
-   token, and do not use the CLI fallback unless the user explicitly asks for it.
-2. Generate for the intended slide crop. Prefer `1536x1024` for landscape slide
-   figures, `1024x1024` for square cards, and `1024x1536` for portrait panels.
-   Keep important content away from edges and avoid generated text unless the
-   user explicitly requires it.
-3. Inspect the result. If accepted, call `import_generated_image` with the
-   returned file under Codex `generated_images` and an exact workspace-relative
-   destination such as `assets/generated/slide-04-mechanism.png`. Never reference
-   the Codex home path directly from a deck.
-4. Add the imported relative path to `slides.md` using Markdown image syntax,
-   layout frontmatter, or the active theme's image component. Write meaningful
-   alt text. Paths are relative to the slide Markdown file.
-5. Run `format_slides`, `validate_slides`, preview inspection, and overflow
-   inspection for every affected slide. A generated file without a Markdown
-   reference, or a Markdown reference without a validated asset, is incomplete.
-
-Read [references/images.md](references/images.md) for prompt, naming, placement,
-replacement, and failure rules.
+Use `$fastppt-image-production` whenever a new generated raster visual, image
+edit, or image variation is needed. It owns prompt construction, intended crop,
+candidate inspection, acceptance, and provenance requirements. This Skill owns
+only the final placement, Slidev validation, preview, and export checks. Read
+[references/images.md](references/images.md) when placing an accepted image or
+choosing a sourced asset.
 
 ## Online research and sourced assets
 

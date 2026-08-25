@@ -17,7 +17,10 @@ import {
   FastPptMcpService,
 } from '../src/server.js'
 
-import type { BrowserCaptureDelegate } from '../src/server.js'
+import type {
+  BrowserCaptureDelegate,
+  ImageProductionDelegate,
+} from '../src/server.js'
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const themesRoot = resolve(packageRoot, '../../themes')
@@ -42,6 +45,7 @@ afterEach(async () => {
 async function fixture(
   options: {
     browserCapture?: BrowserCaptureDelegate
+    imageProduction?: ImageProductionDelegate
     generatedImagesRoot?: string
     themesRoot?: string
     fetch?: typeof fetch
@@ -158,18 +162,20 @@ describe('FastPPT MCP', () => {
       expectedRevision: slides.revision,
       content: `${slides.content}\n\n<img src="./assets/missing.png" alt="Missing" />\n`,
     })
-    await expect(service.validateSlides()).resolves.toMatchObject({
-      valid: false,
-      errors: expect.arrayContaining([
-        expect.objectContaining({
-          code: 'ASSET_UNAVAILABLE',
-          message: 'Asset cannot be resolved: ./assets/missing.png',
-        }),
-      ]),
+    const validation = await service.validateSlides()
+    expect(validation.valid).toBe(false)
+    expect(validation.errors).toContainEqual({
+      code: 'ASSET_UNAVAILABLE',
+      message: 'Asset cannot be resolved: ./assets/missing.png',
     })
     await mkdir(join(workspaceRoot, 'assets'), { recursive: true })
-    await writeFile(join(workspaceRoot, 'assets', 'missing.png'), Buffer.from([0]))
-    await expect(service.validateSlides()).resolves.toMatchObject({ valid: true })
+    await writeFile(
+      join(workspaceRoot, 'assets', 'missing.png'),
+      Buffer.from([0]),
+    )
+    await expect(service.validateSlides()).resolves.toMatchObject({
+      valid: true,
+    })
   })
 
   it('validates referenced images larger than the text read limit', async () => {
@@ -190,6 +196,69 @@ describe('FastPPT MCP', () => {
       valid: true,
       errors: [],
     })
+  })
+
+  it('audits SVG assets before they are used in an editable delivery', async () => {
+    const { workspaceRoot, service } = await fixture()
+    await mkdir(join(workspaceRoot, 'assets'), { recursive: true })
+    await writeFile(
+      join(workspaceRoot, 'assets', 'portable.svg'),
+      '<svg viewBox="0 0 24 24"><rect width="24" height="24"/><path d="M0 0h24"/></svg>',
+    )
+    await writeFile(
+      join(workspaceRoot, 'assets', 'complex.svg'),
+      '<svg><foreignObject><div>Browser-only label</div></foreignObject><animate attributeName="x"/></svg>',
+    )
+    await writeFile(
+      join(workspaceRoot, 'assets', 'unsafe.svg'),
+      '<svg><image href="https://example.test/image.png"/></svg>',
+    )
+
+    await expect(
+      service.inspectSvgAsset('assets/portable.svg'),
+    ).resolves.toMatchObject({
+      valid: true,
+      safeForWorkspace: true,
+      recommendation: 'embed-vector',
+      elements: { rect: 1, path: 1 },
+      warnings: [],
+    })
+    const complex = await service.inspectSvgAsset('assets/complex.svg')
+    expect(complex.safeForWorkspace).toBe(true)
+    expect(complex.recommendation).toBe('rebuild-natively')
+    expect(
+      complex.warnings.some((warning) => warning.includes('foreignObject')),
+    ).toBe(true)
+    const unsafe = await service.inspectSvgAsset('assets/unsafe.svg')
+    expect(unsafe.safeForWorkspace).toBe(false)
+    expect(unsafe.recommendation).toBe('blocked')
+    expect(
+      unsafe.blockers.some((blocker) => blocker.includes('External SVG')),
+    ).toBe(true)
+    await expect(service.inspectSvgAsset('slides.md')).rejects.toThrow(
+      'requires a .svg workspace file',
+    )
+  })
+
+  it('rejects SVG assets with non-portable active or external resources', async () => {
+    const { workspaceRoot, service } = await fixture()
+    await mkdir(join(workspaceRoot, 'assets'), { recursive: true })
+    await writeFile(
+      join(workspaceRoot, 'assets', 'unsafe.svg'),
+      '<svg><script>alert(1)</script></svg>',
+    )
+    const slides = await service.readSlides()
+    await service.writeSlides({
+      path: 'slides.md',
+      expectedRevision: slides.revision,
+      content: `${slides.content}\n\n![Unsafe](./assets/unsafe.svg)\n`,
+    })
+
+    const validation = await service.validateSlides()
+    expect(validation.valid).toBe(false)
+    expect(
+      validation.errors.some((error) => error.code === 'SVG_ASSET_UNSAFE'),
+    ).toBe(true)
   })
 
   it('imports Codex-generated images into exact workspace paths safely', async () => {
@@ -231,30 +300,134 @@ describe('FastPPT MCP', () => {
     ).rejects.toMatchObject({ code: 'PATH_OUTSIDE_WORKSPACE' })
   })
 
+  it('registers generated candidates against the requested deck and requires a decision', async () => {
+    const generatedImagesRoot = await temporaryDirectory(
+      'codex-generated-images-',
+    )
+    const source = join(generatedImagesRoot, 'figure.png')
+    await writeFile(
+      source,
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    )
+    const calls: Array<{ kind: string; value: unknown }> = []
+    const imageProduction: ImageProductionDelegate = {
+      createImageRun: (input) => {
+        calls.push({ kind: 'run', value: input })
+        return Promise.resolve({
+          id: 'a5e00f76-40a0-4a4d-b9d7-43af6d736df7',
+          status: 'draft',
+        })
+      },
+      listImageRuns: () => Promise.resolve([]),
+      listImageAssets: () => Promise.resolve([]),
+      registerImageAsset: (input) => {
+        calls.push({ kind: 'asset', value: input })
+        return Promise.resolve({
+          id: 'f22ff83b-9ebd-4d2c-8306-7c482e9f74d3',
+          accepted: false,
+        })
+      },
+      decideImageCandidate: (input) => {
+        calls.push({ kind: 'decision', value: input })
+        return Promise.resolve({ ...input, accepted: input.accepted })
+      },
+    }
+    const { service } = await fixture({ generatedImagesRoot, imageProduction })
+    const run = await service.createImageRun({
+      path: 'slides.md',
+      slide: 1,
+      purpose: 'generate',
+      prompt: 'A reviewable visual',
+    })
+    await service.importGeneratedImage(
+      source,
+      'assets/generated/slide-01-visual.png',
+      String(run.id),
+      'slides.md',
+    )
+    await service.decideImageCandidate({
+      imageAssetId: 'f22ff83b-9ebd-4d2c-8306-7c482e9f74d3',
+      accepted: true,
+    })
+    expect(calls).toEqual([
+      expect.objectContaining({ kind: 'run' }),
+      {
+        kind: 'asset',
+        value: {
+          path: 'slides.md',
+          destinationPath: 'assets/generated/slide-01-visual.png',
+          runId: 'a5e00f76-40a0-4a4d-b9d7-43af6d736df7',
+          source: 'generated',
+        },
+      },
+      expect.objectContaining({
+        kind: 'decision',
+        value: {
+          imageAssetId: 'f22ff83b-9ebd-4d2c-8306-7c482e9f74d3',
+          accepted: true,
+        },
+      }),
+    ])
+  })
+
   it('downloads public HTTPS images into exact workspace paths safely', async () => {
     const png = Buffer.from([
       0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00,
     ])
     const requested: string[] = []
+    const registrations: unknown[] = []
+    const imageProduction: ImageProductionDelegate = {
+      createImageRun: () => Promise.resolve({}),
+      listImageRuns: () => Promise.resolve([]),
+      listImageAssets: () => Promise.resolve([]),
+      registerImageAsset: (input) => {
+        registrations.push(input)
+        return Promise.resolve({ id: 'remote-asset' })
+      },
+      decideImageCandidate: () => Promise.resolve({}),
+    }
     const { workspaceRoot, service } = await fixture({
-      fetch: (async (input: string | URL | Request) => {
-        requested.push(String(input))
-        return new Response(png, {
-          headers: { 'content-type': 'image/png' },
-        })
-      }) as typeof fetch,
+      imageProduction,
+      fetch: (input) => {
+        requested.push(
+          typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url,
+        )
+        return Promise.resolve(
+          new Response(png, {
+            headers: { 'content-type': 'image/png' },
+          }),
+        )
+      },
     })
 
     await expect(
       service.importRemoteImage(
         'https://images.example.org/chart.png',
         'assets/sources/slide-02-chart.png',
+        undefined,
+        'slides.md',
+        'CC BY 4.0',
+        'Example photographer',
       ),
     ).resolves.toMatchObject({
       path: 'assets/sources/slide-02-chart.png',
       mediaType: 'image/png',
     })
     expect(requested).toEqual(['https://images.example.org/chart.png'])
+    expect(registrations).toEqual([
+      {
+        path: 'slides.md',
+        destinationPath: 'assets/sources/slide-02-chart.png',
+        source: 'remote',
+        sourceUrl: 'https://images.example.org/chart.png',
+        license: 'CC BY 4.0',
+        attribution: 'Example photographer',
+      },
+    ])
     await expect(
       readFile(join(workspaceRoot, 'assets/sources/slide-02-chart.png')),
     ).resolves.toEqual(png)
@@ -455,7 +628,10 @@ describe('FastPPT MCP', () => {
       ],
       [{ name: 'StatCard', kind: 'stat' }],
     )
-    expect(result.layouts.map((layout) => layout.id)).toEqual(['data', 'metrics'])
+    expect(result.layouts.map((layout) => layout.id)).toEqual([
+      'data',
+      'metrics',
+    ])
     expect(result.components).toEqual(['StatCard'])
     await expect(
       readFile(join(themeDir, 'layouts', 'data.vue'), 'utf8'),

@@ -167,7 +167,7 @@ export async function validateEditablePptx(
         message: `Slide ${slideNumber} contains no native editable text`,
       })
     }
-    if (!hasNativeText && slideWidth > 0 && slideHeight > 0) {
+    if (slideWidth > 0 && slideHeight > 0) {
       const picRe = /<p:pic\b[\s\S]*?<\/p:pic>/g
       let pic: RegExpExecArray | null
       while ((pic = picRe.exec(xml))) {

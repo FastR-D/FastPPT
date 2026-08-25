@@ -70,20 +70,47 @@ a user-facing message, and an optional error. Consumers must wait for `ready`;
 
 ## Deck and preview
 
-| Method | Path                                    |
-| ------ | --------------------------------------- |
-| GET    | `/api/v1/decks`                         |
-| POST   | `/api/v1/decks`                         |
-| GET    | `/api/v1/decks/:deckId`                 |
-| PUT    | `/api/v1/decks/:deckId/markdown`        |
-| POST   | `/api/v1/decks/:deckId/format`          |
-| POST   | `/api/v1/decks/:deckId/validate`        |
-| POST   | `/api/v1/decks/:deckId/preview/start`   |
-| POST   | `/api/v1/decks/:deckId/preview/restart` |
-| POST   | `/api/v1/decks/:deckId/preview/stop`    |
-| GET    | `/api/v1/decks/:deckId/preview/status`  |
+| Method | Path                                          |
+| ------ | --------------------------------------------- |
+| GET    | `/api/v1/decks`                               |
+| POST   | `/api/v1/decks`                               |
+| GET    | `/api/v1/decks/:deckId`                       |
+| PUT    | `/api/v1/decks/:deckId/markdown`              |
+| POST   | `/api/v1/decks/:deckId/format`                |
+| POST   | `/api/v1/decks/:deckId/validate`              |
+| POST   | `/api/v1/decks/:deckId/preview/start`         |
+| POST   | `/api/v1/decks/:deckId/preview/restart`       |
+| POST   | `/api/v1/decks/:deckId/preview/stop`          |
+| GET    | `/api/v1/decks/:deckId/preview/status`        |
+| GET    | `/api/v1/decks/:deckId/image-runs`            |
+| POST   | `/api/v1/decks/:deckId/image-runs`            |
+| GET    | `/api/v1/decks/:deckId/image-assets`          |
+| POST   | `/api/v1/decks/:deckId/image-assets`          |
+| GET    | `/api/v1/image-runs/:imageRunId`              |
+| POST   | `/api/v1/image-assets/:imageAssetId/decision` |
 
 Create input is `{ name, themeId }`. Markdown update accepts `{ content, expectedRevision? }`. Format accepts `{ expectedRevision?, dryRun? }` and returns `{ path, content, revision, changed, dryRun, written }`; dry-run never writes the deck. The shared formatter parses Slidev Markdown both before and after formatting, and writes only after both validations succeed. Invalid Slidev/YAML syntax returns `INVALID_REQUEST` with one-based `{ line, column }` details when available.
+
+Image production is a candidate workflow. Create a run with `{ slide, purpose,
+prompt, inputAssetIds? }`, then register a validated workspace image with
+`{ path, runId?, source, sourceUrl?, license?, attribution? }`. `source` is
+`generated`, `manual`, or `remote`; remote assets require their final HTTPS
+source URL and rights/license information, with an optional attribution string.
+Candidates are unaccepted until `POST /api/v1/image-assets/:imageAssetId/decision`
+receives `{ accepted: true }`; only then does the associated run become
+`accepted`. A rejected candidate is terminal, but its run remains open for a
+new candidate. Image paths are workspace-relative, signature-checked PNG, JPEG,
+GIF, or WebP files, and every record binds the deck revision and a SHA-256 hash.
+Deck validation rejects remote/data image URLs, any registered image candidate
+that is not accepted, and accepted image files whose content no longer matches
+their registered SHA-256.
+
+The FastPPT MCP also exposes `inspect_svg_asset` for local SVG delivery. It
+reports `embed-vector`, `rebuild-natively`, or `blocked`: portable SVG remains
+a vector image in PPTX, while decision-bearing labels, data, tables, charts,
+and formulas must be rebuilt with native Slidev content for editability.
+`validate_slides` rejects referenced SVG files containing active content or
+remote/absolute dependencies.
 
 ## Editable PPTX exports
 

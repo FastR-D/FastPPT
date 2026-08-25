@@ -1,0 +1,4 @@
+interface:
+  display_name: 'FastPPT Editable Visuals'
+  short_description: 'Build Slidev visuals that survive editable PPTX export'
+  default_prompt: 'Use $fastppt-editable-visuals to create an editable visual for the requested FastPPT slide.'

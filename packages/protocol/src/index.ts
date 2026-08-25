@@ -232,15 +232,15 @@ export const SessionConversationModeSchema = z.enum([
   'edit-deck',
   'edit-page',
 ])
-export type SessionConversationMode = z.infer<typeof SessionConversationModeSchema>
+export type SessionConversationMode = z.infer<
+  typeof SessionConversationModeSchema
+>
 
 export const SessionThemeSelectionSchema = z.discriminatedUnion('mode', [
   z.object({ mode: z.literal('registered'), themeId: z.string().min(1) }),
   z.object({ mode: z.literal('preserve-source') }),
 ])
-export type SessionThemeSelection = z.infer<
-  typeof SessionThemeSelectionSchema
->
+export type SessionThemeSelection = z.infer<typeof SessionThemeSelectionSchema>
 
 export const PreservationPolicySchema = z.object({
   wording: z.enum(['free', 'preserve']).default('free'),
@@ -253,10 +253,12 @@ export type PreservationPolicy = z.infer<typeof PreservationPolicySchema>
 export const SessionDeckProfileSchema = z.object({
   version: z.literal(1),
   conversationMode: SessionConversationModeSchema.default('create-slide'),
-  target: z.object({
-    markdownPath: z.string().min(1).optional(),
-    slide: z.number().int().positive().optional(),
-  }).optional(),
+  target: z
+    .object({
+      markdownPath: z.string().min(1).optional(),
+      slide: z.number().int().positive().optional(),
+    })
+    .optional(),
   artifactRoute: ArtifactRouteSchema,
   audience: z.string().trim().min(1).max(160),
   communicationIntent: CommunicationIntentSchema,
@@ -280,7 +282,7 @@ export const ManagedInstallStateSchema = z.enum([
 export const SkillInstallStatusSchema = z.object({
   harness: HarnessKindSchema,
   skillId: z.string().min(1),
-  kind: z.enum(['base', 'theme']),
+  kind: z.enum(['base', 'capability', 'theme']),
   themeId: z.string().min(1).optional(),
   expectedVersion: z.string().min(1),
   installedVersion: z.string().min(1).optional(),
@@ -322,6 +324,104 @@ export const DeckSummarySchema = z.object({
 
 export type DeckSummary = z.infer<typeof DeckSummarySchema>
 
+export const ImagePurposeSchema = z.enum(['generate', 'edit', 'variation'])
+export type ImagePurpose = z.infer<typeof ImagePurposeSchema>
+
+export const ImageRunStatusSchema = z.enum([
+  'draft',
+  'candidate-ready',
+  'accepted',
+  'rejected',
+  'superseded',
+])
+export type ImageRunStatus = z.infer<typeof ImageRunStatusSchema>
+
+export const ImageAssetSourceSchema = z.enum(['generated', 'manual', 'remote'])
+export type ImageAssetSource = z.infer<typeof ImageAssetSourceSchema>
+
+export const ImageAssetStatusSchema = z.enum([
+  'candidate',
+  'accepted',
+  'rejected',
+])
+export type ImageAssetStatus = z.infer<typeof ImageAssetStatusSchema>
+
+export const ImageRunSchema = z.object({
+  id: z.string().uuid(),
+  deckId: z.string().min(1),
+  deckRevision: z.string().min(1),
+  slide: z.number().int().positive(),
+  purpose: ImagePurposeSchema,
+  prompt: z.string().trim().min(1).max(8_000),
+  status: ImageRunStatusSchema,
+  inputAssetIds: z.array(z.string().uuid()),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+})
+export type ImageRun = z.infer<typeof ImageRunSchema>
+
+export const ImageAssetSchema = z.object({
+  id: z.string().uuid(),
+  deckId: z.string().min(1),
+  runId: z.string().uuid().optional(),
+  path: z.string().min(1),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  mediaType: z.enum(['image/gif', 'image/jpeg', 'image/png', 'image/webp']),
+  source: ImageAssetSourceSchema,
+  sourceUrl: z.string().url().optional(),
+  license: z.string().trim().min(1).max(300).optional(),
+  attribution: z.string().trim().min(1).max(1_000).optional(),
+  status: ImageAssetStatusSchema,
+  accepted: z.boolean(),
+  createdAt: z.iso.datetime(),
+})
+export type ImageAsset = z.infer<typeof ImageAssetSchema>
+
+export const CreateImageRunRequestSchema = z.object({
+  slide: z.number().int().positive(),
+  purpose: ImagePurposeSchema,
+  prompt: z.string().trim().min(1).max(8_000),
+  inputAssetIds: z.array(z.string().uuid()).max(8).default([]),
+})
+export type CreateImageRunRequest = z.infer<typeof CreateImageRunRequestSchema>
+
+export const RegisterImageAssetRequestSchema = z
+  .object({
+    path: z.string().min(1),
+    runId: z.string().uuid().optional(),
+    source: ImageAssetSourceSchema,
+    sourceUrl: z.string().url().optional(),
+    license: z.string().trim().min(1).max(300).optional(),
+    attribution: z.string().trim().min(1).max(1_000).optional(),
+  })
+  .superRefine((asset, context) => {
+    if (asset.source === 'remote' && !asset.sourceUrl)
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['sourceUrl'],
+        message: 'A remote image requires its final source URL.',
+      })
+    if (
+      asset.source === 'remote' &&
+      asset.sourceUrl &&
+      !/^https:\/\//i.test(asset.sourceUrl)
+    )
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['sourceUrl'],
+        message: 'A remote image source URL must use HTTPS.',
+      })
+    if (asset.source === 'remote' && !asset.license)
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['license'],
+        message: 'A remote image requires license or rights information.',
+      })
+  })
+export type RegisterImageAssetRequest = z.infer<
+  typeof RegisterImageAssetRequestSchema
+>
+
 export const CreateExportRequestSchema = z.object({
   format: z.literal('editable-pptx'),
   outputName: z.string().min(1).max(160),
@@ -341,7 +441,9 @@ export const ImportPptxThemeRequestSchema = z.object({
   dataBase64: z.string().min(1),
   themeName: z.string().min(1).max(64).optional(),
 })
-export type ImportPptxThemeRequest = z.infer<typeof ImportPptxThemeRequestSchema>
+export type ImportPptxThemeRequest = z.infer<
+  typeof ImportPptxThemeRequestSchema
+>
 
 export const ImportPptxThemeResultSchema = z.object({
   themeId: z.string().min(1),
@@ -487,7 +589,9 @@ export const BrowserInspectionJobSchema = z.object({
   policy: ReviewPolicySchema.optional(),
   status: z.enum(['queued', 'completed', 'failed']),
   createdAt: z.iso.datetime(),
-  result: z.union([BrowserOverflowResultSchema, BrowserQualityResultSchema]).optional(),
+  result: z
+    .union([BrowserOverflowResultSchema, BrowserQualityResultSchema])
+    .optional(),
   error: z.string().optional(),
 })
 export type BrowserInspectionJob = z.infer<typeof BrowserInspectionJobSchema>

@@ -11,7 +11,15 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import { constants } from 'node:fs'
-import { basename, dirname, join, relative, resolve, sep } from 'node:path'
+import {
+  basename,
+  dirname,
+  join,
+  posix,
+  relative,
+  resolve,
+  sep,
+} from 'node:path'
 import { Readable } from 'node:stream'
 import { fileURLToPath } from 'node:url'
 
@@ -50,7 +58,8 @@ import {
   ApprovalDecisionRequestSchema,
   ApprovalRequestSchema,
   ApplicationStateSchema,
-  CreateExportRequestSchema, ReviewExportRequestSchema,
+  CreateExportRequestSchema,
+  ReviewExportRequestSchema,
   ImportPptxThemeRequestSchema,
   ImportPptxThemeResultSchema,
   ImportPptxThemeStatusSchema,
@@ -68,6 +77,10 @@ import {
   BrowserInspectionJobSchema,
   BrowserQualityResultSchema,
   DeckQualityReportSchema,
+  CreateImageRunRequestSchema,
+  ImageAssetSchema,
+  ImageRunSchema,
+  RegisterImageAssetRequestSchema,
   SlidewaveSnapshotSchema,
   type ApiErrorBody,
   type WorkspaceInfo,
@@ -137,6 +150,57 @@ function profileDigest(profile: SessionDeckProfile): string {
   return createHash('sha256')
     .update(JSON.stringify(profile))
     .digest('base64url')
+}
+
+function imageMediaType(
+  path: string,
+  bytes: Buffer,
+): 'image/gif' | 'image/jpeg' | 'image/png' | 'image/webp' {
+  const extension = path.toLowerCase().split('.').pop()
+  const matches = {
+    gif:
+      (bytes.subarray(0, 6).equals(Buffer.from('GIF87a')) ||
+        bytes.subarray(0, 6).equals(Buffer.from('GIF89a'))) &&
+      'image/gif',
+    jpeg:
+      bytes.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff])) &&
+      'image/jpeg',
+    png:
+      bytes
+        .subarray(0, 8)
+        .equals(
+          Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+        ) && 'image/png',
+    webp:
+      bytes.subarray(0, 4).equals(Buffer.from('RIFF')) &&
+      bytes.subarray(8, 12).equals(Buffer.from('WEBP')) &&
+      'image/webp',
+  } as const
+  const mediaType =
+    extension === 'gif'
+      ? matches.gif
+      : extension === 'jpg' || extension === 'jpeg'
+        ? matches.jpeg
+        : extension === 'png'
+          ? matches.png
+          : extension === 'webp'
+            ? matches.webp
+            : false
+  if (!mediaType)
+    throw new WorkspaceError(
+      'INVALID_REQUEST',
+      'Image path extension or file signature is unsupported.',
+      400,
+    )
+  return mediaType
+}
+
+function imagePaths(source: string): string[] {
+  const markdown = [
+    ...source.matchAll(/!\[[^\]]*\]\(([^)\s]+)(?:\s+['"][^'"]*['"])?\)/g),
+  ]
+  const html = [...source.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)]
+  return [...markdown, ...html].map((match) => match[1] ?? '').filter(Boolean)
 }
 
 function sessionBrief(profile: SessionDeckProfile): string {
@@ -974,6 +1038,94 @@ export async function createGateway(
     return deck
   }
 
+  const validateDeck = async (deck: DeckSummary) => {
+    const file = await workspaceFiles.readTextFile(deck.entryFile)
+    const errors: Array<{ code: string; message: string }> = []
+    let theme: ReturnType<ThemeRegistry['resolve']> | undefined
+    if (!deck.themeId)
+      errors.push({
+        code: 'THEME_NOT_FOUND',
+        message: 'Deck theme is missing.',
+      })
+    else {
+      try {
+        theme = themeRegistry.resolve(deck.themeId)
+      } catch (cause) {
+        errors.push({
+          code: 'THEME_NOT_FOUND',
+          message: cause instanceof Error ? cause.message : String(cause),
+        })
+      }
+    }
+    if (theme) {
+      const layouts = new Set(theme.manifest.layouts.map((layout) => layout.id))
+      for (const match of file.content.matchAll(
+        /^layout:\s*['"]?([^'"\s]+)['"]?\s*$/gm,
+      )) {
+        const layout = match[1]
+        if (layout && !layouts.has(layout))
+          errors.push({
+            code: 'LAYOUT_UNAVAILABLE',
+            message: `Layout is not registered for ${theme.manifest.id}: ${layout}`,
+          })
+      }
+    }
+    const imageAssets = new Map(
+      database.listImageAssets(deck.id).map((asset) => [asset.path, asset]),
+    )
+    for (const assetPath of imagePaths(file.content)) {
+      if (/^(?:https?:|data:)/i.test(assetPath)) {
+        errors.push({
+          code: 'ASSET_UNAVAILABLE',
+          message: `Image asset must be workspace-relative: ${assetPath}`,
+        })
+        continue
+      }
+      const relativePath = posix.normalize(
+        posix.join(
+          posix.dirname(deck.entryFile.replaceAll('\\', '/')),
+          assetPath,
+        ),
+      )
+      try {
+        const absolutePath = await resolveExistingPath(
+          workspaceFiles.root,
+          relativePath,
+        )
+        const registered = imageAssets.get(relativePath)
+        if (!registered) continue
+        if (registered.status !== 'accepted' || !registered.accepted) {
+          errors.push({
+            code: 'IMAGE_ASSET_UNACCEPTED',
+            message: `Image asset has not been accepted: ${assetPath}`,
+          })
+          continue
+        }
+        const sha256 = createHash('sha256')
+          .update(await readFile(absolutePath))
+          .digest('hex')
+        if (sha256 !== registered.sha256)
+          errors.push({
+            code: 'IMAGE_ASSET_CHANGED',
+            message: `Image asset contents changed after acceptance: ${assetPath}`,
+          })
+      } catch {
+        errors.push({
+          code: 'ASSET_UNAVAILABLE',
+          message: `Asset cannot be resolved: ${assetPath}`,
+        })
+      }
+    }
+    return {
+      deckId: deck.id,
+      revision: file.revision,
+      valid: errors.length === 0,
+      themeId: theme?.manifest.id,
+      themeSkillId: theme?.manifest.skill.id,
+      errors,
+    }
+  }
+
   app.addHook('onRequest', async (request, reply) => {
     const origin = request.headers.origin
     if (!origin || config.allowedWebOrigins.includes(origin)) return
@@ -1394,10 +1546,7 @@ export async function createGateway(
     let themeSkillVersion: string | null = null
     if (input.profile.theme.mode === 'registered') {
       const theme = themeRegistry.resolve(input.profile.theme.themeId).manifest
-      const status = await skillInstaller.themeStatus(
-        input.harness,
-        theme.id,
-      )
+      const status = await skillInstaller.themeStatus(input.harness, theme.id)
       if (!status.available)
         throw new RpcError(
           'The selected theme and its managed Skills are not available',
@@ -1450,11 +1599,10 @@ export async function createGateway(
       .parse(request.params)
     const profile = database.getSessionProfile(harness, sessionId)
     if (!profile)
-      throw new RpcError(
-        'Session profile was not found',
-        'SESSION_NOT_FOUND',
-        { harness, sessionId },
-      )
+      throw new RpcError('Session profile was not found', 'SESSION_NOT_FOUND', {
+        harness,
+        sessionId,
+      })
     return profile
   })
 
@@ -1845,8 +1993,8 @@ export async function createGateway(
     const manifest = JSON.parse(
       await readFile(join(themeDir, 'agent', 'theme-manifest.json'), 'utf8'),
     ) as { layouts?: Array<{ id: string }> }
-    const componentEntries = await import('node:fs/promises').then(({ readdir }) =>
-      readdir(join(themeDir, 'components')).catch(() => []),
+    const componentEntries = await import('node:fs/promises').then(
+      ({ readdir }) => readdir(join(themeDir, 'components')).catch(() => []),
     )
     return {
       layouts: (manifest.layouts ?? []).map((layout) => layout.id),
@@ -1937,13 +2085,16 @@ export async function createGateway(
         }, 240_000),
       ),
     ])
-    if (timedOut) throw new Error('Theme design session timed out after 240 seconds.')
+    if (timedOut)
+      throw new Error('Theme design session timed out after 240 seconds.')
     const designed = await readThemeArtifacts(themeId)
     if (
       designed.layouts.length <= before.layouts.length &&
       designed.components.length <= before.components.length
     )
-      throw new Error('Harness completed without materializing layouts or components.')
+      throw new Error(
+        'Harness completed without materializing layouts or components.',
+      )
 
     setThemeImportStatus(themeId, {
       stage: 'syncing',
@@ -1958,7 +2109,9 @@ export async function createGateway(
       (status) => status.themeId === themeId && status.state !== 'installed',
     )
     if (unavailable.length > 0)
-      throw new Error(`Theme Skill synchronization failed: ${unavailable[0]?.message}`)
+      throw new Error(
+        `Theme Skill synchronization failed: ${unavailable[0]?.message}`,
+      )
 
     setThemeImportStatus(themeId, {
       stage: 'validating',
@@ -1980,7 +2133,10 @@ export async function createGateway(
       ...designed,
       message: '主题提取、特色设计、Skill 同步与结构校验均已完成。',
     })
-    app.log.info({ themeId, harness }, 'Theme design session completed; registry reloaded')
+    app.log.info(
+      { themeId, harness },
+      'Theme design session completed; registry reloaded',
+    )
   }
 
   app.post('/api/v1/imports/pptx-theme', async (request, reply) => {
@@ -1994,11 +2150,7 @@ export async function createGateway(
       reply.code(413)
       return { error: 'The uploaded PPTX exceeds the 200 MiB import limit.' }
     }
-    if (
-      pptx.byteLength < 4 ||
-      pptx[0] !== 0x50 ||
-      pptx[1] !== 0x4b
-    ) {
+    if (pptx.byteLength < 4 || pptx[0] !== 0x50 || pptx[1] !== 0x4b) {
       reply.code(400)
       return { error: 'The uploaded file is not a valid PPTX/ZIP package.' }
     }
@@ -2006,15 +2158,13 @@ export async function createGateway(
     await mkdir(importsDir, { recursive: true })
     const pptxPath = join(importsDir, `${randomUUID()}.pptx`)
     await writeFile(pptxPath, pptx)
-    const extractorPath = join(
-      repositoryRoot,
-      'scripts',
-      'extract-theme.mjs',
-    )
+    const extractorPath = join(repositoryRoot, 'scripts', 'extract-theme.mjs')
     try {
       const { slug } = await runThemeExtraction({
         pptxPath,
-        ...(input.themeName !== undefined ? { themeName: input.themeName } : {}),
+        ...(input.themeName !== undefined
+          ? { themeName: input.themeName }
+          : {}),
         themesRoot: config.themesRoot,
         extractorPath,
       })
@@ -2051,9 +2201,10 @@ export async function createGateway(
         // Optional background enrichment: a harness session designs characteristic
         // layouts/components. Completion reloads the registry and publishes
         // `themes.reloaded`, so the frontend catalog updates automatically.
-        runThemeDesignSession(designHarness, themeId, themeDir)
-          .catch((cause: unknown) => {
-            const message = cause instanceof Error ? cause.message : String(cause)
+        runThemeDesignSession(designHarness, themeId, themeDir).catch(
+          (cause: unknown) => {
+            const message =
+              cause instanceof Error ? cause.message : String(cause)
             const current = designStatuses.get(themeId)
             setThemeImportStatus(themeId, {
               stage: 'failed',
@@ -2067,7 +2218,8 @@ export async function createGateway(
               { themeId, cause: message },
               'Theme design session failed; base theme retained',
             )
-          })
+          },
+        )
       } else {
         setThemeImportStatus(themeId, {
           stage: 'ready',
@@ -2228,50 +2380,179 @@ export async function createGateway(
     )
   })
 
+  app.get('/api/v1/decks/:deckId/image-runs', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    return z.array(ImageRunSchema).parse(database.listImageRuns(deckId))
+  })
+
+  app.post('/api/v1/decks/:deckId/image-runs', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const input = CreateImageRunRequestSchema.parse(request.body)
+    const deck = await resolveDeck(deckId)
+    for (const assetId of input.inputAssetIds) {
+      const asset = database.getImageAsset(assetId)
+      if (!asset || asset.deckId !== deck.id)
+        throw new WorkspaceError(
+          'FILE_NOT_FOUND',
+          `Image input asset is unavailable: ${assetId}`,
+          404,
+        )
+    }
+    const now = new Date().toISOString()
+    const imageRun = ImageRunSchema.parse({
+      id: randomUUID(),
+      deckId: deck.id,
+      deckRevision: deck.revision,
+      slide: input.slide,
+      purpose: input.purpose,
+      prompt: input.prompt,
+      status: 'draft',
+      inputAssetIds: input.inputAssetIds,
+      createdAt: now,
+      updatedAt: now,
+    })
+    database.recordImageRun(imageRun)
+    eventHub.publish(`deck:${deck.id}`, 'image.run.created', imageRun)
+    eventHub.publish('workspace', 'image.run.created', imageRun)
+    return imageRun
+  })
+
+  app.get('/api/v1/image-runs/:imageRunId', (request) => {
+    const { imageRunId } = z
+      .object({ imageRunId: z.string().uuid() })
+      .parse(request.params)
+    const imageRun = database.getImageRun(imageRunId)
+    if (!imageRun)
+      throw new WorkspaceError('FILE_NOT_FOUND', 'Image run not found.', 404)
+    return ImageRunSchema.parse(imageRun)
+  })
+
+  app.get('/api/v1/decks/:deckId/image-assets', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    return z.array(ImageAssetSchema).parse(database.listImageAssets(deckId))
+  })
+
+  app.post('/api/v1/decks/:deckId/image-assets', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const input = RegisterImageAssetRequestSchema.parse(request.body)
+    const deck = await resolveDeck(deckId)
+    const absolutePath = await resolveExistingPath(
+      workspaceFiles.root,
+      input.path,
+    )
+    const bytes = await readFile(absolutePath)
+    const mediaType = imageMediaType(input.path, bytes)
+    let imageRun
+    if (input.runId) {
+      imageRun = database.getImageRun(input.runId)
+      if (!imageRun || imageRun.deckId !== deck.id)
+        throw new WorkspaceError('FILE_NOT_FOUND', 'Image run not found.', 404)
+      if (!['draft', 'candidate-ready'].includes(imageRun.status))
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Image run is no longer accepting candidates.',
+          409,
+        )
+    }
+    const imageAsset = ImageAssetSchema.parse({
+      id: randomUUID(),
+      deckId: deck.id,
+      ...(input.runId ? { runId: input.runId } : {}),
+      path: input.path.replaceAll('\\', '/'),
+      sha256: createHash('sha256').update(bytes).digest('hex'),
+      mediaType,
+      source: input.source,
+      ...(input.sourceUrl ? { sourceUrl: input.sourceUrl } : {}),
+      ...(input.license ? { license: input.license } : {}),
+      ...(input.attribution ? { attribution: input.attribution } : {}),
+      status: 'candidate',
+      accepted: false,
+      createdAt: new Date().toISOString(),
+    })
+    database.recordImageAsset(imageAsset)
+    if (imageRun) {
+      const updatedRun = ImageRunSchema.parse({
+        ...imageRun,
+        status: 'candidate-ready',
+        updatedAt: new Date().toISOString(),
+      })
+      database.recordImageRun(updatedRun)
+      eventHub.publish(
+        `deck:${deck.id}`,
+        'image.run.candidate-ready',
+        updatedRun,
+      )
+    }
+    eventHub.publish(`deck:${deck.id}`, 'image.asset.registered', imageAsset)
+    eventHub.publish('workspace', 'image.asset.registered', imageAsset)
+    return imageAsset
+  })
+
+  app.post('/api/v1/image-assets/:imageAssetId/decision', (request) => {
+    const { imageAssetId } = z
+      .object({ imageAssetId: z.string().uuid() })
+      .parse(request.params)
+    const { accepted } = z.object({ accepted: z.boolean() }).parse(request.body)
+    const asset = database.getImageAsset(imageAssetId)
+    if (!asset)
+      throw new WorkspaceError('FILE_NOT_FOUND', 'Image asset not found.', 404)
+    const imageRun = asset.runId ? database.getImageRun(asset.runId) : undefined
+    if (asset.runId && !imageRun)
+      throw new WorkspaceError('FILE_NOT_FOUND', 'Image run not found.', 404)
+    if (asset.status !== 'candidate')
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'Image candidate has already received a final decision.',
+        409,
+      )
+    if (imageRun && imageRun.status !== 'candidate-ready')
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'Image run is no longer accepting decisions.',
+        409,
+      )
+    const updatedAsset = ImageAssetSchema.parse({
+      ...asset,
+      status: accepted ? 'accepted' : 'rejected',
+      accepted,
+    })
+    database.recordImageAsset(updatedAsset)
+    if (imageRun) {
+      const updatedRun = ImageRunSchema.parse({
+        ...imageRun,
+        status: accepted ? 'accepted' : 'candidate-ready',
+        updatedAt: new Date().toISOString(),
+      })
+      database.recordImageRun(updatedRun)
+      eventHub.publish(
+        `deck:${updatedRun.deckId}`,
+        accepted ? 'image.asset.accepted' : 'image.asset.rejected',
+        { imageRun: updatedRun, imageAsset: updatedAsset },
+      )
+    }
+    eventHub.publish(
+      'workspace',
+      accepted ? 'image.asset.accepted' : 'image.asset.rejected',
+      updatedAsset,
+    )
+    return updatedAsset
+  })
+
   app.post('/api/v1/decks/:deckId/validate', async (request) => {
     const { deckId } = z
       .object({ deckId: z.string().min(1) })
       .parse(request.params)
-    const deck = await resolveDeck(deckId)
-    const file = await workspaceFiles.readTextFile(deck.entryFile)
-    const errors: Array<{ code: string; message: string }> = []
-    let theme: ReturnType<ThemeRegistry['resolve']> | undefined
-    if (!deck.themeId)
-      errors.push({
-        code: 'THEME_NOT_FOUND',
-        message: 'Deck theme is missing.',
-      })
-    else {
-      try {
-        theme = themeRegistry.resolve(deck.themeId)
-      } catch (cause) {
-        errors.push({
-          code: 'THEME_NOT_FOUND',
-          message: cause instanceof Error ? cause.message : String(cause),
-        })
-      }
-    }
-    if (theme) {
-      const layouts = new Set(theme.manifest.layouts.map((layout) => layout.id))
-      for (const match of file.content.matchAll(
-        /^layout:\s*['"]?([^'"\s]+)['"]?\s*$/gm,
-      )) {
-        const layout = match[1]
-        if (layout && !layouts.has(layout))
-          errors.push({
-            code: 'LAYOUT_UNAVAILABLE',
-            message: `Layout is not registered for ${theme.manifest.id}: ${layout}`,
-          })
-      }
-    }
-    return {
-      deckId,
-      revision: file.revision,
-      valid: errors.length === 0,
-      themeId: theme?.manifest.id,
-      themeSkillId: theme?.manifest.skill.id,
-      errors,
-    }
+    return validateDeck(await resolveDeck(deckId))
   })
 
   app.post('/api/v1/decks/:deckId/format', async (request) => {
@@ -2392,6 +2673,13 @@ export async function createGateway(
       .parse(request.params)
     const input = CreateExportRequestSchema.parse(request.body)
     const deck = await resolveDeck(deckId)
+    const validation = await validateDeck(deck)
+    if (!validation.valid)
+      throw new RpcError(
+        'Deck validation found blocking issues. Fix them before export.',
+        'DECK_VALIDATION_FAILED',
+        { deckId, revision: deck.revision, errors: validation.errors },
+      )
     const policy = input.reviewPolicy ?? 'fast'
     if (policy !== 'fast') {
       const report = database.getQualityReport(deckId)
@@ -2464,12 +2752,16 @@ export async function createGateway(
   })
 
   app.post('/api/v1/decks/:deckId/inspections/quality', async (request) => {
-    const { deckId } = z.object({ deckId: z.string().min(1) }).parse(request.params)
-    const input = z.object({
-      slide: z.number().int().positive(),
-      policy: z.enum(['fast', 'standard', 'strict']).default('standard'),
-      profileDigest: z.string().min(1).nullable().default(null),
-    }).parse(request.body)
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const input = z
+      .object({
+        slide: z.number().int().positive(),
+        policy: z.enum(['fast', 'standard', 'strict']).default('standard'),
+        profileDigest: z.string().min(1).nullable().default(null),
+      })
+      .parse(request.body)
     const deck = await resolveDeck(deckId)
     const themeDigest = deck.themeId
       ? createHash('sha256').update(deck.themeId).digest('hex')
@@ -2478,32 +2770,41 @@ export async function createGateway(
       ? themeRegistry.resolve(deck.themeId).packageRoot
       : undefined
     const current = slidevHost.getState(deckId)
-    const state = current.status === 'ready' ? current : await slidevHost.start({
-      deckId,
-      entryFile: await resolveExistingPath(workspaceFiles.root, deck.entryFile),
-      ...(themePackageRoot ? { themePackageRoot } : {}),
-    })
+    const state =
+      current.status === 'ready'
+        ? current
+        : await slidevHost.start({
+            deckId,
+            entryFile: await resolveExistingPath(
+              workspaceFiles.root,
+              deck.entryFile,
+            ),
+            ...(themePackageRoot ? { themePackageRoot } : {}),
+          })
     requireSlidevReady(state, 'inspection')
-    return BrowserInspectionJobSchema.parse(inspectionManager.enqueue(
-      deckId,
-      input.slide,
-      'quality',
-      {
+    return BrowserInspectionJobSchema.parse(
+      inspectionManager.enqueue(deckId, input.slide, 'quality', {
         revision: deck.revision,
         themeId: deck.themeId ?? null,
         themeDigest,
         profileDigest: input.profileDigest,
         policy: input.policy,
-      },
-    ))
+      }),
+    )
   })
 
   app.get('/api/v1/decks/:deckId/quality-report', async (request) => {
-    const { deckId } = z.object({ deckId: z.string().min(1) }).parse(request.params)
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
     await resolveDeck(deckId)
     const report = database.getQualityReport(deckId)
     if (!report)
-      throw new RpcError('Quality report was not found.', 'QUALITY_REPORT_NOT_FOUND', { deckId })
+      throw new RpcError(
+        'Quality report was not found.',
+        'QUALITY_REPORT_NOT_FOUND',
+        { deckId },
+      )
     return DeckQualityReportSchema.parse(report)
   })
 
@@ -2543,18 +2844,20 @@ export async function createGateway(
     const completed = inspectionManager.submitResult(inspectionId, request.body)
     if (completed.kind === 'quality' && completed.status === 'completed') {
       const result = BrowserQualityResultSchema.parse(completed.result)
-      database.recordQualityReport(DeckQualityReportSchema.parse({
-        version: 1,
-        deckId: completed.deckId,
-        revision: completed.revision,
-        themeId: completed.themeId ?? null,
-        themeDigest: completed.themeDigest ?? null,
-        profileDigest: completed.profileDigest ?? null,
-        checkedAt: new Date().toISOString(),
-        policy: completed.policy ?? 'standard',
-        ok: !result.issues.some((issue) => issue.severity === 'error'),
-        issues: result.issues,
-      }))
+      database.recordQualityReport(
+        DeckQualityReportSchema.parse({
+          version: 1,
+          deckId: completed.deckId,
+          revision: completed.revision,
+          themeId: completed.themeId ?? null,
+          themeDigest: completed.themeDigest ?? null,
+          profileDigest: completed.profileDigest ?? null,
+          checkedAt: new Date().toISOString(),
+          policy: completed.policy ?? 'standard',
+          ok: !result.issues.some((issue) => issue.severity === 'error'),
+          issues: result.issues,
+        }),
+      )
     }
     return BrowserInspectionJobSchema.parse(completed)
   })
