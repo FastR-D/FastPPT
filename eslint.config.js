@@ -151,4 +151,12 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   },
+  {
+    ...tseslint.configs.disableTypeChecked,
+    files: ['packages/slidev-host/setup/**/*.ts'],
+    rules: {
+      ...tseslint.configs.disableTypeChecked.rules,
+      '@typescript-eslint/consistent-type-imports': 'error',
+    },
+  },
 )

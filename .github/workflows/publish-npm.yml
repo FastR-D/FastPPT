@@ -2,6 +2,12 @@ name: Publish npm packages
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Verify packages without publishing them
+        required: false
+        default: false
+        type: boolean
   release:
     types: [published]
 
@@ -15,7 +21,6 @@ permissions:
 
 jobs:
   publish:
-    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -41,4 +46,8 @@ jobs:
           pnpm --filter @fastppt/cli lint
           pnpm --filter @fastppt/cli test
       - name: Publish packages
+        if: ${{ !inputs.dry_run }}
         run: pnpm npm:publish
+      - name: Dry-run package publishing
+        if: ${{ inputs.dry_run }}
+        run: pnpm npm:publish:dry-run
