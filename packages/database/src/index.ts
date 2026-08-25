@@ -560,7 +560,7 @@ export function createDatabase(filename: string): FastPptDatabase {
         ? SessionProfileRecordSchema.parse({
             harness: row.harness,
             sessionId: row.session_id,
-            profile: JSON.parse(row.profile),
+            profile: JSON.parse(row.profile) as unknown,
             profileDigest: row.profile_digest,
             registryVersion: row.registry_version,
             themeSkillId: row.theme_skill_id,

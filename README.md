@@ -137,7 +137,7 @@ fastppt --help
 ### 源码开发
 
 ```bash
-git clone https://github.com/FastR-D/FastPPT.git
+git clone https://github.com/FastR-D/FastPPT-slidev.git
 cd FastPPT
 pnpm install
 pnpm dev --dir ./examples/demo-deck
@@ -219,4 +219,3 @@ FastPPT 在以下项目与工作流基础上进行集成、迁移或参考设计
 | [可编辑 PPTX](packages/slidewave/SLIDEV_EDITABLE_PPT.md)        | Slidev 到可编辑 PowerPoint 的转换设计        |
 | [pptx-renderer 参考](https://github.com/aiden0z/pptx-renderer)        | PPTX 渲染参考项目                 |
 | [Kimi PPT Skill 参考](https://github.com/Binaryify/open-kimi-ppt-skill) | PPT 生成 Skill 参考项目           |
-

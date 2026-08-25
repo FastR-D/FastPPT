@@ -40,6 +40,7 @@ describe('theme registry', () => {
     const registry = await loadThemeRegistry(builtInThemes)
     expect(registry.themes.map((theme) => theme.manifest.id)).toEqual([
       'slidev-theme-academy',
+      'slidev-theme-crimson-violet',
       'slidev-theme-eloc',
       'slidev-theme-landing',
       'slidev-theme-ledger',
@@ -58,6 +59,7 @@ describe('theme registry', () => {
       'slidev-theme-the-unnamed',
       'slidev-theme-touying',
       'slidev-theme-tud-db',
+      'slidev-theme-xiaomi',
     ])
     expect(
       registry.resolve('slidev-theme-academy').manifest.skill,

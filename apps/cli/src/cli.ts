@@ -46,7 +46,9 @@ function processExists(pid: number): boolean {
   }
 }
 
-async function readRuntime(workspaceRoot: string): Promise<GatewayRuntime | undefined> {
+async function readRuntime(
+  workspaceRoot: string,
+): Promise<GatewayRuntime | undefined> {
   try {
     const value = JSON.parse(
       await readFile(
@@ -70,7 +72,7 @@ async function readRuntime(workspaceRoot: string): Promise<GatewayRuntime | unde
 
 async function requestJson(url: string): Promise<unknown> {
   const response = await fetch(url, { signal: AbortSignal.timeout(5_000) })
-  const body = (await response.json()) as unknown
+  const body = await response.json()
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`)
   return body
 }
@@ -149,7 +151,11 @@ async function runDoctor(
   json: boolean,
   paths: ReturnType<typeof resolveCliRuntimePaths>,
 ): Promise<void> {
-  const checks: Array<{ name: string; status: 'ok' | 'error'; message: string }> = []
+  const checks: Array<{
+    name: string
+    status: 'ok' | 'error'
+    message: string
+  }> = []
   try {
     const installed = await installBundledThemes({
       bundledThemesRoot: paths.bundledThemesRoot,
@@ -191,7 +197,11 @@ async function runDoctor(
       await access(path)
       checks.push({ name, status: 'ok', message: path })
     } catch {
-      checks.push({ name, status: 'error', message: `Missing runtime asset: ${path}` })
+      checks.push({
+        name,
+        status: 'error',
+        message: `Missing runtime asset: ${path}`,
+      })
     }
   }
   if (root) {

@@ -26,8 +26,10 @@ test('runs the complete local workspace, Harness, editor, preview and export flo
   await expect(page.getByText('fastppt-e2e-workspace').first()).toBeVisible()
   await expect(page.getByTitle('Slidev preview')).toBeVisible()
   await expect(page.locator('.slide-placeholder')).toHaveCount(0)
-  await expect(page.getByText('第 1 页')).toBeVisible()
   const previewFrame = page.getByTitle('Slidev preview').contentFrame()
+  await expect(
+    previewFrame.getByRole('heading', { name: 'Academy E2E' }),
+  ).toBeVisible()
   await expect(
     previewFrame.getByRole('button', { name: 'Go to previous slide' }),
   ).toBeHidden()
