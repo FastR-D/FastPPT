@@ -504,6 +504,47 @@ export const useSessionsStore = defineStore('sessions', () => {
     }
   }
 
+  /**
+   * Create an editing branch from the selected conversation instead of starting
+   * an unrelated session. The harness-owned fork carries the generation
+   * transcript, while the copied FastPPT profile is narrowed to the target page.
+   */
+  async function forkSelectedSessionForPageEdit(input: {
+    title: string
+    profile: SessionDeckProfile
+  }): Promise<boolean> {
+    const sessionId = selectedSessionId.value
+    if (!sessionId) {
+      error.value = '请先选择生成此演示文稿的对话，再创建单页编辑分支。'
+      return false
+    }
+    if (!selectedHarnessStatus.value?.capabilities.sessionFork) {
+      error.value = '当前 Harness 不支持从生成对话创建编辑分支。'
+      return false
+    }
+    error.value = undefined
+    try {
+      const forked = await client.forkSession(selectedHarness.value, sessionId)
+      await Promise.all([
+        client.updateSessionProfile(
+          selectedHarness.value,
+          forked.sessionId,
+          input.profile,
+        ),
+        client.updateSessionAlias(
+          selectedHarness.value,
+          forked.sessionId,
+          input.title,
+        ),
+      ])
+      await selectSession(forked.sessionId)
+      return true
+    } catch (cause) {
+      error.value = cause instanceof Error ? cause.message : String(cause)
+      return false
+    }
+  }
+
   async function send(themeId?: string): Promise<void> {
     const content = draft.value.trim()
     const sessionId = selectedSessionId.value
@@ -676,6 +717,7 @@ export const useSessionsStore = defineStore('sessions', () => {
     createSession,
     renameSelectedSession,
     forkSelectedSession,
+    forkSelectedSessionForPageEdit,
     send,
     addAttachment,
     removeAttachment,

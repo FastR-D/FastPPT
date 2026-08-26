@@ -444,6 +444,18 @@ export function useGatewayClient() {
     )
   }
 
+  function updateSessionProfile(
+    harness: HarnessKind,
+    sessionId: string,
+    profile: SessionDeckProfile,
+  ): Promise<SessionProfileRecord> {
+    return request(
+      `/api/v1/sessions/${harness}/${encodeURIComponent(sessionId)}/profile`,
+      SessionProfileRecordSchema,
+      { method: 'PUT', body: JSON.stringify(profile) },
+    )
+  }
+
   function updateSessionAlias(
     harness: HarnessKind,
     sessionId: string,
@@ -585,6 +597,7 @@ export function useGatewayClient() {
     getSession,
     createSession,
     getSessionProfile,
+    updateSessionProfile,
     updateSessionAlias,
     resumeSession,
     forkSession,

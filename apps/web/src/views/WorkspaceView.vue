@@ -31,6 +31,7 @@ const editorActivity = shallowRef<'files' | 'slidev'>('files')
 const selectedPage = shallowRef(1)
 const pageEditOpen = shallowRef(false)
 const pageEditPage = shallowRef(1)
+const pageEditSubmitting = shallowRef(false)
 
 function flattenMarkdownPaths(
   nodes: readonly FileNode[],
@@ -245,23 +246,22 @@ function openPageEdit(page: number): void {
 }
 
 async function submitPageEdit(instruction: string): Promise<void> {
+  if (pageEditSubmitting.value) return
   const path = filesStore.selectedFile?.path
   const theme = previewStore.selectedTheme
   if (!path || !theme) return
-  const pageSource = slideChunks(filesStore.draft)[pageEditPage.value - 1]
-  if (!pageSource) return
-  await sessionsStore.createSession({
-      title: `${path} · 第 ${pageEditPage.value} 页临时修改`,
-      profile: {
+  pageEditSubmitting.value = true
+  let branched: boolean | undefined
+  try {
+    const sourceProfile = sessionsStore.selectedProfile?.profile
+    const profile: SessionDeckProfile = {
+      ...(sourceProfile ?? {
         version: 1,
-        conversationMode: 'edit-page',
-        target: { markdownPath: path, slide: pageEditPage.value },
-        artifactRoute: 'edit-slidev',
         audience: '沿用当前演示文稿受众',
         communicationIntent: 'instruction',
         narrativeMode: 'instructional',
         language: 'source',
-        theme: { mode: 'registered', themeId: theme.themeId },
+        theme: { mode: 'registered' as const, themeId: theme.themeId },
         preservation: {
           wording: 'free',
           pageCount: 'preserve',
@@ -269,21 +269,39 @@ async function submitPageEdit(instruction: string): Promise<void> {
           visualStructure: 'free',
         },
         reviewPolicy: 'standard',
+      }),
+      conversationMode: 'edit-page',
+      target: { markdownPath: path, slide: pageEditPage.value },
+      artifactRoute: 'edit-slidev',
+      theme:
+        sourceProfile?.theme.mode === 'registered'
+          ? sourceProfile.theme
+          : { mode: 'registered', themeId: theme.themeId },
+      preservation: {
+        wording: sourceProfile?.preservation.wording ?? 'free',
+        pageCount: 'preserve',
+        pageOrder: 'preserve',
+        visualStructure: sourceProfile?.preservation.visualStructure ?? 'free',
       },
-  })
-  if (sessionsStore.error) return
+    }
+    branched = await sessionsStore.forkSelectedSessionForPageEdit({
+      title: `${sessionsStore.selectedSession?.title ?? '演示文稿'} · 第 ${pageEditPage.value} 页编辑`,
+      profile,
+    })
+  } finally {
+    pageEditSubmitting.value = false
+  }
+  if (!branched) return
   pageEditOpen.value = false
   workspaceMode.value = 'chat'
   compactPanel.value = 'workbench'
-  sessionsStore.draft = `只修改 ${path} 的第 ${pageEditPage.value} 页，其他页面必须保持不变。
+  sessionsStore.draft = `请基于本分支继承的演示文稿生成对话继续执行，不要重新进行需求读取或内容分析。
+
+只修改 ${path} 的第 ${pageEditPage.value} 页，其他页面必须保持不变。
 
 修改要求：${instruction}
 
-<fastppt-target-page path="${path}" slide="${pageEditPage.value}">
-${pageSource}
-</fastppt-target-page>
-
-上面的目标页内容是创建对话时的版本。修改前先与当前文档对应页核对；完成后运行格式化、验证和该页质量检查。`
+沿用父对话中已确认的受众、叙事、主题和设计决策。修改前只核对当前文档的目标页；完成后运行格式化、验证和该页质量检查。`
   await sendMessage()
 }
 
@@ -588,7 +606,7 @@ async function createConfiguredSession(input: {
       :open="pageEditOpen"
       :path="filesStore.selectedFile?.path ?? ''"
       :page="pageEditPage"
-      :sending="sessionsStore.sending"
+      :sending="pageEditSubmitting"
       @close="pageEditOpen = false"
       @submit="submitPageEdit"
     />
