@@ -1,0 +1,75 @@
+{
+  "page_id": "page_t1_003",
+  "page_type": "process",
+  "facts": [
+    {
+      "fact_id": "fact_t1_pipeline",
+      "value": "PageContract -> Template Compiler -> Style Compiler -> SVG/结构化对象 -> Adapter -> 静态 QA -> PowerPoint",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_003#facts/fact_t1_pipeline",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    }
+  ],
+  "text": [
+    "PageContract",
+    "Template Compiler",
+    "Style Compiler",
+    "SVG / 结构化对象",
+    "Adapter",
+    "静态 QA",
+    "PowerPoint"
+  ],
+  "content_blocks": [],
+  "relations": [
+    {
+      "relation_id": "process-1",
+      "from": "node-1",
+      "to": "node-2",
+      "kind": "connector"
+    },
+    {
+      "relation_id": "process-2",
+      "from": "node-2",
+      "to": "node-3",
+      "kind": "connector"
+    },
+    {
+      "relation_id": "process-3",
+      "from": "node-3",
+      "to": "node-4",
+      "kind": "connector"
+    },
+    {
+      "relation_id": "process-4",
+      "from": "node-4",
+      "to": "node-5",
+      "kind": "connector"
+    },
+    {
+      "relation_id": "process-5",
+      "from": "node-5",
+      "to": "node-6",
+      "kind": "connector"
+    },
+    {
+      "relation_id": "process-6",
+      "from": "node-6",
+      "to": "node-7",
+      "kind": "connector"
+    }
+  ],
+  "datasets": [],
+  "prohibited_changes": [
+    "page_number",
+    "footer_legal",
+    "master_background"
+  ],
+  "required_capabilities": [
+    "template_skeleton",
+    "style_tokens"
+  ],
+  "title": "生成与导出流程",
+  "content_hash": "sha256:ebe6ee619c8adaa70cc82e557c68a6d7867fcda2d40cbfa4def8ae25d3e764e7",
+  "schema_version": "2.0.0"
+}

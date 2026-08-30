@@ -1,0 +1,26 @@
+{
+  "schema_version": "2.0.0",
+  "required_capabilities": [],
+  "fixture_id": "task1",
+  "style_id": "style_task1_signal",
+  "style_version": "1.0.0",
+  "template_id": "template_task1_briefing",
+  "template_version": "1.0.0",
+  "files": {
+    "hero-grid.png": "sha256:d20d9f71538c36b5de8c0c0afab7edbed6177627fe8d51970cf706170bd0f708",
+    "pages/page_t1_001.json": "sha256:6e7802ad10bdd336a600b74cf33fa5edfd12fc9883c3188b3a5d37e5e393f3b8",
+    "pages/page_t1_002.json": "sha256:214dace1c34d1e2ed1577f81ffe2b970dd788cccb09857d775b7d85d52d050de",
+    "pages/page_t1_003.json": "sha256:52f085353a9a0707c2424fe459d9ef134f8a8587c3b5d2527c25ffe90a75dca6",
+    "SOURCE.md": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+    "style.manifest.json": "sha256:e2076206a23908af20461040c2bce52d8da8ee883390333f88cb77720f25cdc6",
+    "template.manifest.json": "sha256:44d9a925b702e2c59e44d8933646b182f552c387444a5291eba2fa56ae301e95",
+    "template.potx": "sha256:337d083789415d9e4304c958e999f6ec4160ea1a76e609ba6223817f8f952e28",
+    "expected_irs.json": "sha256:f7d87fac7a7a85313ac8cac029a19fb65f5518083cfe020e1f6d0c757cb17551",
+    "powerpoint-golden.json": "sha256:faba5100748ceb3294bf708132d443363e1bbd3232ac7d8a6805fd2d4b923585",
+    "powerpoint/16.0/slide-1.png": "sha256:8aea9e3159b9319dd3b5d630f545817755ecbb930ba1d41128d67508afbc560c",
+    "powerpoint/16.0/slide-2.png": "sha256:e78f756f62bcb88b2625d434bbaaf5576c931f23c330e107d078e2406ce89850",
+    "powerpoint/16.0/slide-3.png": "sha256:64ea0111390b717650a027dd2cd2ea6a862f97c3247def0d05961176ac88f8ac",
+    "source_artifact.manifest.json": "sha256:803ca061b4c4d4feb6a7fda779cc17f939594692710bcc46a6954b3f6a87d719"
+  },
+  "content_hash": "sha256:d62ee4c063a815a376140ebea8469a2768e04428948dc3d7a87e0746dba11927"
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0.0",
+  "artifact_id": "artifact_t1_source",
+  "path": "SOURCE.md",
+  "sha256": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+  "size_bytes": 297,
+  "media_type": "text/markdown",
+  "source": {
+    "kind": "task1_fixture",
+    "fixture_id": "task1"
+  },
+  "status": "committed",
+  "required_capabilities": [
+    "artifact_store",
+    "fact_bindings"
+  ],
+  "content_hash": "sha256:9e9f568f934ef9b54f8f578413ea7c9e1c6d9bb354b22581a592b9f2e00a94a9",
+  "license": "MIT",
+  "editable_level": "text_editable"
+}

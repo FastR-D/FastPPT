@@ -1,0 +1,13 @@
+# FastPPT kernel dependencies / FastPPT 内核依赖
+# =============================================
+#
+# The complete upstream dependency list stays inside the isolated kernel wrapper.
+# update_repo.py fingerprints this file and its recursive -r/--requirement include tree.
+# 完整上游依赖列表保存在隔离的内核目录中。
+# update_repo.py 会对本文件及递归 -r/--requirement 引用树计算指纹。
+#
+# Install / 安装方式：
+#   pip install -r requirements.txt                     # from repo root / 仓库根目录
+#   pip install -r kernel/ppt-master/upstream/requirements.txt
+#
+-r kernel/ppt-master/upstream/requirements.txt

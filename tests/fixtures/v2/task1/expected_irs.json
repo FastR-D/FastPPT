@@ -1,0 +1,1734 @@
+[
+  {
+    "schema_version": "2.0.0",
+    "page_id": "page_t1_001",
+    "page_type": "cover",
+    "slots": [
+      {
+        "slot_id": "page_t1_001:title",
+        "semantic": "title",
+        "capacity": 1,
+        "protected": false
+      },
+      {
+        "slot_id": "page_t1_001:subtitle",
+        "semantic": "subtitle",
+        "capacity": 1,
+        "protected": false
+      },
+      {
+        "slot_id": "page_t1_001:hero_image",
+        "semantic": "hero_image",
+        "capacity": 1,
+        "protected": false
+      }
+    ],
+    "objects": [
+      {
+        "object_id": "page_t1_001:title",
+        "kind": "text",
+        "slot": "page_t1_001:title",
+        "text": "FastPPT v2.0.0",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_001:body:0",
+        "kind": "text",
+        "slot": "page_t1_001:body",
+        "text": "FastPPT",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_001:body:1",
+        "kind": "text",
+        "slot": "page_t1_001:body",
+        "text": "v2.0.0",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_001:body:2",
+        "kind": "text",
+        "slot": "page_t1_001:body",
+        "text": "契约冻结",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "hero-grid",
+        "kind": "image",
+        "artifact_id": "hero-grid.png",
+        "editable_level": "visual_only"
+      }
+    ],
+    "native_objects": [
+      {
+        "object_id": "page_t1_001:title",
+        "kind": "text",
+        "slot": "page_t1_001:title",
+        "text": "FastPPT v2.0.0",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_001:body:0",
+        "kind": "text",
+        "slot": "page_t1_001:body",
+        "text": "FastPPT",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_001:body:1",
+        "kind": "text",
+        "slot": "page_t1_001:body",
+        "text": "v2.0.0",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_001:body:2",
+        "kind": "text",
+        "slot": "page_t1_001:body",
+        "text": "契约冻结",
+        "editable_level": "structured_editable"
+      }
+    ],
+    "svg_regions": [
+      {
+        "region_id": "page_t1_001:title",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_001:body:0",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_001:body:1",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_001:body:2",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "hero-grid",
+        "bounds": {},
+        "editable_level": "visual_only"
+      }
+    ],
+    "media_refs": [
+      "hero-grid.png"
+    ],
+    "editability": {
+      "page": "structured_editable",
+      "artifact": "structured_editable",
+      "page_t1_001:title": "structured_editable",
+      "page_t1_001:body:0": "structured_editable",
+      "page_t1_001:body:1": "structured_editable",
+      "page_t1_001:body:2": "structured_editable",
+      "hero-grid": "visual_only"
+    },
+    "attributes": {
+      "layout": {
+        "name": "cover",
+        "slots": [
+          "title",
+          "subtitle",
+          "hero_image"
+        ]
+      },
+      "background": "#FFFFFF",
+      "content_blocks": [
+        {
+          "block_id": "hero-grid",
+          "kind": "image",
+          "artifact_id": "hero-grid.png",
+          "role": "decorative"
+        }
+      ],
+      "datasets": [],
+      "density": "compact",
+      "facts": [
+        {
+          "fact_id": "fact_t1_product",
+          "value": "FastPPT",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_product",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        },
+        {
+          "fact_id": "fact_t1_version",
+          "value": "v2.0.0",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_version",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        },
+        {
+          "fact_id": "fact_t1_position",
+          "value": "契约冻结",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_position",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        }
+      ],
+      "font_family": "Arial",
+      "font_family_zh": "Microsoft YaHei",
+      "font_scale": 1.0,
+      "font_weight": 400,
+      "foreground": "#171A1D",
+      "min_font_size_pt": 18,
+      "page_id": "page_t1_001",
+      "page_type": "cover",
+      "primary": "#23745B",
+      "prohibited_changes": [
+        "page_number",
+        "footer_legal",
+        "master_background"
+      ],
+      "relations": [],
+      "risk": "#D14D3F",
+      "safe_margin_pt": 12,
+      "text": [
+        "FastPPT",
+        "v2.0.0",
+        "契约冻结"
+      ],
+      "title": "FastPPT v2.0.0",
+      "overrides": [
+        {
+          "attribute_path": "background",
+          "before": "#FFFFFF",
+          "after": "#FFFFFF",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "content_blocks",
+          "before": null,
+          "after": [
+            {
+              "block_id": "hero-grid",
+              "kind": "image",
+              "artifact_id": "hero-grid.png",
+              "role": "decorative"
+            }
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "datasets",
+          "before": null,
+          "after": [],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "density",
+          "before": null,
+          "after": "compact",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "facts",
+          "before": null,
+          "after": [
+            {
+              "fact_id": "fact_t1_product",
+              "value": "FastPPT",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_product",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            },
+            {
+              "fact_id": "fact_t1_version",
+              "value": "v2.0.0",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_version",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            },
+            {
+              "fact_id": "fact_t1_position",
+              "value": "契约冻结",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_position",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            }
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_family",
+          "before": "Arial",
+          "after": "Arial",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_family_zh",
+          "before": null,
+          "after": "Microsoft YaHei",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_scale",
+          "before": 1.0,
+          "after": 1.0,
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_weight",
+          "before": null,
+          "after": 400,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "foreground",
+          "before": null,
+          "after": "#171A1D",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "min_font_size_pt",
+          "before": null,
+          "after": 18,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "page_id",
+          "before": null,
+          "after": "page_t1_001",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "page_type",
+          "before": null,
+          "after": "cover",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "primary",
+          "before": null,
+          "after": "#23745B",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "prohibited_changes",
+          "before": null,
+          "after": [
+            "page_number",
+            "footer_legal",
+            "master_background"
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "relations",
+          "before": null,
+          "after": [],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "risk",
+          "before": null,
+          "after": "#D14D3F",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "safe_margin_pt",
+          "before": null,
+          "after": 12,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "text",
+          "before": null,
+          "after": [
+            "FastPPT",
+            "v2.0.0",
+            "契约冻结"
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "title",
+          "before": null,
+          "after": "FastPPT v2.0.0",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        }
+      ]
+    },
+    "design_snapshot_hash": "sha256:fd182b6af6bdec8389eeaad16ca022d0e04a6f597e551bd93566f00082c10563",
+    "required_capabilities": [
+      "template_skeleton",
+      "style_tokens"
+    ],
+    "content_hash": "sha256:c42c1ca04def37651950f5d8102291b25b9a1a6cedb86ac788bd4a5261f7c291"
+  },
+  {
+    "schema_version": "2.0.0",
+    "page_id": "page_t1_002",
+    "page_type": "comparison",
+    "slots": [
+      {
+        "slot_id": "page_t1_002:title",
+        "semantic": "title",
+        "capacity": 1,
+        "protected": false
+      },
+      {
+        "slot_id": "page_t1_002:left",
+        "semantic": "left",
+        "capacity": 1,
+        "protected": false
+      },
+      {
+        "slot_id": "page_t1_002:right",
+        "semantic": "right",
+        "capacity": 1,
+        "protected": false
+      }
+    ],
+    "objects": [
+      {
+        "object_id": "page_t1_002:title",
+        "kind": "text",
+        "slot": "page_t1_002:title",
+        "text": "本地与服务器",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:0",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "本地",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:1",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "SQLite / 本地文件 / 持久队列",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:2",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "服务器",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:3",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "PostgreSQL 17 / S3 或 MinIO / 独立 Worker",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:4",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "真实服务器 unverified",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:relation:0",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "comparison-local-server",
+          "from": "本地",
+          "to": "服务器",
+          "kind": "comparison"
+        },
+        "editable_level": "structured_editable"
+      }
+    ],
+    "native_objects": [
+      {
+        "object_id": "page_t1_002:title",
+        "kind": "text",
+        "slot": "page_t1_002:title",
+        "text": "本地与服务器",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:0",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "本地",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:1",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "SQLite / 本地文件 / 持久队列",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:2",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "服务器",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:3",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "PostgreSQL 17 / S3 或 MinIO / 独立 Worker",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:body:4",
+        "kind": "text",
+        "slot": "page_t1_002:body",
+        "text": "真实服务器 unverified",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_002:relation:0",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "comparison-local-server",
+          "from": "本地",
+          "to": "服务器",
+          "kind": "comparison"
+        },
+        "editable_level": "structured_editable"
+      }
+    ],
+    "svg_regions": [
+      {
+        "region_id": "page_t1_002:title",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_002:body:0",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_002:body:1",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_002:body:2",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_002:body:3",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_002:body:4",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_002:relation:0",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      }
+    ],
+    "media_refs": [],
+    "editability": {
+      "page": "structured_editable",
+      "artifact": "structured_editable",
+      "page_t1_002:title": "structured_editable",
+      "page_t1_002:body:0": "structured_editable",
+      "page_t1_002:body:1": "structured_editable",
+      "page_t1_002:body:2": "structured_editable",
+      "page_t1_002:body:3": "structured_editable",
+      "page_t1_002:body:4": "structured_editable",
+      "page_t1_002:relation:0": "structured_editable"
+    },
+    "attributes": {
+      "layout": {
+        "name": "two_column",
+        "slots": [
+          "title",
+          "left",
+          "right"
+        ]
+      },
+      "background": "#FFFFFF",
+      "content_blocks": [],
+      "datasets": [],
+      "density": "compact",
+      "facts": [
+        {
+          "fact_id": "fact_t1_local",
+          "value": "本地：SQLite/本地文件/持久队列",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_local",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        },
+        {
+          "fact_id": "fact_t1_server",
+          "value": "服务器：PostgreSQL 17/S3或MinIO/独立Worker",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_server",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        },
+        {
+          "fact_id": "fact_t1_unverified",
+          "value": "真实服务器 unverified",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_unverified",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        }
+      ],
+      "font_family": "Arial",
+      "font_family_zh": "Microsoft YaHei",
+      "font_scale": 1.0,
+      "font_weight": 400,
+      "foreground": "#171A1D",
+      "min_font_size_pt": 18,
+      "page_id": "page_t1_002",
+      "page_type": "comparison",
+      "primary": "#23745B",
+      "prohibited_changes": [
+        "page_number",
+        "footer_legal",
+        "master_background"
+      ],
+      "relations": [
+        {
+          "relation_id": "comparison-local-server",
+          "from": "本地",
+          "to": "服务器",
+          "kind": "comparison"
+        }
+      ],
+      "risk": "#D14D3F",
+      "safe_margin_pt": 12,
+      "text": [
+        "本地",
+        "SQLite / 本地文件 / 持久队列",
+        "服务器",
+        "PostgreSQL 17 / S3 或 MinIO / 独立 Worker",
+        "真实服务器 unverified"
+      ],
+      "title": "本地与服务器",
+      "overrides": [
+        {
+          "attribute_path": "background",
+          "before": "#FFFFFF",
+          "after": "#FFFFFF",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "content_blocks",
+          "before": null,
+          "after": [],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "datasets",
+          "before": null,
+          "after": [],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "density",
+          "before": null,
+          "after": "compact",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "facts",
+          "before": null,
+          "after": [
+            {
+              "fact_id": "fact_t1_local",
+              "value": "本地：SQLite/本地文件/持久队列",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_local",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            },
+            {
+              "fact_id": "fact_t1_server",
+              "value": "服务器：PostgreSQL 17/S3或MinIO/独立Worker",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_server",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            },
+            {
+              "fact_id": "fact_t1_unverified",
+              "value": "真实服务器 unverified",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_unverified",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            }
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_family",
+          "before": "Arial",
+          "after": "Arial",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_family_zh",
+          "before": null,
+          "after": "Microsoft YaHei",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_scale",
+          "before": 1.0,
+          "after": 1.0,
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_weight",
+          "before": null,
+          "after": 400,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "foreground",
+          "before": null,
+          "after": "#171A1D",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "min_font_size_pt",
+          "before": null,
+          "after": 18,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "page_id",
+          "before": null,
+          "after": "page_t1_002",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "page_type",
+          "before": null,
+          "after": "comparison",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "primary",
+          "before": null,
+          "after": "#23745B",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "prohibited_changes",
+          "before": null,
+          "after": [
+            "page_number",
+            "footer_legal",
+            "master_background"
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "relations",
+          "before": null,
+          "after": [
+            {
+              "relation_id": "comparison-local-server",
+              "from": "本地",
+              "to": "服务器",
+              "kind": "comparison"
+            }
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "risk",
+          "before": null,
+          "after": "#D14D3F",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "safe_margin_pt",
+          "before": null,
+          "after": 12,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "text",
+          "before": null,
+          "after": [
+            "本地",
+            "SQLite / 本地文件 / 持久队列",
+            "服务器",
+            "PostgreSQL 17 / S3 或 MinIO / 独立 Worker",
+            "真实服务器 unverified"
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "title",
+          "before": null,
+          "after": "本地与服务器",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        }
+      ]
+    },
+    "design_snapshot_hash": "sha256:fd182b6af6bdec8389eeaad16ca022d0e04a6f597e551bd93566f00082c10563",
+    "required_capabilities": [
+      "template_skeleton",
+      "style_tokens"
+    ],
+    "content_hash": "sha256:92fb1086becba0e419c3ed7e51f2e8bca6f67148f487cee249fe38204713378d"
+  },
+  {
+    "schema_version": "2.0.0",
+    "page_id": "page_t1_003",
+    "page_type": "process",
+    "slots": [
+      {
+        "slot_id": "page_t1_003:title",
+        "semantic": "title",
+        "capacity": 1,
+        "protected": false
+      },
+      {
+        "slot_id": "page_t1_003:nodes",
+        "semantic": "nodes",
+        "capacity": 1,
+        "protected": false
+      },
+      {
+        "slot_id": "page_t1_003:connectors",
+        "semantic": "connectors",
+        "capacity": 1,
+        "protected": false
+      }
+    ],
+    "objects": [
+      {
+        "object_id": "page_t1_003:title",
+        "kind": "text",
+        "slot": "page_t1_003:title",
+        "text": "生成与导出流程",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:0",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "PageContract",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:1",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "Template Compiler",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:2",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "Style Compiler",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:3",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "SVG / 结构化对象",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:4",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "Adapter",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:5",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "静态 QA",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:6",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "PowerPoint",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:0",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-1",
+          "from": "node-1",
+          "to": "node-2",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:1",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-2",
+          "from": "node-2",
+          "to": "node-3",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:2",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-3",
+          "from": "node-3",
+          "to": "node-4",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:3",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-4",
+          "from": "node-4",
+          "to": "node-5",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:4",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-5",
+          "from": "node-5",
+          "to": "node-6",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:5",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-6",
+          "from": "node-6",
+          "to": "node-7",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      }
+    ],
+    "native_objects": [
+      {
+        "object_id": "page_t1_003:title",
+        "kind": "text",
+        "slot": "page_t1_003:title",
+        "text": "生成与导出流程",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:0",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "PageContract",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:1",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "Template Compiler",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:2",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "Style Compiler",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:3",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "SVG / 结构化对象",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:4",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "Adapter",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:5",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "静态 QA",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:body:6",
+        "kind": "text",
+        "slot": "page_t1_003:body",
+        "text": "PowerPoint",
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:0",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-1",
+          "from": "node-1",
+          "to": "node-2",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:1",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-2",
+          "from": "node-2",
+          "to": "node-3",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:2",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-3",
+          "from": "node-3",
+          "to": "node-4",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:3",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-4",
+          "from": "node-4",
+          "to": "node-5",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:4",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-5",
+          "from": "node-5",
+          "to": "node-6",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      },
+      {
+        "object_id": "page_t1_003:relation:5",
+        "kind": "connector",
+        "relation": {
+          "relation_id": "process-6",
+          "from": "node-6",
+          "to": "node-7",
+          "kind": "connector"
+        },
+        "editable_level": "structured_editable"
+      }
+    ],
+    "svg_regions": [
+      {
+        "region_id": "page_t1_003:title",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:0",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:1",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:2",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:3",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:4",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:5",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:body:6",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:relation:0",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:relation:1",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:relation:2",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:relation:3",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:relation:4",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      },
+      {
+        "region_id": "page_t1_003:relation:5",
+        "bounds": {},
+        "editable_level": "structured_editable"
+      }
+    ],
+    "media_refs": [],
+    "editability": {
+      "page": "structured_editable",
+      "artifact": "structured_editable",
+      "page_t1_003:title": "structured_editable",
+      "page_t1_003:body:0": "structured_editable",
+      "page_t1_003:body:1": "structured_editable",
+      "page_t1_003:body:2": "structured_editable",
+      "page_t1_003:body:3": "structured_editable",
+      "page_t1_003:body:4": "structured_editable",
+      "page_t1_003:body:5": "structured_editable",
+      "page_t1_003:body:6": "structured_editable",
+      "page_t1_003:relation:0": "structured_editable",
+      "page_t1_003:relation:1": "structured_editable",
+      "page_t1_003:relation:2": "structured_editable",
+      "page_t1_003:relation:3": "structured_editable",
+      "page_t1_003:relation:4": "structured_editable",
+      "page_t1_003:relation:5": "structured_editable"
+    },
+    "attributes": {
+      "layout": {
+        "name": "process",
+        "slots": [
+          "title",
+          "nodes",
+          "connectors"
+        ]
+      },
+      "background": "#FFFFFF",
+      "content_blocks": [],
+      "datasets": [],
+      "density": "compact",
+      "facts": [
+        {
+          "fact_id": "fact_t1_pipeline",
+          "value": "PageContract -> Template Compiler -> Style Compiler -> SVG/结构化对象 -> Adapter -> 静态 QA -> PowerPoint",
+          "source_artifact_id": "artifact_t1_source",
+          "source_locator": "fixture://task1/pages/page_t1_003#facts/fact_t1_pipeline",
+          "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+          "locked": true
+        }
+      ],
+      "font_family": "Arial",
+      "font_family_zh": "Microsoft YaHei",
+      "font_scale": 1.0,
+      "font_weight": 400,
+      "foreground": "#171A1D",
+      "min_font_size_pt": 18,
+      "page_id": "page_t1_003",
+      "page_type": "process",
+      "primary": "#23745B",
+      "prohibited_changes": [
+        "page_number",
+        "footer_legal",
+        "master_background"
+      ],
+      "relations": [
+        {
+          "relation_id": "process-1",
+          "from": "node-1",
+          "to": "node-2",
+          "kind": "connector"
+        },
+        {
+          "relation_id": "process-2",
+          "from": "node-2",
+          "to": "node-3",
+          "kind": "connector"
+        },
+        {
+          "relation_id": "process-3",
+          "from": "node-3",
+          "to": "node-4",
+          "kind": "connector"
+        },
+        {
+          "relation_id": "process-4",
+          "from": "node-4",
+          "to": "node-5",
+          "kind": "connector"
+        },
+        {
+          "relation_id": "process-5",
+          "from": "node-5",
+          "to": "node-6",
+          "kind": "connector"
+        },
+        {
+          "relation_id": "process-6",
+          "from": "node-6",
+          "to": "node-7",
+          "kind": "connector"
+        }
+      ],
+      "risk": "#D14D3F",
+      "safe_margin_pt": 12,
+      "text": [
+        "PageContract",
+        "Template Compiler",
+        "Style Compiler",
+        "SVG / 结构化对象",
+        "Adapter",
+        "静态 QA",
+        "PowerPoint"
+      ],
+      "title": "生成与导出流程",
+      "overrides": [
+        {
+          "attribute_path": "background",
+          "before": "#FFFFFF",
+          "after": "#FFFFFF",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "content_blocks",
+          "before": null,
+          "after": [],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "datasets",
+          "before": null,
+          "after": [],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "density",
+          "before": null,
+          "after": "compact",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "facts",
+          "before": null,
+          "after": [
+            {
+              "fact_id": "fact_t1_pipeline",
+              "value": "PageContract -> Template Compiler -> Style Compiler -> SVG/结构化对象 -> Adapter -> 静态 QA -> PowerPoint",
+              "source_artifact_id": "artifact_t1_source",
+              "source_locator": "fixture://task1/pages/page_t1_003#facts/fact_t1_pipeline",
+              "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+              "locked": true
+            }
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_family",
+          "before": "Arial",
+          "after": "Arial",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_family_zh",
+          "before": null,
+          "after": "Microsoft YaHei",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_scale",
+          "before": 1.0,
+          "after": 1.0,
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "font_weight",
+          "before": null,
+          "after": 400,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "foreground",
+          "before": null,
+          "after": "#171A1D",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "min_font_size_pt",
+          "before": null,
+          "after": 18,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "page_id",
+          "before": null,
+          "after": "page_t1_003",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "page_type",
+          "before": null,
+          "after": "process",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "primary",
+          "before": null,
+          "after": "#23745B",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "prohibited_changes",
+          "before": null,
+          "after": [
+            "page_number",
+            "footer_legal",
+            "master_background"
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "relations",
+          "before": null,
+          "after": [
+            {
+              "relation_id": "process-1",
+              "from": "node-1",
+              "to": "node-2",
+              "kind": "connector"
+            },
+            {
+              "relation_id": "process-2",
+              "from": "node-2",
+              "to": "node-3",
+              "kind": "connector"
+            },
+            {
+              "relation_id": "process-3",
+              "from": "node-3",
+              "to": "node-4",
+              "kind": "connector"
+            },
+            {
+              "relation_id": "process-4",
+              "from": "node-4",
+              "to": "node-5",
+              "kind": "connector"
+            },
+            {
+              "relation_id": "process-5",
+              "from": "node-5",
+              "to": "node-6",
+              "kind": "connector"
+            },
+            {
+              "relation_id": "process-6",
+              "from": "node-6",
+              "to": "node-7",
+              "kind": "connector"
+            }
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "risk",
+          "before": null,
+          "after": "#D14D3F",
+          "source_type": "style",
+          "package_id": "style_task1_signal",
+          "package_version": "1.0.0",
+          "package_content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e",
+          "conflict_result": "overridden",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "safe_margin_pt",
+          "before": null,
+          "after": 12,
+          "source_type": "default",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "defaulted",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "text",
+          "before": null,
+          "after": [
+            "PageContract",
+            "Template Compiler",
+            "Style Compiler",
+            "SVG / 结构化对象",
+            "Adapter",
+            "静态 QA",
+            "PowerPoint"
+          ],
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        },
+        {
+          "attribute_path": "title",
+          "before": null,
+          "after": "生成与导出流程",
+          "source_type": "page_contract",
+          "package_id": null,
+          "package_version": null,
+          "package_content_hash": null,
+          "conflict_result": "preserved",
+          "compiler_version": "2.0.0"
+        }
+      ]
+    },
+    "design_snapshot_hash": "sha256:fd182b6af6bdec8389eeaad16ca022d0e04a6f597e551bd93566f00082c10563",
+    "required_capabilities": [
+      "template_skeleton",
+      "style_tokens"
+    ],
+    "content_hash": "sha256:bb9750f04fac1d5f2272061a0676e2ded911f09b72c019a2714e0a0a3392d0d0"
+  }
+]

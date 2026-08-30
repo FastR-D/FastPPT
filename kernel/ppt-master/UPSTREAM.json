@@ -1,0 +1,10 @@
+{
+  "name": "ppt-master",
+  "repository": "https://github.com/hugohe3/ppt-master",
+  "remote": "upstream",
+  "branch": "main",
+  "source_path": "skills/ppt-master",
+  "base_commit": "77eaa78a85f15b0d2824ca2c3733c3e57ee3ca12",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2025-2026 Hugo He"
+}

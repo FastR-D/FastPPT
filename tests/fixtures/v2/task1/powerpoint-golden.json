@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0.0",
+  "required_capabilities": [
+    "authoritative_render"
+  ],
+  "powerpoint_major_version": "16.0",
+  "render": {
+    "width": 1600,
+    "height": 900,
+    "format": "PNG"
+  },
+  "input_pptx_sha256": "sha256:3623f2241bcefaa162c54d9d7c4f172bd4662356f170f137a77f03cc2ccc4879",
+  "thresholds": {
+    "ssim_min": 0.985,
+    "rgb_delta_threshold": 24,
+    "max_changed_pixel_ratio": 0.005
+  },
+  "slides": [
+    {
+      "page_id": "page_t1_001",
+      "path": "powerpoint/16.0/slide-1.png",
+      "sha256": "sha256:8aea9e3159b9319dd3b5d630f545817755ecbb930ba1d41128d67508afbc560c"
+    },
+    {
+      "page_id": "page_t1_002",
+      "path": "powerpoint/16.0/slide-2.png",
+      "sha256": "sha256:e78f756f62bcb88b2625d434bbaaf5576c931f23c330e107d078e2406ce89850"
+    },
+    {
+      "page_id": "page_t1_003",
+      "path": "powerpoint/16.0/slide-3.png",
+      "sha256": "sha256:64ea0111390b717650a027dd2cd2ea6a862f97c3247def0d05961176ac88f8ac"
+    }
+  ],
+  "content_hash": "sha256:4319a5507a8f1a087fae1c2b7b189d7e6612a213f5226dc231d84a8bbac3cac3"
+}

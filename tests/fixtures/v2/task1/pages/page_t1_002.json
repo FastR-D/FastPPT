@@ -1,0 +1,59 @@
+{
+  "page_id": "page_t1_002",
+  "page_type": "comparison",
+  "facts": [
+    {
+      "fact_id": "fact_t1_local",
+      "value": "本地：SQLite/本地文件/持久队列",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_local",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    },
+    {
+      "fact_id": "fact_t1_server",
+      "value": "服务器：PostgreSQL 17/S3或MinIO/独立Worker",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_server",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    },
+    {
+      "fact_id": "fact_t1_unverified",
+      "value": "真实服务器 unverified",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_002#facts/fact_t1_unverified",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    }
+  ],
+  "text": [
+    "本地",
+    "SQLite / 本地文件 / 持久队列",
+    "服务器",
+    "PostgreSQL 17 / S3 或 MinIO / 独立 Worker",
+    "真实服务器 unverified"
+  ],
+  "content_blocks": [],
+  "relations": [
+    {
+      "relation_id": "comparison-local-server",
+      "from": "本地",
+      "to": "服务器",
+      "kind": "comparison"
+    }
+  ],
+  "datasets": [],
+  "prohibited_changes": [
+    "page_number",
+    "footer_legal",
+    "master_background"
+  ],
+  "required_capabilities": [
+    "template_skeleton",
+    "style_tokens"
+  ],
+  "title": "本地与服务器",
+  "content_hash": "sha256:4cf0f02f98cccb6627b0c6d9a98520defcc45276db4f4f5744fa215ea7b2dc8e",
+  "schema_version": "2.0.0"
+}

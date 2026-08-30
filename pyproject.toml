@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastppt"
+dynamic = ["version"]
+description = "Portable AI presentation production and editing system"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+license = { file = "LICENSE" }
+authors = [{ name = "FastR-D" }]
+dependencies = []
+
+[project.optional-dependencies]
+server = [
+  "boto3>=1.35",
+  "psycopg[binary]>=3.2",
+]
+agents = [
+  "claude-agent-sdk==0.2.142",
+]
+kernel = [
+  "PyYAML>=6.0",
+  "pypdf>=5.0",
+  "python-pptx>=0.6.21",
+  "XlsxWriter>=3.0.0",
+  "Pillow>=9.0.0",
+]
+test = []
+render = [
+  "pywin32>=308; platform_system == 'Windows'",
+]
+
+[project.scripts]
+fastppt = "fastppt_runtime.cli:main"
+fastppt-api = "fastppt_api.server:main"
+fastppt-worker = "fastppt_worker.cli:main"
+fastppt-render-worker = "fastppt_render.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "fastppt_core.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = [
+  "packages/fastppt-core/src",
+  "packages/edit-orchestrator/src",
+  "packages/ppt-master-adapter/src",
+  "packages/preview/src",
+  "packages/agent-harness/src",
+  "apps/runtime/src",
+  "services/api/src",
+  "services/worker/src",
+  "services/render/src",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

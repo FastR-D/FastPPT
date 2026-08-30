@@ -1,0 +1,118 @@
+name: fastppt-v1
+
+x-fastppt-environment: &fastppt-environment
+  FASTPPT_DEPLOYMENT_MODE: server
+  FASTPPT_HOST: 0.0.0.0
+  FASTPPT_PORT: 43110
+  FASTPPT_DATA_DIR: /var/lib/fastppt/data
+  FASTPPT_TEMP_DIR: /var/lib/fastppt/tmp
+  FASTPPT_EXPORT_DIR: /var/lib/fastppt/exports
+  FASTPPT_DATABASE_URL: postgresql://fastppt:${FASTPPT_POSTGRES_PASSWORD:?set FASTPPT_POSTGRES_PASSWORD}@postgres:5432/fastppt
+  FASTPPT_S3_ENDPOINT: http://minio:9000
+  FASTPPT_ALLOW_INSECURE_S3: "1"
+  FASTPPT_S3_BUCKET: fastppt
+  FASTPPT_S3_REGION: us-east-1
+  FASTPPT_S3_ACCESS_KEY: ${FASTPPT_S3_ACCESS_KEY:?set FASTPPT_S3_ACCESS_KEY}
+  FASTPPT_S3_SECRET_KEY: ${FASTPPT_S3_SECRET_KEY:?set FASTPPT_S3_SECRET_KEY}
+  FASTPPT_SESSION_SECRET: ${FASTPPT_SESSION_SECRET:?set FASTPPT_SESSION_SECRET}
+  FASTPPT_ADMIN_EMAIL: ${FASTPPT_ADMIN_EMAIL:?set FASTPPT_ADMIN_EMAIL}
+  FASTPPT_ADMIN_PASSWORD: ${FASTPPT_ADMIN_PASSWORD:?set FASTPPT_ADMIN_PASSWORD}
+  FASTPPT_CORS_ORIGINS: https://${FASTPPT_DOMAIN:?set FASTPPT_DOMAIN}
+  FASTPPT_AGENT_BACKEND: ${FASTPPT_AGENT_BACKEND:-codex}
+  FASTPPT_MODEL: ${FASTPPT_MODEL:?set FASTPPT_MODEL}
+  FASTPPT_MODEL_ENDPOINT_MODE: ${FASTPPT_MODEL_ENDPOINT_MODE:-official}
+  FASTPPT_MODEL_BASE_URL: ${FASTPPT_MODEL_BASE_URL:-}
+  FASTPPT_MODEL_API_KEY: ${FASTPPT_MODEL_API_KEY:?set FASTPPT_MODEL_API_KEY}
+  FASTPPT_RENDER_BACKEND: ${FASTPPT_RENDER_BACKEND:-unavailable}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fastppt
+      POSTGRES_USER: fastppt
+      POSTGRES_PASSWORD: ${FASTPPT_POSTGRES_PASSWORD:?set FASTPPT_POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fastppt -d fastppt"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2025-07-23T15-54-02Z
+    restart: unless-stopped
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${FASTPPT_S3_ACCESS_KEY:?set FASTPPT_S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${FASTPPT_S3_SECRET_KEY:?set FASTPPT_S3_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-07-21T05-28-08Z
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        mc alias set local http://minio:9000 "$${FASTPPT_S3_ACCESS_KEY}" "$${FASTPPT_S3_SECRET_KEY}" &&
+        mc mb --ignore-existing local/fastppt
+    environment:
+      FASTPPT_S3_ACCESS_KEY: ${FASTPPT_S3_ACCESS_KEY:?set FASTPPT_S3_ACCESS_KEY}
+      FASTPPT_S3_SECRET_KEY: ${FASTPPT_S3_SECRET_KEY:?set FASTPPT_S3_SECRET_KEY}
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/server/Dockerfile
+    image: fastppt:1.2.0
+    restart: unless-stopped
+    environment: *fastppt-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    expose:
+      - "43110"
+
+  worker:
+    image: fastppt:1.2.0
+    restart: unless-stopped
+    command: ["fastppt-worker"]
+    environment: *fastppt-environment
+    depends_on:
+      api:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      FASTPPT_DOMAIN: ${FASTPPT_DOMAIN:?set FASTPPT_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  minio-data:
+  caddy-data:
+  caddy-config:

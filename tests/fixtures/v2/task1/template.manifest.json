@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0.0",
+  "template_id": "template_task1_briefing",
+  "version": "1.0.0",
+  "source_format": ".potx",
+  "mode": "master_template",
+  "source": "FastPPT task-one original fixture",
+  "license": "MIT",
+  "skeleton_ref": "template.potx",
+  "layouts": [
+    {
+      "name": "cover",
+      "slots": [
+        "title",
+        "subtitle",
+        "hero_image"
+      ]
+    },
+    {
+      "name": "two_column",
+      "slots": [
+        "title",
+        "left",
+        "right"
+      ]
+    },
+    {
+      "name": "process",
+      "slots": [
+        "title",
+        "nodes",
+        "connectors"
+      ]
+    }
+  ],
+  "capacity": {
+    "cover": 8,
+    "comparison": 10,
+    "process": 14,
+    "text_lines": 14
+  },
+  "protected_assets": [
+    {
+      "id": "page_number",
+      "kind": "page_number",
+      "immutable": true
+    },
+    {
+      "id": "footer_legal",
+      "kind": "legal_notice",
+      "immutable": true
+    },
+    {
+      "id": "master_background",
+      "kind": "background",
+      "immutable": true
+    }
+  ],
+  "required_capabilities": [
+    "template_skeleton"
+  ],
+  "content_hash": "sha256:56c27288a52579186d94413b3dac7fd6b5ceb7c7be7ba5f22c3d02626a9a469d"
+}

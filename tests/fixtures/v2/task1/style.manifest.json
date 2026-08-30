@@ -1,0 +1,40 @@
+{
+  "schema_version": "2.0.0",
+  "style_id": "style_task1_signal",
+  "version": "1.0.0",
+  "source": "FastPPT task-one original fixture",
+  "license": "MIT",
+  "transformation_record": [
+    {
+      "step": "author",
+      "tool": "FastPPT fixture generator",
+      "version": "2.0.0"
+    }
+  ],
+  "tokens": {
+    "background": "#FFFFFF",
+    "foreground": "#171A1D",
+    "primary": "#23745B",
+    "risk": "#D14D3F",
+    "font_family": "Arial",
+    "font_family_zh": "Microsoft YaHei",
+    "font_scale": 1.0,
+    "density": "compact"
+  },
+  "capability_matrix": {
+    "colors": "applied",
+    "theme_colors": "applied",
+    "font_family": "applied",
+    "font_weight": "applied",
+    "font_scale": "applied",
+    "background": "applied",
+    "density": "applied",
+    "image_treatment": "applied",
+    "chart_visual": "applied",
+    "table_visual": "applied"
+  },
+  "required_capabilities": [
+    "style_tokens"
+  ],
+  "content_hash": "sha256:62dfe19a94354e42afa5ce408b02e4c59023366a504a8d199c5c301829f5a43e"
+}

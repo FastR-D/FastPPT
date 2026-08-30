@@ -1,0 +1,57 @@
+{
+  "page_id": "page_t1_001",
+  "page_type": "cover",
+  "facts": [
+    {
+      "fact_id": "fact_t1_product",
+      "value": "FastPPT",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_product",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    },
+    {
+      "fact_id": "fact_t1_version",
+      "value": "v2.0.0",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_version",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    },
+    {
+      "fact_id": "fact_t1_position",
+      "value": "契约冻结",
+      "source_artifact_id": "artifact_t1_source",
+      "source_locator": "fixture://task1/pages/page_t1_001#facts/fact_t1_position",
+      "source_hash": "sha256:24082fc41e8fa1e055df6447edb313c9731edae9a1cd7c71962004f5be2e7e61",
+      "locked": true
+    }
+  ],
+  "text": [
+    "FastPPT",
+    "v2.0.0",
+    "契约冻结"
+  ],
+  "content_blocks": [
+    {
+      "block_id": "hero-grid",
+      "kind": "image",
+      "artifact_id": "hero-grid.png",
+      "role": "decorative"
+    }
+  ],
+  "relations": [],
+  "datasets": [],
+  "prohibited_changes": [
+    "page_number",
+    "footer_legal",
+    "master_background"
+  ],
+  "required_capabilities": [
+    "template_skeleton",
+    "style_tokens"
+  ],
+  "title": "FastPPT v2.0.0",
+  "content_hash": "sha256:b3769ce02ccaea3670bb7c48275ffa486d08936bac2c1fda9ff40a64a5895a05",
+  "schema_version": "2.0.0"
+}

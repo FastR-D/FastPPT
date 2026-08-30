@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>FastPPT</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand" aria-label="FastPPT">
+        <span class="brand-mark">F</span>
+        <div><strong>FastPPT</strong><span id="product-version"></span></div>
+      </div>
+      <div class="project-heading">
+        <strong id="project-name">未选择项目</strong>
+        <span id="save-state">已保存</span>
+      </div>
+      <div class="top-actions">
+        <span class="mode-badge" id="deployment-mode">LOCAL</span>
+        <button class="icon-button top-icon" id="details-button" aria-label="打开项目详情" title="项目详情" disabled>☷</button>
+        <button class="icon-button top-icon" id="project-actions-button" aria-label="项目操作" title="项目操作" disabled>⋮</button>
+        <button class="secondary compact-command" id="upload-button" disabled><span aria-hidden="true">↑</span><span>导入</span></button>
+        <button class="primary compact-command" id="export-button" disabled><span aria-hidden="true">↓</span><span>导出</span></button>
+        <button class="icon-button top-icon account-button" id="account-button" aria-label="退出登录" title="退出登录" hidden>⇥</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="left-rail" aria-label="项目和页面">
+        <div class="rail-title"><span>项目</span><button class="icon-button" id="new-project-button" aria-label="新建项目" title="新建项目">+</button></div>
+        <nav id="project-list" class="project-list" aria-label="项目列表"></nav>
+        <button class="rail-command" id="archived-toggle" type="button">查看归档项目</button>
+        <div class="rail-title page-title"><span>页面</span><button class="icon-button" id="new-deck-button" aria-label="逐页录入" title="逐页录入" disabled>+</button></div>
+        <div id="page-list" class="page-list"></div>
+      </aside>
+
+      <section class="stage" aria-label="页面预览">
+        <div class="stage-toolbar">
+          <div class="preview-tabs" role="tablist" aria-label="预览类型">
+            <button class="preview-tab active" data-preview="visual" role="tab">视觉预览</button>
+            <button class="preview-tab" data-preview="quick" role="tab">快速预览</button>
+            <button class="preview-tab" data-preview="authoritative" role="tab">权威预览</button>
+          </div>
+          <span id="preview-state" class="status neutral">未选择页面</span>
+        </div>
+        <div id="preview-frame" class="preview-frame"><div class="empty-state"><strong>选择或新建项目</strong><span>页面预览会显示在这里</span></div></div>
+        <div class="page-meta"><span id="page-version">版本 -</span><span id="editable-level">可编辑等级 -</span><span id="qa-state">QA -</span></div>
+      </section>
+
+      <aside class="inspector" id="inspector" aria-label="项目详情">
+        <button class="inspector-close" id="inspector-close" aria-label="关闭项目详情" title="关闭">×</button>
+        <div class="inspector-tabs" role="tablist">
+          <button class="inspector-tab active" data-panel="sources">资料</button>
+          <button class="inspector-tab" data-panel="facts">事实</button>
+          <button class="inspector-tab" data-panel="plan">计划</button>
+          <button class="inspector-tab" data-panel="operations">任务</button>
+          <button class="inspector-tab" data-panel="versions">版本</button>
+          <button class="inspector-tab" data-panel="qa">QA</button>
+        </div>
+        <div id="inspector-content" class="inspector-content"></div>
+      </aside>
+
+      <section class="composer" aria-label="自然语言修改">
+        <div class="scope-control" role="group" aria-label="操作作用范围">
+          <button class="scope active" data-scope="single">当前页</button>
+          <button class="scope" data-scope="multi">勾选页</button>
+          <button class="scope" data-scope="global">全局</button>
+        </div>
+        <textarea id="instruction" rows="2" placeholder="描述需要修改的内容" aria-label="修改指令" disabled></textarea>
+        <button class="send-button" id="send-button" aria-label="提交修改" title="提交修改" disabled>提交</button>
+      </section>
+    </main>
+
+    <input id="file-input" type="file" accept=".md,.markdown,.docx,.pdf,.pptx" hidden>
+    <input id="image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+
+    <dialog id="project-dialog">
+      <form method="dialog" id="project-form">
+        <header><strong>新建项目</strong><button value="cancel" aria-label="关闭">×</button></header>
+        <label>项目名称<input id="new-project-name" maxlength="120" required></label>
+        <footer><button value="cancel" class="secondary">取消</button><button value="default" class="primary" id="create-project-button">创建</button></footer>
+      </form>
+    </dialog>
+
+    <dialog id="login-dialog">
+      <form id="login-form">
+        <header><strong>登录 FastPPT</strong></header>
+        <label>邮箱<input id="login-email" type="email" autocomplete="username" required></label>
+        <label>密码<input id="login-password" type="password" autocomplete="current-password" required></label>
+        <footer><button type="submit" class="primary">登录</button></footer>
+      </form>
+    </dialog>
+
+    <dialog id="deck-dialog">
+      <form method="dialog" id="deck-form">
+        <header><strong>逐页录入</strong><button value="cancel" aria-label="关闭">×</button></header>
+        <label>页面内容<textarea id="deck-pages" rows="14" placeholder="第一页标题&#10;正文内容&#10;&#10;---&#10;&#10;第二页标题&#10;正文内容" required></textarea></label>
+        <footer><button value="cancel" class="secondary">取消</button><button value="default" class="primary" id="plan-deck-button">生成计划</button></footer>
+      </form>
+    </dialog>
+
+    <dialog id="import-dialog">
+      <div class="dialog-content">
+        <header><strong>导入项目资源</strong><button data-close-dialog="import-dialog" aria-label="关闭">×</button></header>
+        <div class="command-list">
+          <button id="choose-document" class="command-row"><strong>资料文档</strong><span>Markdown、DOCX、PDF 或 PPTX</span></button>
+          <button id="choose-image" class="command-row"><strong>图片资源</strong><span>PNG、JPEG 或 WebP，并登记语义角色</span></button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="image-dialog">
+      <form method="dialog" id="image-form">
+        <header><strong>登记图片资源</strong><button value="cancel" aria-label="关闭">×</button></header>
+        <div class="selected-file" id="selected-image-name">尚未选择图片</div>
+        <label>语义角色
+          <select id="image-role">
+            <option value="content_reference">内容参考</option>
+            <option value="visual_reference">视觉参考</option>
+            <option value="layout_reference">版式参考</option>
+            <option value="color_reference">配色参考</option>
+            <option value="finished_slide">成品页参考</option>
+            <option value="edit_target">编辑目标</option>
+            <option value="local_asset">本地图片素材</option>
+          </select>
+        </label>
+        <footer><button value="cancel" class="secondary">取消</button><button value="default" class="primary">上传图片</button></footer>
+      </form>
+    </dialog>
+
+    <dialog id="project-actions-dialog">
+      <div class="dialog-content">
+        <header><strong>项目操作</strong><button data-close-dialog="project-actions-dialog" aria-label="关闭">×</button></header>
+        <label>项目名称<input id="rename-project-name" maxlength="120"></label>
+        <div class="project-action-grid">
+          <button class="secondary" id="rename-project">重命名</button>
+          <button class="secondary" id="copy-project">复制项目</button>
+          <button class="danger" id="archive-project">归档项目</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="confirm-dialog">
+      <div class="confirm-content">
+        <header><strong id="confirm-title">确认执行计划</strong><button id="close-confirm" aria-label="关闭">×</button></header>
+        <div id="confirm-summary"></div>
+        <footer><button id="cancel-plan" class="secondary">取消计划</button><button id="confirm-plan" class="primary">确认并执行</button></footer>
+      </div>
+    </dialog>
+
+    <dialog id="compare-dialog">
+      <div class="dialog-content">
+        <header><strong>版本比较</strong><button data-close-dialog="compare-dialog" aria-label="关闭">×</button></header>
+        <div id="compare-content"></div>
+      </div>
+    </dialog>
+
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
