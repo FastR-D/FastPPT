@@ -9,7 +9,7 @@
     "height": 900,
     "format": "PNG"
   },
-  "input_pptx_sha256": "sha256:3623f2241bcefaa162c54d9d7c4f172bd4662356f170f137a77f03cc2ccc4879",
+  "input_pptx_sha256": "sha256:25c493a7560baa603883ed1f511d6ff094289a57f65aa6c52fe1720e34c97940",
   "thresholds": {
     "ssim_min": 0.985,
     "rgb_delta_threshold": 24,
@@ -32,5 +32,5 @@
       "sha256": "sha256:64ea0111390b717650a027dd2cd2ea6a862f97c3247def0d05961176ac88f8ac"
     }
   ],
-  "content_hash": "sha256:4319a5507a8f1a087fae1c2b7b189d7e6612a213f5226dc231d84a8bbac3cac3"
+  "content_hash": "sha256:4b72fe4336b5312acd14cac077cf6af4bc0deecde768b91d9b6e326213d69dfe"
 }

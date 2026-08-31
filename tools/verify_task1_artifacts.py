@@ -90,6 +90,26 @@ def main() -> int:
                 "../slideLayouts/slideLayout6.xml",
             ]:
                 raise SystemExit("slides are not bound to cover/two-column/process template layouts")
+            if (manifest.get("qa_report") or {}).get("facts") != "passed":
+                raise SystemExit("manifest QA did not verify PPTX facts")
+            fixture_root = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "v2" / "task1"
+            slide_names = [
+                f"ppt/slides/slide{index}.xml"
+                for index in range(1, len(pages) + 1)
+            ]
+            text_namespaces = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
+            for index, page in enumerate(pages):
+                source_page = json.loads(
+                    (fixture_root / "pages" / f"{page['page_id']}.json").read_text(encoding="utf-8")
+                )
+                slide_root = ET.fromstring(output.read(slide_names[index]))
+                slide_text = [item.text or "" for item in slide_root.findall(".//a:t", text_namespaces)]
+                for fact in source_page.get("facts") or []:
+                    value = str(fact.get("value") or "")
+                    if value not in slide_text:
+                        raise SystemExit(
+                            f"PPTX slide {index + 1} is missing verbatim fact {fact.get('fact_id')}"
+                        )
     readiness = manifest.get("powerpoint_readiness") or {}
     golden = manifest.get("powerpoint_golden") or {}
     if readiness.get("status") == "ready":

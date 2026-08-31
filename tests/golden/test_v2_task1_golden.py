@@ -64,6 +64,13 @@ class V2Task1GoldenTests(TestCase):
                 }
                 process_xml = ET.fromstring(archive.read("ppt/slides/slide3.xml"))
                 self.assertEqual(len(process_xml.findall(".//p:cxnSp", namespaces)), 6)
+                slide_text = {}
+                for index in range(1, 4):
+                    slide_xml = ET.fromstring(archive.read(f"ppt/slides/slide{index}.xml"))
+                    slide_text[index] = [item.text or "" for item in slide_xml.findall(".//a:t", {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"})]
+                for index, page in enumerate(fixture["pages"], 1):
+                    for fact in page.facts:
+                        self.assertIn(str(fact["value"]), slide_text[index])
                 layout_targets = []
                 for index in range(1, 4):
                     relationships = ET.fromstring(archive.read(f"ppt/slides/_rels/slide{index}.xml.rels"))

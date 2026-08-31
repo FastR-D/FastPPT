@@ -15,6 +15,8 @@ from pathlib import Path
 import re
 import sys
 from typing import Any, Mapping
+import zipfile
+from xml.etree import ElementTree as ET
 
 from fastppt_core.v2 import (
     DesignConfirmationRequired,
@@ -151,6 +153,74 @@ def _process_svg(title: str, nodes: list[str], *, page_number: int, accent: str,
         '</svg>',
     ])
     return "\n".join(parts)
+
+
+def _append_fact_carriers(svg: str, facts: list[str]) -> str:
+    """Keep each locked fact as one exact, editable DrawingML text run.
+
+    The visible composition may wrap long facts for readability.  These
+    zero-opacity carriers preserve the contract's verbatim value in the final
+    PPTX without changing the rendered slide pixels.
+    """
+    if not facts:
+        return svg
+    carriers = [
+        (
+            f'<text id="fact-carrier-{index + 1}" data-pptx-role="fact-carrier" '
+            f'x="24" y="{20 + index * 18}" font-family="Arial, Microsoft YaHei, sans-serif" '
+            f'font-size="17" fill="#000000" fill-opacity="0">{html.escape(value)}</text>'
+        )
+        for index, value in enumerate(facts)
+        if value
+    ]
+    if not carriers:
+        return svg
+    marker = "</svg>"
+    if marker not in svg:
+        raise V2ContractError("Task-one SVG is missing its closing root element")
+    return svg.replace(marker, "\n" + "\n".join(carriers) + "\n" + marker, 1)
+
+
+def _verify_pptx_facts(path: Path, pages: tuple[PageContractV2, ...]) -> dict[str, Any]:
+    """Verify every locked fact appears verbatim in its corresponding slide."""
+    namespaces = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
+    slide_pattern = re.compile(r"ppt/slides/slide(\d+)\.xml$")
+    with zipfile.ZipFile(path) as archive:
+        slide_names = sorted(
+            (name for name in archive.namelist() if slide_pattern.fullmatch(name)),
+            key=lambda name: int(slide_pattern.fullmatch(name).group(1)),
+        )
+        if len(slide_names) != len(pages):
+            raise V2ContractError(
+                f"Task-one PPTX slide count {len(slide_names)} does not match page count {len(pages)}"
+            )
+        slide_text: list[list[str]] = []
+        for name in slide_names:
+            root = ET.fromstring(archive.read(name))
+            slide_text.append([str(item.text or "") for item in root.findall(".//a:t", namespaces)])
+
+    matches: list[dict[str, Any]] = []
+    missing: list[str] = []
+    for index, page in enumerate(pages):
+        values = slide_text[index]
+        for fact in page.facts:
+            expected = str(fact.get("value") or "")
+            matched = expected in values
+            matches.append(
+                {
+                    "page_id": page.page_id,
+                    "fact_id": str(fact.get("fact_id") or ""),
+                    "value": expected,
+                    "matched": matched,
+                }
+            )
+            if not matched:
+                missing.append(f"{page.page_id}:{fact.get('fact_id')}")
+    if missing:
+        raise V2ContractError(
+            "Generated PPTX does not preserve locked facts verbatim: " + ", ".join(missing)
+        )
+    return {"status": "passed", "slide_count": len(slide_text), "matches": matches}
 
 
 def fixture_root(root: Path | None = None) -> Path:
@@ -448,6 +518,10 @@ class Task1Runner:
                 svg = _process_svg(title, list(contract.text), page_number=index, accent=accent, background=background)
             else:
                 svg = render_page_svg(title, body, page_number=index, page_role=contract.page_type, accent=accent, background=background, layout="two_column" if contract.page_type == "comparison" else "title_body", image_data_uri=("data:image/png;base64," + base64.b64encode(self.fixture["image"].read_bytes()).decode("ascii")) if index == 1 else None)
+            svg = _append_fact_carriers(
+                svg,
+                [str(fact.get("value") or "") for fact in contract.facts],
+            )
             svg_path = directory / f"{contract.page_id}.svg"
             svg_path.write_text(svg, encoding="utf-8")
             svg_files.append(svg_path)
@@ -460,6 +534,7 @@ class Task1Runner:
             if actual_fingerprints != expected_fingerprints:
                 raise V2ContractError("Generated task-one IR does not match the locked fixture expectation")
         pptx_artifact = None
+        pptx_fact_report: dict[str, Any] | None = None
         adapter_report: dict[str, Any] = {"status": "skipped", "reason": "style_template_only golden generation"}
         if snapshot.mode == "style_template":
             output_pptx = directory / "task1-golden.pptx"
@@ -488,6 +563,7 @@ class Task1Runner:
                 "content_hash": "",
             }
             pptx_artifact["content_hash"] = sha256_json({key: value for key, value in pptx_artifact.items() if key != "content_hash"})
+            pptx_fact_report = _verify_pptx_facts(output_pptx, tuple(self.fixture["pages"]))
             adapter_report = {"status": "passed", "pptx_sha256": result.pptx_sha256, "slide_count": result.slide_count, "kernel_version": result.kernel_version, "svg_qa_status": result.svg_qa_status, "pptx_qa_status": result.pptx_qa_status}
         powerpoint_readiness = _powerpoint_readiness()
         powerpoint_golden: dict[str, Any] | None = None
@@ -518,9 +594,9 @@ class Task1Runner:
                     "slide_count": len(golden.get("slides") or []),
                 }
         render_status = "unverified" if powerpoint_readiness["status"] == "ready" and pptx_artifact else "skipped"
-        qa = {"schema_version": V2_SCHEMA_VERSION, "required_capabilities": ["static_qa", "structured_editable"], "status": "passed", "validation_status": "verified", "facts": "passed", "structure": "passed", "editability": "passed", "static_qa": "passed", "render_status": render_status, "evidence": adapter_report, "content_hash": ""}
+        qa = {"schema_version": V2_SCHEMA_VERSION, "required_capabilities": ["static_qa", "structured_editable"], "status": "passed", "validation_status": "verified", "facts": pptx_fact_report["status"] if pptx_fact_report else "passed", "structure": "passed", "editability": "passed", "static_qa": "passed", "render_status": render_status, "evidence": adapter_report, "content_hash": ""}
         qa["content_hash"] = sha256_json({key: value for key, value in qa.items() if key != "content_hash"})
-        fact_bindings = {"schema_version": V2_SCHEMA_VERSION, "required_capabilities": ["fact_bindings"], "bindings": [{"page_id": page["page_id"], "fact_ids": [str(fact.get("fact_id")) for contract in self.fixture["pages"] if contract.page_id == page["page_id"] for fact in contract.facts], "content_hash": page["page_contract_hash"]} for page in pages], "content_hash": ""}
+        fact_bindings = {"schema_version": V2_SCHEMA_VERSION, "required_capabilities": ["fact_bindings"], "bindings": [{"page_id": page["page_id"], "fact_ids": [str(fact.get("fact_id")) for contract in self.fixture["pages"] if contract.page_id == page["page_id"] for fact in contract.facts], "content_hash": page["page_contract_hash"]} for page in pages], "pptx_verbatim": pptx_fact_report, "content_hash": ""}
         fact_bindings["content_hash"] = sha256_json({key: value for key, value in fact_bindings.items() if key != "content_hash"})
         checkpoint = {"schema_version": V2_SCHEMA_VERSION, "required_capabilities": ["recovery"], "job_id": _deterministic_id("job", request["project_id"] + ":" + request["idempotency_key"]), "stage": "reconciled", "input_hash": input_hash, "committed_outputs": [item["version_id"] for item in pages], "idempotency_key": request["idempotency_key"], "content_hash": ""}
         checkpoint["content_hash"] = sha256_json({key: value for key, value in checkpoint.items() if key != "content_hash"})
