@@ -67,15 +67,16 @@ function App() {
   const [revisionSessions, setRevisionSessions] = useState<
     Record<string, string>
   >({});
-  const [intake, setIntake] = useState<{ status: string; sessionId?: string }>({
+  const [intake, setIntake] = useState<{ status: string; sessionId?: string; topic?: string; sources?: string[] }>({
     status: "empty",
   });
   const [project, setProject] = useState<ProjectInfo>();
   const [launcherOpen, setLauncherOpen] = useState(() => window.location.pathname === "/");
   const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [validationFailed, setValidationFailed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [generationStaging, setGenerationStaging] = useState<{ jobId: string; status: string; slides: string[] } | null>(null);
-  const [leftWidth, setLeftWidth] = useState(200), [rightWidth, setRightWidth] = useState(360);
+  const [leftWidth, setLeftWidth] = useState(200), [rightWidth, setRightWidth] = useState(460);
   const resize = (side: "left" | "right", event: React.PointerEvent) => { const start = event.clientX, initial = side === "left" ? leftWidth : rightWidth; const move = (next: PointerEvent) => { const delta = next.clientX - start, width = Math.max(160, Math.min(480, side === "left" ? initial + delta : initial - delta)); (side === "left" ? setLeftWidth : setRightWidth)(width); }; const stop = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); }; window.addEventListener("pointermove", move); window.addEventListener("pointerup", stop); };
   const refreshSlides = async () => {
     const result = await api<{ slides: Slide[] }>("/api/slides");
@@ -107,7 +108,8 @@ function App() {
       const canonicalPath = `/projects/${encodeURIComponent(project.projectId)}`;
       if (window.location.pathname !== "/" && window.location.pathname !== canonicalPath) window.history.replaceState(null, "", `${canonicalPath}${window.location.search}`);
       setConfirmation(workflow);
-      setIntake(currentIntake);
+      setIntake(currentIntake?.topic ? currentIntake : { status: "empty" });
+      if (currentIntake.status === "research_required" || currentIntake.status === "researching" || String(currentIntake.status).endsWith("failed")) setPanel("job");
       setStatus(
         `${project.route} · ${project.stage} · ${project.exportStale ? "导出已过期" : "导出最新"}`,
       );
@@ -155,7 +157,10 @@ function App() {
           ),
         );
       if (data.type === "revision.committed") void refreshSlides();
-      if (["generation.progress", "validation.failed", "generation.failed"].includes(data.type)) void api<any>("/api/workflow/generation/staging").then(setGenerationStaging);
+      if (["generation.progress", "validation.failed", "generation.failed", "generation.completed", "workflow.plan_ready"].includes(data.type)) {
+        void refreshSlides();
+        void api<any>("/api/workflow/generation/staging").then(setGenerationStaging);
+      }
       setStatus(data.type === "generation.progress" ? `正在生成 ${data.slide}（staging 可预览）` : data.type);
     };
     types.forEach((type) => stream.addEventListener(type, receive));
@@ -291,9 +296,8 @@ function App() {
         : {}),
       ...(scope === "region" && slide.id === current.id ? { region } : {}),
     }));
-    const baseRevisions = Object.fromEntries(
-      chosen.map((slide) => [slide.id, slide.revision]),
-    );
+    if (chosen.some((slide) => !slide.revision)) return setStatus("该页面尚未生成，暂时无法创建修改任务");
+    const baseRevisions = Object.fromEntries(chosen.map((slide) => [slide.id, slide.revision!]));
     const session = await revisionSession(chosen.map((slide) => slide.id));
     const job = await api<Job>("/api/jobs", {
       method: "POST",
@@ -390,9 +394,23 @@ function App() {
   }
   const validate = () =>
     api<any>("/api/validate", { method: "POST" }).then(
-      (result) => setStatus(`检查通过 · ${result.returncode}`),
-      (error) => setStatus(`检查失败 · ${error.message}`),
+      (result) => { setValidationFailed(false); setStatus(result.status === "not_started" && generationStaging?.status !== "failed" ? "尚未生成页面，暂不需要检查" : `检查通过 · ${result.returncode}`); },
+      (error) => { setValidationFailed(true); setStatus(`检查失败 · ${error.message}`); setPanel("job"); },
     );
+  const repairGeneration = async () => {
+    if (!generationStaging?.jobId) return;
+    setStatus("正在调用 Agent 修复生成结果…");
+    try {
+      const result = await api<{ slides: string[] }>(`/api/workflow/generation/${generationStaging.jobId}/repair`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider, intent: "修复所有 SVG 校验错误，确保整套页面通过最终检查" }) });
+      setValidationFailed(false);
+      await refreshSlides();
+      setGenerationStaging(null);
+      setStatus(`Agent 修复完成 · ${result.slides.length} 页`);
+    } catch (error) {
+      setValidationFailed(true);
+      setStatus(`Agent 修复失败 · ${(error as Error).message}`);
+    }
+  };
   const exportDeck = () => {
     if (generationStaging && !slides.some((slide) => slide.revision)) { setPanel("job"); setStatus("当前只有 staging SVG，请先输入修复要求并通过检查后再导出"); return; }
     setStatus("正在导出…");
@@ -446,19 +464,20 @@ function App() {
         <button className="project-home" onClick={() => { window.history.pushState(null, "", "/"); setLauncherOpen(true); }}>
           {project?.projectName ?? "FastPPT"}
         </button>
-        <span>{status}</span>
-        {confirmation?.stage && (
+        <span>{status.replace("unknown", "待开始").replace("topic_research", "主题研究")}</span>
+        {confirmation?.stage && confirmation.stage !== "studio" && (
           <em>
             {confirmation.stage} ·{" "}
             {confirmation.confirmed ? "已确认" : "等待确认"}
           </em>
         )}
         <button onClick={validate}>检查</button>
+        {validationFailed && <><button className="primary" onClick={validate}>重新检查</button>{generationStaging?.jobId && <button className="primary" onClick={() => void repairGeneration()}>修复</button>}</>}
         <button onClick={() => void changeHistory("undo")} title="撤销当前页 (Ctrl/Cmd+Z)">撤销</button>
         <button onClick={() => void changeHistory("redo")} title="重做当前页 (Ctrl/Cmd+Shift+Z)">重做</button>
         <button onClick={exportDeck}>导出</button>
       </header>
-      <aside className="slides"><button className="collapse-toggle" onClick={() => setLeftCollapsed((value) => !value)} aria-label={leftCollapsed ? "展开页面栏" : "折叠页面栏"}>{leftCollapsed ? "›" : "‹"}</button><span className="resize-handle left-handle" onPointerDown={(event) => resize("left", event)} onDoubleClick={() => setLeftWidth(200)} aria-label="调整页面栏宽度" />
+      <aside className="slides"><span className="resize-handle left-handle" onPointerDown={(event) => resize("left", event)} onDoubleClick={() => setLeftWidth(200)} aria-label="调整页面栏宽度" />
         {slides.map((slide) => (
           <div className="slideRow" key={slide.id}>
             <input
@@ -509,7 +528,7 @@ function App() {
         )}
       </aside>
       <main>
-        {generationStaging?.slides.includes(current?.id ?? "") ? (
+        {generationStaging?.slides.includes(current?.id ?? "") && !current?.revision ? (
           <div className="staging-canvas"><small>最近生成 staging · {generationStaging.status}</small><iframe title={`${current?.id} staging SVG`} src={`/api/jobs/${generationStaging.jobId}/staging/${current?.id}/raw`} /></div>
         ) : current?.revision ? (
           <CanvasViewport
@@ -517,6 +536,7 @@ function App() {
             revision={current.revision}
             tool={scope}
             bindCanvas={bindCanvas}
+            onRegion={(value) => { setRegion(value); setScope("region"); setStatus(`已框选区域 ${Math.round(value.width)} × ${Math.round(value.height)}`); }}
           />
         ) : (
           <div className="empty">
@@ -531,7 +551,7 @@ function App() {
           </div>
         )}
       </main>
-      <section className="chat"><button className="collapse-toggle" onClick={() => setRightCollapsed((value) => !value)} aria-label={rightCollapsed ? "展开对话栏" : "折叠对话栏"}>{rightCollapsed ? "‹" : "›"}</button><span className="resize-handle right-handle" onPointerDown={(event) => resize("right", event)} onDoubleClick={() => setRightWidth(360)} aria-label="调整对话栏宽度" />
+      <section className="chat"><span className="resize-handle right-handle" onPointerDown={(event) => resize("right", event)} onDoubleClick={() => setRightWidth(360)} aria-label="调整对话栏宽度" />
         <nav>
           {[
             ["job", "对话"],
@@ -547,9 +567,9 @@ function App() {
             </button>
           ))}
         </nav>
-        {intake.status === "empty" && (
+        {(intake.status === "empty" || project?.stage === "topic_research" || intake.status.endsWith("failed")) && (
           <div className="workspace-intake">
-            <IntakeComposer onStatus={setStatus} onCreated={(created) => { setIntake(created); setPanel("confirm"); }} />
+            <IntakeComposer initialTopic={intake.topic} initialSources={intake.sources} onStatus={setStatus} onCreated={(created) => { setIntake(created); setPanel("confirm"); }} />
           </div>
         )}
         {intake.status !== "empty" && panel === "job" && (
@@ -605,7 +625,7 @@ function App() {
               作用域
               <select
                 value={scope}
-                onChange={(event) => setScope(event.target.value)}
+                onChange={(event) => { const value = event.target.value; setScope(value); if (value === "region") setStatus("请在画布上拖拽框选区域"); }}
               >
                 <option value="" disabled>
                   请选择作用域
@@ -670,7 +690,7 @@ function ExportHistory() {
         <article key={item.historyId}>
           <b>{item.status === "completed" ? "导出成功" : "导出失败"}</b>
           <small>{new Date(item.recordedAt ?? item.timestamp).toLocaleString("zh-CN")}</small>
-          <small>版本 · {item.deckRevision ?? "未知"}</small>
+          <small>版本 · <span title={item.deckRevision ?? "未知"}>{item.deckRevision ? item.deckRevision.slice(0, 10) : "未知"}</span></small>
           {item.status === "completed" && item.historyId && <a className="button-link" href={`/api/export/history/${encodeURIComponent(item.historyId)}/download`}>下载此版本</a>}
           {item.status !== "completed" && item.stderr && <pre>{item.stderr}</pre>}
         </article>
@@ -815,16 +835,7 @@ function Confirmation({ onStatus }: { onStatus: (value: string) => void }) {
   return (
     <div className="confirm">
       <PlanningEditor onStatus={onStatus} />
-      <article>
-        <b>共享确认门</b>
-        <small>{session?.current_stage ?? "未连接"}</small>
-        <p>规划保存后，确认将以一个事务生成并检查整套页面。</p>
-      </article>
-      <textarea
-        value={payload}
-        onChange={(event) => setPayload(event.target.value)}
-        spellCheck={false}
-      />
+      {session?.current_stage && session.current_stage !== "studio" && <small>{session.current_stage}</small>}
       <button className="primary" disabled={busy} onClick={submit}>
         {busy ? "确认并生成中…" : "确认并生成整套"}
       </button>
@@ -923,7 +934,8 @@ function NotesEditor() {
   const [notice, setNotice] = useState("");
   useEffect(() => { api<any>("/api/accessories/notes").then((result) => { setRoster(result.roster); setNotes(result.notes); }, (error) => setNotice(error.message)); }, []);
   const save = async () => { try { await api("/api/accessories/notes", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ notes }) }); setNotice("讲稿已保存，当前导出已标记为过期"); } catch (error) { setNotice((error as Error).message); } };
-  return <div className="cards notes-panel">{!roster.length && <article className="empty"><b>暂无页面讲稿</b><p>生成页面后可为每页填写讲稿。</p></article>}{roster.map((slide) => <article key={slide}><b>{slide}</b><textarea aria-label={`${slide} 讲稿`} value={notes[slide] ?? ""} onChange={(event) => setNotes({ ...notes, [slide]: event.target.value })} placeholder="输入本页讲稿（可留空，保存时会由服务端校验页面集合）" /></article>)}{roster.length > 0 && <button className="primary" onClick={() => void save()}>保存全部讲稿</button>}{notice && <small className="sidecar-notice">{notice}</small>}</div>;
+  const generate = async (slide?: string) => { try { await api("/api/accessories/notes/generate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(slide ? { slide } : {}) }); const result = await api<any>("/api/accessories/notes"); setNotes(result.notes); setNotice(slide ? `${slide} 讲稿已生成` : "全部讲稿已生成"); } catch (error) { setNotice((error as Error).message); } };
+  return <div className="cards notes-panel"><div className="notes-actions"><button className="primary" onClick={() => void generate()}>创建全部讲稿</button>{roster.length > 0 && <button onClick={() => void generate(roster[0])}>生成当前页讲稿</button>}</div>{!roster.length && <article className="empty"><b>暂无页面讲稿</b><p>生成页面后可为每页填写讲稿。</p></article>}{roster.map((slide) => <article key={slide}><b>{slide}</b><button onClick={() => void generate(slide)}>生成本页</button><textarea aria-label={`${slide} 讲稿`} value={notes[slide] ?? ""} onChange={(event) => setNotes({ ...notes, [slide]: event.target.value })} placeholder="输入本页讲稿" /></article>)}{roster.length > 0 && <button className="primary" onClick={() => void save()}>保存全部讲稿</button>}{notice && <small className="sidecar-notice">{notice}</small>}</div>;
 }
 
 function Sidecars() {

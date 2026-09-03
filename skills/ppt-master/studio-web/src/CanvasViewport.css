@@ -6,5 +6,8 @@
 .canvas-viewport { position: relative; min-width: 0; min-height: 0; overflow: hidden; border-radius: 8px; }
 .canvas-page { position: absolute; top: 50%; left: 50%; transform-origin: center; translate: -50% -50%; background: white; box-shadow: 0 18px 48px #0007; }
 .canvas-page iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
-.canvas-pan-capture { position: absolute; inset: 0; cursor: grab; }
+.canvas-region-layer { position: absolute; inset: 0; z-index: 10; cursor: crosshair; pointer-events: auto; touch-action: none; background: transparent; }
+.canvas-pan-capture { position: absolute; inset: 0; z-index: 10; cursor: grab; pointer-events: auto; }
+.canvas-pan-capture.is-region { cursor: crosshair; }
+.region-draft { position: absolute; border: 2px solid #356ac4; background: #6ba5ff33; pointer-events: none; }
 .canvas-viewport.is-panning:active .canvas-pan-capture { cursor: grabbing; }

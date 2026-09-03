@@ -18,14 +18,18 @@ function fitScale(viewport: CanvasSize, canvas: CanvasSize) {
   return clampZoom(Math.min((viewport.width - padding) / canvas.width, (viewport.height - padding) / canvas.height));
 }
 
-export function CanvasViewport({ slideId, revision, tool, bindCanvas }: { slideId: string; revision: string; tool: string; bindCanvas: (frame: HTMLIFrameElement | null) => void }) {
+export function CanvasViewport({ slideId, revision, tool, bindCanvas, onRegion }: { slideId: string; revision: string; tool: string; bindCanvas: (frame: HTMLIFrameElement | null) => void; onRegion?: (region: { x: number; y: number; width: number; height: number }) => void }) {
   const viewportRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const dragStart = useRef<{ pointer: Point; pan: Point }>();
   const [canvas, setCanvas] = useState<CanvasSize>({ width: 1280, height: 720 });
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState<Point>({ x: 0, y: 0 });
   const [panning, setPanning] = useState(false);
+  const [selecting, setSelecting] = useState(false);
+  const [regionDraft, setRegionDraft] = useState<{ x: number; y: number; width: number; height: number }>();
+  const regionStart = useRef<Point>();
 
   const fit = useCallback(() => {
     const viewport = viewportRef.current?.getBoundingClientRect();
@@ -43,6 +47,7 @@ export function CanvasViewport({ slideId, revision, tool, bindCanvas }: { slideI
   }, [fit]);
 
   useEffect(() => { setPan({ x: 0, y: 0 }); }, [slideId, revision]);
+  useEffect(() => { setSelecting(tool === "region"); setRegionDraft(undefined); regionStart.current = undefined; }, [tool]);
 
   const attachFrame = (frame: HTMLIFrameElement | null) => {
     frameRef.current = frame;
@@ -55,30 +60,43 @@ export function CanvasViewport({ slideId, revision, tool, bindCanvas }: { slideI
   };
 
   const startPan = (event: React.PointerEvent) => {
+    if (selecting && onRegion) { const rect = pageRef.current?.getBoundingClientRect(); if (!rect) return; regionStart.current = { x: (event.clientX - rect.left) / zoom, y: (event.clientY - rect.top) / zoom }; setRegionDraft({ x: event.clientX - rect.left, y: event.clientY - rect.top, width: 0, height: 0 }); event.currentTarget.setPointerCapture(event.pointerId); event.preventDefault(); return; }
     if (!panning) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     dragStart.current = { pointer: { x: event.clientX, y: event.clientY }, pan };
   };
 
   const movePan = (event: React.PointerEvent) => {
+    if (regionStart.current && onRegion) { const rect = pageRef.current?.getBoundingClientRect(); if (rect) { const sx = rect.left + regionStart.current.x * zoom, sy = rect.top + regionStart.current.y * zoom; setRegionDraft({ x: Math.min(event.clientX, sx) - rect.left, y: Math.min(event.clientY, sy) - rect.top, width: Math.abs(event.clientX - sx), height: Math.abs(event.clientY - sy) }); } return; }
     if (!dragStart.current) return;
     setPan({ x: dragStart.current.pan.x + event.clientX - dragStart.current.pointer.x, y: dragStart.current.pan.y + event.clientY - dragStart.current.pointer.y });
+  };
+  const finishRegion = (event: React.PointerEvent) => {
+    if (regionStart.current && onRegion) {
+      const rect = pageRef.current?.getBoundingClientRect() ?? event.currentTarget.getBoundingClientRect();
+      const end = { x: (event.clientX - rect.left) / zoom, y: (event.clientY - rect.top) / zoom };
+      onRegion({ x: Math.min(regionStart.current.x, end.x), y: Math.min(regionStart.current.y, end.y), width: Math.abs(end.x - regionStart.current.x), height: Math.abs(end.y - regionStart.current.y) });
+      regionStart.current = undefined;
+      setRegionDraft(undefined);
+    }
+    dragStart.current = undefined;
   };
 
   return <div className="canvas-shell">
     <div className="canvas-toolbar" role="toolbar" aria-label="画布工具">
-      <button className={panning ? "active" : ""} onClick={() => setPanning((value) => !value)} aria-pressed={panning}>抓手</button>
+      <button className={panning ? "active" : ""} onClick={() => { setPanning((value) => !value); setSelecting(false); }} aria-pressed={panning}>抓手</button>
+      <button className={selecting ? "active" : ""} onClick={() => { setSelecting((value) => !value); setPanning(false); }} aria-pressed={selecting}>框选</button>
       <button onClick={() => setZoom(clampZoom(zoom - ZOOM_STEP))} aria-label="缩小">−</button>
       <button className="zoom-value" onClick={fit} title="适应画布">{Math.round(zoom * 100)}%</button>
       <button onClick={() => setZoom(clampZoom(zoom + ZOOM_STEP))} aria-label="放大">＋</button>
       <button onClick={fit}>适应</button>
       <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}>100%</button>
     </div>
-    <div ref={viewportRef} className={`canvas-viewport${panning ? " is-panning" : ""}`} onPointerDown={startPan} onPointerMove={movePan} onPointerUp={() => { dragStart.current = undefined; }} onPointerCancel={() => { dragStart.current = undefined; }}>
-      <div className="canvas-page" style={{ width: canvas.width, height: canvas.height, transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}>
+    <div ref={viewportRef} className={`canvas-viewport${panning ? " is-panning" : ""}`} onPointerDown={panning ? startPan : undefined} onPointerMove={panning ? movePan : undefined} onPointerUp={panning ? finishRegion : undefined}>
+      <div ref={pageRef} className="canvas-page" style={{ width: canvas.width, height: canvas.height, transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}>
         <iframe ref={attachFrame} onLoad={loaded} title="SVG 页面" src={`/api/slides/${slideId}/raw?tool=${encodeURIComponent(tool)}&revision=${encodeURIComponent(revision)}`}/>
+        {selecting && <div className="canvas-region-layer" onPointerDown={startPan} onPointerMove={movePan} onPointerUp={finishRegion} onPointerCancel={() => { regionStart.current = undefined; setRegionDraft(undefined); }}>{regionDraft && <div className="region-draft" style={{ left: regionDraft.x, top: regionDraft.y, width: regionDraft.width, height: regionDraft.height }} />}</div>}
       </div>
-      {panning && <div className="canvas-pan-capture" aria-hidden="true"/>}
     </div>
   </div>;
 }
