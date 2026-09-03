@@ -785,6 +785,8 @@ ChartEx 导入被有意限制为 7 个已验证数据模型：`treemap`、`sunbu
 
 ## 顶层路线与支撑文档
 
+Project Studio 是既有项目可选的、仅绑定回环地址的本地控制面，不是第四条产物路线，也不是托管服务。它把页面／整套会话、绑定 revision 的 Agent 作业、事务 staging、既有 checker／exporter 和经用户批准的项目记忆连成闭环，同时继续以项目文件为权威。Confirm UI receipt 仍由 Confirm UI 校验和写入；Studio 只有在核对项目 lock 后才能代理该回环服务。旧 SVG 编辑器继续承担确定性预览和标注。
+
 [`workflows/index.md`](../../skills/ppt-master/workflows/index.md) 是仅供维护者使用的目录，不进入任务加载链。运行时路线选择以 [`workflows/routing.md`](../../skills/ppt-master/workflows/routing.md) 为权威。PPT Master 只有三条顶层产物路线：Generate PPTX、Create Template、Edit Native PPTX。用户请求只能进入其中一条；任何支撑文档都不与它们竞争。
 
 支撑文件保持拆分，只是为了收紧路线合同，并在需要时加载可选上下文：

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StudioEvent",
+  "type": "object",
+  "required": ["eventId", "sequence", "type", "timestamp"],
+  "properties": {
+    "eventId": {"type": "string", "pattern": "^evt_[A-Za-z0-9]+$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "type": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": true
+}

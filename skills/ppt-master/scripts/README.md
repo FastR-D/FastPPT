@@ -14,6 +14,8 @@ This directory contains user-facing scripts for conversion, project setup, SVG p
 - `scripts/pptx_ooxml/`: shared OOXML intake, cloning, and package primitives
 - `scripts/svg_finalize/`: internal post-processing helpers used by `finalize_svg.py`
 - `scripts/docs/`: topic-focused script documentation
+- `studio-ts/`: TypeScript/Fastify Project Studio service and Agent SDK adapters
+- `scripts/studio/`: Project Studio schemas and static UI assets
 - `scripts/prompt_audit.py` + `scripts/prompt_audit_manifest.json`: maintainer-only prompt budget/governance lint (see [`docs/prompt_audit.md`](docs/prompt_audit.md)); the manifest is audit-only and never loaded as prompt context
 - `scripts/assets/`: static assets consumed by scripts
 
@@ -446,3 +448,12 @@ python3 scripts/update_repo.py --skip-pip
 - [Skill Entry](../SKILL.md)
 
 _Last updated: 2026-07-11_
+# Project Studio
+
+Run the TypeScript/Fastify local interaction surface with:
+
+`pnpm studio projects/<project> 6070`
+
+It is loopback-only and keeps project interaction state under the project
+`interaction/` directory. See `scripts/docs/project-studio.md` for the API
+contract and Agent file handoff protocol.

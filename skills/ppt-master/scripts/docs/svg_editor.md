@@ -2,6 +2,13 @@
 
 Browser SVG editor behind the [`live-preview`](../../workflows/stages/live-preview.md) stage and Generate Step 6's `--live` auto-startup. This page documents editor behavior, lifecycle, and remote access; the stage owns when to launch and how to apply annotations.
 
+Project Studio is the conversation-first control surface for projects that need
+page/deck threads, Agent jobs, revisions, transactional multi-page changes, and
+route export state. This editor remains the compatible deterministic preview
+surface and continues to own `live_preview/lock.json`, direct staged edits, and
+annotations. Both surfaces use the same authoring files; do not run either as a
+second presentation authority. See [`project-studio.md`](project-studio.md).
+
 ## Commands
 
 ```bash

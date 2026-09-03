@@ -345,6 +345,19 @@ AI 全程处理——内容分析、视觉设计、SVG 生成、PPTX 导出。
 
 ### 5. 图片获取（可选）
 
+Agent 已具备联网检索、图片下载和图片插入能力。制作 PPT 时会先把网页/图片落地到项目目录，再由 SVG 图片嵌入链路导出为可编辑的 PowerPoint 图片对象；不会把整页截图当作 PPT 页面。
+
+常用命令（将 `<SKILL_DIR>` 替换为实际 `skills/ppt-master` 绝对路径）：
+
+```bash
+python3 <SKILL_DIR>/scripts/source_to_md.py <URL>
+python3 <SKILL_DIR>/scripts/image_search.py --query "关键词" --filename hero.jpg -o <project_path>/images
+python3 <SKILL_DIR>/scripts/image_search.py --from-url "https://..." --filename reference.jpg -o <project_path>/images
+python3 <SKILL_DIR>/scripts/analyze_images.py <project_path>/images
+```
+
+下载后的文件放在 `<project_path>/images/`，来源和许可记录在 `image_sources.json`；SVG 页面引用这些本地文件后，`svg_to_pptx.py` 会将其编译为原生图片对象。
+
 非用户自带图片有两条路径，可在同一份 deck 里按图混用：
 
 **A) AI 生图** — Agent host 提供原生生图工具时可直接使用；也可通过 `image_gen.py` 配置 `IMAGE_BACKEND` 和供应商 `*_API_KEY`。host-native 生图不需要另配供应商生图 API Key，直接要求 Agent 使用自身生图工具即可。`python3 skills/ppt-master/scripts/image_gen.py --list-backends` 查看供应商后端清单。`gpt-image-2` 目前综合质量最佳。

@@ -948,6 +948,14 @@ The tempting simplifications below have explicit costs. Treat them as negative c
 
 ## Routes and Supporting Runbooks
 
+Project Studio is an optional loopback-only control plane for an existing
+project, not a fourth artifact route or a hosted service. It joins page/deck
+conversation, revision-bound Agent jobs, transactional staging, the existing
+checker/exporter, and user-approved project memory while keeping project files
+authoritative. Confirm UI receipts remain owned and validated by Confirm UI;
+Studio can only proxy that loopback service after verifying the project lock.
+The legacy SVG editor remains the deterministic preview and annotation surface.
+
 [`workflows/index.md`](../skills/ppt-master/workflows/index.md) is a maintainer-only inventory and does not enter the task-loading chain. Runtime route selection is authoritative in [`workflows/routing.md`](../skills/ppt-master/workflows/routing.md). PPT Master has exactly three top-level artifact routes: Generate PPTX, Create Template, and Edit Native PPTX. A user request enters one of those routes; no supporting runbook competes with them.
 
 Supporting files stay separate only to keep route contracts focused and load optional context on demand:

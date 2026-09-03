@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Revision",
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "elementRef": {
+      "type": "object",
+      "required": ["revision", "elementId"],
+      "properties": {
+        "revision": {"$ref": "#/$defs/sha256"},
+        "elementId": {"type": "string", "minLength": 1},
+        "tag": {"type": "string"},
+        "structuralPath": {"type": "string"},
+        "bbox": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}, {"type": "number"}], "minItems": 4, "maxItems": 4},
+        "textDigest": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "required": ["pageRevision", "deckRevision", "exportRevision", "conversationRevision"],
+  "properties": {
+    "pageRevision": {"$ref": "#/$defs/sha256"},
+    "deckRevision": {"$ref": "#/$defs/sha256"},
+    "exportRevision": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "conversationRevision": {"$ref": "#/$defs/sha256"}
+  },
+  "additionalProperties": false
+}

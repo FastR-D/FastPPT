@@ -6,6 +6,12 @@ description: Main-pipeline editor stage for starting live preview and applying s
 
 > (1) Start/reopen the browser SVG editor when no preview service is running; (2) apply user-submitted annotations after Step 7 export. Executor's mandatory auto-startup lives in [`generate-pptx`](../generate-pptx.md) Step 6 — never re-launch a preview that is already running. Editor behavior, lifecycle, ports, and remote access are documented in [`svg_editor.md`](../../scripts/docs/svg_editor.md).
 
+Projects already using Project Studio keep Studio as the conversation and Agent
+job surface while this stage remains the deterministic preview/annotation
+owner. After Step 7 succeeds, the owning route releases Studio's waiting edit
+jobs through the handoff in [`project-studio`](project-studio.md); this does not
+change the annotation application steps below.
+
 ## When to Run
 
 - **Step 1** — no preview service is running and the user wants to look at the deck or click an element (post-export re-entry in a fresh chat, or the user clicked **Exit preview** earlier).

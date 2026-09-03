@@ -127,6 +127,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/*
 ENV/
 build/
 develop-eggs/
@@ -184,6 +185,7 @@ PERSONAL_NOTES.md
 # Use cloud sync (iCloud/Dropbox) for backup and multi-device access
 projects/*
 !projects/README.md
+references/*
 
 # Derived template review exports (local review only; never template input)
 skills/ppt-master/templates/brands/*/exports/
