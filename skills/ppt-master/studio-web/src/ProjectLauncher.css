@@ -19,6 +19,9 @@
 .recent-projects > div:first-child { display: flex; align-items: center; justify-content: space-between; }
 .project-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
 .project-card { position: relative; display: grid; min-height: 190px; gap: 7px; align-content: start; padding: 16px; text-align: left; }
+.project-card > button:first-child { display:grid; gap:7px; padding:0; border:0; background:transparent; text-align:left; }
+.project-actions { display:flex; gap:6px; margin-top:auto; }
+.project-actions button { min-height:28px; padding:4px 9px; font-size:12px; }
 .project-card p { display: -webkit-box; overflow: hidden; margin: 0; color: #bdc8da; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .project-card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px #0005; }
 .project-card .project-icon { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 7px; background: #203f6f; color: #91bdff; }

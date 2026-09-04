@@ -4,13 +4,16 @@ import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { createStudio } from "./server.js";
-import { prepareStaging, recoverTransactions } from "./transaction.js";
+import { commitStagedImages, prepareStaging, recoverTransactions } from "./transaction.js";
 
 const root = await mkdtemp(path.join(os.tmpdir(), "fastppt-studio-"));
 await mkdir(path.join(root, "svg_output"));
 await writeFile(path.join(root, "svg_output", "P01.svg"), '<svg xmlns="http://www.w3.org/2000/svg"><text id="title">Hi</text></svg>');
 const staging = await prepareStaging(root, path.join(root, "interaction"), "staging_smoke", ["P01"]);
 assert.equal(await readFile(path.join(staging, "svg_output", "P01.svg"), "utf8"), '<svg xmlns="http://www.w3.org/2000/svg"><text id="title">Hi</text></svg>');
+await mkdir(path.join(staging, "images", "nested"), { recursive: true }); await writeFile(path.join(staging, "images", "nested", "photo.png"), "image");
+assert.deepEqual(await commitStagedImages(root, staging), [path.join("images", "nested", "photo.png")]);
+assert.equal(await readFile(path.join(root, "images", "nested", "photo.png"), "utf8"), "image");
 const app = await createStudio(root);
 assert.equal((await app.inject({ method: "GET", url: "/healthz" })).statusCode, 200);
 assert.match((await app.inject({ method: "GET", url: "/" })).body, /FastPPT/);
@@ -104,12 +107,17 @@ const generationApp = await createStudio(generationRoot, { checker: async () => 
 const generatedFirst = (await generationApp.inject({ method: "POST", url: "/api/workflow/generate-first" })).json(); assert.equal(generatedFirst.status, "completed");
 assert.match(await readFile(path.join(generationRoot, "svg_output", "P01.svg"), "utf8"), /Opening/); await generationApp.close();
 const failedGenerationRoot = await mkdtemp(path.join(os.tmpdir(), "fastppt-generation-failed-")); await mkdir(path.join(failedGenerationRoot, "interaction"), { recursive: true }); await writeFile(path.join(failedGenerationRoot, "interaction", "page_plan.json"), JSON.stringify({ status: "confirmed", canvas: "ppt169", pages: [{ id: "P01", role: "title", title: "Opening" }] }));
-const failedGenerationApp = await createStudio(failedGenerationRoot, { checker: async () => ({ code: 1, stdout: "", stderr: "invalid" }), generator: async () => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"/>' });
+const failedGenerationApp = await createStudio(failedGenerationRoot, { checker: async () => ({ code: 1, stdout: "", stderr: "invalid" }), generator: async () => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"></svg>' });
 assert.equal((await failedGenerationApp.inject({ method: "POST", url: "/api/workflow/generate-first" })).statusCode, 422);
-assert.equal((await failedGenerationApp.inject({ method: "GET", url: "/api/slides" })).json().slides[0].revision, null); await failedGenerationApp.close();
+const failedSlide = (await failedGenerationApp.inject({ method: "GET", url: "/api/slides" })).json().slides[0];
+assert.equal(failedSlide.revision, null); assert.equal(failedSlide.status, "validation_failed");
+const failedStaging = (await failedGenerationApp.inject({ method: "GET", url: "/api/workflow/generation/staging" })).json();
+assert.equal(failedStaging.status, "failed"); assert.deepEqual(failedStaging.slides, ["P01"]); await failedGenerationApp.close();
 const deckGenerationRoot = await mkdtemp(path.join(os.tmpdir(), "fastppt-generation-deck-")); await mkdir(path.join(deckGenerationRoot, "interaction"), { recursive: true }); await writeFile(path.join(deckGenerationRoot, "interaction", "page_plan.json"), JSON.stringify({ status: "confirmed", canvas: "ppt169", pages: [{ id: "P01", role: "title", title: "Opening" }, { id: "P02", role: "content", title: "Detail" }] }));
-const deckGenerationApp = await createStudio(deckGenerationRoot, { checker: async () => ({ code: 0, stdout: "passed", stderr: "" }), generator: async (_provider, prompt) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"><text>${prompt.includes("P02") ? "Detail" : "Opening"}</text></svg>` });
+const generationPrompts: string[] = [];
+const deckGenerationApp = await createStudio(deckGenerationRoot, { checker: async () => ({ code: 0, stdout: "passed", stderr: "" }), generator: async (_provider, prompt) => { generationPrompts.push(prompt); return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"><text>${prompt.includes("P02") ? "Detail" : "Opening"}</text></svg>`; } });
 const generatedDeck = (await deckGenerationApp.inject({ method: "POST", url: "/api/workflow/generate-all" })).json(); assert.deepEqual(generatedDeck.slides, ["P01", "P02"]); assert.equal((await deckGenerationApp.inject({ method: "GET", url: "/api/slides" })).json().slides.length, 2); await deckGenerationApp.close();
+assert.ok(generationPrompts.every((prompt) => prompt.includes("image_search.py") && prompt.includes("--save-candidates") && prompt.includes("candidates/review_sheet.jpg") && prompt.includes("--promote") && prompt.includes("../images/<filename>") && prompt.includes("technical SVG checker pass is not visual approval")));
 const partialGenerationRoot = await mkdtemp(path.join(os.tmpdir(), "fastppt-generation-partial-")); await mkdir(path.join(partialGenerationRoot, "interaction"), { recursive: true }); await writeFile(path.join(partialGenerationRoot, "interaction", "page_plan.json"), JSON.stringify({ status: "confirmed", canvas: "ppt169", pages: [{ id: "P01", role: "title", title: "Opening" }, { id: "P02", role: "content", title: "Detail" }] }));
 const partialGenerationApp = await createStudio(partialGenerationRoot, { checker: async () => ({ code: 0, stdout: "passed", stderr: "" }), generator: async (_provider, prompt) => prompt.includes('"id": "P02"') ? "invalid" : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"/>' }); assert.equal((await partialGenerationApp.inject({ method: "POST", url: "/api/workflow/generate-all" })).statusCode, 422); assert.ok((await partialGenerationApp.inject({ method: "GET", url: "/api/slides" })).json().slides.every((slide: { revision: null }) => slide.revision === null)); await partialGenerationApp.close();
 const generationSession = (await app.inject({ method: "POST", url: "/api/harness/sessions", payload: { kind: "codex", purpose: "generation", context: { topic: "Studio" } } })).json();
@@ -141,6 +149,9 @@ assert.equal((await app.inject({ method: "POST", url: "/api/slides/P01/resolve-e
 assert.equal((await app.inject({ method: "POST", url: "/api/slides/P01/resolve-element", payload: { revision: `sha256:${"0".repeat(64)}`, elementId: "old", tag: elementResult.elements[0].tag, structuralPath: elementResult.elements[0].structuralPath, bbox: elementResult.elements[0].bbox, textDigest: elementResult.elements[0].textDigest } })).json().status, "relocated");
 assert.equal((await app.inject({ method: "POST", url: "/api/slides/P01/resolve-element", payload: { revision: `sha256:${"0".repeat(64)}`, elementId: "old" } })).statusCode, 409);
 assert.equal((await app.inject({ method: "GET", url: "/api/slides/%2e%2e%2fsecret/raw" })).statusCode, 400);
+await mkdir(path.join(root, "images"), { recursive: true }); await writeFile(path.join(root, "images", "preview.jpg"), "jpeg-test");
+const previewImage = await app.inject({ method: "GET", url: "/api/slides/images/preview.jpg" }); assert.equal(previewImage.statusCode, 200); assert.match(String(previewImage.headers["content-type"]), /^image\/jpeg/); assert.equal(previewImage.body, "jpeg-test");
+assert.equal((await app.inject({ method: "GET", url: "/api/slides/images/not-an-image.txt" })).statusCode, 400);
 assert.equal((await app.inject({ method: "GET", url: "/api/conversations/invalid/P01" })).statusCode, 400);
 assert.equal((await app.inject({ method: "POST", url: "/api/conversations/page/P01/messages", payload: { content: "x", attachments: [{ path: "../secret" }] } })).statusCode, 400);
 const job = await app.inject({ method: "POST", url: "/api/jobs", payload: { scope: "page", targets: [{ slide: "P01" }], baseRevisions: { P01: slides.slides[0].revision }, intent: "调整标题", mode: "agent", exportAfter: false } });
@@ -235,6 +246,13 @@ const notesRoster = (await app.inject({ method: "GET", url: "/api/accessories/no
 assert.equal((await app.inject({ method: "PUT", url: "/api/accessories/notes", payload: { notes: Object.fromEntries(notesRoster.roster.map((slide: string) => [slide, "本页讲稿"])) } })).statusCode, 200);
 assert.equal((await app.inject({ method: "PUT", url: "/api/accessories/notes", payload: { notes: { ...notesRoster.notes, extra: "越界" } } })).statusCode, 422);
 await app.close();
+
+const committedDiffRoot = await mkdtemp(path.join(os.tmpdir(), "fastppt-committed-diff-"));
+await mkdir(path.join(committedDiffRoot, "svg_output"), { recursive: true }); await mkdir(path.join(committedDiffRoot, "interaction", "jobs", "job_committed_diff", "staging", "svg_output"), { recursive: true }); await mkdir(path.join(committedDiffRoot, "interaction", "revisions", "P01"), { recursive: true });
+const committedBefore = '<svg xmlns="http://www.w3.org/2000/svg"><text>Before</text></svg>', committedAfter = '<svg xmlns="http://www.w3.org/2000/svg"><text>After</text></svg>', committedBackup = path.join(committedDiffRoot, "interaction", "revisions", "P01", "before.svg");
+await writeFile(committedBackup, committedBefore); await writeFile(path.join(committedDiffRoot, "svg_output", "P01.svg"), committedAfter); await writeFile(path.join(committedDiffRoot, "interaction", "jobs", "job_committed_diff", "staging", "svg_output", "P01.svg"), committedAfter);
+await writeFile(path.join(committedDiffRoot, "interaction", "jobs", "job_committed_diff", "request.json"), JSON.stringify({ status: "completed", targets: [{ slide: "P01" }] })); await writeFile(path.join(committedDiffRoot, "interaction", "jobs", "job_committed_diff", "commit.json"), JSON.stringify({ status: "committed", backups: { P01: committedBackup } }));
+const committedDiffApp = await createStudio(committedDiffRoot); const committedDiff = (await committedDiffApp.inject({ method: "GET", url: "/api/jobs/job_committed_diff/diff" })).json().slides[0]; assert.equal(committedDiff.changed, true); assert.match(committedDiff.before, /Before/); assert.match(committedDiff.after, /After/); await committedDiffApp.close();
 
 const generatingRoot = await mkdtemp(path.join(os.tmpdir(), "fastppt-generating-"));
 await mkdir(path.join(generatingRoot, "svg_output"));

@@ -1,4 +1,4 @@
-import { copyFile, cp, mkdir, readdir, rename, rm } from "node:fs/promises";
+import { copyFile, cp, mkdir, readdir, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { atomicJson, authoringDirectory, exists, hashFile, now, readJson } from "./store.js";
 
@@ -73,6 +73,25 @@ export async function commitGeneratedSlides(root: string, interaction: string, j
     await atomicJson(journal, { jobId, status: "rolled_back", slides, backups, created, applied, timestamp: now() });
     throw error;
   }
+}
+
+export async function commitStagedImages(root: string, stagingRoot: string) {
+  const source = path.join(stagingRoot, "images");
+  if (!(await exists(source)) || !(await stat(source)).isDirectory()) return [];
+  const target = path.join(root, "images");
+  await mkdir(target, { recursive: true });
+  const committed: string[] = [];
+  const copyDirectory = async (sourceDirectory: string, targetDirectory: string) => {
+    await mkdir(targetDirectory, { recursive: true });
+    for (const entry of await readdir(sourceDirectory, { withFileTypes: true })) {
+      const sourcePath = path.join(sourceDirectory, entry.name);
+      const targetPath = path.join(targetDirectory, entry.name);
+      if (entry.isDirectory()) await copyDirectory(sourcePath, targetPath);
+      else if (entry.isFile()) { await copyFile(sourcePath, targetPath); committed.push(path.relative(root, targetPath)); }
+    }
+  };
+  await copyDirectory(source, target);
+  return committed;
 }
 
 export async function recoverTransactions(root: string, interaction: string) {

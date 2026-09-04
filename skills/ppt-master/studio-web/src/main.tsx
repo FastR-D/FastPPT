@@ -15,6 +15,7 @@ type Slide = {
   statusLabel?: string;
 };
 type Message = { messageId: string; role: string; content: string };
+type Attachment = { path: string; mimeType?: string };
 type Region = { x: number; y: number; width: number; height: number };
 type Job = { jobId: string; status: string; sessionId?: string; slide?: string };
 type HarnessSession = {
@@ -55,9 +56,11 @@ function App() {
     [scope, setScope] = useState("page"),
     [provider, setProvider] = useState("codex");
   const [intent, setIntent] = useState(""),
+    [attachments, setAttachments] = useState<Attachment[]>([]),
     [selectedElement, setSelectedElement] = useState<string>(),
     [region, setRegion] = useState<Region>();
   const [status, setStatus] = useState("加载中"),
+    [copyNotice, setCopyNotice] = useState(false),
     [jobs, setJobs] = useState<Job[]>([]),
     [panel, setPanel] = useState(() => new URLSearchParams(window.location.search).get("panel") ?? "job"),
     [confirmation, setConfirmation] = useState<any>();
@@ -157,6 +160,7 @@ function App() {
           ),
         );
       if (data.type === "revision.committed") void refreshSlides();
+      if (data.type === "validation.passed") { setValidationFailed(false); void refreshSlides(); }
       if (["generation.progress", "validation.failed", "generation.failed", "generation.completed", "workflow.plan_ready"].includes(data.type)) {
         void refreshSlides();
         void api<any>("/api/workflow/generation/staging").then(setGenerationStaging);
@@ -283,7 +287,7 @@ function App() {
     await api(`${thread}/messages`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ content: intent }),
+      body: JSON.stringify({ content: intent, attachments }),
     });
     const targets = chosen.map((slide) => ({
       slide: slide.id,
@@ -318,7 +322,25 @@ function App() {
       { messageId: crypto.randomUUID(), role: "user", content: intent },
     ]);
     setIntent("");
+    setAttachments([]);
     if (job.status === "queued") void runAgent(job.jobId);
+  }
+  async function uploadConversationFiles(files: FileList | null) {
+    if (!files?.length) return;
+    try {
+      const uploaded: Attachment[] = [];
+      for (const file of Array.from(files)) {
+        if (file.size > 20 * 1024 * 1024) throw new Error(`${file.name} 超过 20 MB`);
+        const content = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader(); reader.onerror = () => reject(reader.error);
+          reader.onload = () => resolve(String(reader.result).split(",")[1] ?? ""); reader.readAsDataURL(file);
+        });
+        const body = await api<{ source: string }>("/api/uploads", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: file.name, content }) });
+        uploaded.push({ path: body.source, mimeType: file.type || "application/octet-stream" });
+      }
+      setAttachments((current) => [...current, ...uploaded]);
+      setStatus(`已上传 ${uploaded.length} 个对话附件`);
+    } catch (error) { setStatus(`上传失败 · ${(error as Error).message}`); }
   }
   async function approve(jobId: string) {
     await api(`/api/jobs/${jobId}/approve`, { method: "POST" });
@@ -394,7 +416,7 @@ function App() {
   }
   const validate = () =>
     api<any>("/api/validate", { method: "POST" }).then(
-      (result) => { setValidationFailed(false); setStatus(result.status === "not_started" && generationStaging?.status !== "failed" ? "尚未生成页面，暂不需要检查" : `检查通过 · ${result.returncode}`); },
+      (result) => { setValidationFailed(false); void refreshSlides(); setStatus(result.status === "not_started" && generationStaging?.status !== "failed" ? "尚未生成页面，暂不需要检查" : `检查通过 · ${result.returncode}`); },
       (error) => { setValidationFailed(true); setStatus(`检查失败 · ${error.message}`); setPanel("job"); },
     );
   const repairGeneration = async () => {
@@ -464,7 +486,7 @@ function App() {
         <button className="project-home" onClick={() => { window.history.pushState(null, "", "/"); setLauncherOpen(true); }}>
           {project?.projectName ?? "FastPPT"}
         </button>
-        <span>{status.replace("unknown", "待开始").replace("topic_research", "主题研究")}</span>
+        <button className="status-copy" title="点击复制提示文本" onClick={() => { const text = status.replace("unknown", "待开始").replace("topic_research", "主题研究"); void navigator.clipboard?.writeText(text); setCopyNotice(true); window.setTimeout(() => setCopyNotice(false), 2500); }}>{copyNotice ? "顶栏提示文本已复制" : status.replace("unknown", "待开始").replace("topic_research", "主题研究")}</button>
         {confirmation?.stage && confirmation.stage !== "studio" && (
           <em>
             {confirmation.stage} ·{" "}
@@ -504,6 +526,8 @@ function App() {
                     src={`/api/slides/${slide.id}/raw?revision=${encodeURIComponent(slide.revision)}`}
                     alt={`${slide.id} 缩略图`}
                   />
+                ) : generationStaging?.slides.includes(slide.id) ? (
+                  <img src={`/api/jobs/${generationStaging.jobId}/staging/${slide.id}/raw`} alt={`${slide.id} 暂存预览`} />
                 ) : (
                   <span>{slide.id}</span>
                 )}
@@ -557,9 +581,7 @@ function App() {
             ["job", "对话"],
             ["confirm", "确认"],
             ["history", "版本"],
-            ["exports", "导出"],
             ["memory", "记忆"],
-            ["sidecar", "附属"],
             ["notes", "讲稿"],
           ].map(([id, label]) => (
             <button key={id} onClick={() => setPanel(id)}>
@@ -649,6 +671,8 @@ function App() {
               onChange={(event) => setIntent(event.target.value)}
               placeholder="描述修改意图"
             />
+            <label className="upload-button conversation-upload">添加文件<input type="file" multiple accept=".md,.txt,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.json,.png,.jpg,.jpeg,.webp,.svg" onChange={(event) => void uploadConversationFiles(event.target.files)} /></label>
+            {attachments.length > 0 && <small>已附加：{attachments.map((attachment) => attachment.path).join("、")}</small>}
             <button onClick={submit}>{!current?.revision && generationStaging?.slides.includes(current?.id ?? "") ? "修复生成结果并重新检查" : "创建并执行修改作业"}</button>
           </>
         )}
@@ -657,9 +681,8 @@ function App() {
           <History slide={current} onRestored={refreshSlides} />
         )}{" "}
         {intake.status !== "empty" && panel === "exports" && <ExportHistory />}
-        {intake.status !== "empty" && panel === "memory" && <Memory />}
-        {intake.status !== "empty" && panel === "sidecar" && <Sidecars />}
-        {intake.status !== "empty" && panel === "notes" && <NotesEditor />}
+        {panel === "memory" && <Memory />}
+        {panel === "notes" && <NotesEditor />}
       </section>
       {launcherOpen && project && (
         <ProjectLauncher
