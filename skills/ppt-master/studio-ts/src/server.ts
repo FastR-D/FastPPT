@@ -438,7 +438,17 @@ server.post<{ Body: unknown }>("/api/workflow/intake", async (request, reply) =>
   if (!parsed.success) return reply.code(422).send({ error: "invalid intake request", issues: parsed.error.issues });
   const sources: string[] = [];
   for (const source of parsed.data.sources) {
-    if (path.isAbsolute(source) || source.split(/[\\/]/).includes("..")) return reply.code(400).send({ error: "sources must use project-relative paths" });
+    if (source.split(/[\\/]/).includes("..")) return reply.code(400).send({ error: "sources must not contain parent traversal" });
+    if (path.isAbsolute(source)) {
+      if (!(await exists(source))) return reply.code(400).send({ error: `source not found: ${source}` });
+      const uploads = path.join(root, "uploads"); await mkdir(uploads, { recursive: true });
+      const extension = path.extname(source).toLowerCase();
+      const safeName = path.basename(source).replace(/[^A-Za-z0-9._-]/g, "_");
+      const relative = path.join("uploads", `${path.basename(safeName, extension)}-${Date.now()}${extension}`);
+      await copyFile(source, path.join(root, relative));
+      sources.push(relative);
+      continue;
+    }
     const resolved = path.resolve(root, source);
     if (!resolved.startsWith(`${root}${path.sep}`) || !(await exists(resolved))) return reply.code(400).send({ error: `source not found in project: ${source}` });
     sources.push(source);
