@@ -21,6 +21,7 @@ export interface GetSessionInput {
 export interface CreateSessionInput {
   cwd: string
   title?: string
+  model?: string
 }
 
 export interface SessionReference {
@@ -68,6 +69,7 @@ export interface SendMessageInput {
   themeId?: string
   themeSkillId?: string
   themeSkillVersion?: string
+  model?: string
 }
 
 export interface CancelRunInput {

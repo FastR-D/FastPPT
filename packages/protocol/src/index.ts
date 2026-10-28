@@ -1,4 +1,40 @@
 import { z } from 'zod'
+import {
+  AnimationDocumentV1Schema,
+  SpeakerNotesDocumentV1Schema,
+  CreationDecisionV1Schema,
+  ImportAnalysisV1Schema,
+  PptxRenderEvidenceV1Schema,
+} from '@fastppt/presentation-ir'
+
+export {
+  AnimationDocumentV1Schema,
+  SpeakerNotesDocumentV1Schema,
+  MasterSnapshotV1Schema,
+  NativeMasterLayoutSchema,
+  CreationDecisionV1Schema,
+  ImportAnalysisV1Schema,
+  ImportLayoutCandidateSchema,
+  ExportCapabilityReportSchema,
+  digest as presentationDigest,
+  normalizeAnimation,
+  estimateNotesSeconds,
+  NarrationProviderSchema,
+  NarrationManifestV1Schema,
+  NarrationProviderStatusV1Schema,
+  cuesToSrt,
+} from '@fastppt/presentation-ir'
+export type {
+  AnimationDocumentV1,
+  SpeakerNotesDocumentV1,
+  MasterSnapshotV1,
+  CreationDecisionV1,
+  ImportAnalysisV1,
+  ImportLayoutCandidate,
+  ExportCapabilityReport,
+  NarrationManifestV1,
+  NarrationProviderStatusV1,
+} from '@fastppt/presentation-ir'
 
 export { HtmlDeckSnapshotSchema as SlidewaveSnapshotSchema } from '@fastppt/slidewave/snapshot'
 export type { HtmlDeckSnapshot as SlidewaveSnapshot } from '@fastppt/slidewave/snapshot'
@@ -268,10 +304,19 @@ export const SessionDeckProfileSchema = z.object({
   theme: SessionThemeSelectionSchema,
   preservation: PreservationPolicySchema,
   reviewPolicy: ReviewPolicySchema,
+  creationDecisions: z.array(CreationDecisionV1Schema).optional(),
+  deliveryOptions: z
+    .object({
+      master: z.boolean(),
+      notes: z.boolean(),
+      animations: z.boolean(),
+    })
+    .optional(),
 })
 export type SessionDeckProfile = z.infer<typeof SessionDeckProfileSchema>
 
 export const ManagedInstallStateSchema = z.enum([
+  'on-demand',
   'missing',
   'installed',
   'update-available',
@@ -303,6 +348,32 @@ export const ThemeSkillStatusSchema = z.object({
   available: z.boolean(),
 })
 export type ThemeSkillStatus = z.infer<typeof ThemeSkillStatusSchema>
+
+export const ColorPaletteSchema = z.object({
+  id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,100}$/),
+  title: z.string(),
+  family: z.string(),
+  kind: z.enum(['categorical', 'sequential', 'diverging', 'cyclical', 'theme', 'design']),
+  colors: z.array(z.string().regex(/^#[0-9A-F]{6}$/)).min(2).max(12),
+  source: z.string(),
+  sourceUrl: z.string().url(),
+  sources: z.array(z.string().url()),
+  license: z.string(),
+  tags: z.array(z.string()),
+  aliases: z.array(z.string()),
+  originalColorCount: z.number().int().min(2),
+})
+export type ColorPalette = z.infer<typeof ColorPaletteSchema>
+export const PaletteSearchResponseSchema = z.object({
+  total: z.number().int().nonnegative(),
+  offset: z.number().int().nonnegative(),
+  limit: z.number().int().positive(),
+  items: z.array(ColorPaletteSchema),
+})
+export const PaletteRecommendationSchema = z.object({
+  query: z.string(),
+  recommendations: z.array(z.object({ palette: ColorPaletteSchema, reason: z.string() })),
+})
 
 export const McpConfigStatusSchema = z.object({
   harness: HarnessKindSchema,
@@ -429,8 +500,52 @@ export const CreateExportRequestSchema = z.object({
   review: z.boolean().optional(),
   reviewPolicy: ReviewPolicySchema.optional(),
   profileDigest: z.string().min(1).nullable().optional(),
+  options: z
+    .object({
+      policy: z
+        .enum(['editable', 'strict-editable', 'visual-fidelity'])
+        .optional(),
+      master: z.boolean().default(true),
+      notes: z.boolean().default(true),
+      animations: z.boolean().default(true),
+      diagrams: z.boolean().default(true),
+      review: z.boolean().default(true),
+    })
+    .default({
+      master: true,
+      notes: true,
+      animations: true,
+      diagrams: true,
+      review: true,
+    }),
 })
 export type CreateExportRequest = z.infer<typeof CreateExportRequestSchema>
+
+export const DeckNotesDocumentSchema = z.object({
+  version: z.literal(1),
+  notes: z.array(SpeakerNotesDocumentV1Schema),
+})
+export type DeckNotesDocument = z.infer<typeof DeckNotesDocumentSchema>
+export const DeckAnimationsDocumentSchema = z.object({
+  version: z.literal(1),
+  animations: z.array(AnimationDocumentV1Schema),
+})
+export type DeckAnimationsDocument = z.infer<
+  typeof DeckAnimationsDocumentSchema
+>
+export const PutDiagramDocumentSchema = z.object({ document: z.unknown() })
+export type PutDiagramDocument = z.infer<typeof PutDiagramDocumentSchema>
+
+export const CreationWizardSchema = z.object({
+  id: z.string().min(1),
+  version: z.literal(1),
+  status: z.enum(['draft', 'committed', 'abandoned']).default('draft'),
+  currentStep: z.string().default('task'),
+  decisions: z.array(CreationDecisionV1Schema).default([]),
+  profileDigest: z.string().optional(),
+  updatedAt: z.iso.datetime(),
+})
+export type CreationWizard = z.infer<typeof CreationWizardSchema>
 
 export const ReviewExportRequestSchema = z.object({
   approved: z.boolean(),
@@ -440,12 +555,15 @@ export const ImportPptxThemeRequestSchema = z.object({
   fileName: z.string().min(1).max(200),
   dataBase64: z.string().min(1),
   themeName: z.string().min(1).max(64).optional(),
+  harness: HarnessKindSchema.optional(),
+  model: z.string().trim().min(1).max(120).optional(),
 })
 export type ImportPptxThemeRequest = z.infer<
   typeof ImportPptxThemeRequestSchema
 >
 
 export const ImportPptxThemeResultSchema = z.object({
+  jobId: z.string().uuid(),
   themeId: z.string().min(1),
   displayName: z.string().min(1),
   packageName: z.string().min(1),
@@ -475,6 +593,7 @@ export const ImportPptxThemeStatusSchema = z.object({
   components: z.array(z.string()),
   message: z.string().min(1),
   error: z.string().optional(),
+  analysis: ImportAnalysisV1Schema.optional(),
 })
 export type ImportPptxThemeStatus = z.infer<typeof ImportPptxThemeStatusSchema>
 
@@ -509,7 +628,76 @@ export const ExportQaReportSchema = z.object({
 })
 export type ExportQaReport = z.infer<typeof ExportQaReportSchema>
 
+const ExportObjectBoxSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  width: z.number(),
+  height: z.number(),
+})
+export const ExportObjectReportSchema = z.object({
+  layoutRepair: z
+    .object({
+      source: ExportObjectBoxSchema,
+      proposed: ExportObjectBoxSchema,
+      applied: z.boolean(),
+    })
+    .optional(),
+  slideId: z.string(),
+  elementId: z.string(),
+  source: z.object({
+    tag: z.string(),
+    path: z.string(),
+    className: z.string().optional(),
+    anchor: z.string().optional(),
+    pseudo: z.enum(['before', 'after']).optional(),
+  }),
+  kind: z.enum(['shape', 'line', 'text', 'image', 'table']),
+  semanticKind: z.literal('table').optional(),
+  requiredRepresentation: z.literal('native-table').optional(),
+  representation: z.enum(['native-table', 'native-shapes', 'native-text', 'image']).optional(),
+  semanticPreserved: z.boolean().optional(),
+  structureOwnerId: z.string().optional(),
+  childIds: z.array(z.string()).optional(),
+  pptxObjectName: z.string().optional(),
+  verification: z.object({ structure: z.enum(['passed', 'unverified']), visual: z.literal('unverified'), application: z.literal('unverified') }).optional(),
+  nativeCount: z.number().int().nonnegative(),
+  imageCount: z.number().int().nonnegative(),
+  imageKinds: z
+    .object({
+      vector: z.number().int().nonnegative(),
+      raster: z.number().int().nonnegative(),
+      unknown: z.number().int().nonnegative(),
+    })
+    .optional(),
+  status: z.enum(['native', 'image', 'mixed', 'missing']),
+  editableRequired: z.boolean(),
+  fonts: z
+    .object({
+      requested: z.array(z.string()),
+      emitted: z.array(z.string()),
+      substituted: z.boolean(),
+    })
+    .optional(),
+  reasons: z.array(z.string()),
+})
+
 export const ExportJobSchema = z.object({
+  snapshotVersions: z.array(z.union([z.literal(1), z.literal(2)])).min(1).optional(),
+  themeRules: z.object({
+    revision: z.string().min(1), digest: z.string().nullable(),
+    binding: z.lazy(() => ThemeRuleExceptionBindingSchema).optional(),
+    exceptions: z.array(z.lazy(() => ThemeRuleExceptionSchema)).optional(),
+    stage: z.enum(['pre-export', 'post-export']),
+    issues: z.array(z.lazy(() => ThemeRuleIssueSchema)),
+    readback: z.object({
+      source: z.literal('pptx-xml'), sha256: z.string().regex(/^[a-f0-9]{64}$/),
+      checkedAt: z.iso.datetime(), status: z.enum(['passed', 'issues', 'failed']),
+      issues: z.array(z.lazy(() => ThemeRuleIssueSchema)), error: z.string().optional(),
+      render: PptxRenderEvidenceV1Schema.optional(),
+      slides: z.array(z.object({ index: z.number().int().positive(), part: z.string(), slideId: z.string().optional(), layoutPart: z.string().optional(), layout: z.string().optional(), masterPart: z.string().optional(), master: z.string().optional() })),
+    }).optional(),
+  }).optional(),
+  objects: z.array(ExportObjectReportSchema).optional(),
   id: z.string().min(1),
   deckId: z.string().min(1),
   format: z.literal('editable-pptx'),
@@ -566,11 +754,18 @@ export const BrowserOverflowResultSchema = z.object({
 })
 export type BrowserOverflowResult = z.infer<typeof BrowserOverflowResultSchema>
 
+export const ThemeRuleMeasurementSchema = z.object({
+  slide: z.number().int().positive(),
+  textLines: z.number().int().nonnegative(),
+  density: z.number().min(0).max(1),
+  tokens: z.array(z.string().min(1)),
+})
 export const BrowserQualityResultSchema = z.object({
   inspectionAvailable: z.literal(true),
   slide: z.number().int().positive(),
   slideCount: z.number().int().nonnegative(),
   issues: z.array(z.lazy(() => DeckQualityIssueSchema)),
+  ruleMeasurement: ThemeRuleMeasurementSchema.optional(),
 })
 export type BrowserQualityResult = z.infer<typeof BrowserQualityResultSchema>
 
@@ -585,6 +780,7 @@ export const BrowserInspectionJobSchema = z.object({
   revision: z.string().min(1).optional(),
   themeId: z.string().min(1).nullable().optional(),
   themeDigest: z.string().min(1).nullable().optional(),
+  masterDigest: z.string().nullable().optional(),
   profileDigest: z.string().min(1).nullable().optional(),
   policy: ReviewPolicySchema.optional(),
   status: z.enum(['queued', 'completed', 'failed']),
@@ -796,6 +992,7 @@ export const SendMessageRequestSchema = z.object({
       }),
     )
     .default([]),
+  model: z.string().trim().min(1).max(120).optional(),
 })
 
 export const DeckQualityIssueSchema = z.object({
@@ -825,17 +1022,87 @@ export const DeckQualityIssueSchema = z.object({
 })
 export type DeckQualityIssue = z.infer<typeof DeckQualityIssueSchema>
 
+export const ThemeRuleIssueSchema = z.object({
+  ruleId: z.string().min(1),
+  severity: z.enum(['error', 'warning', 'needs-human']),
+  code: z.string().min(1),
+  message: z.string().min(1),
+  slide: z.number().int().positive().optional(),
+  status: z.enum(['violation', 'unverified']).optional(),
+  source: z.string().optional(),
+  suggestedFix: z.string().optional(),
+  exception: z.object({ id: z.string().uuid(), reason: z.string(), approvedAt: z.iso.datetime() }).optional(),
+  locator: z.object({ layout: z.string().optional(), master: z.string().optional(), placeholderIndex: z.number().int().nonnegative().optional(), objectName: z.string().optional(), token: z.string().optional() }).optional(),
+})
+export type ThemeRuleIssue = z.infer<typeof ThemeRuleIssueSchema>
+
+export const ThemeRuleExceptionBindingSchema = z.object({
+  deckId: z.string().min(1), revision: z.string().min(1),
+  themeId: z.string().nullable(), themeDigest: z.string().nullable(), ruleDigest: z.string().nullable(),
+  masterDigest: z.string().nullable(), profileDigest: z.string().nullable(),
+  optionsDigest: z.string().regex(/^[a-f0-9]{64}$/), authoredDigest: z.string().regex(/^[a-f0-9]{64}$/),
+})
+export type ThemeRuleExceptionBinding = z.infer<typeof ThemeRuleExceptionBindingSchema>
+export const ThemeRuleExceptionSchema = z.object({
+  id: z.string().uuid(), binding: ThemeRuleExceptionBindingSchema,
+  phase: z.enum(['export', 'readback']), issueFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  issue: ThemeRuleIssueSchema.omit({ exception: true }), reason: z.string().trim().min(1).max(1000),
+  actor: z.literal('user'), approvedAt: z.iso.datetime(), revokedAt: z.iso.datetime().optional(),
+})
+export type ThemeRuleException = z.infer<typeof ThemeRuleExceptionSchema>
+export const ThemeRuleExceptionDocumentSchema = z.object({ version: z.literal(1), entries: z.array(ThemeRuleExceptionSchema) })
+export const ThemeRuleExceptionContextRequestSchema = z.object({
+  phase: z.enum(['export', 'readback']).default('export'), exportId: z.string().uuid().optional(),
+  profileDigest: z.string().min(1).nullable().default(null), options: CreateExportRequestSchema.shape.options,
+})
+export type ThemeRuleExceptionContextRequest = z.infer<typeof ThemeRuleExceptionContextRequestSchema>
+export const ApproveThemeRuleExceptionSchema = ThemeRuleExceptionContextRequestSchema.extend({
+  expectedBinding: ThemeRuleExceptionBindingSchema, issueFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  reason: z.string().trim().min(1).max(1000),
+})
+export const ThemeRuleExceptionReviewSchema = z.object({
+  binding: ThemeRuleExceptionBindingSchema, phase: z.enum(['export', 'readback']),
+  issues: z.array(z.object({ fingerprint: z.string().regex(/^[a-f0-9]{64}$/), issue: ThemeRuleIssueSchema })),
+  entries: z.array(z.object({ exception: ThemeRuleExceptionSchema, state: z.enum(['active', 'expired', 'revoked']) })),
+})
+export type ThemeRuleExceptionReview = z.infer<typeof ThemeRuleExceptionReviewSchema>
+
+export const ThemeRuleApprovalReportSchema = z.object({
+  version: z.literal(1), scope: z.literal('theme-catalog'), checkedAt: z.iso.datetime(),
+  digest: z.string().nullable(), catalogDigest: z.string().regex(/^[a-f0-9]{64}$/), layouts: z.array(z.string()), valid: z.boolean(),
+  issues: z.array(ThemeRuleIssueSchema),
+})
+export type ThemeRuleApprovalReport = z.infer<typeof ThemeRuleApprovalReportSchema>
+
+export const DeckValidationResultSchema = z.object({
+  deckId: z.string().min(1),
+  revision: z.string().min(1),
+  valid: z.boolean(),
+  themeId: z.string().optional(),
+  themeSkillId: z.string().optional(),
+  themeRuleDigest: z.string().nullable().default(null),
+  themeRuleIssues: z.array(ThemeRuleIssueSchema).default([]),
+  errors: z.array(
+    z.object({ code: z.string().min(1), message: z.string().min(1) }),
+  ),
+})
+export type DeckValidationResult = z.infer<typeof DeckValidationResultSchema>
+
 export const DeckQualityReportSchema = z.object({
   version: z.literal(1),
   deckId: z.string().min(1),
   revision: z.string().min(1),
   themeId: z.string().nullable(),
   themeDigest: z.string().nullable(),
+  masterDigest: z.string().nullable().default(null),
   profileDigest: z.string().nullable(),
   checkedAt: z.iso.datetime(),
   policy: ReviewPolicySchema,
   ok: z.boolean(),
   issues: z.array(DeckQualityIssueSchema),
+  themeRuleDigest: z.string().nullable().default(null),
+  themeRuleIssues: z.array(ThemeRuleIssueSchema).default([]),
+  ruleMeasurements: z.array(ThemeRuleMeasurementSchema).default([]),
 })
 export type DeckQualityReport = z.infer<typeof DeckQualityReportSchema>
 
@@ -870,3 +1137,32 @@ export const IconSearchResponseSchema = z.object({
 export type IconSearchResponse = z.infer<typeof IconSearchResponseSchema>
 
 export const API_VERSION = 'v1' as const
+
+// Resource-library responses are shared by the gallery and agent tools.
+export const LayoutResourceSummarySchema = z.object({
+  id: z.string(), title: z.string(), kind: z.enum(['layout', 'diagram']),
+  description: z.string(), tags: z.array(z.string()), style: z.string(),
+  scenarios: z.string(), source: z.string(), sourcePage: z.number().int().positive(),
+  file: z.string(), aspect: z.number().positive(), density: z.enum(['airy', 'balanced', 'dense']),
+  status: z.enum(['reconstructed', 'needs-review', 'excluded']), warnings: z.array(z.string()),
+  license: z.string(), stats: z.record(z.string(), z.number()), revision: z.string().optional(),
+  renderQa: z.object({ textOverflow: z.number(), missingImages: z.number(), textOutsidePage: z.number().optional(), blockSsim: z.number().optional(), normalizedMae: z.number().optional(), error: z.string().optional() }).optional(),
+})
+export type LayoutResourceSummary = z.infer<typeof LayoutResourceSummarySchema>
+export const ResourceSearchResultSchema = z.object({
+  total: z.number(), offset: z.number(), limit: z.number(),
+  items: z.array(LayoutResourceSummarySchema.extend({ score: z.number(), matched: z.array(z.string()) })),
+})
+export const ResourceDetailSchema = z.object({ resource: LayoutResourceSummarySchema, markdown: z.string() })
+export const SlideRegionSchema = z.object({
+  x: z.number().min(0).max(1), y: z.number().min(0).max(1),
+  width: z.number().positive().max(1), height: z.number().positive().max(1),
+}).refine(box => box.x + box.width <= 1.000001 && box.y + box.height <= 1.000001, 'Region exceeds slide bounds')
+export type SlideRegion = z.infer<typeof SlideRegionSchema>
+
+export const CreativeAnimationSummarySchema = z.object({
+  id:z.string(),title:z.string(),category:z.string(),scope:z.enum(['object','multi-object']),source:z.string(),sourcePage:z.number(),file:z.string(),motionFile:z.string(),aspect:z.number(),targets:z.array(z.string()),effects:z.number(),durationMs:z.number(),warnings:z.array(z.string()),origin:z.enum(['creative-library','layout-motion']),tags:z.array(z.string()),useCases:z.array(z.string()).default([]),revision:z.string(),
+})
+export type CreativeAnimationSummary=z.infer<typeof CreativeAnimationSummarySchema>
+export const CreativeAnimationSearchSchema=z.object({total:z.number(),offset:z.number(),limit:z.number(),items:z.array(CreativeAnimationSummarySchema)})
+export const CreativeAnimationDetailSchema=z.object({resource:CreativeAnimationSummarySchema,motion:AnimationDocumentV1Schema,markdown:z.string()})

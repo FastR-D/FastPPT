@@ -8,7 +8,7 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { loadThemeRegistry } from '@fastppt/theme-registry'
@@ -22,6 +22,8 @@ import {
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const themesRoot = resolve(packageRoot, '../../themes')
 const temporaryDirectories = new Set<string>()
+// Registry fixtures exercise source manifests and skills, not generated bundles.
+const sourceThemeFilter = (source: string): boolean => !['.theme-build', 'node_modules', 'dist', '.turbo'].includes(basename(source))
 
 async function temporaryDirectory(prefix: string): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), prefix))
@@ -39,7 +41,7 @@ afterEach(async () => {
 })
 
 describe('ManagedSkillInstaller', () => {
-  it('plans and installs common capabilities and every registered theme Skill for both Harnesses', async () => {
+  it('installs common capabilities eagerly and materializes only a requested theme', async () => {
     const workspaceRoot = await temporaryDirectory('fastppt-skills-')
     const registry = await loadThemeRegistry(themesRoot)
     const installer = new ManagedSkillInstaller({
@@ -48,16 +50,14 @@ describe('ManagedSkillInstaller', () => {
       registry,
     })
     const dryRun = await installer.reconcile({ dryRun: true })
-    const expectedStatusCount = (registry.themes.length + 4) * 2
+    const expectedStatusCount = (registry.themes.length + 6) * 2
     expect(dryRun.statuses).toHaveLength(expectedStatusCount)
-    expect(dryRun.statuses.every((status) => status.state === 'missing')).toBe(
-      true,
-    )
+    expect(dryRun.statuses.every((status) => status.state === (status.kind === 'theme' ? 'on-demand' : 'missing'))).toBe(true)
 
     const installed = await installer.reconcile()
     expect(installed.statuses).toHaveLength(expectedStatusCount)
     expect(
-      installed.statuses.every((status) => status.state === 'installed'),
+      installed.statuses.every((status) => status.state === (status.kind === 'theme' ? 'on-demand' : 'installed')),
     ).toBe(true)
     expect(
       installed.statuses.map((status) => `${status.harness}:${status.skillId}`),
@@ -67,12 +67,16 @@ describe('ManagedSkillInstaller', () => {
         'claude:fastppt-page-edit',
         'claude:fastppt-image-production',
         'claude:fastppt-editable-visuals',
+        'claude:fastppt-theme-create',
+        'claude:fastppt-ppt-generate',
         'claude:fastppt-theme-academy',
         'claude:fastppt-theme-landing',
         'codex:fastppt',
         'codex:fastppt-page-edit',
         'codex:fastppt-image-production',
         'codex:fastppt-editable-visuals',
+        'codex:fastppt-theme-create',
+        'codex:fastppt-ppt-generate',
         'codex:fastppt-theme-academy',
         'codex:fastppt-theme-landing',
         'claude:fastppt-theme-strategy',
@@ -80,12 +84,30 @@ describe('ManagedSkillInstaller', () => {
         'claude:fastppt-theme-magazine',
       ]),
     )
+    await expect(installer.themeStatus('claude', 'slidev-theme-academy')).resolves.toMatchObject({ available: false, theme: { state: 'on-demand' } })
+    await Promise.all([installer.ensureTheme('claude', 'slidev-theme-academy'), installer.ensureTheme('claude', 'slidev-theme-academy')])
+    await expect(installer.themeStatus('codex', 'slidev-theme-academy')).resolves.toMatchObject({ theme: { state: 'on-demand' } })
+    await expect(installer.themeStatus('claude', 'slidev-theme-landing')).resolves.toMatchObject({ theme: { state: 'on-demand' } })
     await expect(
       installer.themeStatus('claude', 'slidev-theme-academy'),
     ).resolves.toMatchObject({
       available: true,
       skillId: 'fastppt-theme-academy',
     })
+  })
+
+  it('unloads legacy managed themes at startup while preserving edited skills', async () => {
+    const workspaceRoot = await temporaryDirectory('fastppt-skills-lazy-')
+    const installer = new ManagedSkillInstaller({ workspaceRoot, commonSkillRoot: packageRoot, registry: await loadThemeRegistry(themesRoot) })
+    await installer.ensureTheme('claude', 'slidev-theme-academy')
+    await installer.ensureTheme('codex', 'slidev-theme-academy')
+    const edited = join(workspaceRoot, '.agents/skills/fastppt-theme-academy/SKILL.md')
+    await writeFile(edited, 'custom theme instructions\n')
+    const report = await installer.reconcile({ unloadThemes: true })
+    expect(report.unloadedThemeDirectories).toContain(join(workspaceRoot, '.claude/skills/fastppt-theme-academy'))
+    await expect(installer.themeStatus('claude', 'slidev-theme-academy')).resolves.toMatchObject({ theme: { state: 'on-demand' } })
+    await expect(installer.themeStatus('codex', 'slidev-theme-academy')).resolves.toMatchObject({ theme: { state: 'conflict' } })
+    await expect(readFile(edited, 'utf8')).resolves.toBe('custom theme instructions\n')
   })
 
   it('never overwrites a modified managed Skill or an unmanaged target', async () => {
@@ -160,10 +182,11 @@ describe('ManagedSkillInstaller', () => {
 
   it('installs a third registered theme without an installer code change', async () => {
     const fixtureThemes = await temporaryDirectory('fastppt-themes-')
-    await cp(themesRoot, fixtureThemes, { recursive: true })
+    await cp(themesRoot, fixtureThemes, { recursive: true, filter: sourceThemeFilter })
     const third = join(fixtureThemes, 'slidev-theme-fixture')
     await cp(join(themesRoot, 'slidev-theme-landing'), third, {
       recursive: true,
+      filter: sourceThemeFilter,
     })
     const packageJsonPath = join(third, 'package.json')
     const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8')) as {
@@ -212,7 +235,7 @@ describe('ManagedSkillInstaller', () => {
   it('cleans only unmodified stale managed Skills when explicitly requested', async () => {
     const workspaceRoot = await temporaryDirectory('fastppt-skills-')
     const fixtureThemes = await temporaryDirectory('fastppt-themes-')
-    await cp(themesRoot, fixtureThemes, { recursive: true })
+    await cp(themesRoot, fixtureThemes, { recursive: true, filter: sourceThemeFilter })
     const registry = await loadThemeRegistry(fixtureThemes)
     const installer = new ManagedSkillInstaller({
       workspaceRoot,
@@ -220,6 +243,8 @@ describe('ManagedSkillInstaller', () => {
       registry,
     })
     await installer.reconcile()
+    await installer.ensureTheme('claude', 'slidev-theme-landing')
+    await installer.ensureTheme('codex', 'slidev-theme-landing')
     const staleClean = join(
       workspaceRoot,
       '.claude',

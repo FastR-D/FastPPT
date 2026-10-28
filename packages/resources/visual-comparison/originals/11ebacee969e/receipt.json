@@ -1,0 +1,9 @@
+{
+  "id": "11ebacee969e",
+  "source": "references/GordenPPTSkill/templates/architecture-deck/template.pptx",
+  "sourceSha256": "03cdc0b85e2e26ea9a2f02e467c5fb79614299250514fb3399f6170485c9e06f",
+  "pages": 37,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

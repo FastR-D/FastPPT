@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "slideId": "c9f1632d31e4-0103",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s7",
+      "label": "s7",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0103-effect-1",
+          "kind": "native",
+          "target": "s7",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 1000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 500.0,
+              "repeat": 2.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 1000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"0\" presetClass=\"path\" presetSubtype=\"0\" repeatCount=\"2000\" fill=\"hold\" grpId=\"0\" nodeType=\"withEffect\"><p:childTnLst><p:animMotion origin=\"layout\" path=\"M 6.25E-7 1.11111E-6 L 0.01055 -0.01343 L 0.00898 0.00393 L -0.00326 -0.01435 L 0.00247 0.01412 L -0.00729 -0.00347 L 0.00651 -0.01343 L 0.00651 -0.01204 L 0.00872 0.01088 L 0.00794 0.01042 L -0.00729 0.00717 L 0.00078 -0.01296 L 0.0099 0.00717 L 0.00924 0.00717 L -0.00547 -0.00324 L 0.01146 -0.0044 L -0.00287 0.00741 C -0.00378 0.00717 -0.00378 0.00764 -0.00378 0.00694 L 0.00417 -0.01482 L 0.00482 0.01042 L 0.0043 0.0088 L -0.00534 -0.0088 L 0.01224 -0.00579 L 0.0112 -0.00579 L -0.00495 0.00532 L 0.00677 -0.01158 L 0.00677 -0.01065 L 0.0069 0.00856 L 6.25E-7 1.11111E-6 Z \" pathEditMode=\"relative\" rAng=\"0\" ptsTypes=\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"><p:cBhvr><p:cTn id=\"6\" dur=\"500\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:rCtr x=\"24700\" y=\"-4600\"/></p:animMotion></p:childTnLst></p:cTn>",
+            "sourceSpid": "7",
+            "sourceOrder": 0,
+            "class": "path",
+            "presetId": "0",
+            "behaviors": [
+              {
+                "type": "animMotion",
+                "attribute": "ppt_x",
+                "durationMs": 500.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": "M 6.25E-7 1.11111E-6 L 0.01055 -0.01343 L 0.00898 0.00393 L -0.00326 -0.01435 L 0.00247 0.01412 L -0.00729 -0.00347 L 0.00651 -0.01343 L 0.00651 -0.01204 L 0.00872 0.01088 L 0.00794 0.01042 L -0.00729 0.00717 L 0.00078 -0.01296 L 0.0099 0.00717 L 0.00924 0.00717 L -0.00547 -0.00324 L 0.01146 -0.0044 L -0.00287 0.00741 C -0.00378 0.00717 -0.00378 0.00764 -0.00378 0.00694 L 0.00417 -0.01482 L 0.00482 0.01042 L 0.0043 0.0088 L -0.00534 -0.0088 L 0.01224 -0.00579 L 0.0112 -0.00579 L -0.00495 0.00532 L 0.00677 -0.01158 L 0.00677 -0.01065 L 0.0069 0.00856 L 6.25E-7 1.11111E-6 Z ",
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ],
+            "nativeOriginalXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" id=\"5\" presetID=\"0\" presetClass=\"path\" presetSubtype=\"0\" repeatCount=\"indefinite\" fill=\"hold\" grpId=\"0\" nodeType=\"withEffect\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst><p:childTnLst><p:animMotion origin=\"layout\" path=\"M 6.25E-7 1.11111E-6 L 0.01055 -0.01343 L 0.00898 0.00393 L -0.00326 -0.01435 L 0.00247 0.01412 L -0.00729 -0.00347 L 0.00651 -0.01343 L 0.00651 -0.01204 L 0.00872 0.01088 L 0.00794 0.01042 L -0.00729 0.00717 L 0.00078 -0.01296 L 0.0099 0.00717 L 0.00924 0.00717 L -0.00547 -0.00324 L 0.01146 -0.0044 L -0.00287 0.00741 C -0.00378 0.00717 -0.00378 0.00764 -0.00378 0.00694 L 0.00417 -0.01482 L 0.00482 0.01042 L 0.0043 0.0088 L -0.00534 -0.0088 L 0.01224 -0.00579 L 0.0112 -0.00579 L -0.00495 0.00532 L 0.00677 -0.01158 L 0.00677 -0.01065 L 0.0069 0.00856 L 6.25E-7 1.11111E-6 Z \" pathEditMode=\"relative\" rAng=\"0\" ptsTypes=\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"><p:cBhvr><p:cTn id=\"6\" dur=\"500\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:rCtr x=\"24700\" y=\"-4600\"/></p:animMotion></p:childTnLst></p:cTn>"
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": [
+    "creative-loop-normalized-to-two-cycles"
+  ]
+}

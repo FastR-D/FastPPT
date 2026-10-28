@@ -1,0 +1,1692 @@
+{
+  "version": 1,
+  "slideId": "e888597c48f2-0249",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s7",
+      "label": "s7",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-1",
+          "kind": "native",
+          "target": "s7",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"6\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"7\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"8\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "7",
+            "sourceOrder": 0,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "label": "s6",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-2",
+          "kind": "native",
+          "target": "s6",
+          "trigger": "with-previous",
+          "delayMs": 105.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"9\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"10\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"11\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"12\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "6",
+            "sourceOrder": 1,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "label": "s9",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-3",
+          "kind": "native",
+          "target": "s9",
+          "trigger": "with-previous",
+          "delayMs": 210.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"13\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"14\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"15\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"16\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "9",
+            "sourceOrder": 2,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "label": "s5",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-4",
+          "kind": "native",
+          "target": "s5",
+          "trigger": "with-previous",
+          "delayMs": 315.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"17\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"18\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"19\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"20\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "5",
+            "sourceOrder": 3,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s33",
+      "label": "s33",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-5",
+          "kind": "native",
+          "target": "s33",
+          "trigger": "with-previous",
+          "delayMs": 525.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"21\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"22\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"33\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"23\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"33\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"24\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"33\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "33",
+            "sourceOrder": 4,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s35",
+      "label": "s35",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-6",
+          "kind": "native",
+          "target": "s35",
+          "trigger": "with-previous",
+          "delayMs": 630.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"25\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"26\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"35\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"27\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"35\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"28\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"35\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "35",
+            "sourceOrder": 5,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s34",
+      "label": "s34",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-7",
+          "kind": "native",
+          "target": "s34",
+          "trigger": "with-previous",
+          "delayMs": 735.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"29\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"30\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"34\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"31\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"34\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"32\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"34\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "34",
+            "sourceOrder": 6,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s36",
+      "label": "s36",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-8",
+          "kind": "native",
+          "target": "s36",
+          "trigger": "with-previous",
+          "delayMs": 840.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"33\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"34\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"36\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"35\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"36\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"36\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"36\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "36",
+            "sourceOrder": 7,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s38",
+      "label": "s38",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-9",
+          "kind": "native",
+          "target": "s38",
+          "trigger": "with-previous",
+          "delayMs": 945.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"37\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"38\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"38\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"39\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"38\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"40\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"38\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "38",
+            "sourceOrder": 8,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s39",
+      "label": "s39",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-10",
+          "kind": "native",
+          "target": "s39",
+          "trigger": "with-previous",
+          "delayMs": 1050.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"41\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"42\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"39\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"43\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"39\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"44\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"39\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "39",
+            "sourceOrder": 9,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s40",
+      "label": "s40",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-11",
+          "kind": "native",
+          "target": "s40",
+          "trigger": "with-previous",
+          "delayMs": 1155.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"45\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"46\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"40\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"47\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"40\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"48\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"40\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "40",
+            "sourceOrder": 10,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "label": "s10",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-12",
+          "kind": "native",
+          "target": "s10",
+          "trigger": "with-previous",
+          "delayMs": 1260.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"49\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"50\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"10\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"51\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"10\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"52\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"10\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "10",
+            "sourceOrder": 11,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "label": "s12",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-13",
+          "kind": "native",
+          "target": "s12",
+          "trigger": "with-previous",
+          "delayMs": 735.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"53\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"54\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"12\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"55\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"12\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"56\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"12\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "12",
+            "sourceOrder": 12,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "label": "s13",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-14",
+          "kind": "native",
+          "target": "s13",
+          "trigger": "with-previous",
+          "delayMs": 525.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"57\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"58\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"13\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"59\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"13\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"60\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"13\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "13",
+            "sourceOrder": 13,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s15",
+      "label": "s15",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-15",
+          "kind": "native",
+          "target": "s15",
+          "trigger": "with-previous",
+          "delayMs": 315.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"61\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"62\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"15\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"63\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"15\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"64\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"15\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "15",
+            "sourceOrder": 14,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s16",
+      "label": "s16",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0249-effect-16",
+          "kind": "native",
+          "target": "s16",
+          "trigger": "with-previous",
+          "delayMs": 1050.0,
+          "durationMs": 1750.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 1750.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 1750.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"65\" presetID=\"2\" presetClass=\"entr\" presetSubtype=\"4\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"66\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"16\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"67\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"16\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_x\"/></p:val></p:tav></p:tavLst></p:anim><p:anim calcmode=\"lin\" valueType=\"num\"><p:cBhvr additive=\"base\"><p:cTn id=\"68\" dur=\"1750\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"16\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1+#ppt_h/2\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"#ppt_y\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "16",
+            "sourceOrder": 15,
+            "class": "entr",
+            "presetId": "2",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_x",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_x",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "ppt_y",
+                "durationMs": 1750.0,
+                "delayMs": 0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1+#ppt_h/2",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "#ppt_y",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": []
+}

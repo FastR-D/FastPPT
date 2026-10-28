@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "slideId": "c9f1632d31e4-0115",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s7",
+      "label": "s7",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0115-effect-1",
+          "kind": "native",
+          "target": "s7",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 4000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 2000.0,
+              "repeat": 2.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 4000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"0\" presetClass=\"entr\" presetSubtype=\"0\" repeatCount=\"2000\" fill=\"hold\" grpId=\"0\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"6\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim to=\"\" calcmode=\"lin\" valueType=\"num\"><p:cBhvr><p:cTn id=\"7\" dur=\"1000\" accel=\"30000\" decel=\"70000\" autoRev=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>style.opacity</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"rand(0.4)\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>",
+            "sourceSpid": "7",
+            "sourceOrder": 0,
+            "class": "entr",
+            "presetId": "0",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "anim",
+                "attribute": "style.opacity",
+                "durationMs": 1000.0,
+                "delayMs": 0.0,
+                "frames": [
+                  {
+                    "at": 0.0,
+                    "value": "1",
+                    "formula": null
+                  },
+                  {
+                    "at": 1.0,
+                    "value": "rand(0.4)",
+                    "formula": null
+                  }
+                ],
+                "from": null,
+                "to": "",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": true,
+                "repeat": 1.0,
+                "accel": 0.3,
+                "decel": 0.7
+              }
+            ],
+            "nativeOriginalXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" id=\"5\" presetID=\"0\" presetClass=\"entr\" presetSubtype=\"0\" repeatCount=\"indefinite\" fill=\"hold\" grpId=\"0\" nodeType=\"withEffect\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"6\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:anim to=\"\" calcmode=\"lin\" valueType=\"num\"><p:cBhvr><p:cTn id=\"7\" dur=\"1000\" accel=\"30000\" decel=\"70000\" autoRev=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"7\"/></p:tgtEl><p:attrNameLst><p:attrName>style.opacity</p:attrName></p:attrNameLst></p:cBhvr><p:tavLst><p:tav tm=\"0\"><p:val><p:strVal val=\"1\"/></p:val></p:tav><p:tav tm=\"100000\"><p:val><p:strVal val=\"rand(0.4)\"/></p:val></p:tav></p:tavLst></p:anim></p:childTnLst></p:cTn>"
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": [
+    "browser-random-motion-is-seeded",
+    "creative-loop-normalized-to-two-cycles"
+  ]
+}

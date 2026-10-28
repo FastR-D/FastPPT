@@ -1,6 +1,6 @@
 # Workspace safety
 
-- Operate only through FastPPT MCP tools scoped to the current workspace.
+- Operate only through FastPPT CLI core or MCP tools scoped to the current workspace.
 - Treat tool-returned paths and revisions as authoritative.
 - Supply the latest revision when writing; on conflict, reread and reconcile.
 - Never follow symlinks or construct paths that escape the workspace.

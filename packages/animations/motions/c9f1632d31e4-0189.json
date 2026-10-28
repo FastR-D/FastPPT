@@ -1,0 +1,264 @@
+{
+  "version": 1,
+  "slideId": "c9f1632d31e4-0189",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s72",
+      "label": "s72",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0189-effect-1",
+          "kind": "native",
+          "target": "s72",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 12000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 6000.0,
+              "repeat": 2.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 12000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"2000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animRot by=\"21600000\"><p:cBhvr><p:cTn id=\"6\" dur=\"6000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"72\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>",
+            "sourceSpid": "72",
+            "sourceOrder": 0,
+            "class": "emph",
+            "presetId": "8",
+            "behaviors": [
+              {
+                "type": "animRot",
+                "attribute": "r",
+                "durationMs": 6000.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": "21600000",
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ],
+            "nativeOriginalXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" id=\"5\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"indefinite\" fill=\"hold\" nodeType=\"withEffect\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst><p:childTnLst><p:animRot by=\"21600000\"><p:cBhvr><p:cTn id=\"6\" dur=\"6000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"72\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s81",
+      "label": "s81",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0189-effect-2",
+          "kind": "native",
+          "target": "s81",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 9000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 4500.0,
+              "repeat": 2.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 9000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"7\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"2000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animRot by=\"21600000\"><p:cBhvr><p:cTn id=\"8\" dur=\"4500\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"81\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>",
+            "sourceSpid": "81",
+            "sourceOrder": 1,
+            "class": "emph",
+            "presetId": "8",
+            "behaviors": [
+              {
+                "type": "animRot",
+                "attribute": "r",
+                "durationMs": 4500.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": "21600000",
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ],
+            "nativeOriginalXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" id=\"7\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"indefinite\" fill=\"hold\" nodeType=\"withEffect\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst><p:childTnLst><p:animRot by=\"21600000\"><p:cBhvr><p:cTn id=\"8\" dur=\"4500\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"81\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s86",
+      "label": "s86",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0189-effect-3",
+          "kind": "native",
+          "target": "s86",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 12000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 6000.0,
+              "repeat": 2.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 12000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"9\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"2000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animRot by=\"-21600000\"><p:cBhvr><p:cTn id=\"10\" dur=\"6000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"86\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>",
+            "sourceSpid": "86",
+            "sourceOrder": 2,
+            "class": "emph",
+            "presetId": "8",
+            "behaviors": [
+              {
+                "type": "animRot",
+                "attribute": "r",
+                "durationMs": 6000.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": "-21600000",
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ],
+            "nativeOriginalXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" id=\"9\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"indefinite\" fill=\"hold\" nodeType=\"withEffect\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst><p:childTnLst><p:animRot by=\"-21600000\"><p:cBhvr><p:cTn id=\"10\" dur=\"6000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"86\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s93",
+      "label": "s93",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0189-effect-4",
+          "kind": "native",
+          "target": "s93",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 16000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 8000.0,
+              "repeat": 2.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 16000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"11\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"2000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animRot by=\"21600000\"><p:cBhvr><p:cTn id=\"12\" dur=\"8000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"93\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>",
+            "sourceSpid": "93",
+            "sourceOrder": 3,
+            "class": "emph",
+            "presetId": "8",
+            "behaviors": [
+              {
+                "type": "animRot",
+                "attribute": "r",
+                "durationMs": 8000.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": "21600000",
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ],
+            "nativeOriginalXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" id=\"11\" presetID=\"8\" presetClass=\"emph\" presetSubtype=\"0\" repeatCount=\"indefinite\" fill=\"hold\" nodeType=\"withEffect\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst><p:childTnLst><p:animRot by=\"21600000\"><p:cBhvr><p:cTn id=\"12\" dur=\"8000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"93\"/></p:tgtEl><p:attrNameLst><p:attrName>r</p:attrName></p:attrNameLst></p:cBhvr></p:animRot></p:childTnLst></p:cTn>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s68",
+      "label": "s68",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0189-effect-5",
+          "kind": "native",
+          "target": "s68",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 59.4,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 60.0,
+              "repeat": 0.99,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 59.4,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"13\" presetID=\"11\" presetClass=\"entr\" presetSubtype=\"0\" repeatCount=\"990\" fill=\"hold\" grpId=\"0\" nodeType=\"withEffect\"><p:iterate type=\"wd\"><p:tmPct val=\"50000\"/></p:iterate><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"14\" dur=\"60\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"68\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set></p:childTnLst></p:cTn>",
+            "sourceSpid": "68",
+            "sourceOrder": 4,
+            "class": "entr",
+            "presetId": "11",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 60.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": [
+    "browser-whole-object-iteration; native-pptx-retains-iterate",
+    "creative-loop-normalized-to-two-cycles"
+  ]
+}

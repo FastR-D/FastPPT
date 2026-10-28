@@ -1,4 +1,22 @@
 <script setup lang="ts">
+import {
+  Article,
+  Box,
+  Button,
+  Header,
+  Heading,
+  Link,
+  Panel,
+  Svg,
+  SvgPath,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Text,
+} from '@fastppt/components'
 import { computed, onUnmounted, shallowRef } from 'vue'
 
 import { useGatewayClient } from '../../api/useGatewayClient.js'
@@ -62,66 +80,72 @@ onUnmounted(() => window.removeEventListener('keydown', handleWindowKey))
 </script>
 
 <template>
-  <section class="theme-catalog" aria-labelledby="theme-catalog-title">
-    <header class="catalog-header">
-      <div>
-        <span class="eyebrow">Local theme registry</span>
-        <h1 id="theme-catalog-title">可用主题</h1>
-        <p>查看本地已注册主题、功能清单及 Agent Skill 原文。</p>
-      </div>
-      <span class="theme-count">{{ sortedThemes.length }} 个主题</span>
-    </header>
+  <Panel class="theme-catalog" aria-labelledby="theme-catalog-title">
+    <Header class="catalog-header">
+      <Box>
+        <Text class="eyebrow">Local theme registry</Text>
+        <Heading id="theme-catalog-title" as="h1">可用主题</Heading>
+        <Text as="p">查看本地已注册主题、功能清单及 Agent Skill 原文。</Text>
+      </Box>
+      <Text class="theme-count">{{ sortedThemes.length }} 个主题</Text>
+    </Header>
 
-    <div v-if="loading && !sortedThemes.length" class="catalog-state">
+    <Box v-if="loading && !sortedThemes.length" class="catalog-state">
       正在读取主题注册表…
-    </div>
-    <div v-else-if="error && !sortedThemes.length" class="catalog-state error">
+    </Box>
+    <Box v-else-if="error && !sortedThemes.length" class="catalog-state error">
       {{ error }}
-    </div>
-    <div v-else class="table-shell">
-      <table>
-        <thead>
-          <tr>
-            <th>主题</th>
-            <th>简要描述</th>
-            <th>Skill</th>
-            <th>版本</th>
-            <th class="repo-heading">原始 Repo</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="theme in sortedThemes" :key="theme.themeId">
-            <td>
-              <strong>{{ theme.displayName }}</strong>
-              <code>{{ theme.packageName }}</code>
-            </td>
-            <td class="description-cell">
-              <span>{{ theme.description }}</span>
-              <button
+    </Box>
+    <Box v-else class="table-shell">
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableHeader>主题</TableHeader>
+            <TableHeader>简要描述</TableHeader>
+            <TableHeader>Skill</TableHeader>
+            <TableHeader>版本</TableHeader>
+            <TableHeader class="repo-heading">原始 Repo</TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow v-for="theme in sortedThemes" :key="theme.themeId">
+            <TableCell>
+              <Text as="strong">{{ theme.displayName }}</Text>
+              <Text as="code">{{ theme.packageName }}</Text>
+            </TableCell>
+            <TableCell class="description-cell">
+              <Text>{{ theme.description }}</Text>
+              <Button
+                variant="quiet"
                 class="expand-button"
                 type="button"
                 :aria-label="`查看 ${theme.displayName} 详细功能`"
                 @click="openDetails(theme)"
               >
                 展开
-              </button>
-            </td>
-            <td>
-              <div class="skill-cell">
-                <code>{{ theme.skillId }}</code>
-                <button
+              </Button>
+            </TableCell>
+            <TableCell>
+              <Box class="skill-cell">
+                <Text as="code">{{ theme.skillId }}</Text>
+                <Button
+                  variant="quiet"
                   class="expand-button"
                   type="button"
                   :aria-label="`查看 ${theme.skillId} 文件`"
                   @click="openSkill(theme)"
                 >
                   展开
-                </button>
-              </div>
-            </td>
-            <td><code>{{ theme.version }}</code></td>
-            <td class="repo-cell">
-              <a
+                </Button>
+              </Box>
+            </TableCell>
+            <TableCell
+            >
+              <Text as="code">{{ theme.version }}</Text>
+            </TableCell
+            >
+            <TableCell class="repo-cell">
+              <Link
                 class="repo-link"
                 :href="theme.repositoryUrl"
                 target="_blank"
@@ -129,82 +153,99 @@ onUnmounted(() => window.removeEventListener('keydown', handleWindowKey))
                 :aria-label="`打开 ${theme.displayName} 原始仓库`"
                 :title="theme.repositoryUrl"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
+                <Svg viewBox="0 0 24 24" aria-hidden="true">
+                  <SvgPath
                     fill="currentColor"
                     d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.87c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82a9.5 9.5 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
                   />
-                </svg>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                </Svg>
+              </Link>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </Box>
 
     <Teleport to="body">
-      <div
+      <Box
         v-if="detailTheme || skillTheme"
         class="modal-backdrop"
         role="presentation"
         @mousedown.self="closeModal"
       >
-        <section
+        <Panel
           class="theme-modal"
           role="dialog"
           aria-modal="true"
           :aria-labelledby="detailTheme ? 'theme-detail-title' : 'skill-title'"
         >
-          <header class="modal-header">
-            <div v-if="detailTheme">
-              <span class="eyebrow">Theme capabilities</span>
-              <h2 id="theme-detail-title">{{ detailTheme.displayName }}</h2>
-              <p>{{ detailTheme.description }}</p>
-            </div>
-            <div v-else-if="skillTheme">
-              <span class="eyebrow">Agent skill source</span>
-              <h2 id="skill-title">{{ skillTheme.skillId }}</h2>
-              <p>{{ skillTheme.skillVersion }} · SKILL.md</p>
-            </div>
-            <button
+          <Header class="modal-header">
+            <Box v-if="detailTheme">
+              <Text class="eyebrow">Theme capabilities</Text>
+              <Heading id="theme-detail-title" as="h2">
+                {{
+                  detailTheme.displayName
+                }}
+              </Heading>
+              <Text as="p">{{ detailTheme.description }}</Text>
+            </Box>
+            <Box v-else-if="skillTheme">
+              <Text class="eyebrow">Agent skill source</Text>
+              <Heading id="skill-title" as="h2">
+                {{
+                  skillTheme.skillId
+                }}
+              </Heading>
+              <Text as="p">{{ skillTheme.skillVersion }} · SKILL.md</Text>
+            </Box>
+            <Button
+              variant="secondary"
               class="close-button"
               type="button"
               aria-label="关闭弹窗"
               @click="closeModal"
             >
               ×
-            </button>
-          </header>
+            </Button>
+          </Header>
 
-          <div v-if="detailTheme" class="modal-content feature-list">
-            <article
+          <Box v-if="detailTheme" class="modal-content feature-list">
+            <Article
               v-for="feature in detailTheme.supportedFeatures"
               :key="feature.id"
             >
-              <strong>{{ feature.label }}</strong>
-              <code>{{ feature.id }}</code>
-              <p>{{ feature.description }}</p>
-            </article>
-            <section class="layout-list">
-              <strong>可用布局</strong>
-              <div>
-                <span v-for="layout in detailTheme.layouts" :key="layout.id">
+              <Text as="strong">{{ feature.label }}</Text>
+              <Text as="code">{{ feature.id }}</Text>
+              <Text as="p">{{ feature.description }}</Text>
+            </Article>
+            <Panel class="layout-list">
+              <Text as="strong">可用布局</Text>
+              <Box>
+                <Text v-for="layout in detailTheme.layouts" :key="layout.id">
                   {{ layout.label }}
-                </span>
-              </div>
-            </section>
-          </div>
-          <div v-else class="modal-content skill-source">
-            <p v-if="skillLoading" class="catalog-state">正在读取 SKILL.md…</p>
-            <p v-else-if="skillError" class="catalog-state error">
+                </Text>
+              </Box>
+            </Panel>
+          </Box>
+          <Box v-else class="modal-content skill-source">
+            <Text v-if="skillLoading" as="p" class="catalog-state"
+            >
+              正在读取 SKILL.md…
+            </Text
+            >
+            <Text v-else-if="skillError" as="p" class="catalog-state error">
               {{ skillError }}
-            </p>
-            <pre v-else><code>{{ skillDocument?.content }}</code></pre>
-          </div>
-        </section>
-      </div>
+            </Text>
+            <Text v-else as="pre"
+            >
+              <Text as="code">{{ skillDocument?.content }}</Text>
+            </Text
+            >
+          </Box>
+        </Panel>
+      </Box>
     </Teleport>
-  </section>
+  </Panel>
 </template>
 
 <style scoped>
@@ -223,7 +264,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleWindowKey))
   margin-bottom: 24px;
 }
 .eyebrow {
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.12em;
@@ -305,11 +346,6 @@ code {
 }
 .expand-button {
   margin-top: 8px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-accent);
-  font-size: 11px;
 }
 .skill-cell {
   min-width: 180px;
@@ -329,8 +365,8 @@ code {
   color: var(--color-text);
 }
 .repo-link:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: var(--color-accent-strong);
+  color: var(--color-accent-strong);
 }
 .repo-link svg {
   width: 17px;
@@ -351,8 +387,7 @@ code {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(3 8 7 / 76%);
-  backdrop-filter: blur(8px);
+  background: var(--color-overlay);
 }
 .theme-modal {
   display: grid;
@@ -363,7 +398,7 @@ code {
   border: 1px solid var(--color-border-strong);
   border-radius: 14px;
   background: var(--color-panel-raised);
-  box-shadow: 0 24px 80px rgb(0 0 0 / 45%);
+  box-shadow: var(--shadow-modal);
 }
 .modal-header {
   display: flex;
@@ -380,12 +415,6 @@ code {
 .close-button {
   width: 30px;
   height: 30px;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-panel);
-  color: var(--color-muted);
-  font-size: 20px;
 }
 .modal-content {
   min-height: 0;
@@ -430,7 +459,7 @@ code {
   padding: 5px 8px;
   border-radius: 6px;
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   font-size: 10px;
 }
 .skill-source pre {

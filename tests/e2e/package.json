@@ -11,11 +11,18 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@fastppt/fastppt-mcp": "workspace:*",
     "@fastppt/gateway": "workspace:*",
     "@fastppt/harness-core": "workspace:*",
+    "@fastppt/pptx-import": "workspace:*",
+    "@fastppt/presentation-ir": "workspace:*",
     "@fastppt/protocol": "workspace:*",
     "@fastppt/slidewave": "workspace:*",
-    "tsx": "^4.20.3"
+    "@fastppt/theme-registry": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "jszip": "3.10.1",
+    "tsx": "^4.20.3",
+    "@fastppt/slidev-host": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",

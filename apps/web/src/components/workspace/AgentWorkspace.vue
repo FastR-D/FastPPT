@@ -1,6 +1,26 @@
 <script setup lang="ts">
 import {
+  Article,
+  Box,
+  BrandMark,
+  Button,
+  Description,
+  DescriptionList,
+  Disclosure,
+  DisclosureTrigger,
+  Field,
+  Footer,
+  Header,
+  Heading,
+  Panel,
+  Term,
+  Text,
+  TextArea,
+  TextField,
+} from '@fastppt/components'
+import {
   computed,
+  defineAsyncComponent,
   nextTick,
   onMounted,
   shallowRef,
@@ -8,7 +28,10 @@ import {
   watch,
 } from 'vue'
 
-import MarkdownEditor from '../editor/MarkdownEditor.vue'
+const MarkdownEditor = defineAsyncComponent(
+  () => import('../editor/MarkdownEditor.vue'),
+)
+import { userFacingContent } from '../../workspace/message-markdown.js'
 import ConversationMessage from './ConversationMessage.vue'
 
 import type {
@@ -26,7 +49,6 @@ import type { DeepReadonly } from 'vue'
 
 const props = defineProps<{
   mode: 'chat' | 'files'
-  workspaceName: string
   selectedFile: FileContent | undefined
   draft: string
   dirty: boolean
@@ -56,6 +78,7 @@ const emit = defineEmits<{
   updateMessageDraft: [content: string]
   attach: [file: File]
   removeAttachment: [path: string]
+  createSession: []
   send: []
   cancel: []
   resolveApproval: [input: { approvalId: string; decision: ApprovalDecision }]
@@ -133,6 +156,7 @@ const VISIBLE_EVENT_TYPES = new Set<UnifiedAgentEvent['type']>([
 const visibleAgentEvents = (events: readonly UnifiedAgentEvent[]) =>
   events.filter((event) => VISIBLE_EVENT_TYPES.has(event.type))
 
+const showActivity = shallowRef(false)
 const conversationItems = computed(() =>
   [
     ...props.messages.map((message, index) => ({
@@ -142,7 +166,14 @@ const conversationItems = computed(() =>
       fallbackOrder: index * 2,
       message,
     })),
-    ...visibleAgentEvents(props.agentEvents).map((event, index) => ({
+    ...(showActivity.value
+      ? visibleAgentEvents(props.agentEvents)
+      : props.agentEvents.filter(
+          (event) =>
+            event.type === 'run.failed' ||
+            event.type === 'harness.disconnected',
+        )
+    ).map((event, index) => ({
       kind: 'event' as const,
       id: `event:${event.eventId}`,
       timestamp: event.timestamp,
@@ -180,6 +211,11 @@ async function scrollToConversationTail(force = false): Promise<void> {
   if (element) element.scrollTop = element.scrollHeight
 }
 
+function jumpToLatest(): void {
+  followConversationTail.value = true
+  void scrollToConversationTail(true)
+}
+
 watch(conversationTail, () => void scrollToConversationTail())
 onMounted(() => void scrollToConversationTail(true))
 
@@ -191,8 +227,13 @@ const sendDisabled = computed(
     !props.session ||
     !props.messageDraft.trim() ||
     props.sending ||
+    props.runActive ||
     Boolean(props.sendDisabledReason),
 )
+
+function requestSend(event?: KeyboardEvent): void {
+  if (!event?.isComposing && !sendDisabled.value) emit('send')
+}
 
 function approvalReason(approval: ApprovalRequest): string {
   return approval.reason ?? 'Provider 未提供风险说明，请核对操作内容后决定。'
@@ -200,132 +241,180 @@ function approvalReason(approval: ApprovalRequest): string {
 </script>
 
 <template>
-  <section class="agent-panel panel-surface">
+  <Panel class="agent-panel panel-surface">
     <template v-if="mode === 'chat'">
-      <div v-if="!session" class="conversation-empty">
-        <div class="conversation-orbit"><span>F</span></div>
-        <h2>创建或选择 {{ harness === 'claude' ? 'Claude' : 'Codex' }} 会话</h2>
-        <p>
-          会话会按当前 workspace
-          过滤。流式消息、命令、文件修改与审批都会保留结构化事件。
-        </p>
-      </div>
-      <div
+      <Box v-if="!session" class="conversation-empty">
+        <Box class="conversation-orbit"><BrandMark class="conversation-logo" /></Box>
+        <Heading as="h2"
+        >
+          创建或选择
+          {{ harness === 'claude' ? 'Claude' : 'Codex' }} 会话
+        </Heading
+        >
+        <Text as="p"
+        >
+          选择左侧会话继续工作，或新建会话，描述你的演示文稿需求。
+        </Text
+        >
+        <Button
+          variant="primary"
+          class="empty-create"
+          type="button"
+          @click="emit('createSession')"
+        >
+          开始新会话
+        </Button>
+      </Box>
+      <Box
         v-else
         ref="conversationStream"
         class="conversation-stream"
         @scroll.passive="updateConversationFollowState"
       >
-        <div class="session-heading">
-          <strong>{{ session.title ?? session.preview }}</strong>
-          <span>{{ session.status }}</span>
-        </div>
-        <details v-if="runAudit" class="run-audit-card">
-          <summary>本次运行 Skill 审计 · {{ runAudit.status }}</summary>
-          <dl>
-            <div>
-              <dt>主题</dt>
-              <dd>{{ runAudit.themeId ?? '未解析' }}</dd>
-            </div>
-            <div>
-              <dt>主题 Skill</dt>
-              <dd>
+        <Box class="session-heading">
+          <Text as="strong">{{ session.title ?? session.preview }}</Text>
+          <Text>
+            {{
+              runActive
+                ? '正在处理…'
+                : session.status === 'idle'
+                  ? '就绪'
+                  : session.status
+            }}
+          </Text>
+        </Box>
+        <Box class="conversation-toolbar">
+          <Field>
+            <TextField v-model="showActivity" type="checkbox" />显示执行过程 ·
+            {{ visibleAgentEvents(agentEvents).length }}
+          </Field
+          ><Text v-if="runActive" role="status">Agent 正在工作</Text>
+        </Box>
+        <Disclosure v-if="runAudit" class="run-audit-card">
+          <DisclosureTrigger
+          >
+            本次运行 Skill 审计 · {{ runAudit.status }}
+          </DisclosureTrigger
+          >
+          <DescriptionList>
+            <Box>
+              <Term>主题</Term>
+              <Description>{{ runAudit.themeId ?? '未解析' }}</Description>
+            </Box>
+            <Box>
+              <Term>主题 Skill</Term>
+              <Description>
                 {{ runAudit.themeSkillId ?? '未解析' }}@{{
                   runAudit.themeSkillVersion ?? 'unknown'
                 }}
-              </dd>
-            </div>
-            <div>
-              <dt>解析状态</dt>
-              <dd>{{ runAudit.skillResolutionStatus }}</dd>
-            </div>
-            <div>
-              <dt>调用状态</dt>
-              <dd>{{ runAudit.invocationStatus }}</dd>
-            </div>
-            <div>
-              <dt>调用机制</dt>
-              <dd>{{ runAudit.invocationMechanism ?? '尚未记录' }}</dd>
-            </div>
-            <div>
-              <dt>观察证据</dt>
-              <dd>
+              </Description>
+            </Box>
+            <Box>
+              <Term>解析状态</Term>
+              <Description>{{ runAudit.skillResolutionStatus }}</Description>
+            </Box>
+            <Box>
+              <Term>调用状态</Term>
+              <Description>{{ runAudit.invocationStatus }}</Description>
+            </Box>
+            <Box>
+              <Term>调用机制</Term>
+              <Description>
+                {{
+                  runAudit.invocationMechanism ?? '尚未记录'
+                }}
+              </Description>
+            </Box>
+            <Box>
+              <Term>观察证据</Term>
+              <Description>
                 {{
                   runAudit.observationEvidence === null
                     ? 'Harness 未提供稳定观察证据'
                     : JSON.stringify(runAudit.observationEvidence)
                 }}
-              </dd>
-            </div>
-          </dl>
-        </details>
+              </Description>
+            </Box>
+          </DescriptionList>
+        </Disclosure>
         <template v-for="entry in conversationItems" :key="entry.id">
-          <article
+          <Article
             v-if="entry.kind === 'message'"
             class="message-card"
             :class="`message-${entry.message.role}`"
           >
-            <header class="message-meta">
-              <strong>{{
+            <Header class="message-meta">
+              <Text as="strong">
+                {{
+                  entry.message.role === 'user'
+                    ? '你'
+                    : entry.message.role === 'assistant'
+                      ? harness === 'claude'
+                        ? 'Claude'
+                        : 'Codex'
+                      : entry.message.role
+                }}
+              </Text>
+              <Text v-if="entry.message.createdAt" as="time">
+                {{
+                  new Date(entry.message.createdAt).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                }}
+              </Text>
+            </Header>
+            <ConversationMessage
+              :content="
                 entry.message.role === 'user'
-                  ? '你'
-                  : entry.message.role === 'assistant'
-                    ? harness === 'claude'
-                      ? 'Claude'
-                      : 'Codex'
-                    : entry.message.role
-              }}</strong>
-              <time v-if="entry.message.createdAt">{{
-                new Date(entry.message.createdAt).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              }}</time>
-            </header>
-            <ConversationMessage :content="entry.message.content" />
-          </article>
-          <article
+                  ? userFacingContent(entry.message.content)
+                  : entry.message.content
+              "
+            />
+          </Article>
+          <Article
             v-else
             class="event-card"
             :class="`event-${eventKind(entry.event)}`"
           >
-            <span class="event-dot" aria-hidden="true"></span>
-            <small>{{ eventLabel(entry.event) }}</small>
-          </article>
+            <Text class="event-dot" aria-hidden="true"></Text>
+            <Text as="small">{{ eventLabel(entry.event) }}</Text>
+          </Article>
         </template>
-        <article
+        <Article
           v-for="approval in approvals"
           :key="approval.id"
           class="approval-card"
         >
-          <strong>{{ approval.title }}</strong>
-          <dl class="approval-context">
-            <div>
-              <dt>Harness</dt>
-              <dd>{{ approval.harness }}</dd>
-            </div>
-            <div>
-              <dt>工作目录</dt>
-              <dd>{{ approval.cwd ?? '未提供' }}</dd>
-            </div>
-            <div>
-              <dt>影响文件</dt>
-              <dd>
+          <Text as="strong">{{ approval.title }}</Text>
+          <DescriptionList class="approval-context">
+            <Box>
+              <Term>Harness</Term>
+              <Description>{{ approval.harness }}</Description>
+            </Box>
+            <Box>
+              <Term>工作目录</Term>
+              <Description>{{ approval.cwd ?? '未提供' }}</Description>
+            </Box>
+            <Box>
+              <Term>影响文件</Term>
+              <Description>
                 {{
                   approval.affectedFiles.length
                     ? approval.affectedFiles.join(', ')
                     : '未提供'
                 }}
-              </dd>
-            </div>
-            <div>
-              <dt>风险说明</dt>
-              <dd>{{ approvalReason(approval) }}</dd>
-            </div>
-          </dl>
-          <code v-if="approval.command">{{ approval.command }}</code>
-          <div>
-            <button
+              </Description>
+            </Box>
+            <Box>
+              <Term>风险说明</Term>
+              <Description>{{ approvalReason(approval) }}</Description>
+            </Box>
+          </DescriptionList>
+          <Text v-if="approval.command" as="code">{{ approval.command }}</Text>
+          <Box>
+            <Button
+              variant="secondary"
               type="button"
               @click="
                 $emit('resolveApproval', {
@@ -335,8 +424,9 @@ function approvalReason(approval: ApprovalRequest): string {
               "
             >
               拒绝
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
               type="button"
               @click="
                 $emit('resolveApproval', {
@@ -346,8 +436,9 @@ function approvalReason(approval: ApprovalRequest): string {
               "
             >
               允许一次
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
               type="button"
               @click="
                 $emit('resolveApproval', {
@@ -357,24 +448,33 @@ function approvalReason(approval: ApprovalRequest): string {
               "
             >
               本会话允许
-            </button>
-          </div>
-        </article>
-      </div>
-      <footer class="composer-shell">
-        <div v-if="attachments.length" class="attachment-list">
-          <span v-for="attachment in attachments" :key="attachment.path">
+            </Button>
+          </Box>
+        </Article>
+      </Box>
+      <Button
+        v-if="!followConversationTail"
+        variant="secondary"
+        class="jump-to-latest"
+        @click="jumpToLatest"
+      >
+        ↓ 回到最新消息
+      </Button>
+      <Footer class="composer-shell">
+        <Box v-if="attachments.length" class="attachment-list">
+          <Text v-for="attachment in attachments" :key="attachment.path">
             {{ attachment.name }} · {{ Math.ceil(attachment.size / 1024) }} KB
-            <button
+            <Button
+              variant="secondary"
               type="button"
               :aria-label="`移除附件 ${attachment.name}`"
               @click="$emit('removeAttachment', attachment.path)"
             >
               ×
-            </button>
-          </span>
-        </div>
-        <textarea
+            </Button>
+          </Text>
+        </Box>
+        <TextArea
           id="fastppt-message"
           name="message"
           :value="messageDraft"
@@ -382,42 +482,49 @@ function approvalReason(approval: ApprovalRequest): string {
           placeholder="输入演示文稿需求…"
           rows="3"
           @input="updateMessageDraft"
-          @keydown.ctrl.enter.prevent="$emit('send')"
-          @keydown.meta.enter.prevent="$emit('send')"
-        ></textarea>
-        <div v-if="sendDisabledReason" class="agent-error">
+          @keydown.ctrl.enter.prevent="requestSend"
+          @keydown.meta.enter.prevent="requestSend"
+        ></TextArea>
+        <Box v-if="sendDisabledReason" class="agent-error">
           发送已禁用：{{ sendDisabledReason }}
-        </div>
-        <div v-if="agentError" class="agent-error">{{ agentError }}</div>
-        <div class="composer-meta">
-          <div class="composer-tools">
-            <label :class="{ disabled: attaching || attachments.length >= 4 }">
-              <input
+        </Box>
+        <Box v-if="agentError" class="agent-error">{{ agentError }}</Box>
+        <Box class="composer-meta">
+          <Box class="composer-tools">
+            <Field :class="{ disabled: attaching || attachments.length >= 4 }">
+              <TextField
                 type="file"
                 accept="image/png,image/jpeg,image/gif,image/webp"
                 :disabled="attaching || attachments.length >= 4"
                 @change="attachImage"
               />
               {{ attaching ? '上传中…' : '添加图片' }}
-            </label>
-            <span>Ctrl / ⌘ + Enter 发送</span>
-          </div>
-          <button v-if="runActive" type="button" @click="$emit('cancel')">
+            </Field>
+            <Text>Ctrl / ⌘ + Enter 发送</Text>
+          </Box>
+          <Button
+            v-if="runActive"
+            variant="secondary"
+            type="button"
+            @click="$emit('cancel')"
+          >
             停止
-          </button>
-          <button
+          </Button>
+          <Button
             v-else
+            variant="primary"
             type="button"
             :disabled="sendDisabled"
-            @click="$emit('send')"
+            @click="requestSend()"
           >
             {{ sending ? '启动中…' : '发送' }}
-          </button>
-        </div>
-      </footer>
+          </Button>
+        </Box>
+      </Footer>
     </template>
     <MarkdownEditor
       v-else-if="selectedFile"
+      :key="selectedFile.path"
       :path="selectedFile.path"
       :content="draft"
       :dirty="dirty"
@@ -428,62 +535,46 @@ function approvalReason(approval: ApprovalRequest): string {
       @save="$emit('save')"
       @format="$emit('format')"
     />
-    <div v-else class="markdown-empty">
+    <Box v-else class="markdown-empty">
       从左侧文件树选择一个文本文件开始编辑。
-    </div>
-  </section>
+    </Box>
+  </Panel>
 </template>
 
 <style scoped>
-.agent-panel {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-}
-.panel-header {
+.conversation-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 22px 16px;
-}
-.eyebrow {
-  color: var(--color-accent);
+  gap: 10px;
+  margin-bottom: 18px;
+  color: var(--color-muted);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+}
+.conversation-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.conversation-toolbar span {
+  color: var(--color-accent-strong);
+}
+.jump-to-latest {
+  position: absolute;
+  bottom: 200px;
+  left: 50%;
+  z-index: 3;
+}
+
+.agent-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 h1,
 h2,
 p {
   margin: 0;
-}
-h1 {
-  margin-top: 4px;
-  font-size: 17px;
-}
-.mode-pill {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--color-muted);
-  font-size: 11px;
-}
-.tabs {
-  display: flex;
-  gap: 18px;
-  padding: 0 22px;
-  border-bottom: 1px solid var(--color-border);
-}
-.tab {
-  padding: 9px 0;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--color-muted);
-}
-.tab-active {
-  border-color: var(--color-accent);
-  color: var(--color-text);
 }
 .conversation-empty,
 .markdown-empty {
@@ -491,7 +582,7 @@ h1 {
   align-content: center;
   justify-items: center;
   gap: 12px;
-  max-width: 430px;
+  max-width: 420px;
   margin: auto;
   padding: 32px;
   color: var(--color-muted);
@@ -499,7 +590,7 @@ h1 {
 }
 .conversation-stream {
   min-height: 0;
-  padding: 22px clamp(18px, 4vw, 56px);
+  padding: 16px clamp(16px, 2vw, 30px);
   overflow: auto;
 }
 .session-heading {
@@ -513,7 +604,7 @@ h1 {
 .message-card,
 .approval-card,
 .run-audit-card {
-  width: min(88%, 760px);
+  width: min(94%, 760px);
   margin: 12px 0;
   padding: 14px 16px;
   border: 1px solid var(--color-border);
@@ -526,11 +617,6 @@ h1 {
     var(--color-accent) 40%,
     var(--color-border)
   );
-}
-.run-audit-card summary {
-  color: var(--color-muted);
-  cursor: pointer;
-  font-size: 11px;
 }
 .run-audit-card dl {
   display: grid;
@@ -565,10 +651,9 @@ h1 {
 .event-card small {
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
 }
-.message-content,
 .approval-card p {
   line-height: 1.65;
   overflow-wrap: anywhere;
@@ -616,13 +701,13 @@ h1 {
   border-left-width: 3px;
 }
 .event-command {
-  border-left-color: #fbbf24;
+  border-left-color: var(--color-warning);
 }
 .event-tool {
-  border-left-color: #60a5fa;
+  border-left-color: var(--color-accent);
 }
 .event-file {
-  border-left-color: var(--color-accent);
+  border-left-color: var(--color-accent-strong);
 }
 .event-error {
   border-color: color-mix(
@@ -633,13 +718,13 @@ h1 {
   color: var(--color-danger);
 }
 .approval-card {
-  border-color: #735f29;
-  background: #211d12;
+  border-color: var(--color-border-strong);
+  background: var(--color-warning-soft);
 }
 .approval-card code {
   display: block;
   margin-top: 8px;
-  color: #fde68a;
+  color: var(--color-warning);
   font-size: 11px;
   white-space: pre-wrap;
 }
@@ -664,7 +749,7 @@ h1 {
 }
 .approval-context dd {
   overflow-wrap: anywhere;
-  color: #fde68a;
+  color: var(--color-warning);
   font-family: var(--font-mono);
 }
 .approval-card div {
@@ -672,17 +757,9 @@ h1 {
   gap: 7px;
   margin-top: 10px;
 }
-.approval-card button {
-  padding: 6px 9px;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 7px;
-  background: var(--color-panel-raised);
-  color: var(--color-text);
-  font-size: 10px;
-}
 .conversation-empty h2 {
   color: var(--color-text);
-  font-size: 22px;
+  font-size: 19px;
 }
 .conversation-empty p,
 .markdown-empty {
@@ -696,18 +773,14 @@ h1 {
   place-items: center;
   border: 1px solid var(--color-border-strong);
   border-radius: 18px;
-  background: radial-gradient(
-    circle at 40% 30%,
-    #173e35,
-    var(--color-panel-raised)
-  );
-  color: var(--color-accent);
+  background: var(--color-selected);
+  color: var(--color-accent-strong);
   font-size: 21px;
   font-weight: 800;
-  transform: rotate(-4deg);
 }
-.conversation-orbit span {
-  transform: rotate(4deg);
+.conversation-orbit .conversation-logo {
+  width: 40px;
+  height: 40px;
 }
 .composer-shell {
   width: min(calc(100% - 36px), 820px);
@@ -715,16 +788,15 @@ h1 {
   padding: 14px;
   border: 1px solid var(--color-border-strong);
   border-radius: 13px;
-  background: var(--color-panel-raised);
+  background: var(--color-panel);
+}
+.composer-shell:focus-within {
+  border-color: var(--color-accent-strong);
+  box-shadow: var(--focus-ring);
 }
 .composer-shell textarea {
   width: 100%;
   resize: none;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--color-text);
-  font-size: 13px;
 }
 .agent-error {
   margin: 5px 0;
@@ -744,7 +816,7 @@ h1 {
   gap: 10px;
 }
 .composer-tools label {
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   cursor: pointer;
 }
 .composer-tools label.disabled {
@@ -774,21 +846,38 @@ h1 {
   color: var(--color-muted);
   font-size: 10px;
 }
-.attachment-list button {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-text);
+
+.empty-create {
+  min-height: 34px;
 }
-.composer-meta button {
-  padding: 7px 13px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--color-accent);
-  color: #071612;
+.message-user {
+  background: var(--color-selected);
 }
-.composer-meta button:disabled {
-  background: var(--color-disabled);
-  color: var(--color-muted);
+.session-heading strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-secondary);
+  font-size: 12px;
+}
+.session-heading > span {
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .composer-tools > span {
+    display: none;
+  }
+  .composer-shell {
+    width: calc(100% - 20px);
+    margin: 8px auto 10px;
+    padding: 10px;
+  }
+  .conversation-stream {
+    padding: 12px;
+  }
+  .conversation-empty {
+    padding: 18px;
+  }
 }
 </style>

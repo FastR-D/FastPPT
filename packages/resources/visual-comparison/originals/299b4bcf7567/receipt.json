@@ -1,0 +1,9 @@
+{
+  "id": "299b4bcf7567",
+  "source": "references/GordenPPTSkill/templates/thesis-formula/template.pptx",
+  "sourceSha256": "ac149b78583ce751648f096cc07fe358d663d1f94efb365b45957dcfffc02d04",
+  "pages": 39,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

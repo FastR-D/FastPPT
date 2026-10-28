@@ -1,11 +1,45 @@
 import { describe, expect, it } from 'vitest'
 import JSZip from 'jszip'
 
+import { HtmlDeckSnapshotSchema } from '../../src/snapshot'
 import { normalizeSlidevPageNumber } from '../../src/slidev/capture'
 import { htmlDeckToPresentation } from '../../src/slidev/render'
 import { landingContentDeck } from './fixtures/landingContentSlide'
 
 describe('editable Slidev rendering', () => {
+  it('writes asymmetric source cropping while keeping the visible picture frame', async () => {
+    const deck = structuredClone(landingContentDeck)
+    deck.slides[0]!.elements = [{
+      id: 'cropped-image', kind: 'image',
+      box: { x: 40, y: 80, width: 120, height: 70 },
+      crop: { left: 0.1, top: 0.2, right: 0.3, bottom: 0.1 },
+      zIndex: 0, opacity: 1, order: 0,
+      source: { tag: 'img', path: 'root/img' },
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+QWc9WQAAAABJRU5ErkJggg==',
+    }]
+    const result = htmlDeckToPresentation(deck)
+    const zip = await JSZip.loadAsync(await result.presentation.toArrayBuffer())
+    const xml = await zip.file('ppt/slides/slide1.xml')!.async('string')
+    expect(xml).toContain('<a:srcRect l="10000" r="30000" t="20000" b="10000"/>')
+    const scale = 13.333 / deck.slides[0]!.width
+    const frame = xml.match(/<p:spPr>\s*<a:xfrm[^>]*>[\s\S]*?<a:ext cx="(\d+)" cy="(\d+)"/)
+    expect(Number(frame?.[1])).toBeCloseTo(120 * scale * 914400, -1)
+    expect(Number(frame?.[2])).toBeCloseTo(70 * scale * 914400, -1)
+    expect(result.objects[0]?.imageCount).toBe(1)
+  })
+
+  it('rejects crop metadata that removes the entire source image', () => {
+    const deck = structuredClone(landingContentDeck)
+    deck.slides[0]!.elements = [{
+      id: 'invalid-crop', kind: 'image',
+      box: { x: 0, y: 0, width: 100, height: 100 },
+      crop: { left: 0.6, top: 0, right: 0.4, bottom: 0 },
+      zIndex: 0, opacity: 1, order: 0,
+      source: { tag: 'img', path: 'root/img' }, path: 'image.png',
+    }]
+    expect(() => HtmlDeckSnapshotSchema.parse(deck)).toThrow()
+  })
+
   it('does not pass HTTP image paths to PptxGenJS', () => {
     const deck = structuredClone(landingContentDeck)
     deck.slides[0]!.elements.push({
@@ -100,7 +134,8 @@ describe('editable Slidev rendering', () => {
       throw new Error('Expected native rendering operations were not produced')
 
     expect(result.elementCount).toBe(7)
-    expect(result.warnings).toHaveLength(1)
+    expect(result.warnings.filter(warning => warning.code !== 'text-letter-spacing-compatibility')).toHaveLength(1)
+    expect(result.warnings.filter(warning => warning.code === 'text-letter-spacing-compatibility')).toHaveLength(2)
     expect(operations.map((operation) => operation.kind)).toEqual([
       'shape',
       'text',
@@ -113,9 +148,9 @@ describe('editable Slidev rendering', () => {
       'image',
     ])
     expect(title.opts.fontFace).toBe('Microsoft YaHei')
-    expect(title.opts.fontSize).toBeCloseTo(19.58, 2)
+    expect(title.opts.fontSize).toBeCloseTo(20 * 13.333 / 980 * 72, 2)
     expect(title.opts.x).toBeCloseTo((35 * 13.333) / 980, 4)
-    expect(title.opts.y).toBeCloseTo((16 * 7.5) / 552, 4)
+    expect(title.opts.y).toBeCloseTo((16 * 13.333) / 980, 4)
     expect(cardShadow.opts.fill).toEqual({
       type: 'solid',
       color: 'ECF5FB',
@@ -292,7 +327,30 @@ describe('editable Slidev rendering', () => {
     ])
   })
 
-  it('uses measured text advance to prevent clipping after font substitution', async () => {
+  it('keeps explicit Latin, CJK and complex script fonts in one editable text operation', async () => {
+    const deck = structuredClone(landingContentDeck)
+    const text = deck.slides[0]!.elements.find(element => element.kind === 'text')
+    if (!text || text.kind !== 'text') throw new Error('Missing text fixture')
+    text.text = 'AB 中文 عَرَبِي 👩‍💻'
+    text.style.fontFamily = 'Noto Sans SC'
+    text.style.fontFamilies = { latin: 'Inter', ea: 'Noto Serif SC', cs: 'Noto Sans Arabic' }
+    const result = htmlDeckToPresentation(deck)
+    await result.presentation.flush()
+    const operations = result.presentation['_slides'][0]._ops.filter(operation => operation.kind === 'text' && operation.text === text.text)
+    expect(operations).toHaveLength(1)
+    const operation = operations[0]!
+    if (operation.kind !== 'text') throw new Error('Missing text operation')
+    expect(operation.runs?.map(run => ({ text: run.text, font: run.options?.fontFace }))).toEqual([
+      { text: 'AB ', font: 'Inter' }, { text: '中文', font: 'Noto Serif SC' },
+      { text: ' ', font: 'Inter' }, { text: 'عَرَبِي', font: 'Noto Sans Arabic' },
+      { text: ' 👩‍💻', font: 'Inter' },
+    ])
+    const evidence = result.objects.find(object => object.elementId === text.id)!
+    expect(evidence.nativeCount).toBe(1)
+    expect(evidence.fonts).toMatchObject({ requested: ['Noto Sans SC', 'Inter', 'Noto Serif SC', 'Noto Sans Arabic'], substituted: false })
+  })
+
+  it('only expands measured text geometry when explicitly requested', async () => {
     const deck = structuredClone(landingContentDeck)
     const text = deck.slides[0]!.elements.find(
       (element) => element.kind === 'text' && element.text === 'Editable text',
@@ -302,7 +360,14 @@ describe('editable Slidev rendering', () => {
     text.style.align = 'right'
     text.metrics = { advancePx: 80, graphemeCount: 13 }
 
-    const result = htmlDeckToPresentation(deck)
+    const preserved = htmlDeckToPresentation(deck)
+    const original = preserved.presentation._slides[0]!._ops.find((operation) => operation.kind === 'text' && operation.text === 'Editable text')
+    if (!original || original.kind !== 'text') throw new Error('Missing text operation')
+    expect(original.opts.x).toBeCloseTo(200 * 13.333 / 980, 5)
+    expect(original.opts.w).toBeCloseTo(50 * 13.333 / 980, 5)
+    expect(preserved.objects.find((object) => object.elementId === text.id)?.layoutRepair).toMatchObject({ applied: false, source: text.box })
+    const result = htmlDeckToPresentation(deck, { textGeometry: 'expand-measured' })
+    expect(result.objects.find((object) => object.elementId === text.id)?.layoutRepair?.applied).toBe(true)
     await result.presentation.flush()
     const operation = result.presentation['_slides'][0]._ops.find(
       (candidate) =>
@@ -336,6 +401,7 @@ describe('editable Slidev rendering', () => {
     if (!operation || operation.kind !== 'text')
       throw new Error('Missing text operation')
     expect(operation.opts.fontFace).toBe('Arial')
+    expect(result.objects.find((object) => object.elementId === text.id)?.fonts).toEqual({ requested: ['Helvetica Neue'], emitted: ['Arial'], substituted: true })
   })
 
   it('preserves a small CSS radius on a tall clipped container', async () => {
@@ -389,9 +455,31 @@ describe('editable Slidev rendering', () => {
   })
 
   it('rejects unsupported snapshot versions before creating partial output', () => {
-    const invalid = { ...landingContentDeck, version: 2 }
+    const invalid = { ...landingContentDeck, version: 3 }
     expect(() => htmlDeckToPresentation(invalid as never)).toThrow(
       /expected version 1/,
     )
+  })
+})
+
+
+describe('source canvas proportions', () => {
+  it.each([[900, 1600], [1200, 1200], [1800, 700]])('preserves %s × %s in emitted PPTX slide dimensions', async (width, height) => {
+    const deck = structuredClone(landingContentDeck)
+    deck.slides[0]!.width = width
+    deck.slides[0]!.height = height
+    deck.slides[0]!.elements = []
+    const rendered = htmlDeckToPresentation(deck)
+    const zip = await JSZip.loadAsync(await rendered.presentation.toArrayBuffer())
+    const xml = await zip.file('ppt/presentation.xml')!.async('string')
+    const size = /<p:sldSz[^>]*cx="(\d+)"[^>]*cy="(\d+)"/.exec(xml)!
+    expect(Number(size[1]) / Number(size[2])).toBeCloseTo(width / height, 6)
+  })
+
+  it('rejects implicit stretching of mixed aspect ratios', () => {
+    const deck = structuredClone(landingContentDeck)
+    deck.slides.push({ ...structuredClone(deck.slides[0]!), id: 'portrait', width: 900, height: 1600 })
+    expect(() => htmlDeckToPresentation(deck)).toThrow('Mixed slide aspect ratios')
+    expect(() => htmlDeckToPresentation(deck, { layout: 'LAYOUT_WIDE' })).not.toThrow()
   })
 })

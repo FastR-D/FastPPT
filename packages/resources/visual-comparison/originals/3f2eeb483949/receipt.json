@@ -1,0 +1,9 @@
+{
+  "id": "3f2eeb483949",
+  "source": "references/pptset/【红色版】150页数据分析模板.pptx",
+  "sourceSha256": "c4d7ef5a4c6db41ccac545c1aa137aeadac3cd25c8a7cf6e037cbf6cc47ee154",
+  "pages": 169,
+  "pdf": "【红色版】150页数据分析模板.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

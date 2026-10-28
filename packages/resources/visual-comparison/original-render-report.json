@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "sourceCount": 31,
+  "pageCount": 3497,
+  "sources": [
+    {
+      "id": "11ebacee969e",
+      "source": "references/GordenPPTSkill/templates/architecture-deck/template.pptx",
+      "sourceSha256": "03cdc0b85e2e26ea9a2f02e467c5fb79614299250514fb3399f6170485c9e06f",
+      "pages": 37,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "849d2d32fb5f",
+      "source": "references/GordenPPTSkill/templates/competition-speech/template.pptx",
+      "sourceSha256": "3ac9bbdb0107fd90b8cdca088e3408f2c41d7bf13b4e9fc1a4d2fd177808d0a7",
+      "pages": 59,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "ddefe998440f",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourceSha256": "0e34ee4df6f9d1bbb7529bad71d3f75ec1181504e1694b96f8d4a13d9a3a072f",
+      "pages": 17,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "e43cbe4c5b9b",
+      "source": "references/GordenPPTSkill/templates/data-viz-deck/template.pptx",
+      "sourceSha256": "ceb16faad8ac784b514a2dcc140933077049dcb744a2fa7be89a3a7a7da24923",
+      "pages": 41,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "2d2c4efff591",
+      "source": "references/GordenPPTSkill/templates/geometric-summary/template.pptx",
+      "sourceSha256": "94c24c9cb259caf88bbbf86f47771b69ef36873491c2cfe8161f54ec56fcaebd",
+      "pages": 21,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "5e206af1d674",
+      "source": "references/GordenPPTSkill/templates/mckinsey-style/template.pptx",
+      "sourceSha256": "4318e0275748feb5bdea2bf81819312f99f97474fc37a88b25f62ca01b143b8c",
+      "pages": 37,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "7a46cee65826",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourceSha256": "156cb8939fc43f96559b525c673c8bebb338f1fca77ce6b2e823b2a16d46befc",
+      "pages": 16,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "47f5918bdc82",
+      "source": "references/GordenPPTSkill/templates/operations-deck/template.pptx",
+      "sourceSha256": "1b5878e724e0177bae812e7c8e3b41fabfcdd5bb8b9e4af2c9506595437f16ca",
+      "pages": 52,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "34422534f8b5",
+      "source": "references/GordenPPTSkill/templates/premium-corp/template.pptx",
+      "sourceSha256": "502c871be80b930400e9815ef0581232610261a8c0389d1642b409b872bd0c28",
+      "pages": 35,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "9475bb7ff164",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourceSha256": "558ce85c0d64cd2a06faf88d6a4aa331e8cd4c685c59101c835ded2fbc87696d",
+      "pages": 19,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "697b3e9c846d",
+      "source": "references/GordenPPTSkill/templates/red-patriot-general/template.pptx",
+      "sourceSha256": "bab045bca75ab5bd99db2aaafa9641cb9a45c2baa9c1644b79ae5925c7a95295",
+      "pages": 25,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "205a1b068a79",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourceSha256": "1e8d3cac61b7b6fa2efb2e9c0f4e100a9fea22deff66b8fe971d543b65ec3ed4",
+      "pages": 16,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "9facdc1b042c",
+      "source": "references/GordenPPTSkill/templates/red-teaching-framework/template.pptx",
+      "sourceSha256": "f083a1799e2a4ce2f66135c250977d1c348f582d6f004cca549f4a3b027fa256",
+      "pages": 30,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "39f4aad07819",
+      "source": "references/GordenPPTSkill/templates/red-teaching-models/template.pptx",
+      "sourceSha256": "268d5c1cba9ff94b3ea6b03b8ad007110c4d839624bfc3f70b6cf42644f7edee",
+      "pages": 30,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "e46aa4161157",
+      "source": "references/GordenPPTSkill/templates/report-massive-charts/template.pptx",
+      "sourceSha256": "09be8eaf86127e3619089b4465a8f235159efdb91b4bcc99b7ed0bead65feea2",
+      "pages": 38,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "573f07533505",
+      "source": "references/GordenPPTSkill/templates/report-massive-models/template.pptx",
+      "sourceSha256": "2ef2d8446af183ed78c108ea6587417ded72068a8eb53d666c9687058988bf5a",
+      "pages": 38,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "5a440751c8c2",
+      "source": "references/GordenPPTSkill/templates/report-massive-reports/template.pptx",
+      "sourceSha256": "31e32d9dbe6e4e5b5391c5df77cb580178337c4f806cd72f08e4f3c3f45d5873",
+      "pages": 37,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "98d564bdf18c",
+      "source": "references/GordenPPTSkill/templates/report-savior/template.pptx",
+      "sourceSha256": "7b79ef03b4dcce5d38a91840d37778e49d04f4f0ae3c43068e3dd7dd62bc3d8e",
+      "pages": 44,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "299b4bcf7567",
+      "source": "references/GordenPPTSkill/templates/thesis-formula/template.pptx",
+      "sourceSha256": "ac149b78583ce751648f096cc07fe358d663d1f94efb365b45957dcfffc02d04",
+      "pages": 39,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "4013c739f962",
+      "source": "references/GordenPPTSkill/templates/thesis-novice/template.pptx",
+      "sourceSha256": "fadca83953a2bc87de78dcdc1fe76515f334cd9014905b267d07edb36c4b27dd",
+      "pages": 32,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "da05a3fb283d",
+      "source": "references/GordenPPTSkill/templates/top-thesis/template.pptx",
+      "sourceSha256": "a4cb74324d5317b90e326f5409506653c92fa164b283c8e54a40bc2184c4506f",
+      "pages": 39,
+      "pdf": "template.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "e48d83706172",
+      "source": "references/pptset/01-【红蓝】50页工作汇报专用PPT模板.pptx",
+      "sourceSha256": "23979d658f5c428482bd867168f4213ff39833e68146af33c15018e03453a256",
+      "pages": 69,
+      "pdf": "01-【红蓝】50页工作汇报专用PPT模板.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "71caabc93d70",
+      "source": "references/pptset/【01-蓝金版】350页满分PPT模板-旁门左道PPT原创出品.pptx",
+      "sourceSha256": "33960e33acb3e8d8cc4b56f1a98ca9e52e19509d4c62da3202bfa07d2542b2e3",
+      "pages": 380,
+      "pdf": "【01-蓝金版】350页满分PPT模板-旁门左道PPT原创出品.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "f753356251a9",
+      "source": "references/pptset/【加赠】700页逻辑图形 (1).pptx",
+      "sourceSha256": "05a29b9373ad4ecd773261e9a0493e2ba7231a79ecb68a6049a2dd0881d03343",
+      "pages": 733,
+      "pdf": "【加赠】700页逻辑图形 (1).pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "5eb4d31d8b16",
+      "source": "references/pptset/【天空蓝配色版】定制级工作型PPT设计灵感手册.pptx",
+      "sourceSha256": "0295994f4578d83cca364c1526a7a6d3d617b90c4ae9640e8e51489790df3773",
+      "pages": 164,
+      "pdf": "【天空蓝配色版】定制级工作型PPT设计灵感手册.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "560c86eda0e3",
+      "source": "references/pptset/【极致蓝配色版】定制级总结汇报PPT灵感手册-旁门左道PPT原创出品.pptx",
+      "sourceSha256": "47ebba0a9f4e60c8bb42ac87aea0fe6f2c9d8d50dbc25168a4403b3b89032b31",
+      "pages": 156,
+      "pdf": "【极致蓝配色版】定制级总结汇报PPT灵感手册-旁门左道PPT原创出品.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "9a04224856b0",
+      "source": "references/pptset/【橄榄绿】定制级企业介绍PPT设计灵感手册.pptx",
+      "sourceSha256": "19b334a0c7671b34939c77031869d46f2396ff40e9805aef6fb1f25d0f7132e1",
+      "pages": 153,
+      "pdf": "【橄榄绿】定制级企业介绍PPT设计灵感手册.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "d63a197fd23d",
+      "source": "references/pptset/【活力蓝】定制级活动推广PPT设计灵感手册.pptx",
+      "sourceSha256": "dc65552212847b260feb33388b21cdb99778e592b74255df932f4cbb2b8a8045",
+      "pages": 151,
+      "pdf": "【活力蓝】定制级活动推广PPT设计灵感手册.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "3f2eeb483949",
+      "source": "references/pptset/【红色版】150页数据分析模板.pptx",
+      "sourceSha256": "c4d7ef5a4c6db41ccac545c1aa137aeadac3cd25c8a7cf6e037cbf6cc47ee154",
+      "pages": 169,
+      "pdf": "【红色版】150页数据分析模板.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "a05afce176e0",
+      "source": "references/pptset/【绿色版】200页逻辑框架汇报PPT模板.pptx",
+      "sourceSha256": "0adeb3d7a1827620849095b43b18179f6caf10a660a7ae80152b36d4f5a0435e",
+      "pages": 216,
+      "pdf": "【绿色版】200页逻辑框架汇报PPT模板.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slides included",
+      "rasterizer": "PyMuPDF at 960px width"
+    },
+    {
+      "id": "e888597c48f2",
+      "source": "references/pptset/【蓝金版】500页创意图文排版PPT模板-动画版新.pptx",
+      "sourceSha256": "244eeb89e9dbef770d6126d5652b75574e8065792300df903a7c094c7e1bcbd2",
+      "pages": 604,
+      "pdf": "【蓝金版】500页创意图文排版PPT模板-动画版新.pdf",
+      "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+      "rasterizer": "PyMuPDF at 960px width"
+    }
+  ]
+}

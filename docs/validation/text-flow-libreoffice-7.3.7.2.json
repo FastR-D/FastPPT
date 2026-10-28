@@ -1,0 +1,5590 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-09T00:20:35.080Z",
+  "sourcePptxSha256": "23c85a602125e9e816ddf774d329fe2cb04eed1ccfc26247ff456e0bd26546a3",
+  "comparisonBasis": "target-application-probe",
+  "units": "points",
+  "tolerancePoints": 0.25,
+  "environment": {
+    "application": {
+      "name": "LibreOffice",
+      "version": "7.3.7.2",
+      "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+    },
+    "platform": {
+      "system": "Linux",
+      "release": "6.11.8-10-generic",
+      "architecture": "x86_64"
+    },
+    "locale": {
+      "requested": "en-US",
+      "observed": "en-US",
+      "ui": "en-US",
+      "decimalSeparator": ".",
+      "decimalSeparatorAsLocale": true
+    },
+    "configurationSha256": "6dab98044e83c5e9ace511cc20530381cadafdd9e26c0bc9e8aa00a7bf1cf23b"
+  },
+  "reproducers": [
+    {
+      "path": "tests/e2e/scripts/text-flow-compatibility.ts",
+      "sha256": "953237f1f2f9011549ca7cbeecb02dd0e65bbf15f08bab2fae235f048a04959c"
+    },
+    {
+      "path": "tests/e2e/scripts/lib/libreoffice-text-probe.py",
+      "sha256": "ef674f6f70f0b2958cebb08a10413b088a3526f19969d159746ea21110039c93"
+    }
+  ],
+  "artifacts": [
+    {
+      "stage": "actual-native-export",
+      "pptxSha256": "23c85a602125e9e816ddf774d329fe2cb04eed1ccfc26247ff456e0bd26546a3",
+      "pdfSha256": "21a6b6d984418abbd70be6dcdd15634512e1879cab8846c702c2c0f3cec591bf",
+      "pageCount": 33,
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nBAAAAA+LiberationMono                TrueType          WinAnsi          yes yes yes    105  0\nCAAAAA+OpenSymbol                    TrueType          WinAnsi          yes yes yes    110  0\n",
+      "cases": [
+        {
+          "id": "baseline",
+          "page": 1,
+          "source": {
+            "id": "baseline",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "expected": [
+              [
+                "AAAA",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                100,
+                0
+              ],
+              [
+                "CCCC",
+                160,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "AAAA",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              100,
+              0
+            ],
+            [
+              "CCCC",
+              160,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 88.0282
+            },
+            {
+              "text": "BBBB",
+              "x": 100.036,
+              "y": 46.97865,
+              "end": 148.0672
+            },
+            {
+              "text": "CCCC",
+              "x": 160.075,
+              "y": 46.97865,
+              "end": 208.1062
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "left-field-wrap",
+          "page": 2,
+          "source": {
+            "id": "left-field-wrap",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "center-field-wrap",
+          "page": 3,
+          "source": {
+            "id": "center-field-wrap",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "align": "center",
+            "expected": [
+              [
+                "ABBBB",
+                40,
+                0
+              ],
+              [
+                "CCCC",
+                112,
+                0
+              ],
+              [
+                "DDDD",
+                172,
+                0
+              ],
+              [
+                "EEEE",
+                40,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABBBB",
+              40,
+              0
+            ],
+            [
+              "CCCC",
+              112,
+              0
+            ],
+            [
+              "DDDD",
+              172,
+              0
+            ],
+            [
+              "EEEE",
+              40,
+              1
+            ]
+          ],
+          "known": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "known-difference"
+        },
+        {
+          "id": "right-field-wrap",
+          "page": 4,
+          "source": {
+            "id": "right-field-wrap",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "align": "right",
+            "expected": [
+              [
+                "ABBBB",
+                40,
+                0
+              ],
+              [
+                "CCCC",
+                112,
+                0
+              ],
+              [
+                "DDDD",
+                172,
+                0
+              ],
+              [
+                "EEEE",
+                40,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABBBB",
+              40,
+              0
+            ],
+            [
+              "CCCC",
+              112,
+              0
+            ],
+            [
+              "DDDD",
+              172,
+              0
+            ],
+            [
+              "EEEE",
+              40,
+              1
+            ]
+          ],
+          "known": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "known-difference"
+        },
+        {
+          "id": "decimal-field-wrap",
+          "page": 5,
+          "source": {
+            "id": "decimal-field-wrap",
+            "text": "A\t12.34 CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "align": "decimal",
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "12.34",
+                88,
+                0
+              ],
+              [
+                "CCCC",
+                160,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "12.34",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                40,
+                1
+              ],
+              [
+                "DDDD",
+                100,
+                1
+              ],
+              [
+                "EEEE",
+                160,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\t12.34 CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "12.34",
+              88,
+              0
+            ],
+            [
+              "CCCC",
+              160,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "known": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "12.34",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              40,
+              1
+            ],
+            [
+              "DDDD",
+              100,
+              1
+            ],
+            [
+              "EEEE",
+              160,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "12.34",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 172.036
+            },
+            {
+              "text": "CCCC",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "DDDD",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            },
+            {
+              "text": "EEEE",
+              "x": 160.075,
+              "y": 76.99665,
+              "end": 208.1062
+            }
+          ],
+          "status": "known-difference"
+        },
+        {
+          "id": "before-tab-wrap",
+          "page": 6,
+          "source": {
+            "id": "before-tab-wrap",
+            "text": "AAAA BBBB CCCC DDDD\tEE FF",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "AAAA",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                100,
+                0
+              ],
+              [
+                "CCCC",
+                160,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EE",
+                112,
+                1
+              ],
+              [
+                "FF",
+                148,
+                1
+              ]
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD\tEE FF",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "AAAA",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              100,
+              0
+            ],
+            [
+              "CCCC",
+              160,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EE",
+              112,
+              1
+            ],
+            [
+              "FF",
+              148,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 88.0282
+            },
+            {
+              "text": "BBBB",
+              "x": 100.036,
+              "y": 46.97865,
+              "end": 148.0672
+            },
+            {
+              "text": "CCCC",
+              "x": 160.075,
+              "y": 46.97865,
+              "end": 208.1062
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EE",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 136.0126
+            },
+            {
+              "text": "FF",
+              "x": 148.0204,
+              "y": 76.99665,
+              "end": 172.036
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "tab-exceeds-width",
+          "page": 7,
+          "source": {
+            "id": "tab-exceeds-width",
+            "text": "A\tB",
+            "stops": [
+              240
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "B",
+                40,
+                2
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "B",
+                112,
+                0
+              ]
+            ]
+          },
+          "importedText": "A\tB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "B",
+              40,
+              2
+            ]
+          ],
+          "known": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "B",
+              112,
+              0
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 124.0048
+            }
+          ],
+          "status": "known-difference"
+        },
+        {
+          "id": "default-exceeds-width",
+          "page": 8,
+          "source": {
+            "id": "default-exceeds-width",
+            "text": "ABCDEFGHIJKLMN\tB",
+            "expected": [
+              [
+                "ABCDEFGHIJKLMN",
+                40,
+                0
+              ],
+              [
+                "B",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "ABCDEFGHIJKLMN\tB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABCDEFGHIJKLMN",
+              40,
+              0
+            ],
+            [
+              "B",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABCDEFGHIJKLMN",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 208.1062
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 124.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "before-tab-at-edge",
+          "page": 9,
+          "source": {
+            "id": "before-tab-at-edge",
+            "text": "ABCDEFGHIJKLMNO\tB",
+            "expected": [
+              [
+                "ABCDEFGHIJKLMNO",
+                40,
+                0
+              ],
+              [
+                "B",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "ABCDEFGHIJKLMNO\tB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABCDEFGHIJKLMNO",
+              40,
+              0
+            ],
+            [
+              "B",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABCDEFGHIJKLMNO",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 220.114
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 124.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "tab-after-wrapped-word",
+          "page": 10,
+          "source": {
+            "id": "tab-after-wrapped-word",
+            "text": "AAAAAAAAAAAAAAAAAAAA\tB",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "AAAAAAAAAAAAAAA",
+                40,
+                0
+              ],
+              [
+                "AAAAA",
+                40,
+                1
+              ],
+              [
+                "B",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "AAAAAAAAAAAAAAAAAAAA\tB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "AAAAAAAAAAAAAAA",
+              40,
+              0
+            ],
+            [
+              "AAAAA",
+              40,
+              1
+            ],
+            [
+              "B",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAAAAAAAAAAAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 220.114
+            },
+            {
+              "text": "AAAAA",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 100.036
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 124.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "negative-indent",
+          "page": 11,
+          "source": {
+            "id": "negative-indent",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "margin": 40,
+            "indent": -20,
+            "expected": [
+              [
+                "A",
+                60,
+                0
+              ],
+              [
+                "BBBB",
+                152,
+                0
+              ],
+              [
+                "CCCC",
+                80,
+                1
+              ],
+              [
+                "DDDD",
+                140,
+                1
+              ],
+              [
+                "EEEE",
+                80,
+                2
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                60,
+                0
+              ],
+              [
+                "BBBB",
+                80,
+                0
+              ],
+              [
+                "CCCC",
+                140,
+                0
+              ],
+              [
+                "DDDD",
+                80,
+                1
+              ],
+              [
+                "EEEE",
+                140,
+                1
+              ]
+            ],
+            "diagnosticExpected": [
+              [
+                "A",
+                80,
+                0
+              ],
+              [
+                "BBBB",
+                152,
+                0
+              ],
+              [
+                "CCCC",
+                80,
+                1
+              ],
+              [
+                "DDDD",
+                140,
+                1
+              ],
+              [
+                "EEEE",
+                80,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              60,
+              0
+            ],
+            [
+              "BBBB",
+              152,
+              0
+            ],
+            [
+              "CCCC",
+              80,
+              1
+            ],
+            [
+              "DDDD",
+              140,
+              1
+            ],
+            [
+              "EEEE",
+              80,
+              2
+            ]
+          ],
+          "known": [
+            [
+              "A",
+              60,
+              0
+            ],
+            [
+              "BBBB",
+              80,
+              0
+            ],
+            [
+              "CCCC",
+              140,
+              0
+            ],
+            [
+              "DDDD",
+              80,
+              1
+            ],
+            [
+              "EEEE",
+              140,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 60.009,
+              "y": 46.97865,
+              "end": 72.0168
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "CCCC",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "DDDD",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            }
+          ],
+          "status": "known-difference"
+        },
+        {
+          "id": "positive-indent",
+          "page": 12,
+          "source": {
+            "id": "positive-indent",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "margin": 20,
+            "indent": 20,
+            "expected": [
+              [
+                "A",
+                80,
+                0
+              ],
+              [
+                "BBBB",
+                132,
+                0
+              ],
+              [
+                "CCCC",
+                60,
+                1
+              ],
+              [
+                "DDDD",
+                120,
+                1
+              ],
+              [
+                "EEEE",
+                60,
+                2
+              ]
+            ],
+            "diagnosticExpected": [
+              [
+                "A",
+                60,
+                0
+              ],
+              [
+                "BBBB",
+                132,
+                0
+              ],
+              [
+                "CCCC",
+                60,
+                1
+              ],
+              [
+                "DDDD",
+                120,
+                1
+              ],
+              [
+                "EEEE",
+                60,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              80,
+              0
+            ],
+            [
+              "BBBB",
+              132,
+              0
+            ],
+            [
+              "CCCC",
+              60,
+              1
+            ],
+            [
+              "DDDD",
+              120,
+              1
+            ],
+            [
+              "EEEE",
+              60,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 92.0018
+            },
+            {
+              "text": "BBBB",
+              "x": 132.009,
+              "y": 46.97865,
+              "end": 180.020187
+            },
+            {
+              "text": "CCCC",
+              "x": 60.009,
+              "y": 76.99665,
+              "end": 108.020187
+            },
+            {
+              "text": "DDDD",
+              "x": 120.007974,
+              "y": 76.99665,
+              "end": 168.019161
+            },
+            {
+              "text": "EEEE",
+              "x": 60.009,
+              "y": 106.87465,
+              "end": 108.020187
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "zero-stop",
+          "page": 13,
+          "source": {
+            "id": "zero-stop",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              0
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "two-tabs-wrapped",
+          "page": 14,
+          "source": {
+            "id": "two-tabs-wrapped",
+            "text": "A\tBBBB CCCC DDDD\tEE FF",
+            "stops": [
+              72,
+              120
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EE",
+                112,
+                1
+              ],
+              [
+                "FF",
+                148,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD\tEE FF",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EE",
+              112,
+              1
+            ],
+            [
+              "FF",
+              148,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EE",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 136.0126
+            },
+            {
+              "text": "FF",
+              "x": 148.0204,
+              "y": 76.99665,
+              "end": 172.036
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "exhausted-stops",
+          "page": 15,
+          "source": {
+            "id": "exhausted-stops",
+            "text": "A\tBBBB\tCC DD EE",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CC",
+                184,
+                0
+              ],
+              [
+                "DD",
+                40,
+                1
+              ],
+              [
+                "EE",
+                76,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB\tCC DD EE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CC",
+              184,
+              0
+            ],
+            [
+              "DD",
+              40,
+              1
+            ],
+            [
+              "EE",
+              76,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CC",
+              "x": 183.997,
+              "y": 46.97865,
+              "end": 208.0126
+            },
+            {
+              "text": "DD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 64.0126
+            },
+            {
+              "text": "EE",
+              "x": 76.0204,
+              "y": 76.99665,
+              "end": 100.036
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "end-tab",
+          "page": 16,
+          "source": {
+            "id": "end-tab",
+            "text": "AAAAAAAAAAAAAA\t",
+            "expected": [
+              [
+                "AAAAAAAAAAAAAA",
+                40,
+                0
+              ]
+            ]
+          },
+          "importedText": "AAAAAAAAAAAAAA\t",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "AAAAAAAAAAAAAA",
+              40,
+              0
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAAAAAAAAAAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 208.1062
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "long-word",
+          "page": 17,
+          "source": {
+            "id": "long-word",
+            "text": "A\tBBBBBBBBBBBBBBBBBBBBB",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBBBBBBBBBBBBB",
+                40,
+                1
+              ],
+              [
+                "BBBBBB",
+                40,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBBBBBBBBBBBBBBBBBBB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBBBBBBBBBBBBB",
+              40,
+              1
+            ],
+            [
+              "BBBBBB",
+              40,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBBBBBBBBBBBBB",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 220.114
+            },
+            {
+              "text": "BBBBBB",
+              "x": 39.997,
+              "y": 106.87465,
+              "end": 112.0438
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "boundary-long-word",
+          "page": 18,
+          "source": {
+            "id": "boundary-long-word",
+            "text": "A\tBBBBBBBBBBBBBBBBBBBBB",
+            "width": 180,
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBBBBBBBBBBBBB",
+                40,
+                1
+              ],
+              [
+                "BBBBBB",
+                40,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBBBBBBBBBBBBBBBBBBB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBBBBBBBBBBBBB",
+              40,
+              1
+            ],
+            [
+              "BBBBBB",
+              40,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBBBBBBBBBBBBB",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 220.114
+            },
+            {
+              "text": "BBBBBB",
+              "x": 39.997,
+              "y": 106.87465,
+              "end": 112.0438
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "soft-break-indent",
+          "page": 19,
+          "source": {
+            "id": "soft-break-indent",
+            "text": "A\tB\nC\tD",
+            "stops": [
+              72
+            ],
+            "margin": 40,
+            "indent": 20,
+            "expected": [
+              [
+                "A",
+                100,
+                0
+              ],
+              [
+                "B",
+                152,
+                0
+              ],
+              [
+                "C",
+                80,
+                1
+              ],
+              [
+                "D",
+                152,
+                1
+              ]
+            ],
+            "diagnosticExpected": [
+              [
+                "A",
+                80,
+                0
+              ],
+              [
+                "B",
+                152,
+                0
+              ],
+              [
+                "C",
+                80,
+                1
+              ],
+              [
+                "D",
+                152,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tB\nC\tD",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              100,
+              0
+            ],
+            [
+              "B",
+              152,
+              0
+            ],
+            [
+              "C",
+              80,
+              1
+            ],
+            [
+              "D",
+              152,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 100.006,
+              "y": 46.97865,
+              "end": 112.0138
+            },
+            {
+              "text": "B",
+              "x": 151.994,
+              "y": 46.97865,
+              "end": 164.0018
+            },
+            {
+              "text": "C",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 92.0018
+            },
+            {
+              "text": "D",
+              "x": 151.994,
+              "y": 76.99665,
+              "end": 164.0018
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "decimal-prefix-wrap",
+          "page": 20,
+          "source": {
+            "id": "decimal-prefix-wrap",
+            "text": "A\tBBBB CCCC DDDD. EEEE",
+            "stops": [
+              72
+            ],
+            "align": "decimal",
+            "expected": [
+              [
+                "ABBBB",
+                40,
+                0
+              ],
+              [
+                "CCCC",
+                112,
+                0
+              ],
+              [
+                "DDDD.",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                112,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD.",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD. EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABBBB",
+              40,
+              0
+            ],
+            [
+              "CCCC",
+              112,
+              0
+            ],
+            [
+              "DDDD.",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              112,
+              1
+            ]
+          ],
+          "known": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD.",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD.",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 100.036
+            },
+            {
+              "text": "EEEE",
+              "x": 112.0438,
+              "y": 76.99665,
+              "end": 160.075
+            }
+          ],
+          "status": "known-difference"
+        },
+        {
+          "id": "bullet-left--20",
+          "page": 21,
+          "source": {
+            "id": "bullet-left--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "left",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "y": 43.68965,
+              "end": 67.774044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-left-0",
+          "page": 22,
+          "source": {
+            "id": "bullet-left-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "left",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "y": 43.68965,
+              "end": 87.759044
+            },
+            {
+              "text": "AAAA",
+              "x": 87.704,
+              "y": 46.97865,
+              "end": 135.715187
+            },
+            {
+              "text": "BBBB",
+              "x": 147.702974,
+              "y": 46.97865,
+              "end": 195.714161
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-left-20",
+          "page": 23,
+          "source": {
+            "id": "bullet-left-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "left",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "y": 43.68965,
+              "end": 107.771044
+            },
+            {
+              "text": "AAAA",
+              "x": 107.688,
+              "y": 46.97865,
+              "end": 155.7192
+            },
+            {
+              "text": "BBBB",
+              "x": 167.727,
+              "y": 46.97865,
+              "end": 215.7582
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-center--20",
+          "page": 24,
+          "source": {
+            "id": "bullet-center--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "center",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.002,
+              "y": 43.68965,
+              "end": 86.767044
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "y": 46.97865,
+              "end": 147.0452
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "y": 46.97865,
+              "end": 207.0842
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-center-0",
+          "page": 25,
+          "source": {
+            "id": "bullet-center-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "center",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 95.102,
+              "y": 43.68965,
+              "end": 102.867044
+            },
+            {
+              "text": "AAAA",
+              "x": 102.898,
+              "y": 46.97865,
+              "end": 150.9292
+            },
+            {
+              "text": "BBBB",
+              "x": 162.937,
+              "y": 46.97865,
+              "end": 210.9682
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-center-20",
+          "page": 26,
+          "source": {
+            "id": "bullet-center-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "center",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 105.109,
+              "y": 43.68965,
+              "end": 112.874044
+            },
+            {
+              "text": "AAAA",
+              "x": 112.904,
+              "y": 46.97865,
+              "end": 160.915187
+            },
+            {
+              "text": "BBBB",
+              "x": 172.902974,
+              "y": 46.97865,
+              "end": 220.914161
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-right--20",
+          "page": 27,
+          "source": {
+            "id": "bullet-right--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "right",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 97.994,
+              "y": 43.68965,
+              "end": 105.759044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-right-0",
+          "page": 28,
+          "source": {
+            "id": "bullet-right-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "right",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 110.211,
+              "y": 43.68965,
+              "end": 117.976044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-right-20",
+          "page": 29,
+          "source": {
+            "id": "bullet-right-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "right",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 110.211,
+              "y": 43.68965,
+              "end": 117.976044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-justify--20",
+          "page": 30,
+          "source": {
+            "id": "bullet-justify--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "justify",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "y": 43.68965,
+              "end": 67.774044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "y": 46.97865,
+              "end": 226.068887
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-justify-0",
+          "page": 31,
+          "source": {
+            "id": "bullet-justify-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "justify",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.909,
+              "y": 43.68965,
+              "end": 87.674044
+            },
+            {
+              "text": "AAAA",
+              "x": 87.704,
+              "y": 46.97865,
+              "end": 135.715187
+            },
+            {
+              "text": "BBBB",
+              "x": 177.922604,
+              "y": 46.97865,
+              "end": 225.953804
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-justify-20",
+          "page": 32,
+          "source": {
+            "id": "bullet-justify-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "justify",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 99.893,
+              "y": 43.68965,
+              "end": 107.658044
+            },
+            {
+              "text": "AAAA",
+              "x": 107.688,
+              "y": 46.97865,
+              "end": 155.7192
+            },
+            {
+              "text": "BBBB",
+              "x": 177.913617,
+              "y": 46.97865,
+              "end": 225.944817
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-explicit-font-positive",
+          "page": 33,
+          "source": {
+            "id": "bullet-explicit-font-positive",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "bulletFont": "Liberation Mono",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 159.9432
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "y": 46.97865,
+              "end": 219.9822
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        }
+      ]
+    },
+    {
+      "stage": "diagnostic-indent-removed",
+      "pptxSha256": "714987a00a449baf75c0d299f95422fef6444d09eb580b792c04f60fa3a5d7c7",
+      "pdfSha256": "ae0129b1fa441891941b4f0210b78e317d61ebb91aa5d19d80bd1bb323e0ce75",
+      "pageCount": 33,
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nBAAAAA+LiberationMono                TrueType          WinAnsi          yes yes yes    105  0\nCAAAAA+OpenSymbol                    TrueType          WinAnsi          yes yes yes    110  0\n",
+      "cases": [
+        {
+          "id": "baseline",
+          "page": 1,
+          "source": {
+            "id": "baseline",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "expected": [
+              [
+                "AAAA",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                100,
+                0
+              ],
+              [
+                "CCCC",
+                160,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "expected": [
+            [
+              "AAAA",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              100,
+              0
+            ],
+            [
+              "CCCC",
+              160,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 88.0282
+            },
+            {
+              "text": "BBBB",
+              "x": 100.036,
+              "y": 46.97865,
+              "end": 148.0672
+            },
+            {
+              "text": "CCCC",
+              "x": 160.075,
+              "y": 46.97865,
+              "end": 208.1062
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "left-field-wrap",
+          "page": 2,
+          "source": {
+            "id": "left-field-wrap",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "center-field-wrap",
+          "page": 3,
+          "source": {
+            "id": "center-field-wrap",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "align": "center",
+            "expected": [
+              [
+                "ABBBB",
+                40,
+                0
+              ],
+              [
+                "CCCC",
+                112,
+                0
+              ],
+              [
+                "DDDD",
+                172,
+                0
+              ],
+              [
+                "EEEE",
+                40,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "CENTER",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABBBB",
+              40,
+              0
+            ],
+            [
+              "CCCC",
+              112,
+              0
+            ],
+            [
+              "DDDD",
+              172,
+              0
+            ],
+            [
+              "EEEE",
+              40,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABBBB",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 100.0182
+            },
+            {
+              "text": "CCCC",
+              "x": 112.026,
+              "y": 46.97865,
+              "end": 160.0572
+            },
+            {
+              "text": "DDDD",
+              "x": 172.065,
+              "y": 46.97865,
+              "end": 220.0962
+            },
+            {
+              "text": "EEEE",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "right-field-wrap",
+          "page": 4,
+          "source": {
+            "id": "right-field-wrap",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "align": "right",
+            "expected": [
+              [
+                "ABBBB",
+                40,
+                0
+              ],
+              [
+                "CCCC",
+                112,
+                0
+              ],
+              [
+                "DDDD",
+                172,
+                0
+              ],
+              [
+                "EEEE",
+                40,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "RIGHT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABBBB",
+              40,
+              0
+            ],
+            [
+              "CCCC",
+              112,
+              0
+            ],
+            [
+              "DDDD",
+              172,
+              0
+            ],
+            [
+              "EEEE",
+              40,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABBBB",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 100.0182
+            },
+            {
+              "text": "CCCC",
+              "x": 112.026,
+              "y": 46.97865,
+              "end": 160.0572
+            },
+            {
+              "text": "DDDD",
+              "x": 172.065,
+              "y": 46.97865,
+              "end": 220.0962
+            },
+            {
+              "text": "EEEE",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "decimal-field-wrap",
+          "page": 5,
+          "source": {
+            "id": "decimal-field-wrap",
+            "text": "A\t12.34 CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "align": "decimal",
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "12.34",
+                88,
+                0
+              ],
+              [
+                "CCCC",
+                160,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "12.34",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                40,
+                1
+              ],
+              [
+                "DDDD",
+                100,
+                1
+              ],
+              [
+                "EEEE",
+                160,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\t12.34 CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "DECIMAL",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "12.34",
+              88,
+              0
+            ],
+            [
+              "CCCC",
+              160,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "12.34",
+              "x": 87.987,
+              "y": 46.97865,
+              "end": 148.026
+            },
+            {
+              "text": "CCCC",
+              "x": 160.0338,
+              "y": 46.97865,
+              "end": 208.065
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "before-tab-wrap",
+          "page": 6,
+          "source": {
+            "id": "before-tab-wrap",
+            "text": "AAAA BBBB CCCC DDDD\tEE FF",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "AAAA",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                100,
+                0
+              ],
+              [
+                "CCCC",
+                160,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EE",
+                112,
+                1
+              ],
+              [
+                "FF",
+                148,
+                1
+              ]
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD\tEE FF",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "AAAA",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              100,
+              0
+            ],
+            [
+              "CCCC",
+              160,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EE",
+              112,
+              1
+            ],
+            [
+              "FF",
+              148,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 88.0282
+            },
+            {
+              "text": "BBBB",
+              "x": 100.036,
+              "y": 46.97865,
+              "end": 148.0672
+            },
+            {
+              "text": "CCCC",
+              "x": 160.075,
+              "y": 46.97865,
+              "end": 208.1062
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EE",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 136.0126
+            },
+            {
+              "text": "FF",
+              "x": 148.0204,
+              "y": 76.99665,
+              "end": 172.036
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "tab-exceeds-width",
+          "page": 7,
+          "source": {
+            "id": "tab-exceeds-width",
+            "text": "A\tB",
+            "stops": [
+              240
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "B",
+                40,
+                2
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "B",
+                112,
+                0
+              ]
+            ]
+          },
+          "importedText": "A\tB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 8467,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "B",
+              40,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "B",
+              "x": 39.997,
+              "y": 106.87465,
+              "end": 52.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "default-exceeds-width",
+          "page": 8,
+          "source": {
+            "id": "default-exceeds-width",
+            "text": "ABCDEFGHIJKLMN\tB",
+            "expected": [
+              [
+                "ABCDEFGHIJKLMN",
+                40,
+                0
+              ],
+              [
+                "B",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "ABCDEFGHIJKLMN\tB",
+          "importedTabs": [],
+          "expected": [
+            [
+              "ABCDEFGHIJKLMN",
+              40,
+              0
+            ],
+            [
+              "B",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABCDEFGHIJKLMN",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 208.1062
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 124.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "before-tab-at-edge",
+          "page": 9,
+          "source": {
+            "id": "before-tab-at-edge",
+            "text": "ABCDEFGHIJKLMNO\tB",
+            "expected": [
+              [
+                "ABCDEFGHIJKLMNO",
+                40,
+                0
+              ],
+              [
+                "B",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "ABCDEFGHIJKLMNO\tB",
+          "importedTabs": [],
+          "expected": [
+            [
+              "ABCDEFGHIJKLMNO",
+              40,
+              0
+            ],
+            [
+              "B",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABCDEFGHIJKLMNO",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 220.114
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 124.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "tab-after-wrapped-word",
+          "page": 10,
+          "source": {
+            "id": "tab-after-wrapped-word",
+            "text": "AAAAAAAAAAAAAAAAAAAA\tB",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "AAAAAAAAAAAAAAA",
+                40,
+                0
+              ],
+              [
+                "AAAAA",
+                40,
+                1
+              ],
+              [
+                "B",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "AAAAAAAAAAAAAAAAAAAA\tB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "AAAAAAAAAAAAAAA",
+              40,
+              0
+            ],
+            [
+              "AAAAA",
+              40,
+              1
+            ],
+            [
+              "B",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAAAAAAAAAAAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 220.114
+            },
+            {
+              "text": "AAAAA",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 100.036
+            },
+            {
+              "text": "B",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 124.0048
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "negative-indent",
+          "page": 11,
+          "source": {
+            "id": "negative-indent",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "margin": 40,
+            "indent": -20,
+            "expected": [
+              [
+                "A",
+                60,
+                0
+              ],
+              [
+                "BBBB",
+                152,
+                0
+              ],
+              [
+                "CCCC",
+                80,
+                1
+              ],
+              [
+                "DDDD",
+                140,
+                1
+              ],
+              [
+                "EEEE",
+                80,
+                2
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                60,
+                0
+              ],
+              [
+                "BBBB",
+                80,
+                0
+              ],
+              [
+                "CCCC",
+                140,
+                0
+              ],
+              [
+                "DDDD",
+                80,
+                1
+              ],
+              [
+                "EEEE",
+                140,
+                1
+              ]
+            ],
+            "diagnosticExpected": [
+              [
+                "A",
+                80,
+                0
+              ],
+              [
+                "BBBB",
+                152,
+                0
+              ],
+              [
+                "CCCC",
+                80,
+                1
+              ],
+              [
+                "DDDD",
+                140,
+                1
+              ],
+              [
+                "EEEE",
+                80,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              80,
+              0
+            ],
+            [
+              "BBBB",
+              152,
+              0
+            ],
+            [
+              "CCCC",
+              80,
+              1
+            ],
+            [
+              "DDDD",
+              140,
+              1
+            ],
+            [
+              "EEEE",
+              80,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 92.0018
+            },
+            {
+              "text": "BBBB",
+              "x": 151.994,
+              "y": 46.97865,
+              "end": 200.0252
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "positive-indent",
+          "page": 12,
+          "source": {
+            "id": "positive-indent",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              72
+            ],
+            "margin": 20,
+            "indent": 20,
+            "expected": [
+              [
+                "A",
+                80,
+                0
+              ],
+              [
+                "BBBB",
+                132,
+                0
+              ],
+              [
+                "CCCC",
+                60,
+                1
+              ],
+              [
+                "DDDD",
+                120,
+                1
+              ],
+              [
+                "EEEE",
+                60,
+                2
+              ]
+            ],
+            "diagnosticExpected": [
+              [
+                "A",
+                60,
+                0
+              ],
+              [
+                "BBBB",
+                132,
+                0
+              ],
+              [
+                "CCCC",
+                60,
+                1
+              ],
+              [
+                "DDDD",
+                120,
+                1
+              ],
+              [
+                "EEEE",
+                60,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              60,
+              0
+            ],
+            [
+              "BBBB",
+              132,
+              0
+            ],
+            [
+              "CCCC",
+              60,
+              1
+            ],
+            [
+              "DDDD",
+              120,
+              1
+            ],
+            [
+              "EEEE",
+              60,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 60.009,
+              "y": 46.97865,
+              "end": 72.0168
+            },
+            {
+              "text": "BBBB",
+              "x": 132.009,
+              "y": 46.97865,
+              "end": 180.020187
+            },
+            {
+              "text": "CCCC",
+              "x": 60.009,
+              "y": 76.99665,
+              "end": 108.020187
+            },
+            {
+              "text": "DDDD",
+              "x": 120.007974,
+              "y": 76.99665,
+              "end": 168.019161
+            },
+            {
+              "text": "EEEE",
+              "x": 60.009,
+              "y": 106.87465,
+              "end": 108.020187
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "zero-stop",
+          "page": 13,
+          "source": {
+            "id": "zero-stop",
+            "text": "A\tBBBB CCCC DDDD EEEE",
+            "stops": [
+              0
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                100,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 0,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              100,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EEEE",
+              "x": 100.036,
+              "y": 76.99665,
+              "end": 148.0672
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "two-tabs-wrapped",
+          "page": 14,
+          "source": {
+            "id": "two-tabs-wrapped",
+            "text": "A\tBBBB CCCC DDDD\tEE FF",
+            "stops": [
+              72,
+              120
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD",
+                40,
+                1
+              ],
+              [
+                "EE",
+                112,
+                1
+              ],
+              [
+                "FF",
+                148,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD\tEE FF",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            },
+            {
+              "positionHundredthMm": 4233,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CCCC",
+              172,
+              0
+            ],
+            [
+              "DDDD",
+              40,
+              1
+            ],
+            [
+              "EE",
+              112,
+              1
+            ],
+            [
+              "FF",
+              148,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CCCC",
+              "x": 172.036,
+              "y": 46.97865,
+              "end": 220.0672
+            },
+            {
+              "text": "DDDD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 88.0282
+            },
+            {
+              "text": "EE",
+              "x": 111.997,
+              "y": 76.99665,
+              "end": 136.0126
+            },
+            {
+              "text": "FF",
+              "x": 148.0204,
+              "y": 76.99665,
+              "end": 172.036
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "exhausted-stops",
+          "page": 15,
+          "source": {
+            "id": "exhausted-stops",
+            "text": "A\tBBBB\tCC DD EE",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CC",
+                184,
+                0
+              ],
+              [
+                "DD",
+                40,
+                1
+              ],
+              [
+                "EE",
+                76,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB\tCC DD EE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBB",
+              112,
+              0
+            ],
+            [
+              "CC",
+              184,
+              0
+            ],
+            [
+              "DD",
+              40,
+              1
+            ],
+            [
+              "EE",
+              76,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBB",
+              "x": 111.997,
+              "y": 46.97865,
+              "end": 160.0282
+            },
+            {
+              "text": "CC",
+              "x": 183.997,
+              "y": 46.97865,
+              "end": 208.0126
+            },
+            {
+              "text": "DD",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 64.0126
+            },
+            {
+              "text": "EE",
+              "x": 76.0204,
+              "y": 76.99665,
+              "end": 100.036
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "end-tab",
+          "page": 16,
+          "source": {
+            "id": "end-tab",
+            "text": "AAAAAAAAAAAAAA\t",
+            "expected": [
+              [
+                "AAAAAAAAAAAAAA",
+                40,
+                0
+              ]
+            ]
+          },
+          "importedText": "AAAAAAAAAAAAAA\t",
+          "importedTabs": [],
+          "expected": [
+            [
+              "AAAAAAAAAAAAAA",
+              40,
+              0
+            ]
+          ],
+          "words": [
+            {
+              "text": "AAAAAAAAAAAAAA",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 208.1062
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "long-word",
+          "page": 17,
+          "source": {
+            "id": "long-word",
+            "text": "A\tBBBBBBBBBBBBBBBBBBBBB",
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBBBBBBBBBBBBB",
+                40,
+                1
+              ],
+              [
+                "BBBBBB",
+                40,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBBBBBBBBBBBBBBBBBBB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBBBBBBBBBBBBB",
+              40,
+              1
+            ],
+            [
+              "BBBBBB",
+              40,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBBBBBBBBBBBBB",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 220.114
+            },
+            {
+              "text": "BBBBBB",
+              "x": 39.997,
+              "y": 106.87465,
+              "end": 112.0438
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "boundary-long-word",
+          "page": 18,
+          "source": {
+            "id": "boundary-long-word",
+            "text": "A\tBBBBBBBBBBBBBBBBBBBBB",
+            "width": 180,
+            "stops": [
+              72
+            ],
+            "expected": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBBBBBBBBBBBBB",
+                40,
+                1
+              ],
+              [
+                "BBBBBB",
+                40,
+                2
+              ]
+            ]
+          },
+          "importedText": "A\tBBBBBBBBBBBBBBBBBBBBB",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              40,
+              0
+            ],
+            [
+              "BBBBBBBBBBBBBBB",
+              40,
+              1
+            ],
+            [
+              "BBBBBB",
+              40,
+              2
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 52.0048
+            },
+            {
+              "text": "BBBBBBBBBBBBBBB",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 220.114
+            },
+            {
+              "text": "BBBBBB",
+              "x": 39.997,
+              "y": 106.87465,
+              "end": 112.0438
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "soft-break-indent",
+          "page": 19,
+          "source": {
+            "id": "soft-break-indent",
+            "text": "A\tB\nC\tD",
+            "stops": [
+              72
+            ],
+            "margin": 40,
+            "indent": 20,
+            "expected": [
+              [
+                "A",
+                100,
+                0
+              ],
+              [
+                "B",
+                152,
+                0
+              ],
+              [
+                "C",
+                80,
+                1
+              ],
+              [
+                "D",
+                152,
+                1
+              ]
+            ],
+            "diagnosticExpected": [
+              [
+                "A",
+                80,
+                0
+              ],
+              [
+                "B",
+                152,
+                0
+              ],
+              [
+                "C",
+                80,
+                1
+              ],
+              [
+                "D",
+                152,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tB\nC\tD",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "LEFT",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              80,
+              0
+            ],
+            [
+              "B",
+              152,
+              0
+            ],
+            [
+              "C",
+              80,
+              1
+            ],
+            [
+              "D",
+              152,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "A",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 92.0018
+            },
+            {
+              "text": "B",
+              "x": 151.994,
+              "y": 46.97865,
+              "end": 164.0018
+            },
+            {
+              "text": "C",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 92.0018
+            },
+            {
+              "text": "D",
+              "x": 151.994,
+              "y": 76.99665,
+              "end": 164.0018
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "decimal-prefix-wrap",
+          "page": 20,
+          "source": {
+            "id": "decimal-prefix-wrap",
+            "text": "A\tBBBB CCCC DDDD. EEEE",
+            "stops": [
+              72
+            ],
+            "align": "decimal",
+            "expected": [
+              [
+                "ABBBB",
+                40,
+                0
+              ],
+              [
+                "CCCC",
+                112,
+                0
+              ],
+              [
+                "DDDD.",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                112,
+                1
+              ]
+            ],
+            "known": [
+              [
+                "A",
+                40,
+                0
+              ],
+              [
+                "BBBB",
+                112,
+                0
+              ],
+              [
+                "CCCC",
+                172,
+                0
+              ],
+              [
+                "DDDD.",
+                40,
+                1
+              ],
+              [
+                "EEEE",
+                112,
+                1
+              ]
+            ]
+          },
+          "importedText": "A\tBBBB CCCC DDDD. EEEE",
+          "importedTabs": [
+            {
+              "positionHundredthMm": 2540,
+              "alignment": "DECIMAL",
+              "decimalCharacter": "."
+            }
+          ],
+          "expected": [
+            [
+              "ABBBB",
+              40,
+              0
+            ],
+            [
+              "CCCC",
+              112,
+              0
+            ],
+            [
+              "DDDD.",
+              40,
+              1
+            ],
+            [
+              "EEEE",
+              112,
+              1
+            ]
+          ],
+          "words": [
+            {
+              "text": "ABBBB",
+              "x": 39.997,
+              "y": 46.97865,
+              "end": 100.0182
+            },
+            {
+              "text": "CCCC",
+              "x": 112.026,
+              "y": 46.97865,
+              "end": 160.0572
+            },
+            {
+              "text": "DDDD.",
+              "x": 39.997,
+              "y": 76.99665,
+              "end": 100.036
+            },
+            {
+              "text": "EEEE",
+              "x": 112.0438,
+              "y": 76.99665,
+              "end": 160.075
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "bullet-left--20",
+          "page": 21,
+          "source": {
+            "id": "bullet-left--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "left",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 43.68965,
+              "end": 70.779044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-left-0",
+          "page": 22,
+          "source": {
+            "id": "bullet-left-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "left",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 43.68965,
+              "end": 70.779044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-left-20",
+          "page": 23,
+          "source": {
+            "id": "bullet-left-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "left",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 43.68965,
+              "end": 70.779044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-center--20",
+          "page": 24,
+          "source": {
+            "id": "bullet-center--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "center",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 82.006,
+              "y": 43.68965,
+              "end": 89.771044
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "y": 46.97865,
+              "end": 147.0452
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "y": 46.97865,
+              "end": 207.0842
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-center-0",
+          "page": 25,
+          "source": {
+            "id": "bullet-center-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "center",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 82.006,
+              "y": 43.68965,
+              "end": 89.771044
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "y": 46.97865,
+              "end": 147.0452
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "y": 46.97865,
+              "end": 207.0842
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-center-20",
+          "page": 26,
+          "source": {
+            "id": "bullet-center-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "center",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 82.006,
+              "y": 43.68965,
+              "end": 89.771044
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "y": 46.97865,
+              "end": 147.0452
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "y": 46.97865,
+              "end": 207.0842
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-right--20",
+          "page": 27,
+          "source": {
+            "id": "bullet-right--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "right",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.998,
+              "y": 43.68965,
+              "end": 108.763044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-right-0",
+          "page": 28,
+          "source": {
+            "id": "bullet-right-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "right",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.998,
+              "y": 43.68965,
+              "end": 108.763044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-right-20",
+          "page": 29,
+          "source": {
+            "id": "bullet-right-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "right",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.998,
+              "y": 43.68965,
+              "end": 108.763044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-justify--20",
+          "page": 30,
+          "source": {
+            "id": "bullet-justify--20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "justify",
+            "margin": 40,
+            "indent": -20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 43.68965,
+              "end": 70.779044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "y": 46.97865,
+              "end": 226.068887
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-justify-0",
+          "page": 31,
+          "source": {
+            "id": "bullet-justify-0",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "justify",
+            "margin": 40,
+            "indent": 0
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 43.68965,
+              "end": 70.779044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "y": 46.97865,
+              "end": 226.068887
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-justify-20",
+          "page": 32,
+          "source": {
+            "id": "bullet-justify-20",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "paragraphAlign": "justify",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 43.68965,
+              "end": 70.779044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "y": 46.97865,
+              "end": 226.068887
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        },
+        {
+          "id": "bullet-explicit-font-positive",
+          "page": 33,
+          "source": {
+            "id": "bullet-explicit-font-positive",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "bullet": true,
+            "bulletFont": "Liberation Mono",
+            "margin": 40,
+            "indent": 20
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "importedTabs": [],
+          "words": [
+            {
+              "text": "*",
+              "x": 63.014,
+              "y": 44.20065,
+              "end": 75.0218
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "status": "observed-only"
+        }
+      ]
+    }
+  ]
+}

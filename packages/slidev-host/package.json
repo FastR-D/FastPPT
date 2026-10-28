@@ -16,9 +16,11 @@
   "files": [
     "src",
     "setup",
-    "runner.mjs"
+    "runner.mjs",
+    "text-frame-tabs.mjs"
   ],
   "dependencies": {
+    "@fastppt/fonts": "workspace:*",
     "@fastppt/protocol": "workspace:*",
     "@fastppt/slidewave": "workspace:*",
     "@slidev/cli": "catalog:",

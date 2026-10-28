@@ -1,0 +1,6842 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-08T23:35:09.397Z",
+  "sourcePptxSha256": "99450b53a20208ddada03ff04f9c6f7cee92992c3dd99b50e103ce8780ef6836",
+  "sourceConvention": {
+    "status": "unknown",
+    "reason": "drawingml-has-no-decimal-separator"
+  },
+  "comparisonBasis": "target-application-probe",
+  "reproducers": [
+    {
+      "path": "tests/e2e/scripts/decimal-compatibility.ts",
+      "sha256": "5f30e9cfc5c5fb2778df95df33d58cfa22628514d3dc4c7617f8c0995cc28825"
+    },
+    {
+      "path": "tests/e2e/scripts/lib/libreoffice-text-probe.py",
+      "sha256": "ef674f6f70f0b2958cebb08a10413b088a3526f19969d159746ea21110039c93"
+    }
+  ],
+  "tolerancePoints": 0.25,
+  "targets": [
+    {
+      "environment": {
+        "application": {
+          "name": "LibreOffice",
+          "version": "7.3.7.2",
+          "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+        },
+        "platform": {
+          "system": "Linux",
+          "release": "6.11.8-10-generic",
+          "architecture": "x86_64"
+        },
+        "locale": {
+          "requested": "en-US",
+          "observed": "en-US",
+          "ui": "en-US",
+          "decimalSeparator": ".",
+          "decimalSeparatorAsLocale": true
+        },
+        "configurationSha256": "6dab98044e83c5e9ace511cc20530381cadafdd9e26c0bc9e8aa00a7bf1cf23b"
+      },
+      "artifacts": [
+        {
+          "stage": "actual-native-export",
+          "pptxSha256": "99450b53a20208ddada03ff04f9c6f7cee92992c3dd99b50e103ce8780ef6836",
+          "pdfSha256": "79f0080bbefcefb0611d49a26d96ee5ba68e45202bd795efd69087190e282f5b",
+          "pageCount": 23,
+          "cases": [
+            {
+              "id": "period",
+              "page": 1,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "comma",
+              "page": 2,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "missing",
+              "page": 3,
+              "sourceText": "A\t1234",
+              "sourceRuns": [
+                {
+                  "text": "A\t1234"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 142
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1234",
+                  "x": 111.997,
+                  "end": 160.0282
+                }
+              ],
+              "importedText": "A\t1234",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-periods",
+              "page": 4,
+              "sourceText": "A\t1.2.3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.2.3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 178
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t1.2.3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-commas",
+              "page": 5,
+              "sourceText": "A\t1,2,3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,2,3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t1,2,3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "leading-period",
+              "page": 6,
+              "sourceText": "A\t.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 190
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ".34",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "leading-comma",
+              "page": 7,
+              "sourceText": "A\t,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ",34",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "trailing-period",
+              "page": 8,
+              "sourceText": "A\t12.",
+              "sourceRuns": [
+                {
+                  "text": "A\t12."
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t12.",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "trailing-comma",
+              "page": 9,
+              "sourceText": "A\t12,",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t12,",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "negative",
+              "page": 10,
+              "sourceText": "A\t-12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t-12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "-12.34",
+                  "x": 111.997,
+                  "end": 184.0438
+                }
+              ],
+              "importedText": "A\t-12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "currency-prefix",
+              "page": 11,
+              "sourceText": "A\tUSD12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\tUSD12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\tUSD12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "non-numeric",
+              "page": 12,
+              "sourceText": "A\tabc.def",
+              "sourceRuns": [
+                {
+                  "text": "A\tabc.def"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "abc.def",
+                  "x": 111.997,
+                  "end": 196.0516
+                }
+              ],
+              "importedText": "A\tabc.def",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "grouping-comma",
+              "page": 13,
+              "sourceText": "A\t1,234.56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,234.56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\t1,234.56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "grouping-period",
+              "page": 14,
+              "sourceText": "A\t1.234,56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.234,56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 178
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\t1.234,56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "non-separator",
+              "page": 15,
+              "sourceText": "A\t12x34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12x34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12x34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12x34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "run-language-de",
+              "page": 16,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "run-language-en",
+              "page": 17,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34",
+                  "language": "en-US"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "cross-run",
+              "page": 18,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t1",
+                  "language": "fr-FR"
+                },
+                {
+                  "text": "2",
+                  "language": "en-US"
+                },
+                {
+                  "text": ".",
+                  "language": ""
+                },
+                {
+                  "text": "34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.0126
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "soft-break",
+              "page": 19,
+              "sourceText": "A\t12.34\nX\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\nX\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "X",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "56,78",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34\nX\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-stops",
+              "page": 20,
+              "sourceText": "A\t12.34\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                },
+                {
+                  "text": "56,78",
+                  "x": 280
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "56,78",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "56,78",
+                  "x": 183.997,
+                  "end": 244.036
+                }
+              ],
+              "importedText": "A\t12.34\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "empty-field",
+              "page": 21,
+              "sourceText": "A\t\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 316
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 183.997,
+                  "end": 244.036
+                }
+              ],
+              "importedText": "A\t\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "default-after-explicit",
+              "page": 22,
+              "sourceText": "A\t12.34\tB",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\tB"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                },
+                {
+                  "text": "B",
+                  "x": 256
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "B",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "B",
+                  "x": 183.997,
+                  "end": 196.0048
+                }
+              ],
+              "importedText": "A\t12.34\tB",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "collision",
+              "page": 23,
+              "sourceText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "sourceRuns": [
+                {
+                  "text": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 40,
+                  "end": 376
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 111.997,
+                  "end": 436.2076
+                }
+              ],
+              "importedText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "known-difference"
+            }
+          ]
+        },
+        {
+          "stage": "diagnostic-indent-removed",
+          "pptxSha256": "c0685787aaae633f22d7d37479ba52c583fe273030afa6a16a4bed86d919f8db",
+          "pdfSha256": "712463cc3c503ea7f40341e2379109a70ab7fdd6448aeed355418a78d37285ec",
+          "pageCount": 23,
+          "cases": [
+            {
+              "id": "period",
+              "page": 1,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "comma",
+              "page": 2,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "missing",
+              "page": 3,
+              "sourceText": "A\t1234",
+              "sourceRuns": [
+                {
+                  "text": "A\t1234"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 142
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1234",
+                  "x": 141.987,
+                  "end": 190.0182
+                }
+              ],
+              "importedText": "A\t1234",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-periods",
+              "page": 4,
+              "sourceText": "A\t1.2.3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.2.3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 178
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 177.987,
+                  "end": 238.026
+                }
+              ],
+              "importedText": "A\t1.2.3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-commas",
+              "page": 5,
+              "sourceText": "A\t1,2,3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,2,3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t1,2,3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "leading-period",
+              "page": 6,
+              "sourceText": "A\t.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 190
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ".34",
+                  "x": 190.006,
+                  "end": 226.0294
+                }
+              ],
+              "importedText": "A\t.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "leading-comma",
+              "page": 7,
+              "sourceText": "A\t,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ",34",
+                  "x": 154.006,
+                  "end": 190.0294
+                }
+              ],
+              "importedText": "A\t,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "trailing-period",
+              "page": 8,
+              "sourceText": "A\t12.",
+              "sourceRuns": [
+                {
+                  "text": "A\t12."
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.",
+                  "x": 165.997,
+                  "end": 202.0204
+                }
+              ],
+              "importedText": "A\t12.",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "trailing-comma",
+              "page": 9,
+              "sourceText": "A\t12,",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,",
+                  "x": 154.006,
+                  "end": 190.0294
+                }
+              ],
+              "importedText": "A\t12,",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "negative",
+              "page": 10,
+              "sourceText": "A\t-12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t-12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "-12.34",
+                  "x": 154.006,
+                  "end": 226.0528
+                }
+              ],
+              "importedText": "A\t-12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "currency-prefix",
+              "page": 11,
+              "sourceText": "A\tUSD12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\tUSD12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 129.997,
+                  "end": 226.0594
+                }
+              ],
+              "importedText": "A\tUSD12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "non-numeric",
+              "page": 12,
+              "sourceText": "A\tabc.def",
+              "sourceRuns": [
+                {
+                  "text": "A\tabc.def"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "abc.def",
+                  "x": 154.006,
+                  "end": 238.0606
+                }
+              ],
+              "importedText": "A\tabc.def",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "grouping-comma",
+              "page": 13,
+              "sourceText": "A\t1,234.56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,234.56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 129.997,
+                  "end": 226.0594
+                }
+              ],
+              "importedText": "A\t1,234.56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "grouping-period",
+              "page": 14,
+              "sourceText": "A\t1.234,56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.234,56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 178
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 177.987,
+                  "end": 274.0494
+                }
+              ],
+              "importedText": "A\t1.234,56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "non-separator",
+              "page": 15,
+              "sourceText": "A\t12x34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12x34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12x34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12x34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "run-language-de",
+              "page": 16,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "run-language-en",
+              "page": 17,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34",
+                  "language": "en-US"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "cross-run",
+              "page": 18,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t1",
+                  "language": "fr-FR"
+                },
+                {
+                  "text": "2",
+                  "language": "en-US"
+                },
+                {
+                  "text": ".",
+                  "language": ""
+                },
+                {
+                  "text": "34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 165.997,
+                  "end": 225.912535
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "soft-break",
+              "page": 19,
+              "sourceText": "A\t12.34\nX\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\nX\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 165.997,
+                  "end": 226.036
+                },
+                {
+                  "text": "X",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "56,78",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12.34\nX\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-stops",
+              "page": 20,
+              "sourceText": "A\t12.34\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                },
+                {
+                  "text": "56,78",
+                  "x": 280
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 165.997,
+                  "end": 226.036
+                },
+                {
+                  "text": "56,78",
+                  "x": 280.006,
+                  "end": 339.924922
+                }
+              ],
+              "importedText": "A\t12.34\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                },
+                {
+                  "positionHundredthMm": 10583,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "empty-field",
+              "page": 21,
+              "sourceText": "A\t\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 316
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 316.006,
+                  "end": 375.924922
+                }
+              ],
+              "importedText": "A\t\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                },
+                {
+                  "positionHundredthMm": 10583,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "default-after-explicit",
+              "page": 22,
+              "sourceText": "A\t12.34\tB",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\tB"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 166
+                },
+                {
+                  "text": "B",
+                  "x": 256
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 165.997,
+                  "end": 226.036
+                },
+                {
+                  "text": "B",
+                  "x": 255.997,
+                  "end": 268.0048
+                }
+              ],
+              "importedText": "A\t12.34\tB",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "collision",
+              "page": 23,
+              "sourceText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "sourceRuns": [
+                {
+                  "text": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 40,
+                  "end": 376
+                }
+              ],
+              "observed": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 39.997,
+                  "end": 376.1976
+                }
+              ],
+              "importedText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": "."
+                }
+              ],
+              "status": "matched"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "environment": {
+        "application": {
+          "name": "LibreOffice",
+          "version": "7.3.7.2",
+          "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+        },
+        "platform": {
+          "system": "Linux",
+          "release": "6.11.8-10-generic",
+          "architecture": "x86_64"
+        },
+        "locale": {
+          "requested": "de-DE",
+          "observed": "de-DE",
+          "ui": "en-US",
+          "decimalSeparator": ",",
+          "decimalSeparatorAsLocale": true
+        },
+        "configurationSha256": "350cd0df37f578dca8657de3c188cc7a0ddcc43d1a11483998ba6c59632cf78e"
+      },
+      "artifacts": [
+        {
+          "stage": "actual-native-export",
+          "pptxSha256": "99450b53a20208ddada03ff04f9c6f7cee92992c3dd99b50e103ce8780ef6836",
+          "pdfSha256": "089aa170dd3cc5622e5be328727839606ed41a6c239bab2c421ec23afa924bc4",
+          "pageCount": 23,
+          "cases": [
+            {
+              "id": "period",
+              "page": 1,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "comma",
+              "page": 2,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "missing",
+              "page": 3,
+              "sourceText": "A\t1234",
+              "sourceRuns": [
+                {
+                  "text": "A\t1234"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 142
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1234",
+                  "x": 111.997,
+                  "end": 160.0282
+                }
+              ],
+              "importedText": "A\t1234",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-periods",
+              "page": 4,
+              "sourceText": "A\t1.2.3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.2.3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t1.2.3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-commas",
+              "page": 5,
+              "sourceText": "A\t1,2,3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,2,3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 178
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t1,2,3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "leading-period",
+              "page": 6,
+              "sourceText": "A\t.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ".34",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "leading-comma",
+              "page": 7,
+              "sourceText": "A\t,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 190
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ",34",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "trailing-period",
+              "page": 8,
+              "sourceText": "A\t12.",
+              "sourceRuns": [
+                {
+                  "text": "A\t12."
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t12.",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "trailing-comma",
+              "page": 9,
+              "sourceText": "A\t12,",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t12,",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "negative",
+              "page": 10,
+              "sourceText": "A\t-12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t-12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 118
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "-12.34",
+                  "x": 111.997,
+                  "end": 184.0438
+                }
+              ],
+              "importedText": "A\t-12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "currency-prefix",
+              "page": 11,
+              "sourceText": "A\tUSD12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\tUSD12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 94
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\tUSD12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "non-numeric",
+              "page": 12,
+              "sourceText": "A\tabc.def",
+              "sourceRuns": [
+                {
+                  "text": "A\tabc.def"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 106
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "abc.def",
+                  "x": 111.997,
+                  "end": 196.0516
+                }
+              ],
+              "importedText": "A\tabc.def",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "grouping-comma",
+              "page": 13,
+              "sourceText": "A\t1,234.56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,234.56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 178
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\t1,234.56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "grouping-period",
+              "page": 14,
+              "sourceText": "A\t1.234,56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.234,56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\t1.234,56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "non-separator",
+              "page": 15,
+              "sourceText": "A\t12x34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12x34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12x34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12x34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "run-language-de",
+              "page": 16,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "run-language-en",
+              "page": 17,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34",
+                  "language": "en-US"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "cross-run",
+              "page": 18,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t1",
+                  "language": "fr-FR"
+                },
+                {
+                  "text": "2",
+                  "language": "en-US"
+                },
+                {
+                  "text": ".",
+                  "language": ""
+                },
+                {
+                  "text": "34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.0126
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "soft-break",
+              "page": 19,
+              "sourceText": "A\t12.34\nX\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\nX\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "X",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "56,78",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34\nX\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-stops",
+              "page": 20,
+              "sourceText": "A\t12.34\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "56,78",
+                  "x": 316
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "56,78",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "56,78",
+                  "x": 183.997,
+                  "end": 244.036
+                }
+              ],
+              "importedText": "A\t12.34\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "empty-field",
+              "page": 21,
+              "sourceText": "A\t\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 280
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 183.997,
+                  "end": 244.036
+                }
+              ],
+              "importedText": "A\t\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "default-after-explicit",
+              "page": 22,
+              "sourceText": "A\t12.34\tB",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\tB"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "B",
+                  "x": 256
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "B",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "B",
+                  "x": 183.997,
+                  "end": 196.0048
+                }
+              ],
+              "importedText": "A\t12.34\tB",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "collision",
+              "page": 23,
+              "sourceText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "sourceRuns": [
+                {
+                  "text": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 40,
+                  "end": 376
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 111.997,
+                  "end": 436.2076
+                }
+              ],
+              "importedText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            }
+          ]
+        },
+        {
+          "stage": "diagnostic-indent-removed",
+          "pptxSha256": "c0685787aaae633f22d7d37479ba52c583fe273030afa6a16a4bed86d919f8db",
+          "pdfSha256": "dd1ae012ecc4b2392f03550cea3c5c200d39c7d90552c5c9f7cb49c239ac867a",
+          "pageCount": 23,
+          "cases": [
+            {
+              "id": "period",
+              "page": 1,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "comma",
+              "page": 2,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "missing",
+              "page": 3,
+              "sourceText": "A\t1234",
+              "sourceRuns": [
+                {
+                  "text": "A\t1234"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 142
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1234",
+                  "x": 141.987,
+                  "end": 190.0182
+                }
+              ],
+              "importedText": "A\t1234",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-periods",
+              "page": 4,
+              "sourceText": "A\t1.2.3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.2.3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t1.2.3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-commas",
+              "page": 5,
+              "sourceText": "A\t1,2,3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,2,3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 178
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 177.987,
+                  "end": 238.026
+                }
+              ],
+              "importedText": "A\t1,2,3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "leading-period",
+              "page": 6,
+              "sourceText": "A\t.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ".34",
+                  "x": 154.006,
+                  "end": 190.0294
+                }
+              ],
+              "importedText": "A\t.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "leading-comma",
+              "page": 7,
+              "sourceText": "A\t,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 190
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ",34",
+                  "x": 190.006,
+                  "end": 226.0294
+                }
+              ],
+              "importedText": "A\t,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "trailing-period",
+              "page": 8,
+              "sourceText": "A\t12.",
+              "sourceRuns": [
+                {
+                  "text": "A\t12."
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.",
+                  "x": 154.006,
+                  "end": 190.0294
+                }
+              ],
+              "importedText": "A\t12.",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "trailing-comma",
+              "page": 9,
+              "sourceText": "A\t12,",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,",
+                  "x": 165.997,
+                  "end": 202.0204
+                }
+              ],
+              "importedText": "A\t12,",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "negative",
+              "page": 10,
+              "sourceText": "A\t-12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t-12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 118
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "-12.34",
+                  "x": 118.006,
+                  "end": 190.0528
+                }
+              ],
+              "importedText": "A\t-12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "currency-prefix",
+              "page": 11,
+              "sourceText": "A\tUSD12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\tUSD12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 94
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 93.997,
+                  "end": 190.0594
+                }
+              ],
+              "importedText": "A\tUSD12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "non-numeric",
+              "page": 12,
+              "sourceText": "A\tabc.def",
+              "sourceRuns": [
+                {
+                  "text": "A\tabc.def"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 106
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "abc.def",
+                  "x": 105.987,
+                  "end": 190.0416
+                }
+              ],
+              "importedText": "A\tabc.def",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "grouping-comma",
+              "page": 13,
+              "sourceText": "A\t1,234.56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,234.56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 178
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 177.987,
+                  "end": 274.0494
+                }
+              ],
+              "importedText": "A\t1,234.56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "grouping-period",
+              "page": 14,
+              "sourceText": "A\t1.234,56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.234,56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 129.997,
+                  "end": 226.0594
+                }
+              ],
+              "importedText": "A\t1.234,56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "non-separator",
+              "page": 15,
+              "sourceText": "A\t12x34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12x34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12x34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12x34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "run-language-de",
+              "page": 16,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "run-language-en",
+              "page": 17,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34",
+                  "language": "en-US"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "cross-run",
+              "page": 18,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t1",
+                  "language": "fr-FR"
+                },
+                {
+                  "text": "2",
+                  "language": "en-US"
+                },
+                {
+                  "text": ".",
+                  "language": ""
+                },
+                {
+                  "text": "34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.0126
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "soft-break",
+              "page": 19,
+              "sourceText": "A\t12.34\nX\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\nX\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                },
+                {
+                  "text": "X",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "56,78",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12.34\nX\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-stops",
+              "page": 20,
+              "sourceText": "A\t12.34\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "56,78",
+                  "x": 316
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                },
+                {
+                  "text": "56,78",
+                  "x": 316.006,
+                  "end": 375.924922
+                }
+              ],
+              "importedText": "A\t12.34\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                },
+                {
+                  "positionHundredthMm": 10583,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "empty-field",
+              "page": 21,
+              "sourceText": "A\t\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 280
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 280.006,
+                  "end": 339.924922
+                }
+              ],
+              "importedText": "A\t\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                },
+                {
+                  "positionHundredthMm": 10583,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "default-after-explicit",
+              "page": 22,
+              "sourceText": "A\t12.34\tB",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\tB"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "B",
+                  "x": 256
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                },
+                {
+                  "text": "B",
+                  "x": 255.997,
+                  "end": 268.0048
+                }
+              ],
+              "importedText": "A\t12.34\tB",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "collision",
+              "page": 23,
+              "sourceText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "sourceRuns": [
+                {
+                  "text": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 40,
+                  "end": 376
+                }
+              ],
+              "observed": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 39.997,
+                  "end": 376.1976
+                }
+              ],
+              "importedText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "environment": {
+        "application": {
+          "name": "LibreOffice",
+          "version": "7.3.7.2",
+          "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+        },
+        "platform": {
+          "system": "Linux",
+          "release": "6.11.8-10-generic",
+          "architecture": "x86_64"
+        },
+        "locale": {
+          "requested": "fr-FR",
+          "observed": "fr-FR",
+          "ui": "en-US",
+          "decimalSeparator": ",",
+          "decimalSeparatorAsLocale": true
+        },
+        "configurationSha256": "7b112dcd2623109f5890a1e6b331a699522092b9230c997c20e5673f4c0ec23a"
+      },
+      "artifacts": [
+        {
+          "stage": "actual-native-export",
+          "pptxSha256": "99450b53a20208ddada03ff04f9c6f7cee92992c3dd99b50e103ce8780ef6836",
+          "pdfSha256": "0ae5ddaac6de06d6f676a271baa2ce38088da2b41173366ff320696780b821c9",
+          "pageCount": 23,
+          "cases": [
+            {
+              "id": "period",
+              "page": 1,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "comma",
+              "page": 2,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "missing",
+              "page": 3,
+              "sourceText": "A\t1234",
+              "sourceRuns": [
+                {
+                  "text": "A\t1234"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 142
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1234",
+                  "x": 111.997,
+                  "end": 160.0282
+                }
+              ],
+              "importedText": "A\t1234",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-periods",
+              "page": 4,
+              "sourceText": "A\t1.2.3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.2.3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t1.2.3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-commas",
+              "page": 5,
+              "sourceText": "A\t1,2,3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,2,3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 178
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t1,2,3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "leading-period",
+              "page": 6,
+              "sourceText": "A\t.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ".34",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "leading-comma",
+              "page": 7,
+              "sourceText": "A\t,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 190
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ",34",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "trailing-period",
+              "page": 8,
+              "sourceText": "A\t12.",
+              "sourceRuns": [
+                {
+                  "text": "A\t12."
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 154
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t12.",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "trailing-comma",
+              "page": 9,
+              "sourceText": "A\t12,",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,",
+                  "x": 111.997,
+                  "end": 148.0204
+                }
+              ],
+              "importedText": "A\t12,",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "negative",
+              "page": 10,
+              "sourceText": "A\t-12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t-12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 118
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "-12.34",
+                  "x": 111.997,
+                  "end": 184.0438
+                }
+              ],
+              "importedText": "A\t-12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "currency-prefix",
+              "page": 11,
+              "sourceText": "A\tUSD12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\tUSD12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 94
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\tUSD12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "non-numeric",
+              "page": 12,
+              "sourceText": "A\tabc.def",
+              "sourceRuns": [
+                {
+                  "text": "A\tabc.def"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 106
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "abc.def",
+                  "x": 111.997,
+                  "end": 196.0516
+                }
+              ],
+              "importedText": "A\tabc.def",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "grouping-comma",
+              "page": 13,
+              "sourceText": "A\t1,234.56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,234.56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 178
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\t1,234.56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "grouping-period",
+              "page": 14,
+              "sourceText": "A\t1.234,56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.234,56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 111.997,
+                  "end": 208.0594
+                }
+              ],
+              "importedText": "A\t1.234,56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "non-separator",
+              "page": 15,
+              "sourceText": "A\t12x34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12x34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12x34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12x34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "run-language-de",
+              "page": 16,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "run-language-en",
+              "page": 17,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34",
+                  "language": "en-US"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "cross-run",
+              "page": 18,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t1",
+                  "language": "fr-FR"
+                },
+                {
+                  "text": "2",
+                  "language": "en-US"
+                },
+                {
+                  "text": ".",
+                  "language": ""
+                },
+                {
+                  "text": "34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.0126
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "soft-break",
+              "page": 19,
+              "sourceText": "A\t12.34\nX\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\nX\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 166
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "X",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "56,78",
+                  "x": 111.997,
+                  "end": 172.036
+                }
+              ],
+              "importedText": "A\t12.34\nX\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "multiple-stops",
+              "page": 20,
+              "sourceText": "A\t12.34\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "56,78",
+                  "x": 316
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "56,78",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "56,78",
+                  "x": 183.997,
+                  "end": 244.036
+                }
+              ],
+              "importedText": "A\t12.34\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "empty-field",
+              "page": 21,
+              "sourceText": "A\t\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 280
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 183.997,
+                  "end": 244.036
+                }
+              ],
+              "importedText": "A\t\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "default-after-explicit",
+              "page": 22,
+              "sourceText": "A\t12.34\tB",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\tB"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "B",
+                  "x": 256
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 112
+                },
+                {
+                  "text": "B",
+                  "x": 184
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 111.997,
+                  "end": 172.036
+                },
+                {
+                  "text": "B",
+                  "x": 183.997,
+                  "end": 196.0048
+                }
+              ],
+              "importedText": "A\t12.34\tB",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            },
+            {
+              "id": "collision",
+              "page": 23,
+              "sourceText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "sourceRuns": [
+                {
+                  "text": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 40,
+                  "end": 376
+                }
+              ],
+              "known": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 112
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 111.997,
+                  "end": 436.2076
+                }
+              ],
+              "importedText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 0,
+                  "alignment": "LEFT",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "known-difference"
+            }
+          ]
+        },
+        {
+          "stage": "diagnostic-indent-removed",
+          "pptxSha256": "c0685787aaae633f22d7d37479ba52c583fe273030afa6a16a4bed86d919f8db",
+          "pdfSha256": "bab1afbc3cee85a7b3505b56f9006b6866931f3b872a22bc31ed55bf7817d9d7",
+          "pageCount": 23,
+          "cases": [
+            {
+              "id": "period",
+              "page": 1,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "comma",
+              "page": 2,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "missing",
+              "page": 3,
+              "sourceText": "A\t1234",
+              "sourceRuns": [
+                {
+                  "text": "A\t1234"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1234",
+                  "x": 142
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1234",
+                  "x": 141.987,
+                  "end": 190.0182
+                }
+              ],
+              "importedText": "A\t1234",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-periods",
+              "page": 4,
+              "sourceText": "A\t1.2.3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.2.3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.2.3",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t1.2.3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-commas",
+              "page": 5,
+              "sourceText": "A\t1,2,3",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,2,3"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 178
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,2,3",
+                  "x": 177.987,
+                  "end": 238.026
+                }
+              ],
+              "importedText": "A\t1,2,3",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "leading-period",
+              "page": 6,
+              "sourceText": "A\t.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ".34",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ".34",
+                  "x": 154.006,
+                  "end": 190.0294
+                }
+              ],
+              "importedText": "A\t.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "leading-comma",
+              "page": 7,
+              "sourceText": "A\t,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t,34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": ",34",
+                  "x": 190
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": ",34",
+                  "x": 190.006,
+                  "end": 226.0294
+                }
+              ],
+              "importedText": "A\t,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "trailing-period",
+              "page": 8,
+              "sourceText": "A\t12.",
+              "sourceRuns": [
+                {
+                  "text": "A\t12."
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.",
+                  "x": 154
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.",
+                  "x": 154.006,
+                  "end": 190.0294
+                }
+              ],
+              "importedText": "A\t12.",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "trailing-comma",
+              "page": 9,
+              "sourceText": "A\t12,",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,",
+                  "x": 165.997,
+                  "end": 202.0204
+                }
+              ],
+              "importedText": "A\t12,",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "negative",
+              "page": 10,
+              "sourceText": "A\t-12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t-12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "-12.34",
+                  "x": 118
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "-12.34",
+                  "x": 118.006,
+                  "end": 190.0528
+                }
+              ],
+              "importedText": "A\t-12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "currency-prefix",
+              "page": 11,
+              "sourceText": "A\tUSD12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\tUSD12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 94
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "USD12.34",
+                  "x": 93.997,
+                  "end": 190.0594
+                }
+              ],
+              "importedText": "A\tUSD12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "non-numeric",
+              "page": 12,
+              "sourceText": "A\tabc.def",
+              "sourceRuns": [
+                {
+                  "text": "A\tabc.def"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "abc.def",
+                  "x": 106
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "abc.def",
+                  "x": 105.987,
+                  "end": 190.0416
+                }
+              ],
+              "importedText": "A\tabc.def",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "grouping-comma",
+              "page": 13,
+              "sourceText": "A\t1,234.56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1,234.56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 178
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1,234.56",
+                  "x": 177.987,
+                  "end": 274.0494
+                }
+              ],
+              "importedText": "A\t1,234.56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "grouping-period",
+              "page": 14,
+              "sourceText": "A\t1.234,56",
+              "sourceRuns": [
+                {
+                  "text": "A\t1.234,56"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "1.234,56",
+                  "x": 129.997,
+                  "end": 226.0594
+                }
+              ],
+              "importedText": "A\t1.234,56",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "non-separator",
+              "page": 15,
+              "sourceText": "A\t12x34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12x34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12x34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12x34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12x34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "run-language-de",
+              "page": 16,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "run-language-en",
+              "page": 17,
+              "sourceText": "A\t12,34",
+              "sourceRuns": [
+                {
+                  "text": "A\t12,34",
+                  "language": "en-US"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12,34",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12,34",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12,34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "cross-run",
+              "page": 18,
+              "sourceText": "A\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t1",
+                  "language": "fr-FR"
+                },
+                {
+                  "text": "2",
+                  "language": "en-US"
+                },
+                {
+                  "text": ".",
+                  "language": ""
+                },
+                {
+                  "text": "34",
+                  "language": "de-DE"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.0126
+                }
+              ],
+              "importedText": "A\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "soft-break",
+              "page": 19,
+              "sourceText": "A\t12.34\nX\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\nX\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "X",
+                  "x": 40
+                },
+                {
+                  "text": "56,78",
+                  "x": 166
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                },
+                {
+                  "text": "X",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "56,78",
+                  "x": 165.997,
+                  "end": 226.036
+                }
+              ],
+              "importedText": "A\t12.34\nX\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "multiple-stops",
+              "page": 20,
+              "sourceText": "A\t12.34\t56,78",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\t56,78"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "56,78",
+                  "x": 316
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                },
+                {
+                  "text": "56,78",
+                  "x": 316.006,
+                  "end": 375.924922
+                }
+              ],
+              "importedText": "A\t12.34\t56,78",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                },
+                {
+                  "positionHundredthMm": 10583,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "empty-field",
+              "page": 21,
+              "sourceText": "A\t\t12.34",
+              "sourceRuns": [
+                {
+                  "text": "A\t\t12.34"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 280
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 280.006,
+                  "end": 339.924922
+                }
+              ],
+              "importedText": "A\t\t12.34",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                },
+                {
+                  "positionHundredthMm": 10583,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "default-after-explicit",
+              "page": 22,
+              "sourceText": "A\t12.34\tB",
+              "sourceRuns": [
+                {
+                  "text": "A\t12.34\tB"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "A",
+                  "x": 40
+                },
+                {
+                  "text": "12.34",
+                  "x": 130
+                },
+                {
+                  "text": "B",
+                  "x": 256
+                }
+              ],
+              "observed": [
+                {
+                  "text": "A",
+                  "x": 39.997,
+                  "end": 52.0048
+                },
+                {
+                  "text": "12.34",
+                  "x": 129.997,
+                  "end": 190.036
+                },
+                {
+                  "text": "B",
+                  "x": 255.997,
+                  "end": 268.0048
+                }
+              ],
+              "importedText": "A\t12.34\tB",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            },
+            {
+              "id": "collision",
+              "page": 23,
+              "sourceText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "sourceRuns": [
+                {
+                  "text": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12"
+                }
+              ],
+              "expected": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 40,
+                  "end": 376
+                }
+              ],
+              "observed": [
+                {
+                  "text": "AABCDEFGHIJKLMNOPQRSTUVWX.12",
+                  "x": 39.997,
+                  "end": 376.1976
+                }
+              ],
+              "importedText": "A\tABCDEFGHIJKLMNOPQRSTUVWX.12",
+              "importedTabs": [
+                {
+                  "positionHundredthMm": 5292,
+                  "alignment": "DECIMAL",
+                  "decimalCharacter": ","
+                }
+              ],
+              "status": "matched"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

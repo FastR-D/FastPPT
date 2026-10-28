@@ -1,0 +1,9 @@
+{
+  "id": "ddefe998440f",
+  "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+  "sourceSha256": "0e34ee4df6f9d1bbb7529bad71d3f75ec1181504e1694b96f8d4a13d9a3a072f",
+  "pages": 17,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

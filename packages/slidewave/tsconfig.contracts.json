@@ -8,6 +8,9 @@
   },
   "include": [
     "src/snapshot.ts",
-    "src/snapshot-types.ts"
+    "src/primitives/native-geometry.ts",
+    "src/snapshot-types.ts",
+    "src/primitives/text-bullet.ts",
+    "src/primitives/text-tab-layout.ts"
   ]
 }

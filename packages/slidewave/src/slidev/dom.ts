@@ -23,10 +23,20 @@ export function elementSource(
     typeof element.className === 'string'
       ? element.className || undefined
       : undefined
+  const owner = element.closest?.('[data-fastppt-layout-object][data-fastppt-layout]')
+  const layout = owner?.getAttribute('data-fastppt-layout')
+  const name = owner?.getAttribute('data-fastppt-layout-object')
+  const scope = owner?.getAttribute('data-fastppt-object-scope')
+  const group = element.closest?.('[data-fastppt-group]')
+  const anchor = element.getAttribute('data-fastppt-group') ?? element.getAttribute('id') ?? group?.getAttribute('data-fastppt-group') ?? owner?.getAttribute('data-fastppt-group')
   return {
+    ...(layout && name ? { nativeLayoutObject: { layout, name, ...(scope === 'master' ? { scope: 'master' as const } : {}) } } : {}),
     tag: element.tagName.toLowerCase(),
     path,
     ...(className === undefined ? {} : { className }),
+    ...(anchor
+      ? { anchor }
+      : {}),
   }
 }
 
@@ -44,7 +54,7 @@ export function matchesAnySelector(
 }
 
 export function isRenderedElement(
-  element: HTMLElement,
+  element: Element,
   style: CSSStyleDeclaration,
   rootRect: DOMRectReadOnly,
 ): boolean {

@@ -1,0 +1,9 @@
+{
+  "id": "5e206af1d674",
+  "source": "references/GordenPPTSkill/templates/mckinsey-style/template.pptx",
+  "sourceSha256": "4318e0275748feb5bdea2bf81819312f99f97474fc37a88b25f62ca01b143b8c",
+  "pages": 37,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

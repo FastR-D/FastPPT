@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import {
   mkdirSync,
   mkdtempSync,
@@ -125,6 +126,50 @@ describe('workspace files', () => {
     await expect(workspace.readTextFile('large.md')).rejects.toMatchObject({
       code: 'FILE_TOO_LARGE',
     })
+  })
+
+  it('honors root and nested gitignore files before counting tree entries', async () => {
+    const root = temporaryDirectory('fastppt-gitignore-workspace-')
+    execFileSync('git', ['init', '-q'], { cwd: root })
+    writeFileSync(join(root, '.gitignore'), 'generated/\n')
+    mkdirSync(join(root, 'generated', 'nested'), { recursive: true })
+    writeFileSync(join(root, 'generated', 'large.json'), '{}')
+    mkdirSync(join(root, 'src'))
+    writeFileSync(join(root, 'src', '.gitignore'), '*.tmp\ncache/\n')
+    writeFileSync(join(root, 'src', 'notes.tmp'), 'ignored')
+    mkdirSync(join(root, 'src', 'cache'))
+    writeFileSync(join(root, 'src', 'cache', 'index.json'), '{}')
+    writeFileSync(join(root, 'src', 'slides.md'), '# Visible\n')
+
+    const workspace = await WorkspaceService.create(root, {
+      maxTreeEntries: 4,
+    })
+    const files = await workspace.listFiles()
+    expect(files.map((node) => node.name)).toEqual(['.gitignore', 'src'])
+    expect(files.find((node) => node.name === 'src')?.children).toEqual([
+      expect.objectContaining({ name: '.gitignore' }),
+      expect.objectContaining({ name: 'slides.md' }),
+    ])
+  })
+
+  it('ignores an enclosing repository rule that hides a nested workspace', async () => {
+    const repository = temporaryDirectory('fastppt-enclosing-repo-')
+    execFileSync('git', ['init', '-q'], { cwd: repository })
+    writeFileSync(join(repository, '.gitignore'), 'examples/\n')
+    const root = join(repository, 'examples', 'demo-deck')
+    mkdirSync(join(root, 'assets'), { recursive: true })
+    writeFileSync(join(root, 'slides.md'), '# Visible\n')
+    writeFileSync(join(root, 'assets', 'logo.png'), 'image')
+
+    const workspace = await WorkspaceService.create(root)
+    expect((await workspace.listFiles()).map((node) => node.name)).toEqual([
+      'assets',
+      'slides.md',
+    ])
+    expect(
+      (await workspace.listFiles()).find((node) => node.name === 'assets')
+        ?.children,
+    ).toEqual([expect.objectContaining({ name: 'logo.png' })])
   })
 
   it('resolves only contained supported image attachments', async () => {

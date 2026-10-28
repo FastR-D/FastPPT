@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {
+  useColorMode,
+  Box,
+  Button,
+  Header,
+  Panel,
+  Text,
+} from '@fastppt/components'
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
 import type { EditorView } from '@codemirror/view'
 
@@ -18,14 +26,16 @@ const emit = defineEmits<{
 }>()
 
 const editorElement = useTemplateRef<HTMLDivElement>('editorElement')
+const { isDark } = useColorMode()
 let editorView: EditorView | undefined
+let updateTheme: (() => void) | undefined
 
 onMounted(async () => {
   if (!editorElement.value) return
   const [
     { basicSetup },
     { markdown },
-    { EditorState },
+    { EditorState, Compartment },
     { oneDark },
     { EditorView, keymap },
   ] = await Promise.all([
@@ -36,6 +46,11 @@ onMounted(async () => {
     import('@codemirror/view'),
   ])
   if (!editorElement.value) return // 等待期间组件已卸载(如切换文件),不再创建编辑器
+  const theme = new Compartment()
+  updateTheme = () =>
+    editorView?.dispatch({
+      effects: theme.reconfigure(isDark.value ? oneDark : []),
+    })
   editorView = new EditorView({
     parent: editorElement.value,
     state: EditorState.create({
@@ -43,7 +58,28 @@ onMounted(async () => {
       extensions: [
         basicSetup,
         markdown(),
-        oneDark,
+        theme.of(isDark.value ? oneDark : []),
+        EditorView.theme({
+          '&': {
+            color: 'var(--color-text)',
+            backgroundColor: 'var(--color-panel)',
+          },
+          '.cm-content': {
+            caretColor: 'var(--color-accent-strong)',
+            padding: '12px 0',
+          },
+          '.cm-gutters': {
+            backgroundColor: 'var(--color-panel-raised)',
+            color: 'var(--color-muted)',
+            borderRight: '1px solid var(--color-border)',
+          },
+          '.cm-activeLine, .cm-activeLineGutter': {
+            backgroundColor: 'var(--color-selected)',
+          },
+          '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection':
+            { backgroundColor: 'var(--color-selected)' },
+          '&.cm-focused': { outline: 'none' },
+        }),
         EditorView.lineWrapping,
         keymap.of([
           {
@@ -82,48 +118,51 @@ watch(
   },
 )
 
+watch(isDark, () => updateTheme?.())
 onBeforeUnmount(() => editorView?.destroy())
 </script>
 
 <template>
-  <section class="markdown-editor">
-    <header class="editor-toolbar">
-      <div class="file-identity">
-        <span class="file-path">{{ path }}</span>
-        <span v-if="dirty" class="dirty-mark">未保存</span>
-      </div>
-      <div class="editor-actions">
-        <button
+  <Panel class="markdown-editor">
+    <Header class="editor-toolbar">
+      <Box class="file-identity">
+        <Text class="file-path">{{ path }}</Text>
+        <Text v-if="dirty" class="dirty-mark">未保存</Text>
+      </Box>
+      <Box class="editor-actions">
+        <Button
+          variant="secondary"
           type="button"
           :disabled="dirty || saving"
           @click="$emit('format')"
         >
           格式化
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="primary"
           type="button"
           :disabled="!dirty || saving"
           @click="$emit('save')"
         >
           {{ saving ? '保存中…' : '保存' }}
-        </button>
-      </div>
-    </header>
-    <div
+        </Button>
+      </Box>
+    </Header>
+    <Box
       v-if="error"
       class="editor-error"
       :class="{ conflict: externalChange }"
     >
       {{ error }}
-    </div>
-    <div ref="editorElement" class="editor-mount"></div>
-  </section>
+    </Box>
+    <Box ref="editorElement" class="editor-mount"></Box>
+  </Panel>
 </template>
 
 <style scoped>
 .markdown-editor {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   min-height: 0;
 }
 
@@ -159,23 +198,8 @@ onBeforeUnmount(() => editorView?.destroy())
 }
 
 .dirty-mark {
-  color: #fcd34d;
+  color: var(--color-warning);
   font-size: 10px;
-}
-
-.editor-toolbar button {
-  padding: 6px 11px;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 6px;
-  background: var(--color-accent);
-  color: #071612;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.editor-toolbar button:disabled {
-  background: var(--color-disabled);
-  color: var(--color-muted);
 }
 
 .editor-error {
@@ -187,17 +211,18 @@ onBeforeUnmount(() => editorView?.destroy())
 
 .editor-error.conflict {
   background: rgb(252 211 77 / 10%);
-  color: #fcd34d;
+  color: var(--color-warning);
 }
 
 .editor-mount {
+  flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
 .editor-mount :deep(.cm-editor) {
   height: 100%;
-  background: #0d1210;
+  background: var(--color-panel);
   font-family: var(--font-mono);
   font-size: 12px;
 }

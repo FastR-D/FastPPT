@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "xiaomi.ending-position",
+      "kind": "layout-position",
+      "layout": "ending",
+      "positions": ["last"],
+      "severity": "warning",
+      "provenance": "derived",
+      "message": "ending 布局用于收尾。"
+    }
+  ]
+}

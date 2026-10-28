@@ -1,0 +1,9 @@
+{
+  "id": "e48d83706172",
+  "source": "references/pptset/01-【红蓝】50页工作汇报专用PPT模板.pptx",
+  "sourceSha256": "23979d658f5c428482bd867168f4213ff39833e68146af33c15018e03453a256",
+  "pages": 69,
+  "pdf": "01-【红蓝】50页工作汇报专用PPT模板.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

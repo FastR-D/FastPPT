@@ -3,6 +3,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 import vue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
+import componentBoundaries from './scripts/eslint-ui-boundaries.mjs'
 
 export default tseslint.config(
   {
@@ -60,6 +61,14 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
       globals: globals.browser,
+    },
+  },
+  {
+    files: ['apps/web/src/**/*.vue'],
+    plugins: { components: componentBoundaries },
+    rules: {
+      'components/no-native-elements': 'error',
+      'vue/no-undef-components': ['error', { ignorePatterns: ['RouterView'] }],
     },
   },
   {

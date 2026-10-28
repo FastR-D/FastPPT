@@ -1,0 +1,2054 @@
+{
+  "reproducer": "tests/e2e/scripts/tabs-compatibility.ts",
+  "reproducerSha256": "9d193c61a31af1047eee991582cdb5ac6f99766810a6ecb9febc568bd119a995",
+  "generatedAt": "2026-10-08T22:47:50.676Z",
+  "renderer": "LibreOffice 7.3.7.2 30(Build:2)",
+  "applicationScope": "LibreOffice PDF export only. Center/right/decimal cases probe native contracts, not browser support. XML diagnostics remove indent; they are not production output or application editing evidence.",
+  "tolerancePoints": 0.25,
+  "warnings": [
+    {
+      "code": "text-tab-compatibility",
+      "elementId": "body",
+      "message": "Paragraph 1: native tab stops and characters are preserved. LibreOffice 7.3.7.2 can reset stops when an indent is specified and ignore custom default spacing or an empty stop list; verify in the target application."
+    }
+  ],
+  "native": {
+    "kind": "actual-native-export",
+    "pptxSha256": "4b5230337c7504c5ceab6337edad56accff6e495bc0c8b134f90b5bbf1f4f6e3",
+    "pdfSha256": "adb4b3e3a9074d9cbe728fab77be1e911cb0ec2b27f0889c8d3a95b81e0d3c78",
+    "pageCount": 33,
+    "results": [
+      {
+        "name": "default",
+        "page": 1,
+        "intended": [
+          40,
+          112,
+          184
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          },
+          {
+            "text": "C",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "margin",
+        "page": 2,
+        "intended": [
+          80,
+          152,
+          224
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "B",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          },
+          {
+            "text": "C",
+            "x": 223.994,
+            "y": 46.97865,
+            "end": 236.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "positive-indent",
+        "page": 3,
+        "intended": [
+          100,
+          152,
+          224
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 100.006,
+            "y": 46.97865,
+            "end": 112.0138
+          },
+          {
+            "text": "B",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          },
+          {
+            "text": "C",
+            "x": 223.994,
+            "y": 46.97865,
+            "end": 236.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "negative-indent",
+        "page": 4,
+        "intended": [
+          40,
+          80,
+          152
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "C",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "long-negative-indent",
+        "page": 5,
+        "intended": [
+          90,
+          240,
+          312
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 90,
+            "y": 46.97865,
+            "end": 102.0078
+          },
+          {
+            "text": "B",
+            "x": 240.009,
+            "y": 46.97865,
+            "end": 252.0168
+          },
+          {
+            "text": "C",
+            "x": 312.009,
+            "y": 46.97865,
+            "end": 324.0168
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "consecutive",
+        "page": 6,
+        "intended": [
+          40,
+          184
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "explicit",
+        "page": 7,
+        "intended": [
+          40,
+          190,
+          302.5,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          },
+          {
+            "text": "C",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          },
+          {
+            "text": "D",
+            "x": 255.997,
+            "y": 46.97865,
+            "end": 268.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184,
+          256
+        ]
+      },
+      {
+        "name": "explicit-margin",
+        "page": 8,
+        "intended": [
+          80,
+          230,
+          342.5,
+          368
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "B",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          },
+          {
+            "text": "C",
+            "x": 223.994,
+            "y": 46.97865,
+            "end": 236.0018
+          },
+          {
+            "text": "D",
+            "x": 295.994,
+            "y": 46.97865,
+            "end": 308.0018
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          80,
+          152,
+          224,
+          296
+        ]
+      },
+      {
+        "name": "custom-default",
+        "page": 9,
+        "intended": [
+          40,
+          88,
+          136
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          },
+          {
+            "text": "C",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "zero-default-explicit",
+        "page": 10,
+        "intended": [
+          40,
+          190,
+          302.5
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          },
+          {
+            "text": "C",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "inherited",
+        "page": 11,
+        "intended": [
+          40,
+          190
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ]
+      },
+      {
+        "name": "empty-clears-inherited",
+        "page": 12,
+        "intended": [
+          40,
+          112
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-diagnostic-contract",
+        "page": 13,
+        "intended": [
+          40,
+          178
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ]
+      },
+      {
+        "name": "right-diagnostic-contract",
+        "page": 14,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ]
+      },
+      {
+        "name": "decimal-diagnostic-contract",
+        "page": 15,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12.34",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 172.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ]
+      },
+      {
+        "name": "center-multiple",
+        "page": 16,
+        "intended": [
+          40,
+          178,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "center-empty-field",
+        "page": 17,
+        "intended": [
+          40,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          184
+        ]
+      },
+      {
+        "name": "center-soft-break",
+        "page": 18,
+        "intended": [
+          40,
+          178,
+          40,
+          178
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "X",
+            "x": 39.997,
+            "y": 76.99665,
+            "end": 52.0048
+          },
+          {
+            "text": "YY",
+            "x": 111.997,
+            "y": 76.99665,
+            "end": 136.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          40,
+          112
+        ]
+      },
+      {
+        "name": "center-default-after-explicit",
+        "page": 19,
+        "intended": [
+          40,
+          178,
+          256
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "center-cross-run",
+        "page": 20,
+        "intended": [
+          40,
+          178,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "center-zero-default",
+        "page": 21,
+        "intended": [
+          40,
+          178,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "center-clamped-long-field",
+        "page": 22,
+        "intended": [
+          40,
+          52,
+          400
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "ABCDEFGHIJKLMNOPQRSTUVWX",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 400.1842
+          },
+          {
+            "text": "Z",
+            "x": 471.997,
+            "y": 46.97865,
+            "end": 484.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          472
+        ],
+        "expectationNote": "The zero-width tab lets the first two runs touch; pdftotext merges them into one word. Inspect its end position as well."
+      },
+      {
+        "name": "right-multiple",
+        "page": 23,
+        "intended": [
+          40,
+          166,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "right-empty-field",
+        "page": 24,
+        "intended": [
+          40,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          184
+        ]
+      },
+      {
+        "name": "right-soft-break",
+        "page": 25,
+        "intended": [
+          40,
+          166,
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "X",
+            "x": 39.997,
+            "y": 76.99665,
+            "end": 52.0048
+          },
+          {
+            "text": "YY",
+            "x": 111.997,
+            "y": 76.99665,
+            "end": 136.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          40,
+          112
+        ]
+      },
+      {
+        "name": "right-default-after-explicit",
+        "page": 26,
+        "intended": [
+          40,
+          166,
+          256
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "right-cross-run",
+        "page": 27,
+        "intended": [
+          40,
+          166,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "right-zero-default",
+        "page": 28,
+        "intended": [
+          40,
+          166,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 136.0126
+          },
+          {
+            "text": "CC",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 208.0126
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "right-clamped-long-field",
+        "page": 29,
+        "intended": [
+          40,
+          52,
+          400
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "ABCDEFGHIJKLMNOPQRSTUVWX",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 400.1842
+          },
+          {
+            "text": "Z",
+            "x": 471.997,
+            "y": 46.97865,
+            "end": 484.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          472
+        ],
+        "expectationNote": "The zero-width tab lets the first two runs touch; pdftotext merges them into one word. Inspect its end position as well."
+      },
+      {
+        "name": "decimal-de-DE-comma-probe",
+        "page": 30,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12,34",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 172.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ],
+        "language": "de-DE",
+        "expectationNote": "Probe of the conventional comma separator for this run language. DrawingML has no separator attribute; this expectation is not an application support claim."
+      },
+      {
+        "name": "decimal-de-DE-period-probe",
+        "page": 31,
+        "intended": [
+          40,
+          130
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12.34",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 172.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ],
+        "language": "de-DE",
+        "expectationNote": "Probe of a period in a comma-decimal language. The renderer can use its own decimal convention despite the saved run language."
+      },
+      {
+        "name": "decimal-fr-FR-comma-probe",
+        "page": 32,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12,34",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 172.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ],
+        "language": "fr-FR",
+        "expectationNote": "Probe of the conventional comma separator for this run language. DrawingML has no separator attribute; this expectation is not an application support claim."
+      },
+      {
+        "name": "decimal-fr-FR-period-probe",
+        "page": 33,
+        "intended": [
+          40,
+          130
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12.34",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 172.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112
+        ],
+        "language": "fr-FR",
+        "expectationNote": "Probe of a period in a comma-decimal language. The renderer can use its own decimal convention despite the saved run language."
+      }
+    ]
+  },
+  "diagnostic": {
+    "kind": "diagnostic-with-indent-removed",
+    "pptxSha256": "765031bc499c22c889575479fdf75a12cef920ac0cdd2afa52ab91af5e72b3c4",
+    "pdfSha256": "f4b83effc2567914f3a0adbfa07c1ea7a829e131b2c0ce413295b1bd0f78611d",
+    "pageCount": 33,
+    "results": [
+      {
+        "name": "default",
+        "page": 1,
+        "intended": [
+          40,
+          112,
+          184
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          },
+          {
+            "text": "C",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "margin",
+        "page": 2,
+        "intended": [
+          80,
+          152,
+          224
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "B",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          },
+          {
+            "text": "C",
+            "x": 223.994,
+            "y": 46.97865,
+            "end": 236.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "positive-indent",
+        "page": 3,
+        "intended": [
+          80,
+          152,
+          224
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "B",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          },
+          {
+            "text": "C",
+            "x": 223.994,
+            "y": 46.97865,
+            "end": 236.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "negative-indent",
+        "page": 4,
+        "intended": [
+          80,
+          152,
+          224
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "B",
+            "x": 151.994,
+            "y": 46.97865,
+            "end": 164.0018
+          },
+          {
+            "text": "C",
+            "x": 223.994,
+            "y": 46.97865,
+            "end": 236.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "long-negative-indent",
+        "page": 5,
+        "intended": [
+          240,
+          312,
+          384
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 240.009,
+            "y": 46.97865,
+            "end": 252.0168
+          },
+          {
+            "text": "B",
+            "x": 312.009,
+            "y": 46.97865,
+            "end": 324.0168
+          },
+          {
+            "text": "C",
+            "x": 384.009,
+            "y": 46.97865,
+            "end": 396.0168
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "consecutive",
+        "page": 6,
+        "intended": [
+          40,
+          184
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "explicit",
+        "page": 7,
+        "intended": [
+          40,
+          190,
+          302.5,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 190.006,
+            "y": 46.97865,
+            "end": 202.0138
+          },
+          {
+            "text": "C",
+            "x": 302.513,
+            "y": 46.97865,
+            "end": 314.5208
+          },
+          {
+            "text": "D",
+            "x": 327.997,
+            "y": 46.97865,
+            "end": 340.0048
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "explicit-margin",
+        "page": 8,
+        "intended": [
+          80,
+          230,
+          342.5,
+          368
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 79.994,
+            "y": 46.97865,
+            "end": 92.0018
+          },
+          {
+            "text": "B",
+            "x": 230.003,
+            "y": 46.97865,
+            "end": 242.0108
+          },
+          {
+            "text": "C",
+            "x": 342.51,
+            "y": 46.97865,
+            "end": 354.5178
+          },
+          {
+            "text": "D",
+            "x": 367.994,
+            "y": 46.97865,
+            "end": 380.0018
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "custom-default",
+        "page": 9,
+        "intended": [
+          40,
+          88,
+          136
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 111.997,
+            "y": 46.97865,
+            "end": 124.0048
+          },
+          {
+            "text": "C",
+            "x": 183.997,
+            "y": 46.97865,
+            "end": 196.0048
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          112,
+          184
+        ]
+      },
+      {
+        "name": "zero-default-explicit",
+        "page": 10,
+        "intended": [
+          40,
+          190,
+          302.5
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 190.006,
+            "y": 46.97865,
+            "end": 202.0138
+          },
+          {
+            "text": "C",
+            "x": 302.513,
+            "y": 46.97865,
+            "end": 314.5208
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "inherited",
+        "page": 11,
+        "intended": [
+          40,
+          190
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 190.006,
+            "y": 46.97865,
+            "end": 202.0138
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "empty-clears-inherited",
+        "page": 12,
+        "intended": [
+          40,
+          112
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "B",
+            "x": 190.006,
+            "y": 46.97865,
+            "end": 202.0138
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          190
+        ]
+      },
+      {
+        "name": "center-diagnostic-contract",
+        "page": 13,
+        "intended": [
+          40,
+          178
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 177.987,
+            "y": 46.97865,
+            "end": 202.0026
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-diagnostic-contract",
+        "page": 14,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 190.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "decimal-diagnostic-contract",
+        "page": 15,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12.34",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 226.036
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-multiple",
+        "page": 16,
+        "intended": [
+          40,
+          178,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 177.987,
+            "y": 46.97865,
+            "end": 202.0026
+          },
+          {
+            "text": "CC",
+            "x": 327.997,
+            "y": 46.97865,
+            "end": 352.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-empty-field",
+        "page": 17,
+        "intended": [
+          40,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "CC",
+            "x": 327.997,
+            "y": 46.97865,
+            "end": 352.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-soft-break",
+        "page": 18,
+        "intended": [
+          40,
+          178,
+          40,
+          178
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 177.987,
+            "y": 46.97865,
+            "end": 202.0026
+          },
+          {
+            "text": "X",
+            "x": 39.997,
+            "y": 76.99665,
+            "end": 52.0048
+          },
+          {
+            "text": "YY",
+            "x": 177.987,
+            "y": 76.99665,
+            "end": 202.0026
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-default-after-explicit",
+        "page": 19,
+        "intended": [
+          40,
+          178,
+          256
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 177.987,
+            "y": 46.97865,
+            "end": 202.0026
+          },
+          {
+            "text": "CC",
+            "x": 255.997,
+            "y": 46.97865,
+            "end": 280.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-cross-run",
+        "page": 20,
+        "intended": [
+          40,
+          178,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 177.987,
+            "y": 46.97865,
+            "end": 202.0026
+          },
+          {
+            "text": "CC",
+            "x": 327.997,
+            "y": 46.97865,
+            "end": 352.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-zero-default",
+        "page": 21,
+        "intended": [
+          40,
+          178,
+          328
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 177.987,
+            "y": 46.97865,
+            "end": 202.0026
+          },
+          {
+            "text": "CC",
+            "x": 327.997,
+            "y": 46.97865,
+            "end": 352.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "center-clamped-long-field",
+        "page": 22,
+        "intended": [
+          40,
+          400
+        ],
+        "observed": [
+          {
+            "text": "AABCDEFGHIJKLMNOPQRSTUVWX",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 340.1742
+          },
+          {
+            "text": "Z",
+            "x": 399.997,
+            "y": 46.97865,
+            "end": 412.0048
+          }
+        ],
+        "status": "matched",
+        "expectationNote": "The zero-width tab lets the first two runs touch; pdftotext merges them into one word. Inspect its end position as well."
+      },
+      {
+        "name": "right-multiple",
+        "page": 23,
+        "intended": [
+          40,
+          166,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 190.0126
+          },
+          {
+            "text": "CC",
+            "x": 316.006,
+            "y": 46.97865,
+            "end": 339.921535
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-empty-field",
+        "page": 24,
+        "intended": [
+          40,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "CC",
+            "x": 316.006,
+            "y": 46.97865,
+            "end": 339.921535
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-soft-break",
+        "page": 25,
+        "intended": [
+          40,
+          166,
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 190.0126
+          },
+          {
+            "text": "X",
+            "x": 39.997,
+            "y": 76.99665,
+            "end": 52.0048
+          },
+          {
+            "text": "YY",
+            "x": 165.997,
+            "y": 76.99665,
+            "end": 190.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-default-after-explicit",
+        "page": 26,
+        "intended": [
+          40,
+          166,
+          256
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 190.0126
+          },
+          {
+            "text": "CC",
+            "x": 255.997,
+            "y": 46.97865,
+            "end": 280.0126
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-cross-run",
+        "page": 27,
+        "intended": [
+          40,
+          166,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 190.0126
+          },
+          {
+            "text": "CC",
+            "x": 316.006,
+            "y": 46.97865,
+            "end": 339.921535
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-zero-default",
+        "page": 28,
+        "intended": [
+          40,
+          166,
+          316
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "BB",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 190.0126
+          },
+          {
+            "text": "CC",
+            "x": 316.006,
+            "y": 46.97865,
+            "end": 339.921535
+          }
+        ],
+        "status": "matched"
+      },
+      {
+        "name": "right-clamped-long-field",
+        "page": 29,
+        "intended": [
+          40,
+          400
+        ],
+        "observed": [
+          {
+            "text": "AABCDEFGHIJKLMNOPQRSTUVWX",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 340.1742
+          },
+          {
+            "text": "Z",
+            "x": 399.997,
+            "y": 46.97865,
+            "end": 412.0048
+          }
+        ],
+        "status": "matched",
+        "expectationNote": "The zero-width tab lets the first two runs touch; pdftotext merges them into one word. Inspect its end position as well."
+      },
+      {
+        "name": "decimal-de-DE-comma-probe",
+        "page": 30,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12,34",
+            "x": 129.997,
+            "y": 46.97865,
+            "end": 190.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          130
+        ],
+        "language": "de-DE",
+        "expectationNote": "Probe of the conventional comma separator for this run language. DrawingML has no separator attribute; this expectation is not an application support claim."
+      },
+      {
+        "name": "decimal-de-DE-period-probe",
+        "page": 31,
+        "intended": [
+          40,
+          130
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12.34",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 226.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          166
+        ],
+        "language": "de-DE",
+        "expectationNote": "Probe of a period in a comma-decimal language. The renderer can use its own decimal convention despite the saved run language."
+      },
+      {
+        "name": "decimal-fr-FR-comma-probe",
+        "page": 32,
+        "intended": [
+          40,
+          166
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12,34",
+            "x": 129.997,
+            "y": 46.97865,
+            "end": 190.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          130
+        ],
+        "language": "fr-FR",
+        "expectationNote": "Probe of the conventional comma separator for this run language. DrawingML has no separator attribute; this expectation is not an application support claim."
+      },
+      {
+        "name": "decimal-fr-FR-period-probe",
+        "page": 33,
+        "intended": [
+          40,
+          130
+        ],
+        "observed": [
+          {
+            "text": "A",
+            "x": 39.997,
+            "y": 46.97865,
+            "end": 52.0048
+          },
+          {
+            "text": "12.34",
+            "x": 165.997,
+            "y": 46.97865,
+            "end": 226.036
+          }
+        ],
+        "status": "known-difference",
+        "known": [
+          40,
+          166
+        ],
+        "language": "fr-FR",
+        "expectationNote": "Probe of a period in a comma-decimal language. The renderer can use its own decimal convention despite the saved run language."
+      }
+    ]
+  }
+}

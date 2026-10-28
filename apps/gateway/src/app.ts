@@ -1,11 +1,25 @@
+import { registerAnimationRoutes } from './animations.js'
+import { ANIMATION_AUTHORING_GUIDANCE } from '@fastppt/animations'
+import { registerResourceRoutes } from './resources.js'
+import { RESOURCE_AUTHORING_GUIDANCE } from '@fastppt/resources'
+import { PALETTE_AUTHORING_GUIDANCE } from '@fastppt/palettes'
+import { registerPaletteRoutes } from './palettes.js'
+import { withThemeAnchors } from './theme-anchors.js'
+import { withGeneratedCandidates } from './import-candidates.js'
+import { themeRuleSlides, type RuleMeasurement } from './theme-rule-context.js'
+import { evaluateImportRuleApproval } from './theme-rule-approval.js'
+import { applyRuleExceptions, authoredRuleDigest, blockingRuleIssue, ruleExceptionState, ruleIssueFingerprint, ruleOptionsDigest, sameRuleBinding, ThemeRuleExceptionStore } from './theme-rule-exceptions.js'
+import { installThemeDirectory } from './theme-install.js'
 import { spawn } from 'node:child_process'
 import { createHash, randomUUID } from 'node:crypto'
 import { createReadStream, watch, type FSWatcher } from 'node:fs'
 import {
   access,
   chmod,
+  copyFile,
   mkdir,
   readFile,
+  readdir,
   rename,
   rm,
   writeFile,
@@ -26,6 +40,16 @@ import { fileURLToPath } from 'node:url'
 import cors from '@fastify/cors'
 import websocket from '@fastify/websocket'
 import { createDatabase } from '@fastppt/database'
+import {
+  DiagramDocumentV1Schema,
+  renderDiagram,
+  validateDiagram,
+} from '@fastppt/diagram-engine'
+import { analyzePptx } from '@fastppt/pptx-import'
+import {
+  compileDeck,
+  persistDeckIdentities,
+} from '@fastppt/presentation-compiler'
 import { listCollections, searchIcons } from '@fastppt/icons'
 import { resolveFastPptMcpCliEntry } from '@fastppt/fastppt-mcp'
 import { runThemeExtraction } from '@fastppt/fastppt-mcp'
@@ -38,6 +62,7 @@ import {
   isPrettyLoggingEnabled,
   redactSensitiveText,
 } from '@fastppt/logger'
+import { parseSlidevDocument } from '@fastppt/markdown/parser'
 import { SlidevFormatError, formatSlidevMarkdown } from '@fastppt/markdown'
 import {
   FileContentSchema,
@@ -48,6 +73,14 @@ import {
   IconCollectionSummarySchema,
   IconSearchResponseSchema,
   ThemeSummarySchema,
+  ThemeRuleApprovalReportSchema,
+  ThemeRuleExceptionContextRequestSchema,
+  ApproveThemeRuleExceptionSchema,
+  ThemeRuleExceptionReviewSchema,
+  ThemeRuleExceptionSchema,
+  type ThemeRuleExceptionBinding,
+  type ThemeRuleExceptionContextRequest,
+  type ThemeRuleIssue,
   ThemeSkillDocumentSchema,
   ThemeSkillStatusSchema,
   WriteFileRequestSchema,
@@ -55,14 +88,24 @@ import {
   WorkspaceImageAssetSchema,
   WorkspaceInfoSchema,
   DeckSummarySchema,
+  DeckValidationResultSchema,
   ApprovalDecisionRequestSchema,
   ApprovalRequestSchema,
   ApplicationStateSchema,
   CreateExportRequestSchema,
+  DeckAnimationsDocumentSchema,
+  DeckNotesDocumentSchema,
+  ExportCapabilityReportSchema,
+  PutDiagramDocumentSchema,
+  CreationWizardSchema,
+  CreationDecisionV1Schema,
   ReviewExportRequestSchema,
   ImportPptxThemeRequestSchema,
   ImportPptxThemeResultSchema,
   ImportPptxThemeStatusSchema,
+  ImportAnalysisV1Schema,
+  MasterSnapshotV1Schema,
+  NativeMasterLayoutSchema,
   CreateSessionRequestSchema,
   SessionDeckProfileSchema,
   SessionProfileRecordSchema,
@@ -82,6 +125,8 @@ import {
   ImageRunSchema,
   RegisterImageAssetRequestSchema,
   SlidewaveSnapshotSchema,
+  cuesToSrt,
+  NarrationProviderStatusV1Schema,
   type ApiErrorBody,
   type WorkspaceInfo,
   type SessionDeckProfile,
@@ -90,8 +135,12 @@ import { cleanupStaleSlidevCaches, SlidevHost } from '@fastppt/slidev-host'
 import { classifySlidevLogLine } from './slidev-logs.js'
 import { ensureWorkspaceGitignore } from './workspace-gitignore.js'
 import {
+  evaluateThemeRules,
   loadThemeRegistry,
   ThemeRegistryError,
+  ThemeRulesDocumentSchema,
+  themeRulesDigest,
+  themeContentDigest,
   type ThemeRegistry,
 } from '@fastppt/theme-registry'
 import {
@@ -221,6 +270,15 @@ function sessionBrief(profile: SessionDeckProfile): string {
     }`,
     `preservation: ${JSON.stringify(profile.preservation)}`,
     `review_policy: ${profile.reviewPolicy}`,
+    ...(profile.creationDecisions
+      ? [
+          `creation_decisions: ${JSON.stringify(profile.creationDecisions)}`,
+          'Preserve locked creation decisions. Ask for an explicit user revision before changing them.',
+        ]
+      : []),
+    ...(profile.deliveryOptions
+      ? [`delivery_options: ${JSON.stringify(profile.deliveryOptions)}`]
+      : []),
     'Treat this brief as confirmed session configuration. Do not ask the user to repeat it unless the current request conflicts with it.',
     '</fastppt-session-brief>',
   ].join('\n')
@@ -234,8 +292,10 @@ const ADAPTER_NOT_FOUND_CODES = new Set([
   'RUN_NOT_FOUND',
   'SESSION_NOT_FOUND',
 ])
-
 const ADAPTER_CONFLICT_CODES = new Set([
+  'THEME_RULES_STALE',
+  'THEME_RULE_APPROVAL_FAILED',
+  'THEME_RULE_EXCEPTION_STALE',
   'EXPORT_NOT_READY',
   'INSPECTION_NOT_READY',
   'RUN_ALREADY_ACTIVE',
@@ -631,7 +691,7 @@ export async function createGateway(
       enabled: true,
     })
   let skillInstaller = createSkillInstaller(themeRegistry)
-  let skillReport = await skillInstaller.reconcile({ cleanStale: true })
+  let skillReport = await skillInstaller.reconcile({ cleanStale: true, unloadThemes: true })
   database.recordManagedInstallations(skillReport.statuses)
   const themeStateLock = new AsyncReadWriteLock()
   app.log.info(
@@ -777,6 +837,18 @@ export async function createGateway(
     outputRoot: exportRoot,
     ...(options.exporter ? { exporter: options.exporter } : {}),
     captureTimeoutMs: config.exportTimeoutMs,
+    async verifyRuleContext(job, exportOptions) {
+      const binding = job.themeRules?.binding
+      if (!binding) return
+      const deck = await resolveDeck(job.deckId)
+      const current = await currentRuleBinding(deck, binding.profileDigest, exportOptions)
+      if (!sameRuleBinding(binding, current)) throw new Error('Rule exception context changed. Review and export the current deck again.')
+      const entries = await ruleExceptionStore.list(deck.id)
+      for (const frozen of job.themeRules?.exceptions ?? []) {
+        const live = entries.find(entry => entry.id === frozen.id)
+        if (!live || ruleExceptionState(live, current) !== 'active' || JSON.stringify(live) !== JSON.stringify(frozen)) throw new Error('A frozen rule exception was revoked or changed. Export the current deck again.')
+      }
+    },
     onUpdate(job) {
       database.recordExportJob(job, join(exportRoot, job.id, job.outputName))
       eventHub.publish(`export:${job.id}`, 'export.updated', job)
@@ -796,6 +868,7 @@ export async function createGateway(
       )
     },
   })
+  await exportManager.ready()
   const inspectionManager = new BrowserInspectionManager({
     timeoutMs: config.exportTimeoutMs,
     onUpdate(job) {
@@ -1001,7 +1074,35 @@ export async function createGateway(
   app.get('/*', proxySlidevRootResource)
   app.post('/@server-reactive/*', proxySlidevRootResource)
   const listDecks = async (): Promise<DeckSummary[]> => {
-    const paths = collectMarkdownPaths(await workspaceFiles.listFiles())
+    const sampleDirectory = join(workspace.root, 'theme-samples')
+    const samplePaths = await readdir(sampleDirectory, {
+      withFileTypes: true,
+    })
+      .then((entries) =>
+        entries
+          .filter(
+            (entry) =>
+              entry.isFile() &&
+              entry.name.startsWith('slidev-theme-') &&
+              entry.name.endsWith('.md'),
+          )
+          .map((entry) => `theme-samples/${entry.name}`),
+      )
+      .catch((cause: unknown) => {
+        if (
+          cause instanceof Error &&
+          'code' in cause &&
+          cause.code === 'ENOENT'
+        )
+          return []
+        throw cause
+      })
+    const paths = [
+      ...new Set([
+        ...collectMarkdownPaths(await workspaceFiles.listFiles()),
+        ...samplePaths,
+      ]),
+    ]
     const candidates = await Promise.all(
       paths.map(async (entryFile) => {
         const file = await workspaceFiles.readTextFile(entryFile)
@@ -1038,9 +1139,186 @@ export async function createGateway(
     return deck
   }
 
-  const validateDeck = async (deck: DeckSummary) => {
+  const deckDocumentPath = (deckId: string, name: string): string =>
+    join(config.workspaceRoot, '.fastppt', 'decks', deckId, name)
+  const ruleExceptionStore = new ThemeRuleExceptionStore(deckId => deckDocumentPath(deckId, 'theme-rule-exceptions.json'))
+  const readDeckDocument = async <T>(
+    deckId: string,
+    name: string,
+    schema: z.ZodType<T>,
+    fallback?: T,
+  ): Promise<T> => {
+    try {
+      return schema.parse(
+        JSON.parse(await readFile(deckDocumentPath(deckId, name), 'utf8')),
+      )
+    } catch (cause) {
+      if (
+        (cause as NodeJS.ErrnoException).code === 'ENOENT' &&
+        fallback !== undefined
+      )
+        return fallback
+      throw cause
+    }
+  }
+  const writeDeckDocument = async (
+    deckId: string,
+    name: string,
+    value: unknown,
+  ): Promise<void> => {
+    const target = deckDocumentPath(deckId, name)
+    await mkdir(dirname(target), { recursive: true })
+    const temporary = `${target}.${randomUUID()}.tmp`
+    await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
+    await rename(temporary, target)
+  }
+
+  const compileWithThemeAnchors = async (
+    deck: DeckSummary,
+    markdown: string,
+  ) => {
+    const slides = compileDeck(markdown)
+    if (!deck.themeId) return slides
+    const theme = themeRegistry.resolve(deck.themeId)
+    try {
+      const definitions = z
+        .array(NativeMasterLayoutSchema)
+        .parse(
+          JSON.parse(
+            await readFile(
+              join(theme.packageRoot, 'agent', 'native-layouts.json'),
+              'utf8',
+            ),
+          ),
+        )
+      return withThemeAnchors(slides, definitions)
+    } catch (cause) {
+      if (cause instanceof Error && 'code' in cause && cause.code === 'ENOENT')
+        return slides
+      throw cause
+    }
+  }
+
+  const lockedMasterDigest = async (deckId: string): Promise<string | null> => {
+    const snapshot = await readDeckDocument(deckId, 'theme-lock.json', MasterSnapshotV1Schema).catch((cause: unknown) => {
+      if (cause instanceof Error && 'code' in cause && cause.code === 'ENOENT') return undefined
+      throw cause
+    })
+    return snapshot ? createHash('sha256').update(JSON.stringify(snapshot)).digest('hex') : null
+  }
+  const currentRuleBinding = async (deck: DeckSummary, profileDigest: string | null, exportOptions?: unknown): Promise<ThemeRuleExceptionBinding> => {
+    const theme = deck.themeId ? themeRegistry.resolve(deck.themeId) : undefined
+    const rules = theme?.machineRulesPath ? ThemeRulesDocumentSchema.parse(JSON.parse(await readFile(theme.machineRulesPath, 'utf8'))) : undefined
+    return {
+      deckId: deck.id, revision: (await workspaceFiles.readTextFile(deck.entryFile)).revision,
+      themeId: deck.themeId ?? null, themeDigest: theme ? await themeContentDigest(theme.packageRoot) : null,
+      ruleDigest: rules ? themeRulesDigest(rules) : null, masterDigest: await lockedMasterDigest(deck.id),
+      profileDigest, optionsDigest: ruleOptionsDigest(exportOptions), authoredDigest: await authoredRuleDigest(deckDocumentPath(deck.id, '')),
+    }
+  }
+  const validateDeck = async (deck: DeckSummary, options: { phase?: 'validate' | 'quality' | 'export'; measurements?: RuleMeasurement[]; master?: boolean; profileDigest?: string | null; exportOptions?: unknown; applyExceptions?: boolean } = {}) => {
     const file = await workspaceFiles.readTextFile(deck.entryFile)
     const errors: Array<{ code: string; message: string }> = []
+    let themeRuleIssues: ThemeRuleIssue[] = []
+    let themeRuleDigest: string | null = null
+    let compiledSlides = compileDeck(file.content)
+    try {
+      compiledSlides = await compileWithThemeAnchors(deck, file.content)
+    } catch (cause) {
+      errors.push({
+        code: 'THEME_ANCHORS_INVALID',
+        message: cause instanceof Error ? cause.message : String(cause),
+      })
+    }
+    for (const slide of compiledSlides) {
+      for (const diagnostic of slide.animation.diagnostics)
+        errors.push({
+          code: 'ANIMATION_DIAGNOSTIC',
+          message: `Slide ${slide.slideId}: ${diagnostic}`,
+        })
+    }
+    const animationDocument = await readDeckDocument(
+      deck.id,
+      'animations.json',
+      DeckAnimationsDocumentSchema,
+      { version: 1, animations: [] },
+    )
+    const notesDocument = await readDeckDocument(
+      deck.id,
+      'notes.json',
+      DeckNotesDocumentSchema,
+      { version: 1, notes: [] },
+    )
+    const notesBySlide = new Map(
+      notesDocument.notes.map((note) => [note.slideId, note]),
+    )
+    const compiledById = new Map(
+      compiledSlides.map((slide) => [slide.slideId, slide]),
+    )
+    for (const animation of animationDocument.animations) {
+      const compiled = compiledById.get(animation.slideId)
+      if (!compiled) {
+        errors.push({
+          code: 'ANIMATION_SLIDE_UNKNOWN',
+          message: `Animation references missing slide: ${animation.slideId}`,
+        })
+        continue
+      }
+      for (const group of animation.groups) {
+        if (!compiled.anchors.includes(group.id))
+          errors.push({
+            code: 'ANIMATION_TARGET_UNKNOWN',
+            message: `Animation group target does not exist on ${animation.slideId}: ${group.id}`,
+          })
+        if (group.static && group.effects.length)
+          errors.push({
+            code: 'ANIMATION_STATIC_TARGET',
+            message: `Static animation group has effects on ${animation.slideId}: ${group.id}`,
+          })
+        for (const effect of group.effects)
+          if (
+            effect.target !== group.id ||
+            !compiled.anchors.includes(effect.target)
+          )
+            errors.push({
+              code: 'ANIMATION_TARGET_UNKNOWN',
+              message: `Animation effect target does not exist on ${animation.slideId}: ${effect.target}`,
+            })
+        if (
+          notesBySlide.get(animation.slideId)?.spokenText.trim() &&
+          group.effects.some((effect) => effect.trigger === 'on-click')
+        )
+          errors.push({
+            code: 'ANIMATION_CLICK_WITH_NOTES',
+            message: `On-click animation cannot be used on a narrated slide: ${animation.slideId}`,
+          })
+      }
+    }
+    const slideIds = new Set(compiledSlides.map((slide) => slide.slideId))
+    const notedSlides = new Set<string>()
+    for (const note of notesDocument.notes) {
+      if (!slideIds.has(note.slideId))
+        errors.push({
+          code: 'NOTES_SLIDE_UNKNOWN',
+          message: `Notes reference missing slide: ${note.slideId}`,
+        })
+      if (notedSlides.has(note.slideId))
+        errors.push({
+          code: 'NOTES_DUPLICATE_SLIDE',
+          message: `Multiple notes entries reference: ${note.slideId}`,
+        })
+      notedSlides.add(note.slideId)
+      for (const cue of note.cues) {
+        if (
+          cue.endSeconds < cue.startSeconds ||
+          cue.endSeconds > note.estimatedSeconds
+        )
+          errors.push({
+            code: 'NOTES_CUE_INVALID',
+            message: `Invalid cue range on ${note.slideId}: ${cue.startSeconds}-${cue.endSeconds}`,
+          })
+      }
+    }
     let theme: ReturnType<ThemeRegistry['resolve']> | undefined
     if (!deck.themeId)
       errors.push({
@@ -1069,7 +1347,49 @@ export async function createGateway(
             message: `Layout is not registered for ${theme.manifest.id}: ${layout}`,
           })
       }
+
+      if (theme.machineRulesPath) {
+        try {
+          const rules = ThemeRulesDocumentSchema.parse(
+            JSON.parse(
+              await readFile(theme.machineRulesPath, 'utf8'),
+            ) as unknown,
+          )
+          const definitionRaw = await readFile(join(theme.packageRoot, 'agent', 'native-layouts.json'), 'utf8').catch((cause: unknown) => {
+            if (cause instanceof Error && 'code' in cause && cause.code === 'ENOENT') return undefined
+            throw cause
+          })
+          const currentDefinitions = definitionRaw ? z.array(NativeMasterLayoutSchema).parse(JSON.parse(definitionRaw)) : undefined
+          const locked = options.phase === 'export' ? await readDeckDocument(deck.id, 'theme-lock.json', MasterSnapshotV1Schema).catch(() => undefined) : undefined
+          const definitions = options.master === false ? undefined : options.phase === 'export' ? locked?.layoutDefinitions : currentDefinitions
+          const report = database.getQualityReport(deck.id)
+          const savedMeasurements = report && report.revision === deck.revision && report.themeDigest === theme.contentDigest && report.themeRuleDigest === theme.machineRulesDigest && report.masterDigest === await lockedMasterDigest(deck.id) && (options.profileDigest === undefined || options.profileDigest === report.profileDigest) ? report.ruleMeasurements : []
+          themeRuleIssues.push(
+            ...evaluateThemeRules({
+              document: rules,
+              phase: options.phase ?? 'validate',
+              slides: themeRuleSlides(compiledSlides, definitions, compiledSlides.map(slide => animationDocument.animations.find(entry => entry.slideId === slide.slideId) ?? slide.animation), options.measurements ?? savedMeasurements),
+            }),
+          )
+          themeRuleDigest = theme.machineRulesDigest ?? null
+        } catch (cause) {
+          errors.push({
+            code: 'THEME_RULES_INVALID',
+            message: cause instanceof Error ? cause.message : String(cause),
+          })
+        }
+      }
     }
+    if (options.applyExceptions !== false && themeRuleIssues.length) {
+      const exceptions = await ruleExceptionStore.list(deck.id)
+      if (exceptions.length) themeRuleIssues = applyRuleExceptions(themeRuleIssues, exceptions, await currentRuleBinding(deck, options.profileDigest ?? null, options.exportOptions), 'export')
+    }
+    for (const issue of themeRuleIssues)
+      if (blockingRuleIssue(issue))
+        errors.push({
+          code: issue.code,
+          message: `${issue.message}${issue.slide === undefined ? '' : ` (slide ${issue.slide})`}`,
+        })
     const imageAssets = new Map(
       database.listImageAssets(deck.id).map((asset) => [asset.path, asset]),
     )
@@ -1116,18 +1436,49 @@ export async function createGateway(
         })
       }
     }
+    const diagramsRoot = deckDocumentPath(deck.id, 'diagrams')
+    const diagramFiles = await readdir(diagramsRoot, {
+      withFileTypes: true,
+    }).catch(() => [])
+    for (const entry of diagramFiles) {
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue
+      const diagramPath = join(diagramsRoot, entry.name)
+      try {
+        const document = DiagramDocumentV1Schema.parse(
+          JSON.parse(await readFile(diagramPath, 'utf8')),
+        )
+        const diagramValidation = validateDiagram(document)
+        if (!diagramValidation.ok)
+          errors.push({
+            code: 'DIAGRAM_INVALID',
+            message: `${entry.name}: ${diagramValidation.issues.join(' ')}`,
+          })
+      } catch (cause) {
+        errors.push({
+          code: 'DIAGRAM_INVALID',
+          message: `${entry.name}: ${cause instanceof Error ? cause.message : String(cause)}`,
+        })
+      }
+    }
     return {
       deckId: deck.id,
       revision: file.revision,
       valid: errors.length === 0,
       themeId: theme?.manifest.id,
       themeSkillId: theme?.manifest.skill.id,
+      themeRuleDigest,
+      themeRuleIssues,
       errors,
     }
   }
 
   app.addHook('onRequest', async (request, reply) => {
     const origin = request.headers.origin
+    // Script-free resource iframes have opaque origins. Their local webfonts
+    // need CORS, so allow only immutable font reads from that sandbox origin.
+    const sandboxFont = origin === 'null' && (request.method === 'GET' || request.method === 'HEAD')
+      && (/^\/api\/v1\/resources\/assets\/[a-f0-9]{24}\.woff2(?:\?|$)/.test(request.url) || /^\/api\/v1\/animations\/runtime\.js(?:\?|$)/.test(request.url))
+    if (sandboxFont) return
     if (!origin || config.allowedWebOrigins.includes(origin)) return
     request.log.warn({ origin }, 'Rejected browser origin')
     const body: ApiErrorBody = {
@@ -1364,7 +1715,7 @@ export async function createGateway(
           ])
         ).flat()
         return {
-          status: statuses.every((entry) => entry.state === 'installed')
+          status: statuses.every((entry) => entry.state === 'installed' || entry.state === 'on-demand')
             ? 'ok'
             : 'degraded',
           message: `${statuses.filter((entry) => entry.state === 'installed').length}/${statuses.length} managed Skills installed`,
@@ -1546,7 +1897,7 @@ export async function createGateway(
     let themeSkillVersion: string | null = null
     if (input.profile.theme.mode === 'registered') {
       const theme = themeRegistry.resolve(input.profile.theme.themeId).manifest
-      const status = await skillInstaller.themeStatus(input.harness, theme.id)
+      const status = await skillInstaller.ensureTheme(input.harness, theme.id)
       if (!status.available)
         throw new RpcError(
           'The selected theme and its managed Skills are not available',
@@ -1617,7 +1968,7 @@ export async function createGateway(
     let themeSkillVersion: string | null = null
     if (profile.theme.mode === 'registered') {
       const theme = themeRegistry.resolve(profile.theme.themeId).manifest
-      const status = await skillInstaller.themeStatus(harness, theme.id)
+      const status = await skillInstaller.ensureTheme(harness, theme.id)
       if (!status.available)
         throw new RpcError(
           'The selected theme and its managed Skills are not available',
@@ -1713,6 +2064,15 @@ export async function createGateway(
           'INVALID_REQUEST',
           { harness, sessionId },
         )
+      let targetPageContext = ''
+      if (sessionProfile?.profile.conversationMode === 'edit-page') {
+        const target = sessionProfile.profile.target
+        if (!target?.markdownPath || !target.slide) throw new RpcError('Single-page editing requires a Markdown path and slide number', 'INVALID_REQUEST')
+        const file = await workspaceFiles.readTextFile(target.markdownPath)
+        const page = parseSlidevDocument(file.content)[target.slide - 1]
+        if (!page) throw new RpcError('Target slide no longer exists', 'INVALID_REQUEST')
+        targetPageContext = `<fastppt-target-page>\n${JSON.stringify({ path: file.path, slide: target.slide, revision: file.revision, source: page.raw })}\n</fastppt-target-page>\n\n`
+      }
       const attachments = await Promise.all(
         input.attachments.map(async (attachment) => ({
           type: attachment.type,
@@ -1762,7 +2122,7 @@ export async function createGateway(
             'HARNESS_SKILLS_UNSUPPORTED',
             { harness, capabilities },
           )
-        const skillStatus = await installerSnapshot.themeStatus(
+        const skillStatus = await installerSnapshot.ensureTheme(
           harness,
           registeredTheme.manifest.id,
         )
@@ -1793,9 +2153,7 @@ export async function createGateway(
         const eventStream = adapter.sendMessage({
           sessionId,
           cwd: workspace.root,
-          content: sessionProfile
-            ? `${sessionBrief(sessionProfile.profile)}\n\n${input.content}`
-            : input.content,
+          content: `${RESOURCE_AUTHORING_GUIDANCE}\n\n${ANIMATION_AUTHORING_GUIDANCE}\n\n${PALETTE_AUTHORING_GUIDANCE}\n\n${sessionProfile ? sessionBrief(sessionProfile.profile) + '\n\n' : ''}${targetPageContext}${input.content}`,
           attachments,
           themeId: registeredTheme.manifest.id,
           themeSkillId: registeredTheme.manifest.skill.id,
@@ -1973,13 +2331,55 @@ export async function createGateway(
     },
   )
 
+  const isApprovedImportedTheme = (themeId: string): boolean =>
+    Boolean(database.getAppSetting(`pptx-import-approved:${themeId}`)) ||
+    (!database.getAppSetting(`pptx-import-pending:${themeId}`) &&
+      !database.getLatestPptxImportJob(themeId))
+
+  registerResourceRoutes(app)
+  registerAnimationRoutes(app)
+  registerPaletteRoutes(app, async (harness, prompt) => {
+    const release = runLimiter.acquire(harness)
+    const adapter = harnesses[harness]
+    let timeout: ReturnType<typeof setTimeout> | undefined
+    let sessionId: string | undefined
+    let completed = false
+    try {
+      const session = await adapter.createSession({ cwd: workspace.root, title: '画盘配色推荐' })
+      sessionId = session.sessionId
+      const collect = async (): Promise<string> => {
+        let text = ''
+        for await (const event of adapter.sendMessage({ sessionId: session.sessionId, cwd: workspace.root, content: prompt, attachments: [], skills: [] })) {
+          const data = event.data as { delta?: unknown; content?: unknown; message?: { content?: unknown } }
+          if (event.type === 'assistant.delta' && typeof data.delta === 'string') text += data.delta
+          if (event.type === 'assistant.message') {
+            const content = data.content ?? data.message?.content
+            if (typeof content === 'string') text = content
+          }
+          if (text.length > 64000) throw new Error('配色推荐结果过长，请缩小需求后重试。')
+          if (event.type === 'run.failed' || event.type === 'run.cancelled') throw new Error('模型未完成配色推荐，请重试。')
+          if (event.type === 'approval.requested') throw new Error('模型请求了额外操作，请重试配色推荐。')
+        }
+        completed = true
+        return text
+      }
+      return await Promise.race([collect(), new Promise<never>((_resolve, reject) => {
+        timeout = setTimeout(() => reject(new Error('配色推荐超时，请重试。')), 90000)
+      })])
+    } finally {
+      clearTimeout(timeout)
+      if (!completed && sessionId) await adapter.cancelRun({ sessionId }).catch(() => undefined)
+      release()
+    }
+  })
+
   app.get('/api/v1/themes', () =>
     z
       .array(ThemeSummarySchema)
       .parse(
-        themeRegistry.themes.map((theme) =>
-          themeSummary(themeRegistry, theme.manifest.id),
-        ),
+        themeRegistry.themes
+          .filter((theme) => isApprovedImportedTheme(theme.manifest.id))
+          .map((theme) => themeSummary(themeRegistry, theme.manifest.id)),
       ),
   )
 
@@ -1987,9 +2387,36 @@ export async function createGateway(
 
   type ThemeImportStatus = z.infer<typeof ImportPptxThemeStatusSchema>
   const designStatuses = new Map<string, ThemeImportStatus>()
+  const importDrafts = new Map<
+    string,
+    { jobId: string; themeDir: string; slug: string }
+  >()
 
-  const readThemeArtifacts = async (themeId: string) => {
-    const themeDir = join(config.themesRoot, themeId)
+  const importDraftFor = (themeId: string) => {
+    const remembered = importDrafts.get(themeId)
+    if (remembered) return remembered
+    const job = database.getLatestPptxImportJob(themeId)
+    if (!job || job.status === 'approved') return undefined
+    const themeDir = join(
+      config.workspaceRoot,
+      '.fastppt',
+      'import-drafts',
+      job.id,
+      'themes',
+      themeId,
+    )
+    return {
+      jobId: job.id,
+      themeDir,
+      slug: themeId.replace(/^slidev-theme-/, ''),
+    }
+  }
+
+  const readThemeArtifacts = async (
+    themeId: string,
+    themesRoot = config.themesRoot,
+  ) => {
+    const themeDir = join(themesRoot, themeId)
     const manifest = JSON.parse(
       await readFile(join(themeDir, 'agent', 'theme-manifest.json'), 'utf8'),
     ) as { layouts?: Array<{ id: string }> }
@@ -2014,16 +2441,38 @@ export async function createGateway(
     )
   }
 
+  const recordThemeImportJobStatus = (
+    jobId: string | undefined,
+    status: 'ready' | 'failed',
+  ): void => {
+    if (!jobId) return
+    try {
+      const job = database.getPptxImportJob(jobId)
+      if (job)
+        database.recordPptxImportJob({
+          ...job,
+          status,
+          updatedAt: new Date().toISOString(),
+        })
+    } catch (cause) {
+      app.log.debug(
+        { jobId, cause },
+        'Theme import job status was not persisted because the database is unavailable',
+      )
+    }
+  }
+
   /**
    * Background enrichment: run a harness design session that proposes
-   * characteristic Slidev layouts + components for the just-imported theme.
-   * The agent reads the extraction analysis and submits a structured design via
-   * the `design_theme_layouts` MCP tool; completion reloads the registry.
+   * a complete visual system for the just-imported theme. The agent reads the
+   * extraction analysis and submits a structured design contract via
+   * `design_theme_system`; completion reloads the registry.
    */
   async function runThemeDesignSession(
     harness: 'claude' | 'codex',
     themeId: string,
     themeDir: string,
+    jobId?: string,
   ): Promise<void> {
     const before = await readThemeArtifacts(themeId)
     setThemeImportStatus(themeId, {
@@ -2032,19 +2481,20 @@ export async function createGateway(
       ...before,
       message: 'Harness 正在根据提取分析设计特色布局与组件。',
     })
-    const skillStatus = await skillInstaller.themeStatus(harness, themeId)
+    const skillStatus = await skillInstaller.ensureTheme(harness, themeId)
     const session = await harnesses[harness].createSession({
       cwd: workspace.root,
-      title: `Design ${themeId} layouts`,
+      title: `Design ${themeId} visual system`,
     })
     const content = [
-      `Design characteristic Slidev layouts and components for the just-imported theme ${themeId}.`,
+      `Design a coherent Slidev visual system for the just-imported theme ${themeId}.`,
       `Read the extraction analysis at ${join(themeDir, 'EXTRACTION_ANALYSIS.md')} for the palette, fonts, typography, and suggested layouts/components.`,
       `Treat slide-level explicit colors and their frequencies as stronger evidence than generic Office accent slots. Do not introduce corporate blue or another fallback hue unless the analyzed slides actually use it.`,
       `Infer the source deck's visual grammar: whitespace, alignment, image dominance, numeric emphasis, density, and rhythm. Avoid generic card grids unless the source structure supports them.`,
-      `Call the design_theme_layouts MCP tool with a structured list: 3-6 complementary layouts and 1-3 components that cover the source deck's recurring information structures.`,
-      `Use the kinds listed in the tool schema and write a concrete hint per item describing content limits, slot usage, and when the author should choose it. These hints are synchronized into the Theme Skill.`,
-      `After submitting the design, your turn is done — do not continue editing.`,
+      `Call the design_theme_system MCP tool exactly once with a complete version 1 design contract. Choose the actual palette, typography, spacing/radius geometry, 3-6 complementary semantic layouts, and 1-5 signature components from the source deck's recurring visual grammar.`,
+      `Use the tool's controlled composition and component archetypes, but make the design decisions yourself: give every layout a concrete purpose and semantic regions, and every component a concrete purpose and useful variants. The submitted contract becomes tokens, Vue sources, and the Theme Skill.`,
+      `After the design compiles, call create_theme_design_samples for ${themeId}. It writes a five-slide visual-review deck under theme-samples/ that exercises the generated cover, narrative, metrics, media, and closing treatments.`,
+      `After both tool calls succeed, your turn is done — do not continue editing.`,
     ].join('\n')
     const stream = harnesses[harness].sendMessage({
       sessionId: session.sessionId,
@@ -2069,7 +2519,7 @@ export async function createGateway(
         },
       ],
     })
-    // Consume the agent's turn; the design_theme_layouts call materializes files.
+    // Consume the agent's turn; design_theme_system materializes the theme files.
     // Bound the session so a stalled agent cannot dangle the background task.
     let timedOut = false
     await Promise.race([
@@ -2088,13 +2538,14 @@ export async function createGateway(
     if (timedOut)
       throw new Error('Theme design session timed out after 240 seconds.')
     const designed = await readThemeArtifacts(themeId)
-    if (
-      designed.layouts.length <= before.layouts.length &&
-      designed.components.length <= before.components.length
-    )
+    try {
+      await access(join(themeDir, 'agent', 'theme-design.json'))
+      await access(join(workspace.root, 'theme-samples', `${themeId}.md`))
+    } catch {
       throw new Error(
-        'Harness completed without materializing layouts or components.',
+        'Harness completed without materializing a design contract and review deck.',
       )
+    }
 
     setThemeImportStatus(themeId, {
       stage: 'syncing',
@@ -2106,7 +2557,7 @@ export async function createGateway(
     const refreshed = await skillInstaller.reconcile({ cleanStale: true })
     database.recordManagedInstallations(refreshed.statuses)
     const unavailable = refreshed.statuses.filter(
-      (status) => status.themeId === themeId && status.state !== 'installed',
+      (status) => status.themeId === themeId && status.state !== 'installed' && status.state !== 'on-demand',
     )
     if (unavailable.length > 0)
       throw new Error(
@@ -2117,7 +2568,7 @@ export async function createGateway(
       stage: 'validating',
       designing: true,
       ...designed,
-      message: 'Theme Skill 已同步，正在校验主题结构与注册信息。',
+      message: 'Theme Skill 已同步，正在校验主题结构并准备五页视觉审查样张。',
     })
     themeRegistry.resolve(themeId)
     await Promise.all([
@@ -2131,8 +2582,10 @@ export async function createGateway(
       stage: 'ready',
       designing: false,
       ...designed,
-      message: '主题提取、特色设计、Skill 同步与结构校验均已完成。',
+      message:
+        '主题提取、设计系统、五页审查样张、Skill 同步与结构校验均已完成。',
     })
+    recordThemeImportJobStatus(jobId, 'ready')
     app.log.info(
       { themeId, harness },
       'Theme design session completed; registry reloaded',
@@ -2154,25 +2607,590 @@ export async function createGateway(
       reply.code(400)
       return { error: 'The uploaded file is not a valid PPTX/ZIP package.' }
     }
-    const importsDir = join(config.workspaceRoot, '.fastppt', 'imports')
+    const importsDir = join(config.workspaceRoot, '.fastppt', 'import-drafts')
     await mkdir(importsDir, { recursive: true })
-    const pptxPath = join(importsDir, `${randomUUID()}.pptx`)
+    const jobId = randomUUID()
+    const draftRoot = join(importsDir, jobId, 'themes')
+    await mkdir(draftRoot, { recursive: true })
+    const createdAt = new Date().toISOString()
+    database.recordPptxImportJob({
+      id: jobId,
+      themeId: 'pending',
+      status: 'upload',
+      decisions: [],
+      createdAt,
+      updatedAt: createdAt,
+    })
+    const pptxPath = join(importsDir, `${jobId}.pptx`)
     await writeFile(pptxPath, pptx)
     const extractorPath = join(repositoryRoot, 'scripts', 'extract-theme.mjs')
     try {
+      const sourceAnalysis = await analyzePptx(pptx)
+      const sourceAnalysisPath = join(importsDir, jobId, 'source-analysis.json')
+      await writeFile(
+        sourceAnalysisPath,
+        `${JSON.stringify(sourceAnalysis, null, 2)}\n`,
+        'utf8',
+      )
       const { slug } = await runThemeExtraction({
         pptxPath,
+        analysisPath: sourceAnalysisPath,
         ...(input.themeName !== undefined
           ? { themeName: input.themeName }
           : {}),
-        themesRoot: config.themesRoot,
+        themesRoot: draftRoot,
         extractorPath,
       })
-      await reloadThemeRegistry()
-      const theme = themeRegistry.resolve(`slidev-theme-${slug}`)
-      // A newly created theme depends on @fastppt/fonts; in the dev repo the
-      // workspace link needs a `pnpm install`. Best-effort and background so an
-      // unavailable package manager never blocks the import.
+      const themeId = `slidev-theme-${slug}`
+      const themeDir = join(draftRoot, themeId)
+      await mkdir(join(themeDir, 'reference'), { recursive: true })
+      await copyFile(pptxPath, join(themeDir, 'reference', 'source.pptx'))
+      importDrafts.set(themeId, { jobId, themeDir, slug })
+      database.setAppSetting(`pptx-import-pending:${themeId}`, '1')
+      await writeFile(
+        join(themeDir, 'IMPORT_ANALYSIS.json'),
+        `${JSON.stringify(sourceAnalysis, null, 2)}\n`,
+        'utf8',
+      )
+      const extracted = await readThemeArtifacts(themeId, draftRoot)
+      setThemeImportStatus(themeId, {
+        stage: 'designing',
+        designing: true,
+        ...extracted,
+        message: '基础主题已提取，准备启动 harness 特色设计。',
+      })
+      database.recordPptxImportJob({
+        id: jobId,
+        themeId,
+        status: 'ready',
+        sourceHash: createHash('sha256').update(pptx).digest('hex'),
+        analysisPath: 'IMPORT_ANALYSIS.json',
+        decisions: [],
+        createdAt,
+        updatedAt: new Date().toISOString(),
+      })
+      setThemeImportStatus(themeId, {
+        stage: 'ready',
+        designing: false,
+        ...extracted,
+        message: '基础主题已提取，等待审批后注册。',
+      })
+      return ImportPptxThemeResultSchema.parse({
+        jobId,
+        themeId,
+        displayName: slug,
+        packageName: `slidev-theme-${slug}`,
+        skillId: `fastppt-theme-${slug}`,
+        version: '0.1.0-extracted.1',
+        slug,
+        designing: false,
+      })
+    } catch (cause) {
+      database.recordPptxImportJob({
+        id: jobId,
+        themeId: 'pending',
+        status: 'failed',
+        decisions: [],
+        createdAt,
+        updatedAt: new Date().toISOString(),
+      })
+      reply.code(400)
+      return { error: cause instanceof Error ? cause.message : String(cause) }
+    } finally {
+      await rm(pptxPath, { force: true }).catch(() => undefined)
+    }
+  })
+  app.post('/api/v1/pptx-import/jobs', async (request, reply) => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/imports/pptx-theme',
+      payload: request.body as Record<string, unknown>,
+    })
+    reply.code(response.statusCode)
+    return response.json<unknown>()
+  })
+
+  app.get('/api/v1/imports/pptx-theme/:themeId', async (request) => {
+    const { themeId } = z
+      .object({ themeId: z.string().min(1) })
+      .parse(request.params)
+    const current = designStatuses.get(themeId)
+    if (current) return current
+    const draft = importDraftFor(themeId)
+    const artifacts = await readThemeArtifacts(
+      themeId,
+      draft ? dirname(draft.themeDir) : config.themesRoot,
+    )
+    return ImportPptxThemeStatusSchema.parse({
+      themeId,
+      stage: 'ready',
+      designing: false,
+      ...artifacts,
+      message: '主题已就绪。',
+    })
+  })
+
+  app.get('/api/v1/imports/jobs/:jobId', (request) => {
+    const { jobId } = z
+      .object({ jobId: z.string().uuid() })
+      .parse(request.params)
+    const job = database.getPptxImportJob(jobId)
+    if (!job)
+      throw new WorkspaceError(
+        'FILE_NOT_FOUND',
+        'PPTX import job not found.',
+        404,
+      )
+    return job
+  })
+  app.get('/api/v1/pptx-import/jobs/:jobId', (request) => {
+    const { jobId } = z
+      .object({ jobId: z.string().min(1) })
+      .parse(request.params)
+    const job = database.getPptxImportJob(jobId)
+    if (!job)
+      throw new WorkspaceError(
+        'WORKSPACE_NOT_FOUND',
+        'PPTX import job not found.',
+        404,
+      )
+    return job
+  })
+  app.get('/api/v1/pptx-import/jobs', () => database.listPptxImportJobs())
+  app.get('/api/v1/imports/jobs', (request) => {
+    const query = z
+      .object({ themeId: z.string().min(1).optional() })
+      .parse(request.query)
+    return database.listPptxImportJobs(query.themeId)
+  })
+
+  app.get('/api/v1/imports/pptx-theme/:themeId/analysis', async (request) => {
+    const { themeId } = z
+      .object({ themeId: z.string().min(1) })
+      .parse(request.params)
+    const draft = importDraftFor(themeId)
+    const themeDir = draft?.themeDir ?? join(config.themesRoot, themeId)
+    const storedAnalysis = await readFile(
+      join(themeDir, 'IMPORT_ANALYSIS.json'),
+      'utf8',
+    ).catch(() => '')
+    if (storedAnalysis)
+      return withGeneratedCandidates(themeDir, ImportAnalysisV1Schema.parse(JSON.parse(storedAnalysis)))
+    const analysisPath = join(themeDir, 'EXTRACTION_ANALYSIS.md')
+    const analysisText = await readFile(analysisPath, 'utf8').catch(() => '')
+    const artifacts = await readThemeArtifacts(
+      themeId,
+      draft ? dirname(themeDir) : config.themesRoot,
+    )
+    const sourceHash = createHash('sha256').update(analysisText).digest('hex')
+    return ImportAnalysisV1Schema.parse({
+      version: 1,
+      sourceHash,
+      extractedFeatures: {
+        analysisMarkdown: analysisText,
+        layouts: artifacts.layouts,
+        components: artifacts.components,
+      },
+      candidateLayouts: artifacts.layouts.map((id) => ({ id, name: id })),
+      unsupportedOoxml: analysisText.match(/unsupported[^\n]*/gi) ?? [],
+      userOverrides: {},
+    })
+  })
+  const importMutations = new Map<string, Promise<unknown>>()
+  async function serializeImportMutation<T>(
+    themeId: string,
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    const previous = importMutations.get(themeId) ?? Promise.resolve()
+    const current = previous.catch(() => undefined).then(operation)
+    importMutations.set(themeId, current)
+    try {
+      return await current
+    } finally {
+      if (importMutations.get(themeId) === current)
+        importMutations.delete(themeId)
+    }
+  }
+  async function saveImportDecisions(
+    themeId: string,
+    body: unknown,
+    jobId?: string,
+  ) {
+    return serializeImportMutation(themeId, async () => {
+      const decisions = z.array(CreationDecisionV1Schema).parse(body)
+      if (decisions.some(item => item.stepId.startsWith('layout:')) &&
+          !decisions.some(item => item.stepId.startsWith('layout:') && item.selected === 'keep') &&
+          !['tokens', 'mirror', 'reference', 'fidelity'].includes(decisions.find(item => item.stepId === 'strategy')?.selected ?? 'standard'))
+        throw new WorkspaceError('INVALID_REQUEST', 'Select at least one materialized layout or choose the tokens route.', 400)
+      const draft = importDraftFor(themeId)
+      if (!draft)
+        throw new WorkspaceError(
+          'FILE_NOT_FOUND',
+          'Import draft is no longer available.',
+          404,
+        )
+      const job = jobId
+        ? database.getPptxImportJob(jobId)
+        : database.getLatestPptxImportJob(themeId)
+      if (jobId && draft.jobId !== jobId)
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Import task has been superseded by a newer draft.',
+          409,
+        )
+      if (job?.approvedAt)
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Approved import decisions are immutable.',
+          409,
+        )
+      if (
+        new Set(decisions.map((decision) => decision.stepId)).size !==
+        decisions.length
+      )
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Import decision step IDs must be unique.',
+          400,
+        )
+      const previousRaw = database.getAppSetting(
+        `pptx-import-decisions:${themeId}`,
+      )
+      const previous = previousRaw
+        ? z.array(CreationDecisionV1Schema).parse(JSON.parse(previousRaw))
+        : []
+      for (const decision of previous) {
+        if (!decision.locked) continue
+        const next = decisions.find((item) => item.stepId === decision.stepId)
+        if (
+          !next ||
+          JSON.stringify({ ...next, timestamp: decision.timestamp }) !==
+            JSON.stringify(decision)
+        )
+          throw new WorkspaceError(
+            'INVALID_REQUEST',
+            `Import decision is locked: ${decision.stepId}`,
+            409,
+          )
+        next.timestamp = decision.timestamp
+      }
+      const analysisPath = join(draft.themeDir, 'IMPORT_ANALYSIS.json')
+      const analysis = ImportAnalysisV1Schema.parse(
+        JSON.parse(await readFile(analysisPath, 'utf8')),
+      )
+      const review = await withGeneratedCandidates(draft.themeDir, analysis)
+      const manifest = z.object({ layouts: z.array(z.object({ id: z.string() })) }).parse(JSON.parse(await readFile(join(draft.themeDir, 'agent/theme-manifest.json'), 'utf8')))
+      for (const decision of decisions.filter(item => item.stepId.startsWith('layout:') && item.selected === 'keep')) {
+        const id = decision.stepId.slice('layout:'.length)
+        const candidate = review.candidateLayouts.find(item => item.id === id)
+        if ((candidate?.generated && candidate.generated.status !== 'complete') ||
+            candidate?.semanticEvidence.some(item => item.kind === 'reachable-layout' && item.value === 'false') ||
+            !manifest.layouts.some(layout => layout.id === (candidate?.name ?? id)))
+          throw new WorkspaceError('INVALID_REQUEST', `Selected layout is not materialized: ${id}`, 400)
+      }
+      const pendingPath = `${analysisPath}.tmp`
+      await writeFile(
+        pendingPath,
+        `${JSON.stringify({ ...analysis, userOverrides: { ...analysis.userOverrides, decisions } }, null, 2)}\n`,
+        'utf8',
+      )
+      await rename(pendingPath, analysisPath)
+      database.setAppSetting(
+        `pptx-import-decisions:${themeId}`,
+        JSON.stringify(decisions),
+      )
+      if (job)
+        database.recordPptxImportJob({
+          ...job,
+          status: 'decide',
+          decisions,
+          updatedAt: new Date().toISOString(),
+        })
+      eventHub.publish('pptx-import', 'decisions-updated', {
+        ...(jobId ? { jobId } : {}),
+        themeId,
+        decisions,
+      })
+      return { ...(jobId ? { jobId } : {}), themeId, decisions }
+    })
+  }
+  app.post('/api/v1/imports/pptx-theme/:themeId/decisions', async (request) => {
+    const { themeId } = z
+      .object({ themeId: z.string().min(1) })
+      .parse(request.params)
+    return saveImportDecisions(themeId, request.body)
+  })
+  app.post('/api/v1/pptx-import/jobs/:jobId/decisions', async (request) => {
+    const { jobId } = z
+      .object({ jobId: z.string().min(1) })
+      .parse(request.params)
+    const job = database.getPptxImportJob(jobId)
+    if (!job)
+      throw new WorkspaceError(
+        'WORKSPACE_NOT_FOUND',
+        'PPTX import job not found.',
+        404,
+      )
+    return saveImportDecisions(job.themeId, request.body, jobId)
+  })
+  async function approveThemeImport(themeId: string, jobId?: string) {
+    return serializeImportMutation(themeId, async () => {
+      const requestedJob = jobId
+        ? database.getPptxImportJob(jobId)
+        : database.getLatestPptxImportJob(themeId)
+      if (requestedJob?.approvedAt)
+        return { themeId, approvedAt: requestedJob.approvedAt }
+      if (jobId && importDraftFor(themeId)?.jobId !== jobId)
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Import task has been superseded by a newer draft.',
+          409,
+        )
+      const decisions = database.getAppSetting(
+        `pptx-import-decisions:${themeId}`,
+      )
+      if (!decisions)
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Save import decisions before approval.',
+          409,
+        )
+      const draft = importDraftFor(themeId)
+      if (!draft)
+        throw new WorkspaceError(
+          'FILE_NOT_FOUND',
+          'Import draft is no longer available.',
+          404,
+        )
+      const target = join(config.themesRoot, themeId)
+      const parsedDecisions = z
+        .array(CreationDecisionV1Schema)
+        .parse(JSON.parse(decisions))
+      const requestedStrategy =
+        parsedDecisions.find((item) => item.stepId === 'strategy')?.selected ??
+        'editable'
+      const strategy = requestedStrategy
+      const route =
+        strategy === 'editable'
+          ? 'standard'
+          : strategy === 'reference'
+            ? 'mirror'
+            : strategy
+      if (
+        route !== 'standard' &&
+        route !== 'tokens' &&
+        route !== 'mirror' &&
+        route !== 'fidelity'
+      ) {
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Unsupported PPTX import strategy.',
+          400,
+        )
+      }
+      const preserveReferenceDecision =
+        parsedDecisions.find((item) => item.stepId === 'preserve-reference')
+          ?.selected === 'keep'
+      const preserveReference =
+        preserveReferenceDecision || route === 'mirror' || route === 'fidelity'
+      const selectedLayouts = parsedDecisions
+        .filter(
+          (item) =>
+            item.stepId?.startsWith('layout:') && item.selected === 'keep',
+        )
+        .map((item) => item.stepId.slice('layout:'.length))
+      const hasLayoutSelection = parsedDecisions.some(item => item.stepId.startsWith('layout:'))
+      if (hasLayoutSelection && selectedLayouts.length === 0 && route === 'standard')
+        throw new WorkspaceError('INVALID_REQUEST', 'Select at least one materialized layout or choose the tokens route.', 400)
+      const layoutCandidatesRaw = await readFile(
+        join(draft.themeDir, 'agent', 'layout-candidates.json'),
+        'utf8',
+      ).catch(() => '')
+      const layoutCandidates = layoutCandidatesRaw
+        ? (JSON.parse(layoutCandidatesRaw) as {
+            candidates?: Array<{ id?: string; name?: string }>
+          }).candidates ?? []
+        : []
+      const generatedLayoutBySource = new Map(
+        layoutCandidates
+          .filter(
+            (candidate): candidate is { id: string; name: string } =>
+              typeof candidate.id === 'string' &&
+              typeof candidate.name === 'string',
+          )
+          .map((candidate) => [candidate.id, candidate.name]),
+      )
+      const selectedLayoutNames = selectedLayouts.map(
+        (id) => generatedLayoutBySource.get(id) ?? id,
+      )
+      const draftManifest = z
+        .object({ layouts: z.array(z.object({ id: z.string() })) })
+        .passthrough()
+        .parse(
+          JSON.parse(
+            await readFile(
+              join(draft.themeDir, 'agent', 'theme-manifest.json'),
+              'utf8',
+            ),
+          ),
+        )
+      if (
+        selectedLayoutNames.some(
+          (id) => !draftManifest.layouts.some((layout) => layout.id === id),
+        )
+      )
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          'Selected import layout does not exist in the draft.',
+          400,
+        )
+      await installThemeDirectory(
+        draft.themeDir,
+        target,
+        async (candidate) => {
+          if (!preserveReference)
+            await rm(join(candidate, 'reference'), {
+              recursive: true,
+              force: true,
+            })
+          if (hasLayoutSelection || route === 'tokens') {
+            const manifestPath = join(candidate, 'agent', 'theme-manifest.json')
+            const manifest = JSON.parse(
+              await readFile(manifestPath, 'utf8'),
+            ) as {
+              layouts?: Array<{
+                id: string
+                label: string
+                description?: string
+              }>
+            }
+              const kept =
+                manifest.layouts?.filter((layout) =>
+                route === 'tokens' || !selectedLayoutNames.length
+                  ? ![...generatedLayoutBySource.values()].includes(layout.id)
+                  : selectedLayoutNames.includes(layout.id),
+              ) ?? []
+            if (kept.length)
+              await writeFile(
+                manifestPath,
+                `${JSON.stringify({ ...manifest, layouts: kept }, null, 2)}\n`,
+                'utf8',
+              )
+          }
+          if (hasLayoutSelection || route === 'tokens') {
+            const definitionPath = join(candidate, 'agent', 'native-layouts.json')
+            const raw = await readFile(definitionPath, 'utf8').catch((cause: unknown) => {
+              if (cause instanceof Error && 'code' in cause && cause.code === 'ENOENT') return undefined
+              throw cause
+            })
+            if (raw) {
+              const definitions = z.array(NativeMasterLayoutSchema).parse(JSON.parse(raw))
+              await writeFile(definitionPath, `${JSON.stringify(route === 'tokens' ? [] : definitions.filter(layout => selectedLayoutNames.includes(layout.name)), null, 2)}\n`, 'utf8')
+            }
+          }
+          const manifestPath = join(candidate, 'agent', 'theme-manifest.json')
+          const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
+            description?: string
+            supportedFeatures?: Array<{
+              id: string
+              label: string
+              description: string
+            }>
+          }
+          const strategyMetadata = {
+            version: 1,
+            strategy,
+            route,
+            mode:
+              route === 'tokens'
+                ? 'token-only'
+                : route === 'mirror'
+                  ? 'mirror'
+                  : route === 'fidelity'
+                    ? 'fidelity'
+                  : 'editable',
+            generatedAt: new Date().toISOString(),
+            selectedLayoutNames,
+            note:
+              route === 'tokens'
+                ? 'Use this import for colors and fonts; layouts remain as an inspectable extraction but are not intended as a registered design system.'
+                : route === 'mirror'
+                  ? 'Use the preserved source PPTX as the visual reference; extracted layouts are provided for comparison.'
+                  : route === 'fidelity'
+                    ? 'Use the source pages as the visual baseline and review every reported degradation before editing.'
+                  : 'Editable FastPPT theme generated from the extracted source.',
+          }
+          await writeFile(
+            join(candidate, 'IMPORT_STRATEGY.json'),
+            `${JSON.stringify(strategyMetadata, null, 2)}\n`,
+            'utf8',
+          )
+          const feature =
+            route === 'tokens'
+              ? {
+                  id: 'token-only',
+                  label: 'Token-only import',
+                  description:
+                    'Colors and fonts extracted from the source PPTX.',
+                }
+              : route === 'mirror'
+                ? {
+                    id: 'reference-only',
+                    label: 'Reference import',
+                    description:
+                      'Source PPTX retained as the visual reference.',
+                  }
+                : route === 'fidelity'
+                  ? {
+                      id: 'visual-fidelity-review',
+                      label: 'Visual fidelity review',
+                      description:
+                        'Source pages remain the visual baseline and every known downgrade is recorded.',
+                    }
+                : undefined
+          if (feature) {
+            await writeFile(
+              manifestPath,
+              `${JSON.stringify(
+                {
+                  ...manifest,
+                  description: `${manifest.description ?? 'Imported theme'} (${feature.label})`,
+                  ...(manifest.supportedFeatures
+                    ? {
+                        supportedFeatures: [
+                          ...manifest.supportedFeatures,
+                          ...(manifest.supportedFeatures.some(
+                            (item) => item.id === feature.id,
+                          )
+                            ? []
+                            : [feature]),
+                        ],
+                      }
+                    : {}),
+                },
+                null,
+                2,
+              )}\n`,
+              'utf8',
+            )
+          }
+          await writeFile(
+            join(candidate, 'IMPORT_DECISIONS.json'),
+            `${JSON.stringify({ version: 1, strategy, route, preserveReference, preserveReferenceDecision, selectedLayouts, selectedLayoutNames, decisions: parsedDecisions, approvedAt: new Date().toISOString() }, null, 2)}\n`,
+            'utf8',
+          )
+          const ruleReview = await evaluateImportRuleApproval(candidate)
+          const ruleReviewJson = `${JSON.stringify(ruleReview, null, 2)}\n`
+          await writeFile(join(draft.themeDir, 'IMPORT_RULE_REVIEW.json'), ruleReviewJson, 'utf8')
+          await writeFile(join(candidate, 'IMPORT_RULE_REVIEW.json'), ruleReviewJson, 'utf8')
+          if (!ruleReview.valid)
+            throw new RpcError('Selected import layouts violate the theme rules. Review the reported rules before registration.', 'THEME_RULE_APPROVAL_FAILED', { themeId, ruleReview })
+        },
+        async () => {
+          await reloadThemeRegistry()
+          themeRegistry.resolve(themeId)
+        },
+      )
       if (
         config.themesRoot === repositoryRoot ||
         config.themesRoot.startsWith(`${repositoryRoot}${sep}`)
@@ -2183,82 +3201,67 @@ export async function createGateway(
         })
         install.on('error', () => undefined)
       }
-      const themeId = theme.manifest.id
-      const themeDir = join(config.themesRoot, themeId)
-      const extracted = await readThemeArtifacts(themeId)
-      setThemeImportStatus(themeId, {
-        stage: 'designing',
-        designing: true,
-        ...extracted,
-        message: '基础主题已提取，准备启动 harness 特色设计。',
-      })
       const recentHarness = database.getAppSetting('recentHarness')
       const designHarness: 'claude' | 'codex' | undefined =
         recentHarness === 'claude' || recentHarness === 'codex'
           ? recentHarness
-          : 'claude'
-      if (designHarness) {
-        // Optional background enrichment: a harness session designs characteristic
-        // layouts/components. Completion reloads the registry and publishes
-        // `themes.reloaded`, so the frontend catalog updates automatically.
-        runThemeDesignSession(designHarness, themeId, themeDir).catch(
-          (cause: unknown) => {
-            const message =
-              cause instanceof Error ? cause.message : String(cause)
-            const current = designStatuses.get(themeId)
-            setThemeImportStatus(themeId, {
-              stage: 'failed',
-              designing: false,
-              layouts: current?.layouts ?? extracted.layouts,
-              components: current?.components ?? extracted.components,
-              message: '主题基础提取已保留，但特色设计流程未完成。',
-              error: message,
-            })
-            app.log.warn(
-              { themeId, cause: message },
-              'Theme design session failed; base theme retained',
-            )
-          },
-        )
-      } else {
-        setThemeImportStatus(themeId, {
-          stage: 'ready',
-          designing: false,
-          ...extracted,
-          message: '基础主题提取和结构校验已完成。',
+          : undefined
+      const approvedAt = new Date().toISOString()
+      database.setAppSetting(`pptx-import-approved:${themeId}`, approvedAt)
+      database.setAppSetting(`pptx-import-pending:${themeId}`, '')
+      const job = database.getLatestPptxImportJob(themeId)
+      if (job)
+        database.recordPptxImportJob({
+          ...job,
+          status: 'approved',
+          approvedAt,
+          updatedAt: approvedAt,
         })
-      }
-      return ImportPptxThemeResultSchema.parse({
-        themeId,
-        displayName: theme.manifest.displayName,
-        packageName: theme.manifest.packageName,
-        skillId: theme.manifest.skill.id,
-        version: theme.manifest.version,
-        slug,
-        designing: designHarness !== undefined,
-      })
-    } catch (cause) {
-      reply.code(400)
-      return { error: cause instanceof Error ? cause.message : String(cause) }
-    } finally {
-      await rm(pptxPath, { force: true }).catch(() => undefined)
-    }
-  })
-
-  app.get('/api/v1/imports/pptx-theme/:themeId', async (request) => {
+      eventHub.publish('pptx-import', 'approved', { themeId, approvedAt })
+      importDrafts.delete(themeId)
+      if (designHarness)
+        void runThemeDesignSession(
+          designHarness,
+          themeId,
+          target,
+          job?.id,
+        ).catch((cause: unknown) => {
+          const message = cause instanceof Error ? cause.message : String(cause)
+          app.log.warn(
+            { themeId, cause: message },
+            'Theme design session failed',
+          )
+        })
+      return { themeId, approvedAt }
+    })
+  }
+  app.post('/api/v1/imports/pptx-theme/:themeId/approve', async (request) => {
     const { themeId } = z
       .object({ themeId: z.string().min(1) })
       .parse(request.params)
-    const current = designStatuses.get(themeId)
-    if (current) return current
-    const artifacts = await readThemeArtifacts(themeId)
-    return ImportPptxThemeStatusSchema.parse({
-      themeId,
-      stage: 'ready',
-      designing: false,
-      ...artifacts,
-      message: '主题已就绪。',
+    return approveThemeImport(themeId)
+  })
+  app.get('/api/v1/imports/pptx-theme/:themeId/rule-review', async (request) => {
+    const { themeId } = z.object({ themeId: z.string().min(1) }).parse(request.params)
+    const root = importDraftFor(themeId)?.themeDir ?? themeRegistry.resolve(themeId).packageRoot
+    const report = await readFile(join(root, 'IMPORT_RULE_REVIEW.json'), 'utf8').catch((cause: unknown) => {
+      if (cause instanceof Error && 'code' in cause && cause.code === 'ENOENT') return undefined
+      throw cause
     })
+    return report ? ThemeRuleApprovalReportSchema.parse(JSON.parse(report)) : null
+  })
+  app.post('/api/v1/pptx-import/jobs/:jobId/approve', async (request) => {
+    const { jobId } = z
+      .object({ jobId: z.string().min(1) })
+      .parse(request.params)
+    const job = database.getPptxImportJob(jobId)
+    if (!job)
+      throw new WorkspaceError(
+        'WORKSPACE_NOT_FOUND',
+        'PPTX import job not found.',
+        404,
+      )
+    return approveThemeImport(job.themeId, jobId)
   })
 
   app.get('/api/v1/icons', async () => {
@@ -2281,6 +3284,12 @@ export async function createGateway(
     const { themeId } = z
       .object({ themeId: z.string().min(1) })
       .parse(request.params)
+    if (!isApprovedImportedTheme(themeId))
+      throw new WorkspaceError(
+        'FILE_NOT_FOUND',
+        'Theme import is awaiting approval.',
+        404,
+      )
     return themeSummary(themeRegistry, themeId)
   })
 
@@ -2288,6 +3297,12 @@ export async function createGateway(
     const { themeId } = z
       .object({ themeId: z.string().min(1) })
       .parse(request.params)
+    if (!isApprovedImportedTheme(themeId))
+      throw new WorkspaceError(
+        'FILE_NOT_FOUND',
+        'Theme import is awaiting approval.',
+        404,
+      )
     const theme = themeRegistry.resolve(themeId)
     return ThemeSkillDocumentSchema.parse({
       themeId: theme.manifest.id,
@@ -2378,6 +3393,688 @@ export async function createGateway(
           : {}),
       }),
     )
+  })
+
+  app.get('/api/v1/decks/:deckId/notes', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const deck = await resolveDeck(deckId)
+    const stored = await readDeckDocument(
+      deckId,
+      'notes.json',
+      DeckNotesDocumentSchema,
+      undefined,
+    ).catch(() => undefined)
+    if (stored) return stored
+    const source = await workspaceFiles.readTextFile(deck.entryFile)
+    return DeckNotesDocumentSchema.parse({
+      version: 1,
+      notes: compileDeck(source.content)
+        .filter((slide) => slide.notes.spokenText.trim())
+        .map((slide) => slide.notes),
+    })
+  })
+  app.put('/api/v1/decks/:deckId/notes', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    const parsed = DeckNotesDocumentSchema.parse(request.body)
+    const document = DeckNotesDocumentSchema.parse({
+      ...parsed,
+      notes: parsed.notes.map((note) => ({
+        ...note,
+        estimatedSeconds: Math.max(
+          note.estimatedSeconds,
+          ...note.cues.map((cue) => cue.endSeconds),
+          0,
+        ),
+      })),
+    })
+    await writeDeckDocument(deckId, 'notes.json', document)
+    eventHub.publish('notes', 'updated', {
+      deckId,
+      revision: (await resolveDeck(deckId)).revision,
+      actor: 'user',
+    })
+    return document
+  })
+  app.get('/api/v1/decks/:deckId/notes.srt', async (request, reply) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const deck = await resolveDeck(deckId)
+    const pages = compileDeck(
+      (await workspaceFiles.readTextFile(deck.entryFile)).content,
+    )
+    const pageOrder = new Map(pages.map((page, index) => [page.slideId, index]))
+    const stored = await readDeckDocument(
+      deckId,
+      'notes.json',
+      DeckNotesDocumentSchema,
+      { version: 1, notes: [] },
+    )
+    let offset = 0
+    const cues = [...stored.notes]
+      .sort(
+        (a, b) =>
+          (pageOrder.get(a.slideId) ?? Number.MAX_SAFE_INTEGER) -
+          (pageOrder.get(b.slideId) ?? Number.MAX_SAFE_INTEGER),
+      )
+      .flatMap((note) => {
+        const pageCues = note.cues.map((cue) => ({
+          ...cue,
+          startSeconds: cue.startSeconds + offset,
+          endSeconds: cue.endSeconds + offset,
+        }))
+        offset += Math.max(
+          note.estimatedSeconds,
+          ...note.cues.map((cue) => cue.endSeconds),
+          0,
+        )
+        return pageCues
+      })
+    return reply
+      .header('content-disposition', `attachment; filename="${deckId}.srt"`)
+      .type('text/plain; charset=utf-8')
+      .send(cuesToSrt(cues))
+  })
+  app.get('/api/v1/narration/providers', () =>
+    NarrationProviderStatusV1Schema.parse({
+      version: 1,
+      providers: [
+        {
+          provider: 'edge',
+          configured: false,
+          timing: 'provider',
+          reason: 'Provider adapter is not enabled in this installation.',
+        },
+        {
+          provider: 'elevenlabs',
+          configured: false,
+          timing: 'provider',
+          reason: 'Provider adapter is not enabled in this installation.',
+        },
+        {
+          provider: 'minimax',
+          configured: false,
+          timing: 'none',
+          reason: 'Provider adapter is not enabled in this installation.',
+        },
+        {
+          provider: 'qwen',
+          configured: false,
+          timing: 'none',
+          reason: 'Provider adapter is not enabled in this installation.',
+        },
+        {
+          provider: 'cosyvoice',
+          configured: false,
+          timing: 'provider',
+          reason: 'Provider adapter is not enabled in this installation.',
+        },
+      ],
+    }),
+  )
+  app.get('/api/v1/decks/:deckId/animations', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    return DeckAnimationsDocumentSchema.parse(
+      await readDeckDocument(
+        deckId,
+        'animations.json',
+        DeckAnimationsDocumentSchema,
+        { version: 1, animations: [] },
+      ),
+    )
+  })
+  app.put('/api/v1/decks/:deckId/animations', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    const document = DeckAnimationsDocumentSchema.parse(request.body)
+    for (const animation of document.animations) {
+      for (const group of animation.groups)
+        for (const effect of group.effects) {
+          if (effect.durationMs <= 0 || effect.delayMs < 0)
+            throw new WorkspaceError(
+              'INVALID_REQUEST',
+              'Animation timing must be non-negative.',
+              400,
+            )
+        }
+    }
+    await writeDeckDocument(deckId, 'animations.json', document)
+    eventHub.publish('animation', 'updated', {
+      deckId,
+      revision: (await resolveDeck(deckId)).revision,
+      actor: 'user',
+    })
+    return document
+  })
+  app.get('/api/v1/decks/:deckId/diagrams/:diagramId', async (request) => {
+    const { deckId, diagramId } = z
+      .object({
+        deckId: z.string().min(1),
+        diagramId: z.string().regex(/^[a-zA-Z0-9_-]+$/),
+      })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    return DiagramDocumentV1Schema.parse(
+      await readDeckDocument(
+        deckId,
+        `diagrams/${diagramId}.json`,
+        DiagramDocumentV1Schema,
+        {
+          version: 1,
+          kind: 'flowchart',
+          nodes: [],
+          edges: [],
+          tasks: [],
+          style: {
+            width: 1200,
+            height: 700,
+            direction: 'lr',
+            fontFamily: 'Arial',
+          },
+          acceptedRevision: 0,
+        },
+      ),
+    )
+  })
+  app.put('/api/v1/decks/:deckId/diagrams/:diagramId', async (request) => {
+    const { deckId, diagramId } = z
+      .object({
+        deckId: z.string().min(1),
+        diagramId: z.string().regex(/^[a-zA-Z0-9_-]+$/),
+      })
+      .parse(request.params)
+    await resolveDeck(deckId)
+    const document = DiagramDocumentV1Schema.parse(
+      PutDiagramDocumentSchema.parse(request.body).document,
+    )
+    const result = validateDiagram(document)
+    if (!result.ok)
+      throw new WorkspaceError('INVALID_REQUEST', result.issues.join(' '), 400)
+    await writeDeckDocument(deckId, `diagrams/${diagramId}.json`, document)
+    const svgPath = deckDocumentPath(
+      deckId,
+      `assets/generated/${diagramId}.svg`,
+    )
+    await mkdir(dirname(svgPath), { recursive: true })
+    await writeFile(svgPath, renderDiagram(document), 'utf8')
+    eventHub.publish('diagram', 'updated', {
+      deckId,
+      diagramId,
+      revision: (await resolveDeck(deckId)).revision,
+      actor: 'user',
+    })
+    return document
+  })
+  app.post(
+    '/api/v1/decks/:deckId/diagrams/:diagramId/insert',
+    async (request) => {
+      const { deckId, diagramId } = z
+        .object({
+          deckId: z.string().min(1),
+          diagramId: z.string().regex(/^[a-zA-Z0-9_-]+$/),
+        })
+        .parse(request.params)
+      const input = z
+        .object({
+          alt: z.string().min(1).max(120).optional(),
+          expectedRevision: z.string().min(1).optional(),
+        })
+        .parse(request.body ?? {})
+      const deck = await resolveDeck(deckId)
+      const document = DiagramDocumentV1Schema.parse(
+        await readDeckDocument(
+          deckId,
+          `diagrams/${diagramId}.json`,
+          DiagramDocumentV1Schema,
+          undefined,
+        ),
+      )
+      const svg = renderDiagram(document)
+      const directory = posix.dirname(deck.entryFile.replaceAll('\\', '/'))
+      const assetPath = `${directory === '.' ? '' : `${directory}/`}assets/generated/${diagramId}.svg`
+      await workspaceFiles.writeTextFile({ path: assetPath, content: svg })
+      const file = await workspaceFiles.readTextFile(deck.entryFile)
+      const reference = `./assets/generated/${diagramId}.svg`
+      if (!file.content.includes(`](${reference})`)) {
+        const alt = (input.alt ?? `Diagram ${diagramId}`).replace(
+          /[[\]\n\r]/g,
+          ' ',
+        )
+        await workspaceFiles.writeTextFile({
+          path: deck.entryFile,
+          content: `${file.content.trimEnd()}\n\n<!-- fastppt-diagram:${diagramId} -->\n![${alt}](${reference})\n`,
+          expectedRevision: input.expectedRevision ?? file.revision,
+        })
+      }
+      eventHub.publish('diagram', 'inserted', {
+        deckId,
+        diagramId,
+        assetPath,
+        actor: 'user',
+      })
+      return { deckId, diagramId, assetPath, inserted: true }
+    },
+  )
+  app.get('/api/v1/decks/:deckId/export-capabilities', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const deck = await resolveDeck(deckId)
+    const animations = await readDeckDocument(
+      deckId,
+      'animations.json',
+      DeckAnimationsDocumentSchema,
+      { version: 1, animations: [] },
+    )
+    const master = deck.themeId
+      ? themeRegistry.resolve(deck.themeId)
+      : undefined
+    const lockedMaster = await readDeckDocument(
+      deckId,
+      'theme-lock.json',
+      MasterSnapshotV1Schema,
+    ).catch(() => undefined)
+    const themeChanged = Boolean(
+      lockedMaster && master && lockedMaster.digest !== master.contentDigest,
+    )
+    const masterCapability = themeChanged ? 'unsupported' : 'partial'
+    const notes = await readDeckDocument(
+      deckId,
+      'notes.json',
+      DeckNotesDocumentSchema,
+      { version: 1, notes: [] },
+    )
+    const diagramsRoot = deckDocumentPath(deck.id, 'diagrams')
+    const diagramFiles = await readdir(diagramsRoot, {
+      withFileTypes: true,
+    }).catch(() => [])
+    const diagramKinds = await Promise.all(
+      diagramFiles
+        .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+        .map(
+          async (entry) =>
+            DiagramDocumentV1Schema.parse(
+              JSON.parse(
+                await readFile(join(diagramsRoot, entry.name), 'utf8'),
+              ),
+            ).kind,
+        ),
+    )
+    const unsupportedDiagramKinds = diagramKinds.filter(
+      (kind) =>
+        !['flowchart', 'org-chart', 'gantt', 'timeline', 'matrix'].includes(
+          kind,
+        ),
+    )
+    const diagramCapability = unsupportedDiagramKinds.length
+      ? 'partial'
+      : 'supported'
+    const hasCues = notes.notes.some((note) =>
+      note.cues.some(
+        (cue) => cue.text.trim() && cue.endSeconds > cue.startSeconds,
+      ),
+    )
+    const report = ExportCapabilityReportSchema.parse({
+      version: 1,
+      deckRevision: deck.revision,
+      themeDigest: master?.contentDigest,
+      capabilities: {
+        pages: 'supported',
+        notes: 'supported',
+        narration_srt: hasCues ? 'supported' : 'partial',
+        narration_audio: 'unsupported',
+        animations: animations.animations.length ? 'partial' : 'supported',
+        master: masterCapability,
+        diagrams: diagramCapability,
+      },
+      warnings: [
+        'Explicit native layouts preserve placeholder geometry; layouts without definitions share seed geometry. Content placeholder binding and full style inheritance remain incomplete.',
+        ...(hasCues
+          ? []
+          : ['No valid narration cues are saved; SRT export will be empty.']),
+        'Narration audio requires a configured provider; notes and SRT remain available offline.',
+        ...(animations.animations.length
+          ? [
+              'Some object animation effects may require PowerPoint-specific timing support.',
+            ]
+          : []),
+        ...(lockedMaster?.unsupported.length
+          ? lockedMaster.unsupported.map(
+              (item) => `Master limitation: ${item}.`,
+            )
+          : []),
+        ...(unsupportedDiagramKinds.length
+          ? [
+              `${[...new Set(unsupportedDiagramKinds)].join(', ')} diagrams remain SVG assets; flowchart, org-chart, gantt, timeline, and matrix are expanded into editable native shapes.`,
+            ]
+          : []),
+        ...(themeChanged
+          ? [
+              'Registered theme changed after theme-lock snapshot; refresh the master snapshot before export.',
+            ]
+          : []),
+      ],
+      blocks: themeChanged ? ['THEME_LOCK_STALE'] : [],
+    })
+    database.setAppSetting(
+      `export-capabilities:${deckId}`,
+      JSON.stringify({ savedAt: new Date().toISOString(), report }),
+    )
+    return report
+  })
+  app.get(
+    '/api/v1/decks/:deckId/export-capabilities/history',
+    async (request) => {
+      const { deckId } = z
+        .object({ deckId: z.string().min(1) })
+        .parse(request.params)
+      await resolveDeck(deckId)
+      const raw = database.getAppSetting(`export-capabilities:${deckId}`)
+      if (!raw) return { deckId, report: null, savedAt: null }
+      try {
+        const parsed = z
+          .object({
+            savedAt: z.iso.datetime(),
+            report: ExportCapabilityReportSchema,
+          })
+          .parse(JSON.parse(raw))
+        return { deckId, ...parsed }
+      } catch {
+        return { deckId, report: null, savedAt: null }
+      }
+    },
+  )
+  app.get('/api/v1/decks/:deckId/master', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const deck = await resolveDeck(deckId)
+    if (!deck.themeId)
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'Deck has no registered theme.',
+        400,
+      )
+    const theme = themeRegistry.resolve(deck.themeId)
+    const css = await readFile(
+      join(theme.packageRoot, 'styles', 'layout.css'),
+      'utf8',
+    ).catch(() => '')
+    const fonts = [
+      ...new Set(
+        [
+          ...css.matchAll(
+            /(?:font-family|--[\w-]*font[\w-]*)\s*:\s*([^;]+);/gi,
+          ),
+        ].flatMap((match) =>
+          (match[1] ?? '')
+            .split(',')
+            .map((font) => font.trim().replace(/^['"]|['"]$/g, ''))
+            .filter(
+              (font) =>
+                font &&
+                !/^(sans-serif|serif|monospace|inherit)$/i.test(font) &&
+                !/^var\(/i.test(font),
+            ),
+        ),
+      ),
+    ]
+    const colors = Object.fromEntries(
+      [
+        ...css.matchAll(
+          /(--[\w-]*(?:color|blue|red|green|accent|text)[\w-]*)\s*:\s*(#[0-9a-f]{3,8})\b/gi,
+        ),
+      ].map((match) => [match[1]!, match[2]!.toUpperCase()]),
+    )
+    let layoutDefinitions:
+      z.infer<typeof NativeMasterLayoutSchema>[] | undefined
+    try {
+      layoutDefinitions = z
+        .array(NativeMasterLayoutSchema)
+        .parse(
+          JSON.parse(
+            await readFile(
+              join(theme.packageRoot, 'agent', 'native-layouts.json'),
+              'utf8',
+            ),
+          ),
+        )
+    } catch (cause) {
+      if (!(
+        cause instanceof Error &&
+        'code' in cause &&
+        cause.code === 'ENOENT'
+      ))
+        throw cause
+    }
+    const masterGroups = new Map<string, string[]>()
+    for (const name of new Set([
+      ...theme.manifest.layouts.map((layout) => layout.id),
+      ...(layoutDefinitions?.map((layout) => layout.name) ?? []),
+    ])) {
+      const masterId =
+        layoutDefinitions?.find((layout) => layout.name === name)?.masterId ??
+        'default'
+      masterGroups.set(masterId, [...(masterGroups.get(masterId) ?? []), name])
+    }
+    const snapshot = MasterSnapshotV1Schema.parse({
+      version: 1,
+      themeId: theme.manifest.id,
+      digest: theme.contentDigest,
+      fonts,
+      colors,
+      masters: [...masterGroups].map(([id, layouts]) => ({
+        id,
+        layouts,
+        placeholders: ['title', 'content'],
+      })),
+      ...(layoutDefinitions?.length ? { layoutDefinitions } : {}),
+      unsupported: [],
+    })
+    await writeDeckDocument(deckId, 'theme-lock.json', snapshot)
+    return snapshot
+  })
+  const identityInitializations = new Map<
+    string,
+    Promise<{
+      deckId: string
+      revision: string
+      slides: ReturnType<typeof compileDeck>
+    }>
+  >()
+  app.post('/api/v1/decks/:deckId/identities', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const pending = identityInitializations.get(deckId)
+    if (pending) return pending
+    const task = (async () => {
+      const deck = await resolveDeck(deckId)
+      const source = await workspaceFiles.readTextFile(deck.entryFile)
+      const content = persistDeckIdentities(
+        source.content,
+        () => `slide-${randomUUID()}`,
+      )
+      const file =
+        content === source.content
+          ? source
+          : await workspaceFiles.writeTextFile({
+              path: deck.entryFile,
+              content,
+              expectedRevision: source.revision,
+            })
+      return {
+        deckId,
+        revision: file.revision,
+        slides: await compileWithThemeAnchors(deck, file.content),
+      }
+    })()
+    identityInitializations.set(deckId, task)
+    try {
+      return await task
+    } finally {
+      identityInitializations.delete(deckId)
+    }
+  })
+  app.get('/api/v1/decks/:deckId/ir', async (request) => {
+    const { deckId } = z
+      .object({ deckId: z.string().min(1) })
+      .parse(request.params)
+    const deck = await resolveDeck(deckId)
+    const source = await workspaceFiles.readTextFile(deck.entryFile)
+    return {
+      deckId,
+      revision: source.revision,
+      motionPreset: deck.themeId
+        ? (themeRegistry.resolve(deck.themeId).manifest.motionPreset ??
+          'static')
+        : 'static',
+      slides: await compileWithThemeAnchors(deck, source.content),
+    }
+  })
+  app.post('/api/v1/diagrams/validate', (request) => {
+    const document = DiagramDocumentV1Schema.parse(
+      PutDiagramDocumentSchema.parse(request.body).document,
+    )
+    return validateDiagram(document)
+  })
+  app.post('/api/v1/diagrams/render', (request) => {
+    const document = DiagramDocumentV1Schema.parse(
+      PutDiagramDocumentSchema.parse(request.body).document,
+    )
+    const result = validateDiagram(document)
+    if (!result.ok)
+      throw new WorkspaceError('INVALID_REQUEST', result.issues.join(' '), 400)
+    return { svg: renderDiagram(document) }
+  })
+  app.post('/api/v1/creation-wizards', () => {
+    const id = randomUUID()
+    const wizard = CreationWizardSchema.parse({
+      id,
+      version: 1,
+      status: 'draft',
+      currentStep: 'task',
+      decisions: [],
+      updatedAt: new Date().toISOString(),
+    })
+    database.setAppSetting(`creation-wizard:${id}`, JSON.stringify(wizard))
+    eventHub.publish('creation-wizard', 'created', wizard)
+    return wizard
+  })
+  app.get('/api/v1/creation-wizards/:wizardId', (request) => {
+    const { wizardId } = z
+      .object({ wizardId: z.string().min(1) })
+      .parse(request.params)
+    const raw = database.getAppSetting(`creation-wizard:${wizardId}`)
+    if (!raw)
+      throw new WorkspaceError(
+        'FILE_NOT_FOUND',
+        `Creation wizard not found: ${wizardId}`,
+        404,
+      )
+    return CreationWizardSchema.parse(JSON.parse(raw))
+  })
+  app.patch('/api/v1/creation-wizards/:wizardId/steps', (request) => {
+    const { wizardId } = z
+      .object({ wizardId: z.string().min(1) })
+      .parse(request.params)
+    const raw = database.getAppSetting(`creation-wizard:${wizardId}`)
+    if (!raw)
+      throw new WorkspaceError(
+        'FILE_NOT_FOUND',
+        `Creation wizard not found: ${wizardId}`,
+        404,
+      )
+    const current = CreationWizardSchema.parse(JSON.parse(raw))
+    if (current.status !== 'draft')
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'Committed creation decisions are immutable.',
+        409,
+      )
+    const input = z
+      .object({
+        currentStep: z.string().min(1).optional(),
+        decision: CreationDecisionV1Schema.optional(),
+      })
+      .parse(request.body)
+    if (input.decision) {
+      const existing = current.decisions.find(
+        (decision) => decision.stepId === input.decision?.stepId,
+      )
+      if (
+        existing?.locked &&
+        JSON.stringify(existing) !== JSON.stringify(input.decision)
+      )
+        throw new WorkspaceError(
+          'INVALID_REQUEST',
+          `Creation decision is locked: ${existing.stepId}`,
+          409,
+        )
+    }
+    const wizard = CreationWizardSchema.parse({
+      ...current,
+      currentStep: input.currentStep ?? current.currentStep,
+      decisions: input.decision
+        ? [
+            ...current.decisions.filter(
+              (d) => d.stepId !== input.decision?.stepId,
+            ),
+            input.decision,
+          ]
+        : current.decisions,
+      updatedAt: new Date().toISOString(),
+    })
+    database.setAppSetting(
+      `creation-wizard:${wizardId}`,
+      JSON.stringify(wizard),
+    )
+    eventHub.publish('creation-wizard', 'updated', wizard)
+    return wizard
+  })
+  app.post('/api/v1/creation-wizards/:wizardId/commit', (request) => {
+    const { wizardId } = z
+      .object({ wizardId: z.string().min(1) })
+      .parse(request.params)
+    const raw = database.getAppSetting(`creation-wizard:${wizardId}`)
+    if (!raw)
+      throw new WorkspaceError(
+        'FILE_NOT_FOUND',
+        `Creation wizard not found: ${wizardId}`,
+        404,
+      )
+    const current = CreationWizardSchema.parse(JSON.parse(raw))
+    if (current.status === 'committed') return current
+    if (current.status !== 'draft')
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'Only draft wizards can be committed.',
+        409,
+      )
+    const wizard = CreationWizardSchema.parse({
+      ...current,
+      status: 'committed',
+      profileDigest: createHash('sha256')
+        .update(JSON.stringify(current.decisions))
+        .digest('hex'),
+      updatedAt: new Date().toISOString(),
+    })
+    database.setAppSetting(
+      `creation-wizard:${wizardId}`,
+      JSON.stringify(wizard),
+    )
+    eventHub.publish('creation-wizard', 'committed', wizard)
+    return wizard
   })
 
   app.get('/api/v1/decks/:deckId/image-runs', async (request) => {
@@ -2552,7 +4249,51 @@ export async function createGateway(
     const { deckId } = z
       .object({ deckId: z.string().min(1) })
       .parse(request.params)
-    return validateDeck(await resolveDeck(deckId))
+    return DeckValidationResultSchema.parse(
+      await validateDeck(await resolveDeck(deckId)),
+    )
+  })
+
+  const reviewRuleExceptions = async (deck: DeckSummary, input: ThemeRuleExceptionContextRequest) => {
+    const binding = await currentRuleBinding(deck, input.profileDigest, input.options)
+    let issues: ThemeRuleIssue[]
+    if (input.phase === 'readback') {
+      const job = input.exportId ? exportManager.get(input.exportId) : undefined
+      if (!job || job.deckId !== deck.id || !['failed', 'completed', 'review-required'].includes(job.status) || !job.themeRules?.binding || !job.themeRules.readback || job.themeRules.readback.error)
+        throw new RpcError('A completed rule readback report is required; artifact integrity failures cannot be excepted.', 'INVALID_REQUEST')
+      if (!sameRuleBinding(binding, job.themeRules.binding)) throw new RpcError('The exported report is stale. Export the current deck before granting a readback exception.', 'THEME_RULE_EXCEPTION_STALE')
+      issues = job.themeRules.readback.issues
+    } else {
+      issues = (await validateDeck(deck, { phase: 'export', profileDigest: input.profileDigest, master: input.options.master, exportOptions: input.options, applyExceptions: false })).themeRuleIssues
+    }
+    if (!sameRuleBinding(binding, await currentRuleBinding(deck, input.profileDigest, input.options))) throw new RpcError('The deck changed while checking rule evidence. Review it again.', 'THEME_RULE_EXCEPTION_STALE')
+    const entries = await ruleExceptionStore.list(deck.id)
+    return ThemeRuleExceptionReviewSchema.parse({
+      binding, phase: input.phase,
+      issues: applyRuleExceptions(issues, entries, binding, input.phase).map(issue => ({ fingerprint: ruleIssueFingerprint(issue), issue })),
+      entries: entries.map(exception => ({ exception, state: ruleExceptionState(exception, binding) })),
+    })
+  }
+  app.post('/api/v1/decks/:deckId/rule-exceptions/review', async request => {
+    const { deckId } = z.object({ deckId: z.string().min(1) }).parse(request.params)
+    return reviewRuleExceptions(await resolveDeck(deckId), ThemeRuleExceptionContextRequestSchema.parse(request.body ?? {}))
+  })
+  app.post('/api/v1/decks/:deckId/rule-exceptions', async request => {
+    const { deckId } = z.object({ deckId: z.string().min(1) }).parse(request.params)
+    const input = ApproveThemeRuleExceptionSchema.parse(request.body)
+    return ThemeRuleExceptionSchema.parse(await ruleExceptionStore.approve(deckId, async () => {
+      const review = await reviewRuleExceptions(await resolveDeck(deckId), input)
+      if (!sameRuleBinding(review.binding, input.expectedBinding)) throw new RpcError('The rule context changed. Review the current issue before granting an exception.', 'THEME_RULE_EXCEPTION_STALE')
+      const found = review.issues.find(entry => entry.fingerprint === input.issueFingerprint)
+      if (!found) throw new RpcError('The requested rule issue is not present in the current evidence.', 'INVALID_REQUEST')
+      return { binding: review.binding, phase: input.phase, issue: found.issue, reason: input.reason }
+    }))
+  })
+  app.post('/api/v1/decks/:deckId/rule-exceptions/:exceptionId/revoke', async request => {
+    const { deckId, exceptionId } = z.object({ deckId: z.string().min(1), exceptionId: z.string().uuid() }).parse(request.params)
+    await resolveDeck(deckId)
+    if (!(await ruleExceptionStore.list(deckId)).some(entry => entry.id === exceptionId)) throw new WorkspaceError('FILE_NOT_FOUND', 'Rule exception not found.', 404)
+    return ThemeRuleExceptionSchema.parse(await ruleExceptionStore.revoke(deckId, exceptionId))
   })
 
   app.post('/api/v1/decks/:deckId/format', async (request) => {
@@ -2673,21 +4414,224 @@ export async function createGateway(
       .parse(request.params)
     const input = CreateExportRequestSchema.parse(request.body)
     const deck = await resolveDeck(deckId)
-    const validation = await validateDeck(deck)
+    const exportSource = await workspaceFiles.readTextFile(deck.entryFile)
+    const exportSlides = compileDeck(exportSource.content)
+    const notesDocument =
+      input.options?.notes === false
+        ? undefined
+        : await (async () => {
+            const stored = await readDeckDocument(
+              deckId,
+              'notes.json',
+              DeckNotesDocumentSchema,
+              undefined,
+            ).catch(() => undefined)
+            if (stored) return stored
+            const source = await workspaceFiles.readTextFile(deck.entryFile)
+            return DeckNotesDocumentSchema.parse({
+              version: 1,
+              notes: compileDeck(source.content)
+                .filter((slide) => slide.notes.spokenText.trim())
+                .map((slide) => slide.notes),
+            })
+          })()
+    const animationsDocument =
+      input.options?.animations === false
+        ? undefined
+        : await readDeckDocument(
+            deckId,
+            'animations.json',
+            DeckAnimationsDocumentSchema,
+            { version: 1, animations: [] },
+          )
+    if (animationsDocument) {
+      const sourceContent = await workspaceFiles.readTextFile(deck.entryFile)
+      const bySlide = new Map(compileDeck(sourceContent.content).map(slide => [slide.slideId, slide.animation]))
+      for (const animation of animationsDocument.animations) bySlide.set(animation.slideId, animation)
+      animationsDocument.animations = [...bySlide.values()]
+    }
+    const nativeDiagrams =
+      input.options?.diagrams === false
+        ? []
+        : await (async () => {
+            const root = deckDocumentPath(deckId, 'diagrams')
+            const entries = await readdir(root, { withFileTypes: true }).catch(
+              () => [],
+            )
+            const markdown = (await workspaceFiles.readTextFile(deck.entryFile))
+              .content
+            const pages = compileDeck(markdown).map((slide) => slide.markdown)
+            return (
+              await Promise.all(
+                entries
+                  .filter(
+                    (entry) => entry.isFile() && entry.name.endsWith('.json'),
+                  )
+                  .map(async (entry) => {
+                    const diagramId = entry.name.slice(0, -'.json'.length)
+                    const document = DiagramDocumentV1Schema.parse(
+                      JSON.parse(
+                        await readFile(join(root, entry.name), 'utf8'),
+                      ),
+                    )
+                    if (
+                      ![
+                        'flowchart',
+                        'org-chart',
+                        'gantt',
+                        'timeline',
+                        'matrix',
+                      ].includes(document.kind)
+                    )
+                      return undefined
+                    const marker = `fastppt-diagram:${diagramId}`
+                    const fallback = `assets/generated/${diagramId}.svg`
+                    const slide =
+                      pages.findIndex(
+                        (page) =>
+                          page.includes(marker) || page.includes(fallback),
+                      ) + 1
+                    if (slide === 0) return undefined
+                    return {
+                      slide,
+                      diagramId,
+                      document: {
+                        kind: document.kind,
+                        style: document.style,
+                        nodes: document.nodes.map((node) => ({
+                          id: node.id,
+                          label: node.label,
+                          ...(node.x === undefined ? {} : { x: node.x }),
+                          ...(node.y === undefined ? {} : { y: node.y }),
+                          ...(node.color === undefined
+                            ? {}
+                            : { color: node.color }),
+                        })),
+                        edges: document.edges.map((edge) => ({
+                          from: edge.from,
+                          to: edge.to,
+                          ...(edge.label === undefined
+                            ? {}
+                            : { label: edge.label }),
+                        })),
+                        ...(['gantt', 'timeline'].includes(document.kind)
+                          ? {
+                              tasks: document.tasks.map((task) => ({
+                                id: task.id,
+                                label: task.label,
+                                start: task.start,
+                                end: task.end,
+                              })),
+                            }
+                          : {}),
+                      },
+                    }
+                  }),
+              )
+            ).filter(
+              (entry): entry is NonNullable<typeof entry> =>
+                entry !== undefined,
+            )
+          })()
+    const validation = await validateDeck(deck, { phase: 'export', profileDigest: input.profileDigest ?? null, exportOptions: input.options, ...(input.options?.master === undefined ? {} : { master: input.options.master }) })
     if (!validation.valid)
       throw new RpcError(
         'Deck validation found blocking issues. Fix them before export.',
         'DECK_VALIDATION_FAILED',
-        { deckId, revision: deck.revision, errors: validation.errors },
+        { deckId, revision: deck.revision, errors: validation.errors, themeRuleIssues: validation.themeRuleIssues },
       )
+    const currentMaster = deck.themeId
+      ? themeRegistry.resolve(deck.themeId)
+      : undefined
+    const lockedMaster = await readDeckDocument(
+      deckId,
+      'theme-lock.json',
+      MasterSnapshotV1Schema,
+    ).catch(() => undefined)
+    if (
+      lockedMaster &&
+      currentMaster &&
+      lockedMaster.digest !== currentMaster.contentDigest
+    )
+      throw new RpcError(
+        'The registered theme changed after the master snapshot was locked. Refresh the master snapshot before export.',
+        'THEME_LOCK_STALE',
+        {
+          deckId,
+          expectedDigest: currentMaster.contentDigest,
+          lockedDigest: lockedMaster.digest,
+        },
+      )
+    const availableLayouts = new Set([
+      ...(lockedMaster?.masters.flatMap((master) => master.layouts) ?? []),
+      ...(lockedMaster?.layoutDefinitions?.map((layout) => layout.name) ?? []),
+    ])
+    const slideLayouts =
+      input.options?.master === false
+        ? undefined
+        : exportSlides.map((slide) =>
+            availableLayouts.has(slide.layout) ? slide.layout : undefined,
+          )
+    const placeholderBindings =
+      input.options?.master === false
+        ? []
+        : exportSlides.flatMap((slide, index) =>
+            slide.placeholderBindings.map((binding) => ({
+              ...binding,
+              slide: index + 1,
+            })),
+          )
+    for (const binding of placeholderBindings) {
+      const layoutName = slideLayouts?.[binding.slide - 1]
+      const layout = lockedMaster?.layoutDefinitions?.find(
+        (item) => item.name === layoutName,
+      )
+      const slot = layout?.placeholders.find(
+        (slot) => slot.index === binding.index,
+      )
+      if (!slot)
+        throw new RpcError(
+          'Placeholder binding requires a matching locked native layout slot.',
+          'INVALID_REQUEST',
+          {
+            slide: binding.slide,
+            target: binding.target,
+            index: binding.index,
+          },
+        )
+      if (binding.textStyle === 'layout' && !slot.textStyle)
+        throw new RpcError(
+          'Text style inheritance requires defaults on the locked layout placeholder.',
+          'INVALID_REQUEST',
+          {
+            slide: binding.slide,
+            target: binding.target,
+            index: binding.index,
+          },
+        )
+      if (binding.textBody === 'layout' && (!slot.textBody || slot.type === 'pic'))
+        throw new RpcError(
+          'Text body inheritance requires defaults on the locked layout placeholder.',
+          'INVALID_REQUEST',
+          { slide: binding.slide, target: binding.target, index: binding.index },
+        )
+    }
     const policy = input.reviewPolicy ?? 'fast'
     if (policy !== 'fast') {
       const report = database.getQualityReport(deckId)
+      const currentTheme = deck.themeId
+        ? themeRegistry.resolve(deck.themeId)
+        : undefined
       const stale =
         !report ||
         report.revision !== deck.revision ||
-        report.profileDigest !== (input.profileDigest ?? null)
-      if (stale || !report?.ok)
+        report.profileDigest !== (input.profileDigest ?? null) ||
+        report.themeDigest !== (currentTheme?.contentDigest ?? null) ||
+        report.masterDigest !== await lockedMasterDigest(deckId) ||
+        report.themeRuleDigest !== (validation.themeRuleDigest ?? null)
+      const priorBlockers = report?.issues.filter(issue => issue.severity === 'error') ?? []
+      const onlyExceptedRules = priorBlockers.length > 0 && priorBlockers.every(issue => issue.layer === 'schema') && validation.valid
+      if (stale || (!report?.ok && !onlyExceptedRules))
         throw new RpcError(
           stale
             ? 'A current quality inspection is required before export.'
@@ -2712,12 +4656,116 @@ export async function createGateway(
             ...(themePackageRoot ? { themePackageRoot } : {}),
           })
     requireSlidevReady(state, 'export')
+    const ruleDocument = currentMaster?.machineRulesPath
+      ? ThemeRulesDocumentSchema.parse(JSON.parse(await readFile(currentMaster.machineRulesPath, 'utf8')))
+      : undefined
+    if ((ruleDocument ? themeRulesDigest(ruleDocument) : null) !== validation.themeRuleDigest)
+      throw new RpcError('Theme rules changed after validation. Validate the deck again.', 'THEME_RULES_STALE', { deckId })
+    const ruleBinding = ruleDocument ? await currentRuleBinding(deck, input.profileDigest ?? null, input.options) : undefined
+    if (ruleBinding && (ruleBinding.revision !== validation.revision || ruleBinding.ruleDigest !== validation.themeRuleDigest || ruleBinding.themeDigest !== currentMaster?.contentDigest)) throw new RpcError('The rule context changed after validation. Validate the current deck again.', 'THEME_RULE_EXCEPTION_STALE')
+    const ruleExceptions = ruleBinding ? (await ruleExceptionStore.list(deckId)).filter(entry => ruleExceptionState(entry, ruleBinding) === 'active') : []
     return ExportJobSchema.parse(
       exportManager.enqueue({
         deckId,
+        ...(ruleDocument ? { ruleDocument } : {}),
+        themeRules: { revision: deck.revision, digest: validation.themeRuleDigest, stage: 'pre-export', issues: validation.themeRuleIssues, ...(ruleBinding ? { binding: ruleBinding, exceptions: ruleExceptions } : {}) },
         title: deck.name,
         outputName: input.outputName,
         review: input.review ?? false,
+        ...(input.options ? { options: input.options } : {}),
+        ...(notesDocument
+          ? {
+              notes: exportSlides.map(
+                (slide) =>
+                  notesDocument.notes.find(
+                    (note) => note.slideId === slide.slideId,
+                  )?.spokenText ?? '',
+              ),
+            }
+          : {}),
+        ...(animationsDocument
+          ? {
+              transitions: exportSlides.map(
+                (slide) =>
+                  animationsDocument.animations.find(
+                    (animation) => animation.slideId === slide.slideId,
+                  )?.transition ?? slide.animation.transition,
+              ),
+            }
+          : {}),
+        ...(lockedMaster
+          ? { themeColors: Object.values(lockedMaster.colors) }
+          : {}),
+        ...(lockedMaster?.fonts[0] ? { themeFont: lockedMaster.fonts[0] } : {}),
+        ...(lockedMaster
+          ? {
+              masterLayouts: lockedMaster.masters.flatMap(
+                (master) => master.layouts,
+              ),
+            }
+          : {}),
+        ...(lockedMaster?.layoutDefinitions
+          ? { masterLayoutDefinitions: lockedMaster.layoutDefinitions }
+          : {}),
+        ...(slideLayouts?.some((name) => name !== undefined)
+          ? { slideLayouts }
+          : {}),
+        ...(placeholderBindings.length ? { placeholderBindings } : {}),
+        ...(animationsDocument
+          ? {
+              objectAnimations: animationsDocument.animations.flatMap(
+                (animation) => {
+                  const slide =
+                    exportSlides.findIndex(
+                      (page) => page.slideId === animation.slideId,
+                    ) + 1
+                  if (!slide) return []
+                  return animation.groups.flatMap(group => group.effects).map((effect, index) => ({ effect, index })).sort((a,b) => Number(a.effect.params.sourceOrder ?? a.index) - Number(b.effect.params.sourceOrder ?? b.index)).flatMap(({ effect }) => {
+                      if (
+                        ![
+                          'entrance_fade',
+                          'appear',
+                          'fly',
+                          'zoom',
+                          'emphasis_pulse',
+                          'teeter',
+                          'path_line',
+                          'path_arc',
+                          'exit_fade',
+                          'native',
+                        ].includes(effect.kind)
+                      )
+                        return []
+                      return [
+                        {
+                          slide: Number(slide),
+                          target: effect.target,
+                          kind: effect.kind,
+                          ...(typeof effect.params.path === 'string'
+                            ? { path: effect.params.path }
+                            : {}),
+                          ...(typeof effect.params.nativeXml === 'string' ? { nativeXml: effect.params.nativeXml, ...(typeof effect.params.sourceDurationMs === 'number' ? { nativeDurationMs: effect.params.sourceDurationMs } : {}) } : {}),
+                          trigger: effect.trigger,
+                          delayMs: effect.delayMs,
+                          durationMs: effect.durationMs,
+                        },
+                      ]
+                    })
+                },
+              ),
+            }
+          : {}),
+        ...(animationsDocument
+          ? {
+              animationEffects: animationsDocument.animations.flatMap(
+                (animation) =>
+                  animation.groups.flatMap((group) =>
+                    group.effects.map((effect) => effect.kind),
+                  ),
+              ),
+            }
+          : {}),
+        ...(nativeDiagrams.length ? { nativeDiagrams } : {}),
       }),
     )
   })
@@ -2764,7 +4812,7 @@ export async function createGateway(
       .parse(request.body)
     const deck = await resolveDeck(deckId)
     const themeDigest = deck.themeId
-      ? createHash('sha256').update(deck.themeId).digest('hex')
+      ? themeRegistry.resolve(deck.themeId).contentDigest
       : null
     const themePackageRoot = deck.themeId
       ? themeRegistry.resolve(deck.themeId).packageRoot
@@ -2787,6 +4835,7 @@ export async function createGateway(
         revision: deck.revision,
         themeId: deck.themeId ?? null,
         themeDigest,
+        masterDigest: await lockedMasterDigest(deckId),
         profileDigest: input.profileDigest,
         policy: input.policy,
       }),
@@ -2824,7 +4873,7 @@ export async function createGateway(
     return BrowserInspectionJobSchema.parse(job)
   })
 
-  app.post('/api/v1/inspections/:inspectionId/result', (request) => {
+  app.post('/api/v1/inspections/:inspectionId/result', async (request) => {
     const { inspectionId } = z
       .object({ inspectionId: z.string().uuid() })
       .parse(request.params)
@@ -2844,6 +4893,31 @@ export async function createGateway(
     const completed = inspectionManager.submitResult(inspectionId, request.body)
     if (completed.kind === 'quality' && completed.status === 'completed') {
       const result = BrowserQualityResultSchema.parse(completed.result)
+      const deck = await resolveDeck(completed.deckId)
+      const currentTheme = deck.themeId ? themeRegistry.resolve(deck.themeId) : undefined
+      const masterDigest = await lockedMasterDigest(deck.id)
+      const previous = database.getQualityReport(deck.id)
+      const fresh = previous && previous.revision === deck.revision && previous.themeDigest === (currentTheme?.contentDigest ?? null) && previous.masterDigest === masterDigest && previous.themeRuleDigest === (currentTheme?.machineRulesDigest ?? null) && previous.profileDigest === (completed.profileDigest ?? null)
+      const currentCapture = completed.revision === deck.revision && completed.themeDigest === (currentTheme?.contentDigest ?? null) && (completed.masterDigest ?? null) === masterDigest
+      const ruleMeasurements = [
+        ...(fresh && currentCapture ? previous.ruleMeasurements.filter(entry => entry.slide !== completed.slide) : []),
+        ...(currentCapture && result.ruleMeasurement ? [result.ruleMeasurement] : []),
+      ]
+      const browserIssues = [
+        ...(fresh && currentCapture ? previous.issues.filter(issue => issue.layer !== 'schema' && issue.slide !== completed.slide) : []),
+        ...result.issues,
+      ]
+      const validation = await validateDeck(deck, { phase: 'quality', measurements: ruleMeasurements, profileDigest: completed.profileDigest ?? null })
+      const themeRuleQualityIssues = validation.themeRuleIssues.map(
+        (issue) => ({
+          layer: 'schema' as const,
+          severity: issue.severity,
+          code: issue.code,
+          message: issue.message,
+          ...(issue.slide === undefined ? {} : { slide: issue.slide }),
+          suggestedFix: issue.suggestedFix,
+        }),
+      )
       database.recordQualityReport(
         DeckQualityReportSchema.parse({
           version: 1,
@@ -2851,11 +4925,19 @@ export async function createGateway(
           revision: completed.revision,
           themeId: completed.themeId ?? null,
           themeDigest: completed.themeDigest ?? null,
+          masterDigest: completed.masterDigest ?? null,
           profileDigest: completed.profileDigest ?? null,
           checkedAt: new Date().toISOString(),
           policy: completed.policy ?? 'standard',
-          ok: !result.issues.some((issue) => issue.severity === 'error'),
-          issues: result.issues,
+          ok:
+            currentCapture && !browserIssues.some((issue) => issue.severity === 'error') &&
+            !validation.themeRuleIssues.some(
+              blockingRuleIssue,
+            ),
+          issues: [...browserIssues, ...themeRuleQualityIssues],
+          themeRuleDigest: validation.themeRuleDigest,
+          themeRuleIssues: validation.themeRuleIssues,
+          ruleMeasurements,
         }),
       )
     }
@@ -2971,9 +5053,21 @@ export async function createGateway(
         'EXPORT_NOT_READY',
         { exportId, status: persisted.job.status },
       )
+    let verifiedPath: string | undefined
+    if (exportManager.get(exportId)) {
+      try { verifiedPath = (await exportManager.download(exportId)).path }
+      catch (cause) { throw new RpcError(cause instanceof Error ? cause.message : 'Export verification failed.', 'EXPORT_NOT_READY', { exportId }) }
+    } else if (persisted.job.themeRules?.digest) {
+      throw new RpcError('Export rule evidence could not be restored. Export the deck again.', 'EXPORT_NOT_READY', { exportId })
+    }
     const outputPath = await resolveExistingPath(
       exportRoot,
-      relative(exportRoot, persisted.outputPath),
+      relative(exportRoot, verifiedPath ?? persisted.outputPath),
+    )
+    const fallbackName = persisted.job.outputName.replace(/[^\x20-\x7e]|["\\]/g, '_')
+    const encodedName = encodeURIComponent(persisted.job.outputName).replace(
+      /['()*]/g,
+      character => `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
     )
     reply
       .type(
@@ -2981,7 +5075,7 @@ export async function createGateway(
       )
       .header(
         'content-disposition',
-        `attachment; filename="${persisted.job.outputName}"`,
+        `attachment; filename="${fallbackName}"; filename*=UTF-8''${encodedName}`,
       )
     return reply.send(createReadStream(outputPath))
   })

@@ -127,12 +127,12 @@ function fixture(
 }
 
 describe('ClaudeAdapter', () => {
-  it('reports verified SDK capabilities and reads persisted sessions', async () => {
+  it('reports available SDK capabilities and reads persisted sessions', async () => {
     const claude = fixture()
     await expect(claude.getStatus()).resolves.toMatchObject({
       status: 'available',
       compatible: true,
-      version: 'agent-sdk 0.3.220 / Claude Code 2.1.220',
+      version: 'agent-sdk 0.3.221 / Claude Code 2.1.223',
     })
     await expect(
       claude.listSessions({ cwd: process.cwd() }),

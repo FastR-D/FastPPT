@@ -1,0 +1,9 @@
+{
+  "id": "34422534f8b5",
+  "source": "references/GordenPPTSkill/templates/premium-corp/template.pptx",
+  "sourceSha256": "502c871be80b930400e9815ef0581232610261a8c0389d1642b409b872bd0c28",
+  "pages": 35,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

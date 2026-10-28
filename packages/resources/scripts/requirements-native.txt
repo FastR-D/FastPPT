@@ -1,0 +1,3 @@
+# Offline library rebuilding only; not required to preview or reuse resources.
+lxml==6.1.1
+shapely==2.1.2

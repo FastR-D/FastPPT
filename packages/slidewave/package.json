@@ -9,7 +9,13 @@
     "./browser/runtime": "./src/browser/capture-runtime.ts",
     "./snapshot": "./src/snapshot.ts",
     "./server": "./src/server/index.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./diagram-layout": "./src/primitives/diagram-layout.ts",
+    "./xml": "./src/server/slide-xml.ts",
+    "./motion-schedule": "./src/primitives/motion-schedule.ts",
+    "./text-kerning": "./src/primitives/text-kerning.mjs",
+    "./native-motion": "./src/primitives/native-motion.mjs",
+    "./native-animation": "./src/server/native-animation.ts"
   },
   "sideEffects": [
     "./src/browser/capture-runtime.ts",
@@ -58,7 +64,25 @@
       "./browser/runtime": "./dist/browser/runtime.js",
       "./snapshot": "./dist/snapshot.js",
       "./server": "./dist/server/index.js",
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./diagram-layout": "./dist/diagram-layout.js",
+      "./xml": "./dist/xml.js",
+      "./motion-schedule": {
+        "types": "./dist/primitives/motion-schedule.d.ts",
+        "import": "./dist/motion-schedule.js"
+      },
+      "./text-kerning": {
+        "types": "./dist/primitives/text-kerning.d.mts",
+        "import": "./dist/text-kerning.js"
+      },
+      "./native-motion": {
+        "types": "./dist/primitives/native-motion.d.mts",
+        "import": "./dist/native-motion.js"
+      },
+      "./native-animation": {
+        "types": "./dist/server/native-animation.d.ts",
+        "import": "./dist/native-animation.js"
+      }
     }
   },
   "repository": {

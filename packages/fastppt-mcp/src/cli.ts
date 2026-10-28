@@ -3,13 +3,10 @@
 import { basename, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { loadThemeRegistry } from '@fastppt/theme-registry'
-import { WorkspaceService } from '@fastppt/workspace'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 
-import { createFastPptMcpServer, FastPptMcpService } from './server.js'
-import { GatewayBrowserCaptureDelegate } from './gateway-delegate.js'
+import { createFastPptRuntime } from './runtime.js'
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name)
@@ -28,25 +25,16 @@ const input = z
     commonSkillRoot: argument('--common-skill-root'),
   })
 
-const workspaceRoot = resolve(input.workspaceRoot)
-const [workspace, registry] = await Promise.all([
-  WorkspaceService.create(workspaceRoot),
-  loadThemeRegistry(resolve(input.themesRoot)),
-])
-const extractorPath = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  '../../../scripts/extract-theme.mjs',
-)
-const gatewayDelegate = new GatewayBrowserCaptureDelegate(workspaceRoot)
-const service = new FastPptMcpService({
-  workspace,
-  workspaceName: basename(workspaceRoot),
-  registry,
-  commonSkillRoot: resolve(input.commonSkillRoot),
+const moduleDirectory = dirname(fileURLToPath(import.meta.url))
+const runtime = await createFastPptRuntime({
+  workspaceRoot: resolve(input.workspaceRoot),
   themesRoot: resolve(input.themesRoot),
-  extractorPath,
-  browserCapture: gatewayDelegate,
-  imageProduction: gatewayDelegate,
+  commonSkillRoot: resolve(input.commonSkillRoot),
+  extractorPath: resolve(
+    moduleDirectory,
+    basename(moduleDirectory) === 'runtime'
+      ? '../scripts/extract-theme.mjs'
+      : '../../../scripts/extract-theme.mjs',
+  ),
 })
-const server = createFastPptMcpServer(service)
-await server.connect(new StdioServerTransport())
+await runtime.server.connect(new StdioServerTransport())

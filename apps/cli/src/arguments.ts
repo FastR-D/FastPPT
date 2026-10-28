@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
 
-export type CliCommand = 'start' | 'status' | 'doctor' | 'stop'
+export type CliCommand = 'start' | 'status' | 'doctor' | 'diagnose' | 'stop'
 
 export interface CliArguments {
   command: CliCommand
@@ -36,7 +36,7 @@ export function parseCliArguments(
     const argument = argv[index]
     if (
       !commandSeen &&
-      (argument === 'start' ||
+      (argument === 'start' || argument === 'diagnose' ||
         argument === 'status' ||
         argument === 'doctor' ||
         argument === 'stop')
@@ -87,6 +87,7 @@ Commands:
   start                 start the Gateway (default)
   status                show whether this workspace Gateway is running
   doctor                run workspace, runtime, and readiness checks
+  diagnose              report deck export capabilities and blocks
   stop                  stop the Gateway registered for this workspace
 
 Options:

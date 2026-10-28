@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "academy.end-position",
+      "kind": "layout-position",
+      "layout": "end",
+      "positions": ["last"],
+      "severity": "warning",
+      "provenance": "derived",
+      "message": "Use the end layout only for the final courtesy close."
+    }
+  ]
+}

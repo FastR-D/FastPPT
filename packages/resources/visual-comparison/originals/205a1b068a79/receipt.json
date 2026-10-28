@@ -1,0 +1,9 @@
+{
+  "id": "205a1b068a79",
+  "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+  "sourceSha256": "1e8d3cac61b7b6fa2efb2e9c0f4e100a9fea22deff66b8fe971d543b65ec3ed4",
+  "pages": 16,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+  "rasterizer": "PyMuPDF at 960px width"
+}

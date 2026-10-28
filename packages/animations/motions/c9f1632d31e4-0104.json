@@ -1,0 +1,680 @@
+{
+  "version": 1,
+  "slideId": "c9f1632d31e4-0104",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s4",
+      "label": "s4",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0104-effect-1",
+          "kind": "native",
+          "target": "s4",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 150.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 150.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 150.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"22\" presetClass=\"entr\" presetSubtype=\"8\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"6\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"4\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:animEffect transition=\"in\" filter=\"wipe(left)\"><p:cBhvr><p:cTn id=\"7\" dur=\"150\"/><p:tgtEl><p:spTgt spid=\"4\"/></p:tgtEl></p:cBhvr></p:animEffect></p:childTnLst></p:cTn>",
+            "sourceSpid": "4",
+            "sourceOrder": 0,
+            "class": "entr",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 150.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(left)",
+                "transition": "in",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-2",
+          "kind": "native",
+          "target": "s4",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 700.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 700.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 700.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"8\" presetID=\"42\" presetClass=\"path\" presetSubtype=\"0\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animMotion origin=\"layout\" path=\"M 0 7.40741E-7 L 0.10378 -0.00116 \" pathEditMode=\"relative\" rAng=\"0\" ptsTypes=\"AA\"><p:cBhvr><p:cTn id=\"9\" dur=\"700\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"4\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:rCtr x=\"5182\" y=\"-69\"/></p:animMotion></p:childTnLst></p:cTn>",
+            "sourceSpid": "4",
+            "sourceOrder": 1,
+            "class": "path",
+            "presetId": "42",
+            "behaviors": [
+              {
+                "type": "animMotion",
+                "attribute": "ppt_x",
+                "durationMs": 700.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": "M 0 7.40741E-7 L 0.10378 -0.00116 ",
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-3",
+          "kind": "native",
+          "target": "s4",
+          "trigger": "with-previous",
+          "delayMs": 200.0,
+          "durationMs": 500.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 500.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 500.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"10\" presetID=\"22\" presetClass=\"exit\" presetSubtype=\"8\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animEffect transition=\"out\" filter=\"wipe(left)\"><p:cBhvr><p:cTn id=\"11\" dur=\"500\"/><p:tgtEl><p:spTgt spid=\"4\"/></p:tgtEl></p:cBhvr></p:animEffect><p:set><p:cBhvr><p:cTn id=\"12\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"499\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"4\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"hidden\"/></p:to></p:set></p:childTnLst></p:cTn>",
+            "sourceSpid": "4",
+            "sourceOrder": 2,
+            "class": "exit",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 500.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(left)",
+                "transition": "out",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 499.0,
+                "frames": [],
+                "from": null,
+                "to": "hidden",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "label": "s6",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0104-effect-4",
+          "kind": "native",
+          "target": "s6",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 150.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 150.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 150.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"13\" presetID=\"22\" presetClass=\"entr\" presetSubtype=\"1\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"14\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:animEffect transition=\"in\" filter=\"wipe(up)\"><p:cBhvr><p:cTn id=\"15\" dur=\"150\"/><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl></p:cBhvr></p:animEffect></p:childTnLst></p:cTn>",
+            "sourceSpid": "6",
+            "sourceOrder": 3,
+            "class": "entr",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 150.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(up)",
+                "transition": "in",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-5",
+          "kind": "native",
+          "target": "s6",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 700.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 700.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 700.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"16\" presetID=\"42\" presetClass=\"path\" presetSubtype=\"0\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animMotion origin=\"layout\" path=\"M -3.95833E-6 -2.96296E-6 L -3.95833E-6 0.1007 \" pathEditMode=\"relative\" rAng=\"0\" ptsTypes=\"AA\"><p:cBhvr><p:cTn id=\"17\" dur=\"700\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:rCtr x=\"0\" y=\"5023\"/></p:animMotion></p:childTnLst></p:cTn>",
+            "sourceSpid": "6",
+            "sourceOrder": 4,
+            "class": "path",
+            "presetId": "42",
+            "behaviors": [
+              {
+                "type": "animMotion",
+                "attribute": "ppt_x",
+                "durationMs": 700.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": "M -3.95833E-6 -2.96296E-6 L -3.95833E-6 0.1007 ",
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-6",
+          "kind": "native",
+          "target": "s6",
+          "trigger": "with-previous",
+          "delayMs": 200.0,
+          "durationMs": 500.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 500.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 500.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"18\" presetID=\"22\" presetClass=\"exit\" presetSubtype=\"1\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animEffect transition=\"out\" filter=\"wipe(up)\"><p:cBhvr><p:cTn id=\"19\" dur=\"500\"/><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl></p:cBhvr></p:animEffect><p:set><p:cBhvr><p:cTn id=\"20\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"499\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"6\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"hidden\"/></p:to></p:set></p:childTnLst></p:cTn>",
+            "sourceSpid": "6",
+            "sourceOrder": 5,
+            "class": "exit",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 500.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(up)",
+                "transition": "out",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 499.0,
+                "frames": [],
+                "from": null,
+                "to": "hidden",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "label": "s5",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0104-effect-7",
+          "kind": "native",
+          "target": "s5",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 150.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 150.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 150.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"21\" presetID=\"22\" presetClass=\"entr\" presetSubtype=\"8\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"22\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:animEffect transition=\"in\" filter=\"wipe(left)\"><p:cBhvr><p:cTn id=\"23\" dur=\"150\"/><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl></p:cBhvr></p:animEffect></p:childTnLst></p:cTn>",
+            "sourceSpid": "5",
+            "sourceOrder": 6,
+            "class": "entr",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 150.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(left)",
+                "transition": "in",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-8",
+          "kind": "native",
+          "target": "s5",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 700.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 700.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 700.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"24\" presetID=\"42\" presetClass=\"path\" presetSubtype=\"0\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animMotion origin=\"layout\" path=\"M 0 3.33333E-6 L -0.09622 3.33333E-6 \" pathEditMode=\"relative\" rAng=\"0\" ptsTypes=\"AA\"><p:cBhvr><p:cTn id=\"25\" dur=\"700\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:rCtr x=\"-4818\" y=\"0\"/></p:animMotion></p:childTnLst></p:cTn>",
+            "sourceSpid": "5",
+            "sourceOrder": 7,
+            "class": "path",
+            "presetId": "42",
+            "behaviors": [
+              {
+                "type": "animMotion",
+                "attribute": "ppt_x",
+                "durationMs": 700.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": "M 0 3.33333E-6 L -0.09622 3.33333E-6 ",
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-9",
+          "kind": "native",
+          "target": "s5",
+          "trigger": "with-previous",
+          "delayMs": 200.0,
+          "durationMs": 500.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 500.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 500.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"26\" presetID=\"22\" presetClass=\"exit\" presetSubtype=\"2\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animEffect transition=\"out\" filter=\"wipe(right)\"><p:cBhvr><p:cTn id=\"27\" dur=\"500\"/><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl></p:cBhvr></p:animEffect><p:set><p:cBhvr><p:cTn id=\"28\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"499\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"hidden\"/></p:to></p:set></p:childTnLst></p:cTn>",
+            "sourceSpid": "5",
+            "sourceOrder": 8,
+            "class": "exit",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 500.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(right)",
+                "transition": "out",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 499.0,
+                "frames": [],
+                "from": null,
+                "to": "hidden",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "label": "s9",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0104-effect-10",
+          "kind": "native",
+          "target": "s9",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 150.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 150.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 150.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"29\" presetID=\"22\" presetClass=\"entr\" presetSubtype=\"4\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"30\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:animEffect transition=\"in\" filter=\"wipe(down)\"><p:cBhvr><p:cTn id=\"31\" dur=\"150\"/><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl></p:cBhvr></p:animEffect></p:childTnLst></p:cTn>",
+            "sourceSpid": "9",
+            "sourceOrder": 9,
+            "class": "entr",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 150.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(down)",
+                "transition": "in",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-11",
+          "kind": "native",
+          "target": "s9",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 700.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 700.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 700.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"32\" presetID=\"42\" presetClass=\"path\" presetSubtype=\"0\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animMotion origin=\"layout\" path=\"M 3.95833E-6 -2.96296E-6 L 3.95833E-6 -0.12754 \" pathEditMode=\"relative\" rAng=\"0\" ptsTypes=\"AA\"><p:cBhvr><p:cTn id=\"33\" dur=\"700\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl><p:attrNameLst><p:attrName>ppt_x</p:attrName><p:attrName>ppt_y</p:attrName></p:attrNameLst></p:cBhvr><p:rCtr x=\"0\" y=\"-6389\"/></p:animMotion></p:childTnLst></p:cTn>",
+            "sourceSpid": "9",
+            "sourceOrder": 10,
+            "class": "path",
+            "presetId": "42",
+            "behaviors": [
+              {
+                "type": "animMotion",
+                "attribute": "ppt_x",
+                "durationMs": 700.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": "M 3.95833E-6 -2.96296E-6 L 3.95833E-6 -0.12754 ",
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "id": "c9f1632d31e4-0104-effect-12",
+          "kind": "native",
+          "target": "s9",
+          "trigger": "with-previous",
+          "delayMs": 200.0,
+          "durationMs": 500.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 500.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 500.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"34\" presetID=\"22\" presetClass=\"exit\" presetSubtype=\"4\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animEffect transition=\"out\" filter=\"wipe(down)\"><p:cBhvr><p:cTn id=\"35\" dur=\"500\"/><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl></p:cBhvr></p:animEffect><p:set><p:cBhvr><p:cTn id=\"36\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"499\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"9\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"hidden\"/></p:to></p:set></p:childTnLst></p:cTn>",
+            "sourceSpid": "9",
+            "sourceOrder": 11,
+            "class": "exit",
+            "presetId": "22",
+            "behaviors": [
+              {
+                "type": "animEffect",
+                "attribute": null,
+                "durationMs": 500.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": null,
+                "filter": "wipe(down)",
+                "transition": "out",
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 499.0,
+                "frames": [],
+                "from": null,
+                "to": "hidden",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": []
+}

@@ -96,6 +96,18 @@ export interface RunAuditRecord {
   events: PersistedAgentEvent[]
 }
 
+export interface PptxImportJob {
+  id: string
+  themeId: string
+  status: string
+  sourceHash?: string | null
+  analysisPath?: string | null
+  decisions: unknown[]
+  approvedAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 interface RunRow {
   run_id: string
   harness: string
@@ -191,6 +203,10 @@ export interface FastPptDatabase {
   recordImageAsset(asset: ImageAsset): void
   getImageAsset(imageAssetId: string): ImageAsset | undefined
   listImageAssets(deckId: string): ImageAsset[]
+  recordPptxImportJob(job: PptxImportJob): void
+  getPptxImportJob(id: string): PptxImportJob | undefined
+  listPptxImportJobs(themeId?: string): PptxImportJob[]
+  getLatestPptxImportJob(themeId: string): PptxImportJob | undefined
   close(): void
 }
 
@@ -747,6 +763,23 @@ export function createDatabase(filename: string): FastPptDatabase {
       return (selectImageAssets.all(deckId) as Array<{ payload: string }>).map(
         (row) => ImageAssetSchema.parse(JSON.parse(row.payload) as unknown),
       )
+    },
+    recordPptxImportJob(job): void {
+      sqlite.prepare('INSERT INTO pptx_import_jobs (id, theme_id, status, source_hash, analysis_path, decisions, approved_at, created_at, updated_at) VALUES (@id, @themeId, @status, @sourceHash, @analysisPath, @decisions, @approvedAt, @createdAt, @updatedAt) ON CONFLICT(id) DO UPDATE SET theme_id=excluded.theme_id, status=excluded.status, source_hash=excluded.source_hash, analysis_path=excluded.analysis_path, decisions=excluded.decisions, approved_at=excluded.approved_at, updated_at=excluded.updated_at').run({ ...job, sourceHash: job.sourceHash ?? null, analysisPath: job.analysisPath ?? null, approvedAt: job.approvedAt ?? null, decisions: JSON.stringify(job.decisions) })
+    },
+    getPptxImportJob(id): PptxImportJob | undefined {
+      const row = sqlite.prepare('SELECT * FROM pptx_import_jobs WHERE id = ?').get(id) as { id: string; theme_id: string; status: string; source_hash: string | null; analysis_path: string | null; decisions: string; approved_at: string | null; created_at: string; updated_at: string } | undefined
+      return row ? { id: row.id, themeId: row.theme_id, status: row.status, sourceHash: row.source_hash, analysisPath: row.analysis_path, decisions: JSON.parse(row.decisions) as unknown[], approvedAt: row.approved_at, createdAt: row.created_at, updatedAt: row.updated_at } : undefined
+    },
+    listPptxImportJobs(themeId): PptxImportJob[] {
+      const rows = (themeId
+        ? sqlite.prepare('SELECT * FROM pptx_import_jobs WHERE theme_id = ? ORDER BY created_at DESC').all(themeId)
+        : sqlite.prepare('SELECT * FROM pptx_import_jobs ORDER BY created_at DESC').all()) as Array<{ id: string; theme_id: string; status: string; source_hash: string | null; analysis_path: string | null; decisions: string; approved_at: string | null; created_at: string; updated_at: string }>
+      return rows.map((row) => ({ id: row.id, themeId: row.theme_id, status: row.status, sourceHash: row.source_hash, analysisPath: row.analysis_path, decisions: JSON.parse(row.decisions) as unknown[], approvedAt: row.approved_at, createdAt: row.created_at, updatedAt: row.updated_at }))
+    },
+    getLatestPptxImportJob(themeId): PptxImportJob | undefined {
+      const row = sqlite.prepare('SELECT * FROM pptx_import_jobs WHERE theme_id = ? ORDER BY created_at DESC LIMIT 1').get(themeId) as { id: string; theme_id: string; status: string; source_hash: string | null; analysis_path: string | null; decisions: string; approved_at: string | null; created_at: string; updated_at: string } | undefined
+      return row ? { id: row.id, themeId: row.theme_id, status: row.status, sourceHash: row.source_hash, analysisPath: row.analysis_path, decisions: JSON.parse(row.decisions) as unknown[], approvedAt: row.approved_at, createdAt: row.created_at, updatedAt: row.updated_at } : undefined
     },
     close(): void {
       sqlite.close()

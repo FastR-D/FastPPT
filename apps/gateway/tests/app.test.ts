@@ -7,12 +7,14 @@ import {
 } from 'node:fs'
 import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { inflateRawSync } from 'node:zlib'
 
 import {
   DeckSummarySchema,
+  DeckValidationResultSchema,
+  ImportAnalysisV1Schema,
   ApplicationStateSchema,
   FileContentSchema,
   HealthResponseSchema,
@@ -29,10 +31,12 @@ import {
   SlidewaveSnapshotSchema,
   ImportPptxThemeResultSchema,
 } from '@fastppt/protocol'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import { CodexAdapter, RpcError } from '@fastppt/harness-codex'
 import { SlidevHost } from '@fastppt/slidev-host'
+import { ManagedSkillInstaller } from '@fastppt/fastppt-skill'
+import { loadThemeRegistry } from '@fastppt/theme-registry'
 
 import { createGateway, resolveSlidevWebSocketProtocol } from '../src/app.js'
 
@@ -177,12 +181,20 @@ function readZipEntry(archive: Buffer, entryName: string): Buffer {
   throw new Error(`PPTX ZIP entry ${entryName} was not found`)
 }
 
+// Registry fixtures need source data, not generated preview bundles.
+const sourceThemeFilter = (source: string): boolean =>
+  !['.theme-build', 'dist', '.turbo'].includes(basename(source))
+
 function createThemeFixture(): string {
   const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-  cpSync(themesRoot, fixtureThemes, { recursive: true })
+  cpSync(themesRoot, fixtureThemes, {
+    recursive: true,
+    filter: sourceThemeFilter,
+  })
   const third = join(fixtureThemes, 'slidev-theme-fixture')
   cpSync(join(themesRoot, 'slidev-theme-landing'), third, {
     recursive: true,
+    filter: sourceThemeFilter,
   })
   const packagePath = join(third, 'package.json')
   const packageJson = z
@@ -210,6 +222,23 @@ function createThemeFixture(): string {
     ),
   )
   return fixtureThemes
+}
+
+function addMachineRulesToThemeFixture(
+  fixtureThemes: string,
+  rules: Record<string, unknown>,
+): void {
+  const themeRoot = join(fixtureThemes, 'slidev-theme-fixture')
+  const manifestPath = join(themeRoot, 'agent', 'theme-manifest.json')
+  const manifest = z
+    .record(z.string(), z.unknown())
+    .parse(JSON.parse(readFileSync(manifestPath, 'utf8')) as unknown)
+  manifest.machineRulesFile = 'agent/theme-rules.json'
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+  writeFileSync(
+    join(themeRoot, 'agent', 'theme-rules.json'),
+    `${JSON.stringify(rules, null, 2)}\n`,
+  )
 }
 
 afterEach(async () => {
@@ -270,6 +299,7 @@ async function makeApp(
 }
 
 class FakeExporter implements EditablePptxExporter {
+  lastInput?: ExportDeckInput
   getStatus() {
     return Promise.resolve({
       status: 'available' as const,
@@ -278,6 +308,7 @@ class FakeExporter implements EditablePptxExporter {
   }
 
   async export(input: ExportDeckInput) {
+    this.lastInput = input
     input.onProgress?.({ phase: 'capturing-slides', progress: 50 })
     await mkdir(dirname(input.outputPath), { recursive: true })
     await writeFile(input.outputPath, 'fixture editable pptx')
@@ -528,6 +559,10 @@ class BlockingHarness extends FakeCodexHarness {
     })
   }
 
+  get blockedRuns(): number {
+    return this.#releases.length
+  }
+
   releaseNext(): void {
     this.#releases.shift()?.()
   }
@@ -742,7 +777,10 @@ describe('gateway', () => {
   it('rechecks theme, Skill and MCP files on every readiness request', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const copiedThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-    cpSync(themesRoot, copiedThemes, { recursive: true })
+    cpSync(themesRoot, copiedThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
     const app = await createGateway(
       {
         host: '127.0.0.1',
@@ -841,6 +879,10 @@ describe('gateway', () => {
     expect(
       foreignLocalOrigin.headers['access-control-allow-origin'],
     ).toBeUndefined()
+    const fontPath = '/api/v1/resources/assets/000000000000000000000000.woff2'
+    expect((await app.inject({ method: 'GET', url: fontPath, headers: { origin: 'null' } })).statusCode).toBe(404)
+    for (const [method, url] of [['POST', fontPath], ['GET', '/api/v1/workspace'], ['GET', fontPath.replace('.woff2', '.png')]] as const)
+      expect((await app.inject({ method, url, headers: { origin: 'null' } })).statusCode).toBe(403)
   })
 
   it('returns precise not-found errors for runs and browser inspections', async () => {
@@ -1007,10 +1049,10 @@ describe('gateway', () => {
     })
     expect(skillStatus.statusCode).toBe(200)
     expect(skillStatus.json()).toMatchObject({
-      available: true,
+      available: false,
       skillId: 'fastppt-theme-academy',
       base: { state: 'installed' },
-      theme: { state: 'installed' },
+      theme: { state: 'on-demand' },
     })
     const decks = await app.inject({
       method: 'GET',
@@ -1251,6 +1293,7 @@ describe('gateway', () => {
     expect(blockedExport.json()).toMatchObject({
       error: { code: 'DECK_VALIDATION_FAILED' },
     })
+
     await app.inject({
       method: 'POST',
       url: `/api/v1/image-assets/${imageAsset.id}/decision`,
@@ -1379,11 +1422,14 @@ describe('gateway', () => {
     expect(readFileSync(join(root, 'slides.md'), 'utf8')).toBe(invalid)
   })
 
-  it('queues, persists, reports and securely downloads editable PPTX exports', async () => {
+  it.each([
+    { requestedName: '../../Quarter:Final?.pptx', outputName: 'Quarter-Final-.pptx' },
+    { requestedName: "第五章 CPU (教师's).pptx", outputName: "第五章 CPU (教师's).pptx" },
+  ])('queues, persists, reports and securely downloads editable PPTX exports: $outputName', async ({ requestedName, outputName }) => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     writeFileSync(
       join(root, 'slides.md'),
-      '---\ntheme: slidev-theme-academy\n---\n# Export fixture\n',
+      '---\ntheme: slidev-theme-squircle\n---\n# Export fixture\n',
     )
     const app = await makeApp(root, undefined, themesRoot, new FakeExporter())
     const headers = {}
@@ -1400,14 +1446,14 @@ describe('gateway', () => {
       headers,
       payload: {
         format: 'editable-pptx',
-        outputName: '../../Quarter:Final?.pptx',
+        outputName: requestedName,
       },
     })
     expect(created.statusCode).toBe(200)
     const exportId = z
       .object({ id: z.string().uuid(), outputName: z.string() })
       .parse(created.json())
-    expect(exportId.outputName).toBe('Quarter-Final-.pptx')
+    expect(exportId.outputName).toBe(outputName)
     const submitted = await app.inject({
       method: 'POST',
       url: `/api/v1/exports/${exportId.id}/snapshot`,
@@ -1433,9 +1479,12 @@ describe('gateway', () => {
     })
     expect(download.statusCode).toBe(200)
     expect(download.body).toBe('fixture editable pptx')
-    expect(download.headers['content-disposition']).toContain(
-      'Quarter-Final-.pptx',
-    )
+    const disposition = String(download.headers['content-disposition'])
+    expect(disposition).toMatch(/^[\x20-\x7e]+$/)
+    expect(disposition).toContain('attachment; filename="')
+    const encodedName = disposition.split("filename*=UTF-8''")[1]!
+    expect(encodedName).not.toMatch(/['()*]/)
+    expect(decodeURIComponent(encodedName)).toBe(outputName)
     const missing = await app.inject({
       method: 'GET',
       url: '/api/v1/exports/00000000-0000-4000-8000-000000000000',
@@ -1642,7 +1691,10 @@ describe('gateway', () => {
   it('atomically rescans a changed validated theme registry', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-    cpSync(themesRoot, fixtureThemes, { recursive: true })
+    cpSync(themesRoot, fixtureThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
     const app = await makeApp(root, undefined, fixtureThemes)
     const headers = {}
     const before = await app.inject({
@@ -1685,6 +1737,190 @@ describe('gateway', () => {
     })
   })
 
+  it('enforces machine-readable theme rules during validation and export', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-theme-rules-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-fixture\n---\n# First\n\n---\n# Second\n',
+    )
+    const fixtureThemes = createThemeFixture()
+    addMachineRulesToThemeFixture(fixtureThemes, {
+      version: 1,
+      rules: [
+        {
+          id: 'deck.first',
+          kind: 'first-layout',
+          layout: 'cover',
+          severity: 'error',
+        },
+        {
+          id: 'deck.max',
+          kind: 'max-slides',
+          value: 1,
+          severity: 'warning',
+        },
+      ],
+    })
+    const app = await makeApp(root, undefined, fixtureThemes)
+    const deckId = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]?.id
+    expect(deckId).toBeTruthy()
+
+    const invalid = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/validate`,
+    })
+    expect(invalid.statusCode).toBe(200)
+    expect(invalid.json()).toMatchObject({
+      valid: false,
+      themeRuleIssues: [
+        expect.objectContaining({
+          ruleId: 'deck.first',
+          severity: 'error',
+          code: 'THEME_RULE_FIRST_LAYOUT',
+          slide: 1,
+        }),
+        expect.objectContaining({
+          ruleId: 'deck.max',
+          severity: 'warning',
+          code: 'THEME_RULE_MAX_SLIDES',
+        }),
+      ],
+      errors: [expect.objectContaining({ code: 'THEME_RULE_FIRST_LAYOUT' })],
+    })
+
+    const blockedExport = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/exports`,
+      payload: { format: 'editable-pptx', outputName: 'blocked.pptx' },
+    })
+    expect(blockedExport.statusCode).toBe(400)
+    expect(blockedExport.json()).toMatchObject({
+      error: { code: 'DECK_VALIDATION_FAILED' },
+    })
+
+    const exceptionUrl = `/api/v1/decks/${String(deckId)}/rule-exceptions`
+    const reviewResponse = await app.inject({ method: 'POST', url: `${exceptionUrl}/review`, payload: {} })
+    expect(reviewResponse.statusCode).toBe(200)
+    const review = reviewResponse.json()
+    const approvePayload = { expectedBinding: review.binding, issueFingerprint: review.issues[0].fingerprint, reason: 'Use a body page as the opening for this internal draft.' }
+    expect((await app.inject({ method: 'POST', url: exceptionUrl, payload: { ...approvePayload, reason: ' ' } })).statusCode).toBe(400)
+    expect((await app.inject({ method: 'POST', url: exceptionUrl, payload: { ...approvePayload, issueFingerprint: '0'.repeat(64) } })).statusCode).toBe(400)
+    expect((await app.inject({ method: 'POST', url: exceptionUrl, payload: { ...approvePayload, expectedBinding: { ...review.binding, revision: 'stale' } } })).statusCode).toBe(409)
+    expect((await app.inject({ method: 'POST', url: `${exceptionUrl}/review`, payload: { phase: 'readback' } })).statusCode).toBe(400)
+    const approved = await app.inject({ method: 'POST', url: exceptionUrl, payload: approvePayload })
+    expect(approved.statusCode).toBe(200)
+    expect((await app.inject({ method: 'POST', url: `/api/v1/decks/${String(deckId)}/validate` })).json()).toMatchObject({ valid: true, themeRuleIssues: [expect.objectContaining({ severity: 'error', status: 'violation', exception: { id: approved.json().id, reason: approvePayload.reason, approvedAt: expect.any(String) } }), expect.any(Object)] })
+    expect((await app.inject({ method: 'POST', url: `${exceptionUrl}/${approved.json().id}/revoke` })).statusCode).toBe(200)
+    expect((await app.inject({ method: 'POST', url: `/api/v1/decks/${String(deckId)}/validate` })).json()).toMatchObject({ valid: false })
+    const renewed = await app.inject({ method: 'POST', url: exceptionUrl, payload: approvePayload })
+    expect(renewed.statusCode).toBe(200)
+    expect(renewed.json().id).not.toBe(approved.json().id)
+
+    for (const changed of [{ profileDigest: 'different-profile' }, { options: { master: false } }]) {
+      const altered = await app.inject({ method: 'POST', url: `${exceptionUrl}/review`, payload: changed })
+      expect(altered.json()).toMatchObject({ entries: [expect.objectContaining({ state: 'revoked' }), expect.objectContaining({ state: 'expired' })] })
+    }
+    const machineRulesPath = join(fixtureThemes, 'slidev-theme-fixture/agent/theme-rules.json')
+    const savedRules = readFileSync(machineRulesPath, 'utf8')
+    const changedRules = JSON.parse(savedRules) as { rules: Array<{ message?: string }> }
+    changedRules.rules[0]!.message = 'Changed rule content.'
+    writeFileSync(machineRulesPath, JSON.stringify(changedRules))
+    const changedRuleReview = (await app.inject({ method: 'POST', url: `${exceptionUrl}/review`, payload: {} })).json()
+    expect(changedRuleReview.binding.ruleDigest).not.toBe(review.binding.ruleDigest)
+    expect(changedRuleReview.binding.themeDigest).not.toBe(review.binding.themeDigest)
+    expect(changedRuleReview.entries[1].state).toBe('expired')
+    writeFileSync(machineRulesPath, savedRules)
+    expect((await app.inject({ method: 'GET', url: `/api/v1/decks/${String(deckId)}/master` })).statusCode).toBe(200)
+    const changedMasterReview = (await app.inject({ method: 'POST', url: `${exceptionUrl}/review`, payload: {} })).json()
+    expect(changedMasterReview.binding.masterDigest).not.toBe(review.binding.masterDigest)
+    expect(changedMasterReview.entries[1].state).toBe('expired')
+
+    const deck = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]
+    const corrected = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${String(deckId)}/markdown`,
+      payload: {
+        expectedRevision: deck?.revision,
+        content:
+          '---\ntheme: slidev-theme-fixture\nlayout: cover\n---\n# First\n\n---\n# Second\n',
+      },
+    })
+    expect(corrected.statusCode).toBe(200)
+    const expiredReview = (await app.inject({ method: 'POST', url: `${exceptionUrl}/review`, payload: {} })).json<{ entries: Array<{ state: string }> }>()
+    expect(expiredReview.entries.map(entry => entry.state)).toEqual(['revoked', 'expired'])
+    const warningOnly = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${String(deckId)}/validate`,
+    })
+    expect(warningOnly.statusCode).toBe(200)
+    expect(warningOnly.json()).toMatchObject({
+      valid: true,
+      themeRuleIssues: [
+        expect.objectContaining({
+          ruleId: 'deck.max',
+          severity: 'warning',
+          code: 'THEME_RULE_MAX_SLIDES',
+        }),
+      ],
+      errors: [],
+    })
+  })
+
+  it('combines native rule evidence with revision-bound browser measurements before export', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-rule-evidence-'))
+    writeFileSync(join(root, 'slides.md'), '---\ntheme: slidev-theme-fixture\n---\n# First\n\n---\n# Second\n')
+    const fixtureThemes = createThemeFixture()
+    writeFileSync(join(fixtureThemes, 'slidev-theme-fixture/agent/native-layouts.json'), JSON.stringify([{ name: 'default', masterId: 'brand', placeholders: [{ index: 0, type: 'title', x: 100, y: 100, width: 1000, height: 500 }], masterObjects: { objects: [{ name: 'Logo', x: 0, y: 0, width: 50, height: 50 }] } }]))
+    addMachineRulesToThemeFixture(fixtureThemes, { version: 1, rules: [
+      { id: 'master.required', kind: 'required-master', master: 'brand', severity: 'error' },
+      { id: 'slot.title', kind: 'required-placeholder', layout: 'default', type: 'title', index: 0, severity: 'error' },
+      { id: 'logo.required', kind: 'fixed-object', name: 'Logo', owner: 'master', severity: 'error' },
+      { id: 'lines.max', kind: 'max-text-lines', value: 4, severity: 'error' },
+      { id: 'density.max', kind: 'max-density', value: 0.5, severity: 'error' },
+      { id: 'token.brand', kind: 'required-token', token: '--brand', severity: 'error' },
+    ] })
+    const app = await makeApp(root, undefined, fixtureThemes, new FakeExporter())
+    const deck = DeckSummarySchema.array().parse((await app.inject({ method: 'GET', url: '/api/v1/decks' })).json())[0]!
+    expect((await app.inject({ method: 'GET', url: `/api/v1/decks/${deck.id}/master` })).statusCode).toBe(200)
+    const validate = () => app.inject({ method: 'POST', url: `/api/v1/decks/${deck.id}/validate` })
+    const exportDeck = () => app.inject({ method: 'POST', url: `/api/v1/decks/${deck.id}/exports`, payload: { format: 'editable-pptx', outputName: 'rules.pptx' } })
+    const initial = DeckValidationResultSchema.parse((await validate()).json())
+    expect(initial.valid).toBe(true)
+    expect(initial.themeRuleIssues).toHaveLength(6)
+    expect(initial.themeRuleIssues.every(issue => issue.status === 'unverified')).toBe(true)
+    expect((await exportDeck()).json()).toMatchObject({ error: { code: 'DECK_VALIDATION_FAILED' } })
+    const measure = async (slide: number, textLines = 2) => {
+      const inspection = await app.inject({ method: 'POST', url: `/api/v1/decks/${deck.id}/inspections/quality`, payload: { slide } })
+      expect(inspection.statusCode).toBe(200)
+      const completed = await app.inject({ method: 'POST', url: `/api/v1/inspections/${inspection.json().id}/result`, payload: { inspectionAvailable: true, slide, slideCount: 2, issues: [], ruleMeasurement: { slide, textLines, density: 0.2, tokens: ['--brand'] } } })
+      expect(completed.statusCode).toBe(200)
+    }
+    await measure(1, 8)
+    await measure(2)
+    expect((await validate()).json().themeRuleIssues).toMatchObject([{ ruleId: 'lines.max', status: 'violation', slide: 1 }])
+    expect((await exportDeck()).statusCode).toBe(400)
+    await measure(1)
+    expect((await validate()).json().themeRuleIssues).toEqual([])
+    const report = (await app.inject({ method: 'GET', url: `/api/v1/decks/${deck.id}/quality-report` })).json()
+    expect(report.ruleMeasurements).toHaveLength(2)
+    const permitted = await exportDeck()
+    expect(permitted.statusCode).toBe(200)
+    expect(permitted.json().themeRules).toMatchObject({ revision: deck.revision, stage: 'pre-export', issues: [] })
+    const lockedPath = join(root, '.fastppt/decks', deck.id, 'theme-lock.json')
+    const originalLock = readFileSync(lockedPath, 'utf8')
+    const changedLock = JSON.parse(originalLock) as { layoutDefinitions: Array<{ placeholders: Array<{ x: number }> }> }
+    changedLock.layoutDefinitions[0]!.placeholders[0]!.x += 50
+    writeFileSync(lockedPath, JSON.stringify(changedLock))
+    expect((await exportDeck()).json()).toMatchObject({ error: { code: 'DECK_VALIDATION_FAILED' } })
+    writeFileSync(lockedPath, originalLock)
+    writeFileSync(join(root, 'slides.md'), '---\ntheme: slidev-theme-fixture\n---\n# Changed\n')
+    expect((await exportDeck()).json()).toMatchObject({ error: { code: 'DECK_VALIDATION_FAILED' } })
+  })
+
   it('imports a PPTX theme through the upload endpoint and reloads the registry', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-import-'))
     const fixtureThemes = createThemeFixture()
@@ -1708,9 +1944,272 @@ describe('gateway', () => {
     const result = ImportPptxThemeResultSchema.parse(response.json())
     expect(result.themeId).toBe('slidev-theme-import-test')
     expect(result.skillId).toBe('fastppt-theme-import-test')
+    const canonicalJob = await app.inject({
+      method: 'GET',
+      url: `/api/v1/pptx-import/jobs/${result.jobId}`,
+    })
+    expect(canonicalJob.statusCode).toBe(200)
+    expect(canonicalJob.json()).toMatchObject({ id: result.jobId })
+    expect(existsSync(join(fixtureThemes, 'slidev-theme-import-test'))).toBe(
+      false,
+    )
+    expect(
+      existsSync(
+        join(
+          root,
+          '.fastppt',
+          'import-drafts',
+          result.jobId,
+          'themes',
+          result.themeId,
+        ),
+      ),
+    ).toBe(true)
+    const beforeApproval = await app.inject({
+      method: 'GET',
+      url: '/api/v1/themes',
+    })
+    expect(
+      ThemeSummarySchema.array()
+        .parse(beforeApproval.json())
+        .some(
+          (theme: { themeId?: string }) => theme.themeId === result.themeId,
+        ),
+    ).toBe(false)
+    expect(
+      (
+        await app.inject({
+          method: 'GET',
+          url: `/api/v1/themes/${result.themeId}`,
+        })
+      ).statusCode,
+    ).toBe(404)
+    const decisions = [
+      {
+        version: 1,
+        stepId: 'strategy',
+        question: '导入策略',
+        options: ['editable', 'tokens'],
+        selected: 'editable',
+        actor: 'user',
+        locked: true,
+        timestamp: '2026-09-16T00:00:00.000Z',
+      },
+      {
+        version: 1,
+        stepId: 'preserve-reference',
+        question: '保留源 PPTX 作为 reference',
+        options: ['keep', 'skip'],
+        selected: 'keep',
+        actor: 'user',
+        locked: true,
+        timestamp: '2026-09-16T00:00:00.000Z',
+      },
+    ]
+    const invalidDecisions = [
+      { ...decisions[0], selected: 'unsupported-strategy', locked: false },
+    ]
+    const analysis = await app.inject({ method: 'GET', url: `/api/v1/imports/pptx-theme/${result.themeId}/analysis` })
+    expect(ImportAnalysisV1Schema.parse(analysis.json()).candidateLayouts.some(candidate => candidate.generated)).toBe(true)
+    for (const selected of ['skip', 'keep']) {
+      const rejected = await app.inject({ method: 'POST', url: `/api/v1/pptx-import/jobs/${result.jobId}/decisions`, payload: [...decisions, { ...decisions[1], stepId: 'layout:missing', selected }] })
+      expect(rejected.statusCode).toBe(400)
+    }
+    expect(
+      (
+        await app.inject({
+          method: 'POST',
+          url: `/api/v1/pptx-import/jobs/${result.jobId}/decisions`,
+          payload: invalidDecisions,
+        })
+      ).statusCode,
+    ).toBe(200)
+    expect(
+      (
+        await app.inject({
+          method: 'POST',
+          url: `/api/v1/pptx-import/jobs/${result.jobId}/approve`,
+          payload: {},
+        })
+      ).statusCode,
+    ).toBe(400)
+    expect(
+      existsSync(
+        join(
+          root,
+          '.fastppt',
+          'import-drafts',
+          result.jobId,
+          'themes',
+          result.themeId,
+          'agent',
+          'theme-manifest.json',
+        ),
+      ),
+    ).toBe(true)
+    expect(existsSync(join(fixtureThemes, result.themeId))).toBe(false)
+    const concurrentSaves = await Promise.all([
+      app.inject({
+        method: 'POST',
+        url: `/api/v1/pptx-import/jobs/${result.jobId}/decisions`,
+        payload: decisions,
+      }),
+      app.inject({
+        method: 'POST',
+        url: `/api/v1/imports/pptx-theme/${result.themeId}/decisions`,
+        payload: decisions,
+      }),
+    ])
+    expect(concurrentSaves.map((response) => response.statusCode)).toEqual([
+      200, 200,
+    ])
+    const draftAnalysis = JSON.parse(
+      readFileSync(
+        join(
+          root,
+          '.fastppt',
+          'import-drafts',
+          result.jobId,
+          'themes',
+          result.themeId,
+          'IMPORT_ANALYSIS.json',
+        ),
+        'utf8',
+      ),
+    ) as { userOverrides?: { decisions?: unknown[] } }
+    expect(draftAnalysis.userOverrides?.decisions).toEqual(decisions)
+    const decisionUrl = `/api/v1/pptx-import/jobs/${result.jobId}/decisions`
+    expect(
+      (
+        await app.inject({
+          method: 'POST',
+          url: decisionUrl,
+          payload: decisions.map((decision) => ({
+            ...decision,
+            timestamp: '2026-09-17T00:00:00.000Z',
+          })),
+        })
+      ).statusCode,
+    ).toBe(200)
+    expect(
+      (
+        await app.inject({
+          method: 'POST',
+          url: decisionUrl,
+          payload: [{ ...decisions[0], selected: 'tokens' }, decisions[1]],
+        })
+      ).statusCode,
+    ).toBe(409)
+    expect(
+      (await app.inject({ method: 'POST', url: decisionUrl, payload: [] }))
+        .statusCode,
+    ).toBe(409)
+    expect(
+      (
+        await app.inject({
+          method: 'POST',
+          url: decisionUrl,
+          payload: [...decisions, decisions[0]],
+        })
+      ).statusCode,
+    ).toBe(400)
+    const preservedAnalysis = JSON.parse(
+      readFileSync(
+        join(
+          root,
+          '.fastppt',
+          'import-drafts',
+          result.jobId,
+          'themes',
+          result.themeId,
+          'IMPORT_ANALYSIS.json',
+        ),
+        'utf8',
+      ),
+    ) as { userOverrides?: { decisions?: unknown[] } }
+    expect(preservedAnalysis.userOverrides?.decisions).toEqual(decisions)
+    const draftRoot = join(root, '.fastppt', 'import-drafts', result.jobId, 'themes', result.themeId)
+    const rulePath = join(draftRoot, 'agent', 'theme-rules.json')
+    const originalRules = readFileSync(rulePath, 'utf8')
+    const blockedRules = JSON.parse(originalRules) as { rules: unknown[] }
+    blockedRules.rules.push({ id: 'required.absent', kind: 'required-layout', layout: 'absent-layout', severity: 'error' })
+    writeFileSync(rulePath, JSON.stringify(blockedRules))
+    const blockedApproval = await app.inject({ method: 'POST', url: `/api/v1/pptx-import/jobs/${result.jobId}/approve`, payload: {} })
+    expect(blockedApproval.statusCode).toBe(409)
+    expect(blockedApproval.json()).toMatchObject({ error: { code: 'THEME_RULE_APPROVAL_FAILED', retryable: false } })
+    expect(existsSync(join(fixtureThemes, result.themeId))).toBe(false)
+    const blockedReview = await app.inject({ method: 'GET', url: `/api/v1/imports/pptx-theme/${result.themeId}/rule-review` })
+    expect(blockedReview.statusCode).toBe(200)
+    expect(blockedReview.json()).toMatchObject({ valid: false, scope: 'theme-catalog', issues: expect.arrayContaining([expect.objectContaining({ ruleId: 'required.absent', severity: 'error' })]) })
+    writeFileSync(rulePath, originalRules)
+    const approvals = await Promise.all([
+      app.inject({
+        method: 'POST',
+        url: `/api/v1/pptx-import/jobs/${result.jobId}/approve`,
+        payload: {},
+      }),
+      app.inject({
+        method: 'POST',
+        url: `/api/v1/pptx-import/jobs/${result.jobId}/approve`,
+        payload: {},
+      }),
+    ])
+    expect(approvals.map((response) => response.statusCode)).toEqual([200, 200])
+    expect(approvals[0]?.json()).toEqual(approvals[1]?.json())
+    const legacyApproval = await app.inject({
+      method: 'POST',
+      url: `/api/v1/imports/pptx-theme/${result.themeId}/approve`,
+      payload: {},
+    })
+    expect(legacyApproval.statusCode).toBe(200)
+    expect(legacyApproval.json()).toEqual(approvals[0]?.json())
+    expect(
+      existsSync(
+        join(fixtureThemes, result.themeId, 'reference', 'source.pptx'),
+      ),
+    ).toBe(true)
+    expect(
+      JSON.parse(
+        readFileSync(
+          join(fixtureThemes, result.themeId, 'IMPORT_STRATEGY.json'),
+          'utf8',
+        ),
+      ),
+    ).toMatchObject({ strategy: 'editable', mode: 'editable' })
+    const afterApproval = await app.inject({
+      method: 'GET',
+      url: '/api/v1/themes',
+    })
+    expect(
+      ThemeSummarySchema.array()
+        .parse(afterApproval.json())
+        .some(
+          (theme: { themeId?: string }) => theme.themeId === result.themeId,
+        ),
+    ).toBe(true)
     expect(
       existsSync(
         join(fixtureThemes, 'slidev-theme-import-test', 'package.json'),
+      ),
+    ).toBe(true)
+    expect(
+      existsSync(
+        join(
+          fixtureThemes,
+          'slidev-theme-import-test',
+          'agent',
+          'native-layouts.json',
+        ),
+      ),
+    ).toBe(true)
+    expect(
+      existsSync(
+        join(
+          fixtureThemes,
+          'slidev-theme-import-test',
+          'agent',
+          'layout-candidates.json',
+        ),
       ),
     ).toBe(true)
     const status = await app.inject({
@@ -1751,8 +2250,14 @@ describe('gateway', () => {
   it('removes a theme atomically and preserves modified stale managed Skills', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-    cpSync(themesRoot, fixtureThemes, { recursive: true })
+    cpSync(themesRoot, fixtureThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
     const app = await makeApp(root, undefined, fixtureThemes)
+    const installer = new ManagedSkillInstaller({ workspaceRoot: root, commonSkillRoot: resolve(themesRoot, '../packages/fastppt-skill'), registry: await loadThemeRegistry(fixtureThemes) })
+    await installer.ensureTheme('claude', 'slidev-theme-landing')
+    await installer.ensureTheme('codex', 'slidev-theme-landing')
     const headers = {}
     const cleanSkill = join(root, '.claude', 'skills', 'fastppt-theme-landing')
     const modifiedSkill = join(
@@ -1795,8 +2300,14 @@ describe('gateway', () => {
   it('reinstalls managed Skills after an atomic theme version update', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-    cpSync(themesRoot, fixtureThemes, { recursive: true })
+    cpSync(themesRoot, fixtureThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
     const app = await makeApp(root, undefined, fixtureThemes)
+    const installer = new ManagedSkillInstaller({ workspaceRoot: root, commonSkillRoot: resolve(themesRoot, '../packages/fastppt-skill'), registry: await loadThemeRegistry(fixtureThemes) })
+    await installer.ensureTheme('claude', 'slidev-theme-landing')
+    await installer.ensureTheme('codex', 'slidev-theme-landing')
     const headers = {}
     const themeRoot = join(fixtureThemes, 'slidev-theme-landing')
     const nextVersion = '0.0.6-fastppt.1'
@@ -1914,7 +2425,10 @@ describe('gateway', () => {
     async ({ mutate, publicCode, internalCode, statusCode }) => {
       const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
       const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-      cpSync(themesRoot, fixtureThemes, { recursive: true })
+      cpSync(themesRoot, fixtureThemes, {
+        recursive: true,
+        filter: sourceThemeFilter,
+      })
       const app = await makeApp(root, undefined, fixtureThemes)
       mutate(fixtureThemes)
       const response = await app.inject({
@@ -2196,7 +2710,10 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
   it('defers theme reload installation changes until active runs finish', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-    cpSync(themesRoot, fixtureThemes, { recursive: true })
+    cpSync(themesRoot, fixtureThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
     const harness = new BlockingHarness('codex')
     const app = await makeApp(root, harness, fixtureThemes)
     const headers = {}
@@ -2233,6 +2750,7 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
       })
     await Promise.resolve()
     expect(reloaded).toBe(false)
+    await vi.waitFor(() => expect(harness.blockedRuns).toBe(1))
     harness.releaseNext()
     const response = await reload
     expect(response.statusCode).toBe(200)
@@ -2242,7 +2760,10 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
   it('closes with an active run and a queued theme reload', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-themes-'))
-    cpSync(themesRoot, fixtureThemes, { recursive: true })
+    cpSync(themesRoot, fixtureThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
     const harness = new BlockingHarness('codex')
     const app = await makeApp(root, harness, fixtureThemes)
     const headers = {}
@@ -2878,6 +3399,7 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const harness = new FakeCodexHarness('claude')
     const app = await makeApp(root, harness)
+    await mkdir(join(root, '.claude', 'skills', 'fastppt-theme-academy'), { recursive: true })
     writeFileSync(
       join(root, '.claude', 'skills', 'fastppt-theme-academy', 'SKILL.md'),
       'user modification\n',
@@ -2901,7 +3423,28 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
     expect(harness.sent).toBeUndefined()
   })
 
-  it('rejects a theme run before the Harness when its managed Skill is missing', async () => {
+  it('recommends real palettes through the selected Harness without installing theme skills', async () => {
+    const harness = new class extends FakeCodexHarness {
+      override async *sendMessage(input: SendMessageInput): AsyncIterable<UnifiedAgentEvent> {
+        await Promise.resolve()
+        this.sent = input
+        const candidates = JSON.parse(input.content.split('\n候选：')[1]!) as Array<{ id: string }>
+        yield UnifiedAgentEventSchema.parse({ harness: this.kind, sessionId: input.sessionId, runId: 'palette-run', eventId: 'palette-result', sequence: 1, timestamp: new Date().toISOString(), type: 'assistant.message', data: { content: JSON.stringify({ recommendations: [{ id: candidates[0]!.id, reason: '色彩层次适合商务汇报。' }] }) } })
+        yield UnifiedAgentEventSchema.parse({ harness: this.kind, sessionId: input.sessionId, runId: 'palette-run', eventId: 'palette-done', sequence: 2, timestamp: new Date().toISOString(), type: 'run.completed', data: {} })
+      }
+    }()
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-palette-'))
+    const app = await makeApp(root, harness)
+    for (let index = 0; index < 2; index++) {
+      const response = await app.inject({ method: 'POST', url: '/api/v1/palettes/recommend', payload: { query: '商务汇报', harness: 'codex' } })
+      expect(response.statusCode).toBe(200)
+      expect(response.json().recommendations[0].reason).toContain('商务')
+    }
+    expect(harness.sent?.skills).toEqual([])
+    expect(existsSync(join(root, '.agents', 'skills', 'fastppt-theme-academy'))).toBe(false)
+  })
+
+  it('installs a theme on first use before invoking the Harness', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-'))
     const harness = new FakeCodexHarness()
     const app = await makeApp(root, harness)
@@ -2918,15 +3461,11 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
         attachments: [],
       },
     })
-    expect(response.statusCode).toBe(404)
-    expect(response.json()).toMatchObject({
-      error: {
-        code: 'THEME_SKILL_NOT_FOUND',
-        retryable: false,
-        details: { internalCode: 'SKILL_INSTALL_UNAVAILABLE' },
-      },
-    })
-    expect(harness.sent).toBeUndefined()
+    expect(response.statusCode).toBe(202)
+    await expect.poll(() => harness.sent?.themeSkillId).toBe('fastppt-theme-academy')
+    await expect(readFile(join(root, '.agents', 'skills', 'fastppt-theme-academy', 'SKILL.md'), 'utf8')).resolves.toContain('fastppt-theme-academy')
+    expect(existsSync(join(root, '.agents', 'skills', 'fastppt-theme-landing'))).toBe(false)
+    expect(existsSync(join(root, '.claude', 'skills', 'fastppt-theme-academy'))).toBe(false)
   })
 
   it('normalizes a Harness invocation that ends before starting', async () => {
@@ -2953,6 +3492,737 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)))
     expect(harness.sent).toMatchObject({
       themeId: 'slidev-theme-academy',
       themeSkillId: 'fastppt-theme-academy',
+    })
+  })
+
+  it('persists notes, animations, and deterministic diagram sidecars per deck', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-documents-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    const app = await makeApp(root)
+    const deck = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]
+    expect(deck).toBeDefined()
+    const deckId = deck?.id as string
+    const notes = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/notes`,
+      payload: {
+        version: 1,
+        notes: [
+          {
+            version: 1,
+            slideId: 'slide-1',
+            spokenText: 'Three words here',
+            format: 'plain',
+            language: 'en-US',
+            estimatedSeconds: 1.2,
+            cues: [
+              { startSeconds: 0.25, endSeconds: 1.5, text: 'Three words here' },
+            ],
+            status: 'accepted',
+          },
+        ],
+      },
+    })
+    expect(notes.statusCode).toBe(200)
+    expect(notes.json()).toMatchObject({ notes: [{ estimatedSeconds: 1.5 }] })
+    const srt = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/notes.srt`,
+    })
+    expect(srt.statusCode).toBe(200)
+    expect(srt.headers['content-type']).toContain('text/plain')
+    expect(srt.headers['content-disposition']).toContain(`${deckId}.srt`)
+    expect(srt.body).toContain('00:00:00,250 --> 00:00:01,500')
+    expect(srt.body).toContain('Three words here')
+    await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/notes`,
+      payload: {
+        version: 1,
+        notes: [
+          {
+            version: 1,
+            slideId: 'slide-1',
+            spokenText: 'Three words here',
+            format: 'plain',
+            language: 'en-US',
+            estimatedSeconds: 1.2,
+            cues: [
+              { startSeconds: 0.25, endSeconds: 1.5, text: 'Three words here' },
+            ],
+            status: 'accepted',
+          },
+          {
+            version: 1,
+            slideId: 'slide-2',
+            spokenText: 'Second page',
+            format: 'plain',
+            language: 'en-US',
+            estimatedSeconds: 2,
+            cues: [{ startSeconds: 0, endSeconds: 1, text: 'Second page' }],
+            status: 'accepted',
+          },
+        ],
+      },
+    })
+    const deckSrt = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/notes.srt`,
+    })
+    expect(deckSrt.body).toContain('00:00:01,500 --> 00:00:02,500')
+    const animations = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/animations`,
+      payload: {
+        version: 1,
+        animations: [
+          {
+            version: 1,
+            slideId: 'slide-1',
+            transition: { kind: 'fade', durationMs: 500 },
+            groups: [],
+            source: 'user',
+            diagnostics: [],
+          },
+        ],
+      },
+    })
+    expect(animations.statusCode).toBe(200)
+    const diagram = {
+      version: 1,
+      kind: 'flowchart',
+      nodes: [{ id: 'a', label: 'Start' }],
+      edges: [],
+      tasks: [],
+      style: { width: 1200, height: 700, direction: 'lr', fontFamily: 'Arial' },
+      acceptedRevision: 0,
+    }
+    expect(
+      (
+        await app.inject({
+          method: 'PUT',
+          url: `/api/v1/decks/${deckId}/diagrams/start`,
+          payload: { document: diagram },
+        })
+      ).statusCode,
+    ).toBe(200)
+    expect(
+      readFileSync(
+        join(
+          root,
+          '.fastppt',
+          'decks',
+          deckId,
+          'assets',
+          'generated',
+          'start.svg',
+        ),
+        'utf8',
+      ),
+    ).toContain('<svg')
+    const inserted = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${deckId}/diagrams/start/insert`,
+      payload: {},
+    })
+    expect(inserted.statusCode).toBe(200)
+    expect(inserted.json()).toMatchObject({
+      assetPath: 'assets/generated/start.svg',
+    })
+    expect(
+      readFileSync(join(root, 'assets', 'generated', 'start.svg'), 'utf8'),
+    ).toContain('<svg')
+    expect(readFileSync(join(root, 'slides.md'), 'utf8')).toContain(
+      '![Diagram start](./assets/generated/start.svg)',
+    )
+    const capabilities = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/export-capabilities`,
+    })
+    expect(capabilities.json()).toMatchObject({
+      capabilities: {
+        notes: 'supported',
+        narration_srt: 'supported',
+        narration_audio: 'unsupported',
+        animations: 'partial',
+      },
+    })
+    const capabilityHistory = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/export-capabilities/history`,
+    })
+    expect(capabilityHistory.statusCode).toBe(200)
+    expect(capabilityHistory.json()).toMatchObject({
+      deckId,
+      report: { deckRevision: expect.any(String) },
+      savedAt: expect.any(String),
+    })
+    const matrix = { ...diagram, kind: 'matrix' }
+    expect(
+      (
+        await app.inject({
+          method: 'PUT',
+          url: `/api/v1/decks/${deckId}/diagrams/matrix`,
+          payload: { document: matrix },
+        })
+      ).statusCode,
+    ).toBe(200)
+    const nativeMatrix = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/export-capabilities`,
+    })
+    expect(nativeMatrix.json()).toMatchObject({
+      capabilities: { diagrams: 'supported' },
+    })
+    expect(nativeMatrix.json().warnings).not.toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('matrix diagrams remain SVG assets'),
+      ]),
+    )
+  })
+
+  it('reports narration provider availability without exposing credentials', async () => {
+    const root = mkdtempSync(
+      join(tmpdir(), 'fastppt-gateway-narration-providers-'),
+    )
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    const app = await makeApp(root)
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/narration/providers',
+    })
+    expect(response.statusCode).toBe(200)
+    const body = response.json<{
+      version: number
+      providers: Array<{ provider: string }>
+    }>()
+    expect(body.version).toBe(1)
+    expect(
+      body.providers.find((provider) => provider.provider === 'edge'),
+    ).toMatchObject({ provider: 'edge', configured: false, timing: 'provider' })
+  })
+
+  it('blocks click-triggered animations on narrated slides', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-animation-notes-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n<div id="hero">Hero</div>\n',
+    )
+    const app = await makeApp(root)
+    const deck = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]
+    const deckId = deck?.id as string
+    await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/notes`,
+      payload: {
+        version: 1,
+        notes: [
+          {
+            version: 1,
+            slideId: 'slide-1',
+            spokenText: 'Narration',
+            format: 'plain',
+            language: 'en-US',
+            estimatedSeconds: 1,
+            cues: [],
+            status: 'accepted',
+          },
+        ],
+      },
+    })
+    await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/animations`,
+      payload: {
+        version: 1,
+        animations: [
+          {
+            version: 1,
+            slideId: 'slide-1',
+            transition: { kind: 'none', durationMs: 500 },
+            groups: [
+              {
+                id: 'hero',
+                effects: [
+                  {
+                    id: 'effect-1',
+                    kind: 'appear',
+                    target: 'hero',
+                    trigger: 'on-click',
+                    delayMs: 0,
+                    durationMs: 400,
+                    params: {},
+                  },
+                ],
+                static: false,
+              },
+            ],
+            source: 'user',
+            diagnostics: [],
+          },
+        ],
+      },
+    })
+    const response = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${deckId}/exports`,
+      payload: { format: 'editable-pptx', outputName: 'blocked.pptx' },
+    })
+    expect(response.statusCode).toBe(400)
+    expect(response.json()).toMatchObject({
+      error: { code: 'DECK_VALIDATION_FAILED' },
+    })
+    expect(JSON.stringify(response.json())).toContain(
+      'ANIMATION_CLICK_WITH_NOTES',
+    )
+  })
+
+  it('persists page and object identity once, preserving sidecars through reordering', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-identity-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# First\n<div v-click>Before</div>\n\n---\n\n# Second\n',
+    )
+    const app = await makeApp(root, new FakeCodexHarness())
+    const deckId = (
+      await app.inject({ method: 'GET', url: '/api/v1/decks' })
+    ).json()[0].id as string
+    const [first, concurrent] = await Promise.all(
+      [0, 1].map(() =>
+        app.inject({
+          method: 'POST',
+          url: `/api/v1/decks/${deckId}/identities`,
+        }),
+      ),
+    )
+    expect(first!.statusCode).toBe(200)
+    expect(concurrent!.statusCode).toBe(200)
+    expect(
+      first!
+        .json<{ slides: Array<{ slideId: string }> }>()
+        .slides.map((page) => page.slideId),
+    ).toEqual(['slide-1', 'slide-2'])
+    const original = readFileSync(join(root, 'slides.md'), 'utf8')
+    expect(original).toContain('data-fastppt-group=')
+    const repeated = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${deckId}/identities`,
+    })
+    expect(repeated.json().revision).toBe(first!.json().revision)
+    const note = {
+      version: 1,
+      slideId: 'slide-1',
+      spokenText: 'First page note',
+      format: 'plain',
+      language: 'en-US',
+      estimatedSeconds: 1,
+      cues: [],
+      status: 'accepted',
+    }
+    await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/notes`,
+      payload: { version: 1, notes: [note] },
+    })
+    const anchor = first!.json().slides[0].anchors[0] as string
+    writeFileSync(
+      join(root, 'slides.md'),
+      `---\ntheme: slidev-theme-academy\nfastpptId: slide-2\n---\n# Second\n\n---\nfastpptId: slide-1\n---\n# First edited\n<div data-fastppt-group="${anchor}" v-click>After</div>\n`,
+    )
+    const reordered = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/ir`,
+    })
+    expect(
+      reordered
+        .json<{ slides: Array<{ slideId: string }> }>()
+        .slides.map((page) => page.slideId),
+    ).toEqual(['slide-2', 'slide-1'])
+    expect(reordered.json().slides[1].anchors).toEqual([anchor])
+    const notes = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/notes`,
+    })
+    expect(notes.json().notes[0]).toMatchObject({
+      slideId: 'slide-1',
+      spokenText: 'First page note',
+    })
+  })
+
+  it('derives Markdown notes when no notes sidecar exists', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-markdown-notes-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# First\n<!-- notes: Speak about the opening -->\n\n---\n# Second\n',
+    )
+    const app = await makeApp(root)
+    const deck = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]
+    const deckId = deck?.id as string
+    const derived = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/notes`,
+    })
+    expect(derived.statusCode).toBe(200)
+    expect(derived.json()).toMatchObject({
+      notes: [{ slideId: 'slide-1', spokenText: 'Speak about the opening' }],
+    })
+    const explicit = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deckId}/notes`,
+      payload: {
+        version: 1,
+        notes: [
+          {
+            version: 1,
+            slideId: 'slide-2',
+            spokenText: 'Explicit sidecar note',
+            format: 'plain',
+            language: 'en-US',
+            estimatedSeconds: 1,
+            cues: [],
+            status: 'accepted',
+          },
+        ],
+      },
+    })
+    expect(explicit.statusCode).toBe(200)
+    const reread = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/notes`,
+    })
+    expect(reread.json()).toMatchObject({
+      notes: [{ slideId: 'slide-2', spokenText: 'Explicit sidecar note' }],
+    })
+  })
+
+  it('commits a reproducible creation-wizard profile digest', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-wizard-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    const app = await makeApp(root)
+    const created = await app.inject({
+      method: 'POST',
+      url: '/api/v1/creation-wizards',
+      payload: {},
+    })
+    const wizard = created.json()
+    const decision = {
+      version: 1,
+      stepId: 'task',
+      question: '任务',
+      options: ['from-scratch'],
+      selected: 'from-scratch',
+      rationale: 'test',
+      actor: 'user',
+      locked: true,
+      timestamp: '2026-09-16T00:00:00.000Z',
+    }
+    await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/creation-wizards/${wizard.id}/steps`,
+      payload: { currentStep: 'content', decision },
+    })
+    const committed = await app.inject({
+      method: 'POST',
+      url: `/api/v1/creation-wizards/${wizard.id}/commit`,
+      payload: {},
+    })
+    expect(committed.statusCode).toBe(200)
+    expect(committed.json()).toMatchObject({
+      status: 'committed',
+      profileDigest: expect.stringMatching(/^[0-9a-f]{64}$/),
+    })
+    const reread = await app.inject({
+      method: 'GET',
+      url: `/api/v1/creation-wizards/${wizard.id}`,
+    })
+    expect(reread.json().profileDigest).toBe(committed.json().profileDigest)
+    const repeated = await app.inject({
+      method: 'POST',
+      url: `/api/v1/creation-wizards/${wizard.id}/commit`,
+      payload: {},
+    })
+    expect(repeated.json()).toEqual(committed.json())
+    const edit = await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/creation-wizards/${wizard.id}/steps`,
+      payload: { currentStep: 'visual' },
+    })
+    expect(edit.statusCode).toBe(409)
+    const frozen = await app.inject({
+      method: 'GET',
+      url: `/api/v1/creation-wizards/${wizard.id}`,
+    })
+    expect(frozen.json()).toEqual(committed.json())
+  })
+
+  it('protects locked creation decisions from replacement', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-wizard-lock-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    const app = await makeApp(root)
+    const created = await app.inject({
+      method: 'POST',
+      url: '/api/v1/creation-wizards',
+      payload: {},
+    })
+    const wizard = created.json()
+    const locked = {
+      version: 1,
+      stepId: 'task',
+      question: '任务',
+      options: ['from-scratch'],
+      selected: 'from-scratch',
+      actor: 'user',
+      locked: true,
+      timestamp: '2026-09-16T00:00:00.000Z',
+    }
+    await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/creation-wizards/${wizard.id}/steps`,
+      payload: { decision: locked },
+    })
+    const replaced = await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/creation-wizards/${wizard.id}/steps`,
+      payload: { decision: { ...locked, selected: 'create-theme' } },
+    })
+    expect(replaced.statusCode).toBe(409)
+    expect(replaced.json()).toMatchObject({
+      error: { code: 'INVALID_REQUEST' },
+    })
+  })
+
+  it('locks native layout geometry and detects a later geometry change', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-layout-lock-'))
+    const fixtureThemes = mkdtempSync(join(tmpdir(), 'fastppt-layout-themes-'))
+    cpSync(themesRoot, fixtureThemes, {
+      recursive: true,
+      filter: sourceThemeFilter,
+    })
+    const themeManifestPath = join(
+      fixtureThemes,
+      'slidev-theme-academy',
+      'agent',
+      'theme-manifest.json',
+    )
+    const themeManifest = z
+      .record(z.string(), z.unknown())
+      .parse(JSON.parse(readFileSync(themeManifestPath, 'utf8')))
+    writeFileSync(
+      themeManifestPath,
+      JSON.stringify({ ...themeManifest, motionPreset: 'teaching' }),
+    )
+    const nativePath = join(
+      fixtureThemes,
+      'slidev-theme-academy',
+      'agent',
+      'native-layouts.json',
+    )
+    const layout = {
+      name: 'default',
+      masterId: 'Brand',
+      masterObjects: {
+        objects: [
+          {
+            name: 'logo',
+            anchor: 'brand-logo',
+            x: 0,
+            y: 0,
+            width: 1000,
+            height: 1000,
+          },
+        ],
+      },
+      placeholders: [
+        { index: 0, type: 'title', x: 100, y: 200, width: 3000, height: 400 },
+      ],
+    }
+    writeFileSync(nativePath, JSON.stringify([layout]))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\nfastpptPlaceholders:\n  title: 0\n---\n<h1 id="title">Test</h1>\n',
+    )
+    const exporter = new FakeExporter()
+    const app = await makeApp(root, undefined, fixtureThemes, exporter)
+    const deck = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]!
+    const master = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deck.id}/master`,
+    })
+    expect(master.statusCode).toBe(200)
+    expect(master.json()).toMatchObject({
+      layoutDefinitions: [layout],
+      masters: expect.arrayContaining([
+        expect.objectContaining({ id: 'Brand', layouts: ['default'] }),
+      ]),
+    })
+    const ir = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deck.id}/ir`,
+    })
+    expect(ir.json().motionPreset).toBe('teaching')
+    expect(ir.json().slides[0].anchors).toContain('brand-logo')
+    const animation = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/decks/${deck.id}/animations`,
+      payload: {
+        version: 1,
+        animations: [
+          {
+            version: 1,
+            slideId: ir.json().slides[0].slideId,
+            transition: { kind: 'none', durationMs: 500 },
+            groups: [
+              {
+                id: 'brand-logo',
+                effects: [
+                  {
+                    id: 'brand-effect',
+                    kind: 'exit_fade',
+                    target: 'brand-logo',
+                    trigger: 'on-click',
+                    delayMs: 0,
+                    durationMs: 400,
+                    params: {},
+                  },
+                ],
+                static: false,
+              },
+            ],
+            source: 'user',
+            diagnostics: [],
+          },
+        ],
+      },
+    })
+    expect(animation.statusCode).toBe(200)
+    const queued = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${deck.id}/exports`,
+      payload: { format: 'editable-pptx', outputName: 'layout.pptx' },
+    })
+    expect(queued.statusCode).toBe(200)
+    const submitted = await app.inject({
+      method: 'POST',
+      url: `/api/v1/exports/${queued.json().id}/snapshot`,
+      payload: exportSnapshot,
+    })
+    expect(submitted.statusCode).toBe(200)
+    await vi.waitFor(() =>
+      expect(exporter.lastInput).toMatchObject({
+        slideLayouts: ['default'],
+        masterLayoutDefinitions: [layout],
+        placeholderBindings: [{ slide: 1, target: 'title', index: 0 }],
+      }),
+    )
+    expect(exporter.lastInput).toMatchObject({
+      objectAnimations: [
+        expect.objectContaining({
+          slide: 1,
+          target: 'brand-logo',
+          kind: 'exit_fade',
+        }),
+      ],
+    })
+    const markdownPath = join(root, 'slides.md')
+    writeFileSync(
+      markdownPath,
+      readFileSync(markdownPath, 'utf8').replace(
+        'title: 0',
+        'title: { index: 0, textStyle: layout }',
+      ),
+    )
+    const rejected = await app.inject({
+      method: 'POST',
+      url: `/api/v1/decks/${deck.id}/exports`,
+      payload: { format: 'editable-pptx', outputName: 'invalid-style.pptx' },
+    })
+    expect(rejected.statusCode).not.toBe(200)
+    expect(rejected.json()).toMatchObject({
+      error: {
+        code: 'INVALID_REQUEST',
+        message: expect.stringContaining('defaults'),
+      },
+    })
+    writeFileSync(markdownPath, readFileSync(markdownPath, 'utf8').replace('textStyle: layout', 'textBody: layout'))
+    const bodyRejected = await app.inject({ method: 'POST', url: `/api/v1/decks/${deck.id}/exports`, payload: { format: 'editable-pptx', outputName: 'invalid-body.pptx' } })
+    expect(bodyRejected.statusCode).not.toBe(200)
+    expect(bodyRejected.json()).toMatchObject({ error: { code: 'INVALID_REQUEST', message: expect.stringContaining('Text body inheritance') } })
+    layout.placeholders[0]!.x = 800
+    writeFileSync(nativePath, JSON.stringify([layout]))
+    expect(
+      (await app.inject({ method: 'POST', url: '/api/v1/themes/rescan' }))
+        .statusCode,
+    ).toBe(200)
+    const report = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deck.id}/export-capabilities`,
+    })
+    expect(report.json()).toMatchObject({ blocks: ['THEME_LOCK_STALE'] })
+  })
+
+  it('blocks export capabilities when the theme lock is stale', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'fastppt-gateway-theme-lock-'))
+    writeFileSync(
+      join(root, 'slides.md'),
+      '---\ntheme: slidev-theme-academy\n---\n# Test\n',
+    )
+    const app = await makeApp(root)
+    const deck = DeckSummarySchema.array().parse(
+      (await app.inject({ method: 'GET', url: '/api/v1/decks' })).json(),
+    )[0]
+    const deckId = deck?.id as string
+
+    const master = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/master`,
+    })
+    expect(master.statusCode).toBe(200)
+    expect(master.json()).toMatchObject({
+      fonts: expect.arrayContaining(['Inter']),
+      colors: expect.any(Object),
+      masters: [{ id: 'default' }],
+    })
+    const limited = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/export-capabilities`,
+    })
+    expect(limited.json()).toMatchObject({
+      capabilities: { master: 'partial' },
+    })
+    const lockPath = join(root, '.fastppt', 'decks', deckId, 'theme-lock.json')
+    const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as {
+      digest: string
+    }
+    writeFileSync(lockPath, JSON.stringify({ ...lock, digest: 'stale-digest' }))
+
+    const capabilities = await app.inject({
+      method: 'GET',
+      url: `/api/v1/decks/${deckId}/export-capabilities`,
+    })
+    expect(capabilities.statusCode).toBe(200)
+    expect(capabilities.json()).toMatchObject({
+      capabilities: { master: 'unsupported' },
+      blocks: ['THEME_LOCK_STALE'],
     })
   })
 })

@@ -1,0 +1,9 @@
+{
+  "id": "4013c739f962",
+  "source": "references/GordenPPTSkill/templates/thesis-novice/template.pptx",
+  "sourceSha256": "fadca83953a2bc87de78dcdc1fe76515f334cd9014905b267d07edb36c4b27dd",
+  "pages": 32,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

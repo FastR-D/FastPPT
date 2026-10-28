@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Box, Button, Text } from '@fastppt/components'
 import { computed, shallowRef } from 'vue'
 
 import type { FileNode } from '@fastppt/protocol'
@@ -35,20 +36,21 @@ function activate(): void {
 </script>
 
 <template>
-  <div class="tree-node">
-    <button
+  <Box class="tree-node">
+    <Button
+      variant="quiet"
       class="tree-row"
       :class="{ 'tree-row-selected': node.path === selectedPath }"
       :style="{ paddingLeft: `${8 + depth * 13}px` }"
       type="button"
       @click="activate"
     >
-      <span class="tree-icon" :class="{ 'tree-icon-file': !isDirectory }">
+      <Text class="tree-icon" :class="{ 'tree-icon-file': !isDirectory }">
         {{ fileIcon }}
-      </span>
-      <span class="tree-name">{{ node.name }}</span>
-    </button>
-    <div v-if="isDirectory && expanded" class="tree-children">
+      </Text>
+      <Text class="tree-name">{{ node.name }}</Text>
+    </Button>
+    <Box v-if="isDirectory && expanded" class="tree-children">
       <FileTreeNode
         v-for="child in node.children ?? []"
         :key="child.path"
@@ -57,33 +59,20 @@ function activate(): void {
         :depth="depth + 1"
         @select="$emit('select', $event)"
       />
-    </div>
-  </div>
+    </Box>
+  </Box>
 </template>
 
 <style scoped>
 .tree-row {
+  justify-content: flex-start;
   display: flex;
   align-items: center;
   width: 100%;
   min-width: 0;
   height: 24px;
   gap: 5px;
-  padding-top: 0;
-  padding-right: 8px;
-  padding-bottom: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-muted);
-  font-size: 11px;
   text-align: left;
-}
-
-.tree-row:hover,
-.tree-row-selected {
-  background: rgb(255 255 255 / 6%);
-  color: var(--color-text);
 }
 .tree-row-selected {
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
@@ -92,16 +81,16 @@ function activate(): void {
 .tree-icon {
   width: 14px;
   flex: 0 0 auto;
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   font-family: var(--font-mono);
 }
 .tree-icon-file {
-  color: #79a9d1;
-  font-size: 8px;
+  color: var(--color-accent-strong);
+  font-size: 10px;
   font-weight: 700;
 }
 .tree-children {
-  border-left: 1px solid rgb(255 255 255 / 7%);
+  border-left: 1px solid var(--color-border);
   margin-left: 14px;
 }
 

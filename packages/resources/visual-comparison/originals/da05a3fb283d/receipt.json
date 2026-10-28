@@ -1,0 +1,9 @@
+{
+  "id": "da05a3fb283d",
+  "source": "references/GordenPPTSkill/templates/top-thesis/template.pptx",
+  "sourceSha256": "a4cb74324d5317b90e326f5409506653c92fa164b283c8e54a40bc2184c4506f",
+  "pages": 39,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

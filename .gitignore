@@ -17,3 +17,50 @@ task_plan.md
 /examples/
 .vercel
 /references/
+/ppts/
+/decks/
+assets/
+!packages/components/src/assets/
+!packages/components/src/assets/fastppt-icon.svg
+
+# FastPPT workspace files
+.codex/
+.agents/
+.mcp.json
+.mcp.json.fastppt-backup-*
+
+
+# Local data and binary assets: excluded from code-only Git history
+*.csv
+*.db
+*.gif
+*.ico
+*.jpeg
+*.jpg
+*.mp3
+*.mp4
+*.otf
+*.parquet
+*.pdf
+*.png
+*.pptx
+*.pyc
+*.sqlite
+*.ttf
+*.wav
+*.webp
+*.woff
+*.woff2
+*.xlsx
+*.zip
+
+# Resource catalog is versioned even though generic CSV exports are ignored
+!packages/resources/manifest.csv
+# Generated resource render screenshots (report JSON remains versioned)
+/packages/resources/audit/
+/packages/resources/visual-comparison/before/
+/packages/resources/visual-comparison/before-source-text/
+/packages/resources/visual-comparison/before-branding/
+/packages/resources/visual-comparison/*-progress.json
+
+!packages/animations/manifest.csv

@@ -5,7 +5,11 @@ description: Create, edit, validate, preview, and export Slidev presentation dec
 
 # FastPPT deck workflow
 
-Use the FastPPT MCP tools for workspace access. Never bypass them with arbitrary
+Use the FastPPT CLI core or MCP tools for workspace access. Read
+[references/cli.md](references/cli.md) for command equivalents and runtime
+requirements. Invoke `$fastppt-ppt-generate` for end-to-end generation and
+`$fastppt-theme-create` for theme creation or extraction.
+Never bypass the core services with arbitrary
 paths, and never infer a theme from prose. FastPPT supplies an immutable theme
 snapshot and explicitly invokes the one matching theme Skill for each run.
 The tagged FastPPT Session Brief is authoritative for audience, intent,
@@ -14,8 +18,13 @@ Do not ask for these fields again unless the user explicitly changes the task.
 
 ## Required workflow
 
-1. Call `get_workspace`, then `get_theme_manifest` and `get_theme_skill` for the
+1. Call `get_workspace`, then `get_theme_manifest`, `get_theme_rules`, and `get_theme_skill` for the
    supplied theme ID. Stop if the theme or its managed Skill is unavailable.
+   Read the human guidance and machine constraints before choosing layouts and
+   filling slots. Keep their digest and evidence requirements with the plan.
+   An absent or empty machine rule set is not proof of compliance; preserve
+   human review for principles that have no executable check. A provider being
+   available does not mean that this deck has supplied valid evidence.
 2. Translate the Session Brief into a lightweight `deck-plan.json` containing
    the communication goal, argument spine, slide jobs, evidence needs, and
    chosen narrative mode. Read [references/modes.md](references/modes.md).
@@ -56,6 +65,34 @@ standards, [references/modes.md](references/modes.md) for narrative movement,
 [references/safety.md](references/safety.md) before any file write
 or export. Use [examples/basic-deck.md](examples/basic-deck.md) only as a
 structural example; its styling never replaces the active theme Skill.
+
+## Composition resources
+
+Use `search_resources` to retrieve fitting page structures and logic diagrams by
+slide job, relationship and density, then `read_resource` for the best candidates.
+Adapt the selected structure to the active theme or combine its logic diagram
+with a registered theme layout. Create a new composition if candidates do not
+fit. Read conversion warnings and provenance; resource sample content is not
+user evidence. Copy needed local assets into the deck and rewrite their paths.
+Never flatten a whole information slide into an image to imitate a resource.
+
+## Color palettes
+
+Use `search_palettes` and `read_palette` to find sourced color values by mood,
+hue, use case and scheme type. Read actual hex colors before recommending;
+explain background, text, primary and accent roles and check contrast in context.
+Preserve the confirmed theme unless the user requests a palette change.
+Theme Skills are loaded on demand by `get_theme_skill`; request only the theme
+needed for the current task, rather than installing the entire theme catalog.
+
+## Creative motion
+
+Use `search_animations` and `read_animation` to find creative object effects.
+Animation references live separately in `packages/animations`; map effects to
+explicit object anchors, retain the active theme, and compose motions for text,
+images, reveals or choreography. Demo pages illustrate motion rather than provide
+page layouts. Preserve native timing for Slidewave export and disclose browser
+preview limitations.
 
 ## Creative HTML and CSS
 

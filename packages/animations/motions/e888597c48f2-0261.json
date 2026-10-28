@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "slideId": "e888597c48f2-0261",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s22",
+      "label": "s22",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0261-effect-1",
+          "kind": "native",
+          "target": "s22",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 900.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 900.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.5,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 900.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"23\" presetClass=\"entr\" presetSubtype=\"16\" accel=\"50000\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"6\" dur=\"1\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"22\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set><p:animScale><p:cBhvr><p:cTn id=\"7\" dur=\"300\" fill=\"hold\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"22\"/></p:tgtEl></p:cBhvr><p:from x=\"0\" y=\"0\"/><p:to x=\"85000\" y=\"85000\"/></p:animScale><p:animScale><p:cBhvr><p:cTn id=\"8\" dur=\"600\" fill=\"hold\"><p:stCondLst><p:cond delay=\"300\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"22\"/></p:tgtEl></p:cBhvr><p:from x=\"85000\" y=\"85000\"/><p:to x=\"100000\" y=\"100000\"/></p:animScale></p:childTnLst></p:cTn>",
+            "sourceSpid": "22",
+            "sourceOrder": 0,
+            "class": "entr",
+            "presetId": "23",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 1.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "animScale",
+                "attribute": null,
+                "durationMs": 300.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "to": {
+                  "x": 0.85,
+                  "y": 0.85
+                },
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              },
+              {
+                "type": "animScale",
+                "attribute": null,
+                "durationMs": 600.0,
+                "delayMs": 300.0,
+                "frames": [],
+                "from": {
+                  "x": 0.85,
+                  "y": 0.85
+                },
+                "to": {
+                  "x": 1.0,
+                  "y": 1.0
+                },
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": []
+}

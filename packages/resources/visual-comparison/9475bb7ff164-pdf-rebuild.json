@@ -1,0 +1,240 @@
+{
+  "source": {
+    "path": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+    "id": "9475bb7ff164",
+    "sha256": "558ce85c0d64cd2a06faf88d6a4aa331e8cd4c685c59101c835ded2fbc87696d",
+    "pages": 19,
+    "entries": [
+      "9475bb7ff164-0001",
+      "9475bb7ff164-0002",
+      "9475bb7ff164-0003",
+      "9475bb7ff164-0004",
+      "9475bb7ff164-0005",
+      "9475bb7ff164-0006",
+      "9475bb7ff164-0007",
+      "9475bb7ff164-0008",
+      "9475bb7ff164-0009",
+      "9475bb7ff164-0010",
+      "9475bb7ff164-0011",
+      "9475bb7ff164-0012",
+      "9475bb7ff164-0013",
+      "9475bb7ff164-0014",
+      "9475bb7ff164-0015",
+      "9475bb7ff164-0016",
+      "9475bb7ff164-0017",
+      "9475bb7ff164-0018",
+      "9475bb7ff164-0019"
+    ]
+  },
+  "records": [
+    {
+      "id": "9475bb7ff164-0001",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 1,
+      "markdownSha256": "de9aa52232e9b4fdbaad64f8c00c4074d6a4d44f4ba6de214e67c5d8db5dc30d",
+      "layers": 59,
+      "textSpans": 6,
+      "original": "originals/9475bb7ff164/0001.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0002",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 2,
+      "markdownSha256": "8854a1d9a48ab6d21b2382a3c1bfcbec5d5ff3b1f38357d49bb29069de408286",
+      "layers": 59,
+      "textSpans": 10,
+      "original": "originals/9475bb7ff164/0002.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0003",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 3,
+      "markdownSha256": "0760df3d7951ba28bd16cd7dc29a2e00ec2ac815cd201250fef88aafc4cbd332",
+      "layers": 35,
+      "textSpans": 7,
+      "original": "originals/9475bb7ff164/0003.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0004",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 4,
+      "markdownSha256": "b7c9b55346256ceb38eda877062705e5448362b8fbcb335f28ba79a093764839",
+      "layers": 61,
+      "textSpans": 8,
+      "original": "originals/9475bb7ff164/0004.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0005",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 5,
+      "markdownSha256": "1c77497cd4b031fb0809c2815ba943930ee989848b54cbb75c607b50b2399d4c",
+      "layers": 46,
+      "textSpans": 15,
+      "original": "originals/9475bb7ff164/0005.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0006",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 6,
+      "markdownSha256": "a7475ce0fbb76627c33849f967d216d0cf9ac62811ea9892fbeaf44cda6a1c5a",
+      "layers": 52,
+      "textSpans": 19,
+      "original": "originals/9475bb7ff164/0006.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0007",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 7,
+      "markdownSha256": "e40e6b3e87eba41059de056e10b3a39a14395230bedb989a411b5a96c2474073",
+      "layers": 35,
+      "textSpans": 7,
+      "original": "originals/9475bb7ff164/0007.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0008",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 8,
+      "markdownSha256": "8601268db4eaf09d9d7a1a734534d50bb75998155e29df90864605010da4eea0",
+      "layers": 30,
+      "textSpans": 10,
+      "original": "originals/9475bb7ff164/0008.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0009",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 9,
+      "markdownSha256": "1917c5b97adac924ce5eb084a6bf60e65e597b823d02d4af2119405c291367bc",
+      "layers": 38,
+      "textSpans": 17,
+      "original": "originals/9475bb7ff164/0009.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0010",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 10,
+      "markdownSha256": "b1bd9876dceee51b32e9111ac370f25aced57665259ad848d3b1e1d53effcbfc",
+      "layers": 52,
+      "textSpans": 13,
+      "original": "originals/9475bb7ff164/0010.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0011",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 11,
+      "markdownSha256": "5cc19443eec38ef75cad30025805dea73ec3cf8362c7b992153602d3a6fb7764",
+      "layers": 35,
+      "textSpans": 7,
+      "original": "originals/9475bb7ff164/0011.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0012",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 12,
+      "markdownSha256": "d1c99c36daa45dc066ca7d3594c0a5d653695a84068e9f1db0fa3cb3d7409ae9",
+      "layers": 58,
+      "textSpans": 16,
+      "original": "originals/9475bb7ff164/0012.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0013",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 13,
+      "markdownSha256": "4dfd65364cce10c95e8e5c33c4b10d87bec1e8d34afc6fd04a7604d0bc76f049",
+      "layers": 57,
+      "textSpans": 10,
+      "original": "originals/9475bb7ff164/0013.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0014",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 14,
+      "markdownSha256": "bd57d0a84c3c6972189487026914fa87bb5a04146780bffa7378f3f3295bd5b7",
+      "layers": 46,
+      "textSpans": 31,
+      "original": "originals/9475bb7ff164/0014.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0015",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 15,
+      "markdownSha256": "7d9d9d66bdbcaf559dcb5bc1301f462a2e97d92a8ac14bffddad57e6d168eee9",
+      "layers": 35,
+      "textSpans": 7,
+      "original": "originals/9475bb7ff164/0015.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0016",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 16,
+      "markdownSha256": "04b060d6d9bcb76a8c445e05accea3a3c24d50090156b24970d6810218d88894",
+      "layers": 52,
+      "textSpans": 23,
+      "original": "originals/9475bb7ff164/0016.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0017",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 17,
+      "markdownSha256": "4ecc8b2db99f1a19f618f4de55b00094f3a13af4e02fbe1ea391e225f4eba50b",
+      "layers": 59,
+      "textSpans": 20,
+      "original": "originals/9475bb7ff164/0017.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0018",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 18,
+      "markdownSha256": "0c6c1f1f2e30bb53375ea8ce5c7de7076aa9d5e5637ba8c11a254e41223f14a6",
+      "layers": 88,
+      "textSpans": 18,
+      "original": "originals/9475bb7ff164/0018.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "9475bb7ff164-0019",
+      "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+      "sourcePage": 19,
+      "markdownSha256": "82c8eb07ab7d5d4b6b08e98631349b0fa5c7c2a8c6c9b297ec2db3cea0022c2c",
+      "layers": 58,
+      "textSpans": 4,
+      "original": "originals/9475bb7ff164/0019.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    }
+  ]
+}

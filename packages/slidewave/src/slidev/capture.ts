@@ -1,3 +1,10 @@
+import { parseNativeGeometry } from '../primitives/native-geometry.js'
+import { captureTable, UnsupportedTableError } from './capture-table.js'
+import { clipImageBox, type ImageClip } from './image-clipping.js'
+import { readSourceCapitalization } from '../primitives/text-capitalization.mjs'
+import { readSourceKerning } from '../primitives/text-kerning.mjs'
+import { readSourceBaseline } from '../primitives/text-baseline.mjs'
+import { readTextDecorationContract } from '../primitives/text-decoration.mjs'
 import {
   cssDash,
   cssFontFamilies,
@@ -42,6 +49,7 @@ import {
   svgToDataUrl,
 } from './svg'
 import { resolveSlidevCaptureTheme } from './themes'
+import { captureTextParagraphs } from './capture-text-box.js'
 import type { SlidevCaptureTheme } from './themes/types'
 import {
   fontSafeLineBox,
@@ -57,6 +65,7 @@ import {
 } from './transform'
 import {
   HTML_SNAPSHOT_VERSION,
+  type HtmlTableElement,
   type HtmlBox,
   type HtmlCaptureOptions,
   type HtmlColor,
@@ -151,6 +160,7 @@ export async function captureHtmlSlide(
     await waitForHtmlReady(root, options.ready)
   }
 
+  if (options.snapshotVersion !== undefined && options.snapshotVersion !== 1 && options.snapshotVersion !== 2) throw new TypeError('Unsupported capture snapshot version; expected 1 or 2.')
   const rootRect = root.getBoundingClientRect()
   const width = options.canvasWidth ?? (root.offsetWidth || rootRect.width)
   const height = options.canvasHeight ?? (root.offsetHeight || rootRect.height)
@@ -195,8 +205,8 @@ export async function captureHtmlSlide(
   )
 
   return {
-    version: HTML_SNAPSHOT_VERSION,
-    id: options.id ?? root.id ?? root.dataset.slidevPage ?? 'slide',
+    version: options.snapshotVersion ?? HTML_SNAPSHOT_VERSION,
+    id: options.id ?? (root.id || root.dataset.slidevPage || 'slide'),
     width: round(width, context),
     height: round(height, context),
     elements: context.elements,
@@ -252,7 +262,7 @@ export async function captureSlidevDeck(
   )
 
   return {
-    version: HTML_SNAPSHOT_VERSION,
+    version: options.snapshotVersion ?? HTML_SNAPSHOT_VERSION,
     source: 'slidev',
     slides,
     warnings: slides.flatMap((slide) => slide.warnings),
@@ -294,6 +304,86 @@ async function visitElement(
     ? parentTransform
     : mergeTransform(parentTransform, style)
   const source = elementSource(element, path)
+  const geometryMetadata = element.getAttribute('data-fastppt-geometry')
+  if (geometryMetadata !== null) {
+    const geometry = parseNativeGeometry(geometryMetadata)
+    if (Math.abs(transform.rotation)>0.01 || Math.abs(transform.scaleX-transform.scaleY)>0.001) throw new Error('Native geometry must use baked coordinates and uniform viewport scaling')
+    const box=normalizeRect(element.getBoundingClientRect(),context)
+    const paintChildren=[...element.children].filter((child):child is HTMLElement=>child instanceof HTMLElement)
+    const fillStyle=geometry.fill!=='none'&&paintChildren[0]?getComputedStyle(paintChildren[0]):undefined
+    const strokeStyle=geometry.stroke!=='none'&&paintChildren.length?getComputedStyle(paintChildren[paintChildren.length-1]!):undefined
+    // CSS paint is editable. Metadata provides geometry and a fallback paint;
+    // changing an authored HTML color/alpha must also change the exported shape.
+    const fill=geometry.fill==='none'?undefined:parseCssColor(fillStyle?.backgroundColor ?? geometry.fill)
+    const stroke=geometry.stroke==='none'?undefined:parseCssColor(strokeStyle?.backgroundColor ?? geometry.stroke)
+    if(geometry.fill!=='none'&&!fill || geometry.stroke!=='none'&&!stroke)throw new Error('Invalid native geometry paint color')
+    emit<HtmlShapeElement>(context,{
+      id:`${path}:native-geometry`,kind:'shape',shape:'freeform',geometry:{paths:geometry.paths,fillRule:geometry.fillRule},box,source,zIndex,opacity,
+      ...(fill?{fill:multiplyAlpha(fill,opacity*(fillStyle?numericOpacity(fillStyle.opacity):geometry.fillOpacity??1))}:{}),
+      ...(stroke&&geometry.strokeWidthRatio>0?{stroke:{color:multiplyAlpha(stroke,opacity*(strokeStyle?numericOpacity(strokeStyle.opacity):geometry.strokeOpacity??1)),widthPx:box.width*geometry.strokeWidthRatio}}:{}),
+    })
+    return // Child CSS polygons/line segments are implementation, not duplicate objects.
+  }
+  let tableFallbackStart: number | undefined
+  if (element instanceof HTMLTableElement && context.options.snapshotVersion === 2) {
+    const id = source.anchor ? `table:${source.anchor}` : `${path}:table`
+    try {
+      if (Math.abs(transform.rotation) > 0.01 || Math.abs(transform.scaleX - transform.scaleY) > 0.001) throw new UnsupportedTableError('Native tables require unrotated, uniformly scaled geometry.')
+      for (let ancestor = element.parentElement; ancestor && context.root.contains(ancestor); ancestor = ancestor.parentElement) {
+        const css = getComputedStyle(ancestor), clip = ancestor.getBoundingClientRect(), bounds = element.getBoundingClientRect()
+        if ((css.overflowX !== 'visible' && (bounds.left < clip.left - 1 || bounds.right > clip.right + 1)) || (css.overflowY !== 'visible' && (bounds.top < clip.top - 1 || bounds.bottom > clip.bottom + 1))) throw new UnsupportedTableError('An ancestor clips the table; native replacement would reveal hidden content.')
+      }
+      const captured = captureTable(element, {
+        id, opacity,
+        normalize: rect => normalizeRect(rect, context),
+        textStyle: (node, alpha) => captureTextStyle(getComputedStyle(node), node, alpha, transform),
+        scaleX: transform.scaleX, scaleY: transform.scaleY,
+        excluded: node => matchesAnySelector(node, context.excludes),
+      })
+      emit<HtmlTableElement>(context, { ...captured, id, kind: 'table', opacity, zIndex, source })
+      if (element.caption) await visitElement(context, element.caption, `${path}/caption`, opacity, zIndex, transform)
+      return
+    } catch (error) {
+      if (!(error instanceof UnsupportedTableError)) throw error
+      warn(context, 'unsupported-table', `Native table ${id}: ${error.message} Falling back to fragments; table structure is not preserved.`, id)
+      tableFallbackStart = context.elements.length
+    }
+  }
+  if (element.hasAttribute('data-fastppt-text-box')) {
+    if (Math.abs(transform.rotation) > 0.01 || Math.abs(transform.scaleX - transform.scaleY) > 0.001) throw new Error('Explicit text boxes require unrotated, uniformly scaled geometry.')
+    const paragraphs = captureTextParagraphs(element, {
+      scale: averageScale(transform), opacity,
+      style: (node, alpha) => captureTextStyle(getComputedStyle(node), node, alpha, transform),
+      excluded: node => matchesAnySelector(node, context.excludes),
+    })
+    const owner = element.parentElement?.hasAttribute('data-fastppt-source-text-frame') ? element.parentElement : undefined
+    if (owner && [...owner.childNodes].some(node => node !== element && (node instanceof Text ? !!node.data.trim() : node instanceof Element && isRenderedElement(node, getComputedStyle(node), context.rootRect)))) throw new Error('A source text frame must contain only its explicit text box.')
+    const frameStyle = owner ? getComputedStyle(owner) : undefined
+    if (owner && frameStyle) {
+      const rect = normalizeRect(element.getBoundingClientRect(), context)
+      const frame = normalizeRect(owner.getBoundingClientRect(), context)
+      const left = cssPixels(frameStyle.paddingLeft) * transform.scaleX
+      const right = cssPixels(frameStyle.paddingRight) * transform.scaleX
+      if (['marginTop', 'marginRight', 'marginBottom', 'marginLeft'].some(key => cssPixels(style[key as keyof CSSStyleDeclaration] as string) !== 0) || Math.abs(rect.x - frame.x - left) > 1 || Math.abs(rect.width - (frame.width - left - right)) > 1) throw new Error('Explicit text box must fill the source frame content width without extra margins.')
+    }
+    const verticalAlign = frameStyle?.justifyContent === 'center' ? 'middle' : frameStyle?.justifyContent === 'flex-end' ? 'bottom' : 'top'
+    const textFrame = frameStyle ? {
+      insetsPx: { left: cssPixels(frameStyle.paddingLeft) * transform.scaleX, right: cssPixels(frameStyle.paddingRight) * transform.scaleX, top: cssPixels(frameStyle.paddingTop) * transform.scaleY, bottom: cssPixels(frameStyle.paddingBottom) * transform.scaleY },
+      wrap: frameStyle.whiteSpace !== 'pre',
+    } : undefined
+    emit<HtmlTextElement>(context, {
+      id: `${path}:text-box`, kind: 'text',
+      text: paragraphs.map(paragraph => paragraph.runs.map(run => run.text).join('')).join('\n'),
+      style: paragraphs[0]!.style, paragraphs,
+      box: normalizeRect((owner ?? element).getBoundingClientRect(), context),
+      ...(textFrame ? { textFrame } : {}),
+      opacity, zIndex, source, verticalAlign,
+    })
+    return
+  }
+  if (element.hasAttribute('data-fastppt-tab')) throw new Error('Source tabs require an explicit data-fastppt-text-box frame.')
+  const bulletProperties = element.getAttribute('data-fastppt-bullet')
+  if (element.hasAttribute('data-fastppt-bullet-marker') || bulletProperties !== null && (JSON.parse(bulletProperties) as { bullet?: { kind?: unknown } } | null)?.bullet?.kind !== 'none') throw new Error('Source paragraph bullets require an explicit data-fastppt-text-box frame.')
   if (
     !isRoot &&
     context.theme?.captureAsGroup?.({
@@ -311,6 +401,7 @@ async function visitElement(
       zIndex,
       transform,
     )
+    if (tableFallbackStart !== undefined) markTableFragments(context, tableFallbackStart, source.anchor ? `table:${source.anchor}` : `${path}:table`)
     return
   }
   const maskImage = style.maskImage || style.webkitMaskImage
@@ -360,6 +451,8 @@ async function visitElement(
     captureSvg(context, element, source, opacity, zIndex, transform)
   } else if (element instanceof HTMLCanvasElement) {
     captureCanvas(context, element, source, opacity, zIndex, transform)
+  } else if (captureScriptText(context, element, path, opacity, zIndex, transform)) {
+    // Source-layout script spans stay one editable text shape per authored run.
   } else if (!isUnsupportedMedia(element)) {
     let elementIndex = 0
     let textIndex = 0
@@ -419,6 +512,11 @@ async function visitElement(
       transform,
     )
   }
+  if (tableFallbackStart !== undefined) markTableFragments(context, tableFallbackStart, source.anchor ? `table:${source.anchor}` : `${path}:table`)
+}
+
+function markTableFragments(context: CaptureContext, start: number, ownerId: string): void {
+  for (const element of context.elements.slice(start)) element.structure ??= { kind: 'table', ownerId, requiredRepresentation: 'native-table' }
 }
 
 async function captureGroupedElement(
@@ -643,7 +741,7 @@ async function captureBackground(
       box,
       zIndex,
       opacity,
-      source,
+      source: element === context.root || element === context.root.querySelector('.slidev-layout') ? { ...source, role: 'slide-background' } : source,
       ...(fill && fill.alpha > 0 ? { fill } : {}),
       ...(gradient ? { gradient } : {}),
       ...(stroke ? { stroke } : {}),
@@ -872,6 +970,77 @@ function captureBorders(
   }
 }
 
+/** Collapse only the generated font-routing wrapper, preserving its source run. */
+function paragraphLevel(element: Element): number | undefined {
+  const value = element.closest('[data-fastppt-text-level]')?.getAttribute('data-fastppt-text-level')
+  if (value === undefined || value === null) return undefined
+  if (!/^[1-9]$/.test(value)) throw new Error('Source paragraph level must be between 1 and 9.')
+  return Number(value)
+}
+
+function captureScriptText(
+  context: CaptureContext,
+  element: HTMLElement,
+  path: string,
+  opacity: number,
+  zIndex: number,
+  transform: TransformMetrics,
+): boolean {
+  if (element.tagName !== 'SPAN' || !element.hasAttribute('data-fastppt-script-text')) return false
+  const style = getComputedStyle(element)
+  if (!['pre', 'pre-wrap', 'break-spaces'].includes(style.whiteSpace)) return false
+  const base = captureTextStyle(style, element, opacity, transform)
+  // Source decorations live on leaves so authored cancellation can work.
+  // A generated script group may still be one editable run when every leaf
+  // has the same validated style; do not mistake its undecorated wrapper for
+  // an instruction to discard or split those decorations.
+  const first = element.firstElementChild
+  if (style.textDecorationLine === 'none' && first?.hasAttribute('data-fastppt-text-decoration-run') && [...element.childNodes].every(child => child instanceof HTMLSpanElement))
+    base.decoration = captureTextStyle(getComputedStyle(first), first, opacity, transform).decoration
+  if (first?.hasAttribute('data-fastppt-text-capitalization-run')) base.capitalization = readSourceCapitalization(first)
+  if (first?.hasAttribute('data-fastppt-text-baseline-run')) base.baselinePercent = readSourceBaseline(first)!.baselinePercent
+  if (first?.hasAttribute('data-fastppt-text-kerning')) base.kerningThresholdPx = readSourceKerning(first)!.thresholdPx * averageScale(transform)
+  const fontFamilies: NonNullable<HtmlTextStyle['fontFamilies']> = {}
+  const comparable = (value: HtmlTextStyle) => JSON.stringify(Object.fromEntries(Object.entries({ ...value, fontFamily: '' }).sort(([left], [right]) => left.localeCompare(right))))
+  for (const child of element.childNodes) {
+    if (child instanceof Text) continue
+    if (!(child instanceof HTMLSpanElement) || [...child.childNodes].some(node => !(node instanceof Text))) return false
+    const script = child.getAttribute('data-fastppt-font-script')
+    if (script !== 'latin' && script !== 'ea' && script !== 'cs') return false
+    const computed = getComputedStyle(child)
+    if (
+      computed.display !== 'inline' || computed.visibility !== 'visible' ||
+      Number(computed.opacity) !== 1 || computed.transform !== 'none' ||
+      (computed.position !== 'static' && !readSourceBaseline(child)) || computed.verticalAlign !== 'baseline' ||
+      computed.whiteSpace !== style.whiteSpace || (base.capitalization === undefined && computed.textTransform !== style.textTransform) ||
+      computed.backgroundImage !== 'none' || parseCssColor(computed.backgroundColor)?.alpha ||
+      computed.boxShadow !== 'none' || computed.filter !== 'none' ||
+      computed.clipPath !== 'none' || computed.maskImage !== 'none' ||
+      ['before', 'after'].some(pseudo => !['none', 'normal', '""', "''"].includes(getComputedStyle(child, `::${pseudo}`).content)) ||
+      ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft'].some(property => parseFloat(computed[property as keyof CSSStyleDeclaration] as string) !== 0) ||
+      comparable(captureTextStyle(computed, child, opacity, transform)) !== comparable(base)
+    ) return false
+    const face = cssFontFamilies(computed.fontFamily)[0]
+    if (!face || (fontFamilies[script] && fontFamilies[script] !== face)) return false
+    fontFamilies[script] = face
+  }
+  const text = base.capitalization === undefined ? applyTextTransform(element.textContent ?? '', style.textTransform) : element.textContent ?? ''
+  if (!text.trim()) return true
+  const box = normalizeRect(element.getBoundingClientRect(), context)
+  if (!isUsefulBox(box)) return false
+  // The routing wrapper is generated below the original content element.
+  const source = elementSource(element.parentElement ?? element, path)
+  emit<HtmlTextElement>(context, {
+    id: `${path}:script-text`, kind: 'text', text,
+    box: fontSafeLineBox(box, base.lineHeightPx, context.options.precision),
+    zIndex, opacity, source, style: { ...base, fontFamilies },
+    paragraphLevel: paragraphLevel(element),
+    ...rotationProperty(transform),
+    ...(element.closest('a')?.href ? { hyperlink: element.closest('a')!.href } : {}),
+  })
+  return true
+}
+
 function captureTextNode(
   context: CaptureContext,
   node: Text,
@@ -884,6 +1053,7 @@ function captureTextNode(
   if (!parent || !node.data || !node.data.trim()) return
   const style = getComputedStyle(parent)
   const textStyle = captureTextStyle(style, parent, opacity, transform)
+  const baseline = readSourceBaseline(parent)
   const source = elementSource(parent, path)
   const range = document.createRange()
   const fragments: Array<{
@@ -896,11 +1066,12 @@ function captureTextNode(
   for (const grapheme of textGraphemeRanges(node.data)) {
     range.setStart(node, grapheme.start)
     range.setEnd(node, grapheme.end)
-    const rect = [...range.getClientRects()].find(
-      (candidate) => candidate.width > 0 && candidate.height > 0,
-    )
+    const rects = [...range.getClientRects()].filter(candidate => candidate.width > 0 && candidate.height > 0)
+    if (textStyle.capitalization !== undefined && rects.length > 1) throw new Error('A displayed capitalized grapheme crosses line boxes; use an explicit text frame.')
+    const rect = rects[0]
     if (!rect) continue
     const box = normalizeRect(rect, context)
+    if (baseline) box.y += baseline.shiftPx * transform.scaleY
     mergeTextGrapheme(
       fragments,
       grapheme.text,
@@ -912,7 +1083,7 @@ function captureTextNode(
   range.detach()
 
   for (const [index, fragment] of fragments.entries()) {
-    const value = applyTextTransform(fragment.text, style.textTransform)
+    const value = textStyle.capitalization === undefined ? applyTextTransform(fragment.text, style.textTransform) : fragment.text
     const slideId = context.options.id
     const adjustment = context.theme?.adjustText?.({
       root: context.root,
@@ -927,10 +1098,11 @@ function captureTextNode(
       measureReplacementBox: (element, text) =>
         measureReplacementTextBox(element, text, context, transform),
     })
+    if (textStyle.capitalization !== undefined && adjustment?.text !== undefined && adjustment.text !== value) throw new Error('Theme text replacement conflicts with original capitalization text.')
     const text = adjustment?.text ?? value
     if (!text.trim()) continue
     const measuredAdvance =
-      measureTextAdvance(text, style) * averageScale(transform)
+      textStyle.capitalization === undefined ? measureTextAdvance(text, style) * averageScale(transform) : fragment.box.width
     const measuredBox = adjustment?.box ?? fragment.box
     emit<HtmlTextElement>(context, {
       id: `${path}:fragment-${index}`,
@@ -953,6 +1125,7 @@ function captureTextNode(
       style: adjustment?.align
         ? { ...textStyle, align: adjustment.align }
         : textStyle,
+      paragraphLevel: paragraphLevel(parent),
       ...(adjustment?.verticalAlign
         ? { verticalAlign: adjustment.verticalAlign }
         : {}),
@@ -979,6 +1152,32 @@ async function captureImage(
     normalizeRect(image.getBoundingClientRect(), context),
     context,
   )
+  const clips: ImageClip[] = []
+  for (let ancestor = image.parentElement; ancestor && context.root.contains(ancestor); ancestor = ancestor.parentElement) {
+    const css = getComputedStyle(ancestor)
+    const clipsX = /^(hidden|clip|scroll|auto)$/.test(css.overflowX)
+    const clipsY = /^(hidden|clip|scroll|auto)$/.test(css.overflowY)
+    if (!clipsX && !clipsY) continue
+    const rect = ancestor.getBoundingClientRect()
+    // Overflow clips at the padding box, inside borders and scrollbars.
+    const scaleX = ancestor.offsetWidth ? rect.width / ancestor.offsetWidth : 1
+    const scaleY = ancestor.offsetHeight ? rect.height / ancestor.offsetHeight : 1
+    clips.push({
+      box: normalizeRect({
+        left: rect.left + ancestor.clientLeft * scaleX,
+        top: rect.top + ancestor.clientTop * scaleY,
+        width: ancestor.clientWidth * scaleX,
+        height: ancestor.clientHeight * scaleY,
+      } as DOMRectReadOnly, context),
+      x: clipsX,
+      y: clipsY,
+    })
+  }
+  const visible = clipImageBox(box, clips)
+  if (!visible) return
+  // An axis-aligned source rectangle cannot represent a rotated clipping mask.
+  const rotated = nonZeroRotation(transform.rotation) !== undefined
+  if (rotated && visible.crop) warn(context, 'unsupported-transform', 'Overflow clipping of rotated images cannot be represented as a native source rectangle.', source.path)
   let data: string | undefined
   let path: string | undefined
   if (context.options.embedImages) {
@@ -1000,13 +1199,15 @@ async function captureImage(
   emit<HtmlImageElement>(context, {
     id: `${source.path}:image`,
     kind: 'image',
-    box,
+    box: rotated ? box : visible.box,
     zIndex,
     opacity,
     source,
     ...(data ? { data } : {}),
     ...(path ? { path } : {}),
+    assetKey: src,
     alt: image.alt,
+    ...(!rotated && visible.crop ? { crop: visible.crop } : {}),
     ...rotationProperty(transform),
   })
 }
@@ -1245,6 +1446,12 @@ function captureTextStyle(
   opacity: number,
   transform: TransformMetrics,
 ): HtmlTextStyle {
+  const baseline = readSourceBaseline(element)
+  const kerning = readSourceKerning(element)
+  const capitalization = readSourceCapitalization(element)
+  if (capitalization === undefined && (element.hasAttribute('data-fastppt-text-baseline-run') || element.hasAttribute('data-fastppt-font-script')) && (style.textTransform !== 'none' || style.fontVariantCaps !== 'normal')) throw new Error('Source capitalization requires an explicit original-text contract.')
+  if (!kerning && style.fontKerning === 'none' && (element.hasAttribute('data-fastppt-text-level') || element.hasAttribute('data-fastppt-text-baseline-run'))) throw new Error('Source text with disabled kerning requires an explicit threshold contract.')
+  if (baseline?.baselinePercent && (Math.abs(transform.rotation) > 0.01 || Math.abs(transform.scaleX - transform.scaleY) > 0.001)) throw new Error('Source baseline requires unrotated, uniformly scaled text.')
   const scale = averageScale(transform)
   const fontSize = cssPixels(style.fontSize, 16) * scale
   const cssLineHeight = cssPixels(style.lineHeight)
@@ -1258,14 +1465,33 @@ function captureTextStyle(
     decoration.push('underline')
   if (style.textDecorationLine.includes('line-through'))
     decoration.push('line-through')
+  const sourceRun = readTextDecorationContract(element, 'data-fastppt-text-decoration-run')
+  const sourceDefaults = readTextDecorationContract(element, 'data-fastppt-text-decoration-defaults')
+  if (sourceRun) {
+    for (const [key, line] of [['underline', 'underline'], ['strike', 'line-through']] as const)
+      if (decoration.includes(line) !== (sourceRun[key] === true)) throw new Error('Source text decoration differs from its displayed run.')
+    if (decoration.length && (style.textDecorationStyle !== 'solid' || style.textDecorationColor !== style.color || style.textDecorationThickness !== 'auto' || style.textUnderlineOffset !== 'auto' || style.textDecorationSkipInk !== 'none')) throw new Error('Source text decoration has unsupported line style, color or geometry.')
+    if (/overline|blink/.test(style.textDecorationLine)) throw new Error('Unsupported source text decoration.')
+  }
+  if (sourceDefaults) {
+    if (!element.hasAttribute('data-fastppt-text-level') && element.tagName !== 'BR') throw new Error('Text decoration defaults require a paragraph or soft break.')
+    for (const [key, line] of [['underline', 'underline'], ['strike', 'line-through']] as const)
+      if (sourceDefaults[key] && !decoration.includes(line)) decoration.push(line)
+  }
   const language =
     element.closest('[lang]')?.getAttribute('lang') ??
-    document.documentElement.lang ??
+    document.documentElement.getAttribute('lang') ??
     undefined
+  const alternativeLanguage = element.closest('[data-fastppt-alt-lang]')?.getAttribute('data-fastppt-alt-lang') ?? undefined
+  const directionContract = element.closest('[data-fastppt-text-direction]')?.getAttribute('data-fastppt-text-direction')
+  if (directionContract !== undefined && directionContract !== null && (!['ltr', 'rtl'].includes(directionContract) || directionContract !== style.direction)) throw new Error('Source paragraph direction differs from its displayed text.')
 
   return {
     fontFamily: cssFontFamilies(style.fontFamily).join(', ') || 'Arial',
     fontSizePx: fontSize,
+    ...(capitalization === undefined ? {} : { capitalization }),
+    ...(kerning ? { kerningThresholdPx: kerning.thresholdPx * scale } : {}),
+    ...(baseline ? { baselinePercent: baseline.baselinePercent } : {}),
     fontWeight: cssFontWeight(style.fontWeight),
     fontStyle:
       style.fontStyle === 'italic' || style.fontStyle === 'oblique'
@@ -1274,10 +1500,11 @@ function captureTextStyle(
     lineHeightPx: lineHeight,
     letterSpacingPx: cssPixels(style.letterSpacing) * averageScale(transform),
     color,
-    align: cssTextAlign(style.textAlign),
+    align: cssTextAlign(style.textAlign, style.direction),
     decoration,
     direction: style.direction === 'rtl' ? 'rtl' : 'ltr',
-    language,
+    ...(language === undefined ? {} : { language }),
+    ...(alternativeLanguage === undefined ? {} : { alternativeLanguage }),
   }
 }
 
@@ -1360,6 +1587,7 @@ function measureReplacementTextBox(
   const canvas = element.ownerDocument.createElement('canvas')
   const canvasContext = canvas.getContext('2d')
   if (!canvasContext) return box
+  canvasContext.fontKerning = style.fontKerning as CanvasFontKerning
   canvasContext.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
   const letterSpacing = cssPixels(style.letterSpacing)
   const textWidth = (value: string) =>

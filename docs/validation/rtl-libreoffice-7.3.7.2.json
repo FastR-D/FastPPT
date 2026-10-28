@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-09T06:23:45.003Z",
+  "comparisonBasis": "target-application-probe",
+  "browserPixelEquivalence": "unverified",
+  "sourcePptxSha256": "3540b4bd8dca37762e8e331d0bd5dbdb2081dd38b1bac868336b129c360c3a1b",
+  "environment": {
+    "application": {
+      "name": "LibreOffice",
+      "version": "7.3.7.2",
+      "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+    },
+    "platform": {
+      "system": "Linux",
+      "release": "6.11.8-10-generic",
+      "architecture": "x86_64"
+    },
+    "locale": {
+      "requested": "en-US",
+      "observed": "en-US",
+      "ui": "en-US",
+      "decimalSeparator": ".",
+      "decimalSeparatorAsLocale": true
+    },
+    "configurationSha256": "6dab98044e83c5e9ace511cc20530381cadafdd9e26c0bc9e8aa00a7bf1cf23b"
+  },
+  "xml": {
+    "directionAttributes": 5,
+    "rtlParagraphs": 4,
+    "sourceTextPresent": true
+  },
+  "artifacts": [
+    {
+      "stage": "actual-native-export",
+      "pptxSha256": "3540b4bd8dca37762e8e331d0bd5dbdb2081dd38b1bac868336b129c360c3a1b",
+      "pdfSha256": "6014ab7c5b5065fe430d44b05f4cec4cc074d3174df3a8b3d93dc29063ab620d",
+      "pageCount": 5,
+      "cases": [
+        {
+          "page": 1,
+          "source": {
+            "id": "arabic-mixed-right",
+            "text": "مرحبا بالعالم 123 ABC",
+            "language": "ar-SA",
+            "direction": "rtl",
+            "align": "right"
+          },
+          "importedText": "مرحبا بالعالم 123 ABC",
+          "sourcePreserved": true,
+          "status": "observed"
+        },
+        {
+          "page": 2,
+          "source": {
+            "id": "hebrew-mixed-center",
+            "text": "שלום עולם 123 ABC",
+            "language": "he-IL",
+            "direction": "rtl",
+            "align": "center"
+          },
+          "importedText": "שלום עולם 123 ABC",
+          "sourcePreserved": true,
+          "status": "observed"
+        },
+        {
+          "page": 3,
+          "source": {
+            "id": "hebrew-latin-left",
+            "text": "אבג ABC 123 (x)",
+            "language": "en-US",
+            "direction": "rtl",
+            "align": "left"
+          },
+          "importedText": "אבג ABC 123 (x)",
+          "sourcePreserved": true,
+          "status": "observed"
+        },
+        {
+          "page": 4,
+          "source": {
+            "id": "explicit-ltr-arabic",
+            "text": "مرحبا 123 ABC",
+            "language": "ar-SA",
+            "direction": "ltr",
+            "align": "left"
+          },
+          "importedText": "مرحبا 123 ABC",
+          "sourcePreserved": true,
+          "status": "observed"
+        },
+        {
+          "page": 5,
+          "source": {
+            "id": "bidi-controls",
+            "text": "‫abc 123‬",
+            "language": "en-US",
+            "direction": "rtl",
+            "align": "right",
+            "known": "‫abc 123‬"
+          },
+          "importedText": "‫abc 123‬",
+          "sourcePreserved": true,
+          "status": "observed"
+        }
+      ],
+      "pdf": null
+    }
+  ],
+  "limitations": [
+    "Logical text and paragraph direction are verified from the editable XML and UNO readback.",
+    "Unicode bidi controls and mixed scripts are observations of LibreOffice 7.3.7.2.",
+    "RTL bullets, tabs, vertical text, columns, autofit and PowerPoint/WPS/Keynote edit acceptance are not claimed."
+  ],
+  "reproducers": [
+    {
+      "path": "tests/e2e/scripts/rtl-compatibility.ts",
+      "sha256": "fce1a3faae5c6e31b588f825bdea61596a20bfec317118d282125c1fcddc317a"
+    },
+    {
+      "path": "tests/e2e/scripts/lib/libreoffice-text-probe.py",
+      "sha256": "ef674f6f70f0b2958cebb08a10413b088a3526f19969d159746ea21110039c93"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "98d564bdf18c",
+  "source": "references/GordenPPTSkill/templates/report-savior/template.pptx",
+  "sourceSha256": "7b79ef03b4dcce5d38a91840d37778e49d04f4f0ae3c43068e3dd7dd62bc3d8e",
+  "pages": 44,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

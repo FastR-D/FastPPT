@@ -1,0 +1,6 @@
+# Reference artwork required by the theme; override repository binary exclusions.
+!assets/
+!assets/campus.jpeg
+!assets/institute-logo.png
+.theme-build/
+.preview/

@@ -48,6 +48,12 @@ The resulting typography scale is approximately `0.979 pt/px`. A computed 20px h
 
 Browser line wrapping is not delegated to PowerPoint. The capture combines Pretext grapheme/font measurement with DOM `Range` rectangles and emits each rendered line fragment as an independent editable text box with `margin: 0`, `fit: none`, and wrapping disabled. DOM geometry preserves the browser's actual line breaks; Pretext keeps combining marks, ZWJ emoji, CJK, and shaped scripts intact and records a font-aware advance used to prevent PowerPoint clipping.
 
+## Image clipping
+
+Images inside axis-aligned `overflow: hidden`, `clip`, `auto`, or `scroll` containers retain only the visible intersection, including nested containers and independent clipping axes. Capture measures the padding box inside borders and scrollbars in intrinsic slide coordinates. Fully clipped images are omitted. The snapshot stores source crop fractions alongside the visible frame; export writes a native PowerPoint source rectangle, preserving the original image data and allowing the crop to be adjusted in PowerPoint. Existing snapshots without crop metadata keep their original behavior.
+
+Rotated image clipping cannot be represented by a rectangular source crop and produces an `unsupported-transform` warning. Rounded corners and other nonrectangular masks are outside this rectangular clipping support.
+
 ## Landing theme audit
 
 The Landing reference theme in `themes/slidev-theme-landing` uses an intrinsic `980 × 552` canvas, UnoCSS Wind3, `Source Han Sans` for sans text, and `JetBrains Mono` for monospace text.
@@ -119,3 +125,26 @@ Zero-height inline wrappers with visible text descendants are retained. This is 
 Tall `overflow-hidden` containers use an exact CSS-pixel SVG outline for their border radius, because PowerPoint's built-in rounded rectangle scales its corner curvature with the entire shape. Full-width header bands retain an editable rounded fill. This keeps `paper-summary` at its measured 8px corner radius instead of producing square top corners and oversized bottom corners.
 
 For portable files, keep `embedImages` enabled. When it is disabled, the snapshot records asset paths and the renderer assumes those paths remain reachable when PowerPoint is generated.
+
+
+## Native tables (snapshot V2)
+
+Capture hosts can advertise and negotiate snapshot versions `[1, 2]` while keeping
+capture message protocol V1. Legacy requests without `snapshotVersion` continue
+to use V1. The FastPPT workbench chooses V2 only when both the iframe runtime and
+Gateway export job advertise support.
+
+V2 captures supported rectangular HTML/Markdown tables as one editable PowerPoint
+`a:tbl`, with measured rows/columns, inline rich text, links, explicit line breaks,
+solid fills and collapsed solid borders. Captions stay independent text objects.
+The server disables pagination, rejects out-of-slide tables, and validates the
+actual serialized table before writing the file. Reports distinguish native table
+structure from editable shape/text fragments, and leave visual/application editing
+verification explicitly unverified.
+
+Merged cells, separate border layout, nested/media cells and complex effects are
+currently captured as fragments with an `unsupported-table` warning and structural
+requirements attached. `strict-editable` rejects these fragments even when they
+contain no images. Invalid grids and lost content fail every export policy.
+PowerPoint/WPS/Keynote editing and N1b merged-cell support remain pending; see
+[the implementation plan](../../docs/roadmap/native-structured-export.md).

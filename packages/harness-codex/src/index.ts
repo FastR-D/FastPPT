@@ -1,6 +1,5 @@
 export {
   CodexAdapter,
-  CODEX_VERIFIED_VERSION_RANGE,
   type CodexAdapterOptions,
 } from './codex-adapter.js'
 export {

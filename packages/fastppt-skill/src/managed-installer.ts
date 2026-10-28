@@ -72,6 +72,7 @@ export interface SkillInstallReport {
   statuses: SkillInstallStatus[]
   staleManagedDirectories: string[]
   cleanedStaleDirectories: string[]
+  unloadedThemeDirectories: string[]
 }
 
 export interface McpConfigManagerOptions {
@@ -171,6 +172,7 @@ export class ManagedSkillInstaller {
   readonly #commonSkillRoot: string
   readonly #registry: ThemeRegistry
   readonly #enabled: boolean
+  #installationTail: Promise<void> = Promise.resolve()
 
   constructor(options: ManagedSkillInstallerOptions) {
     this.#workspaceRoot = resolve(options.workspaceRoot)
@@ -192,11 +194,17 @@ export class ManagedSkillInstaller {
     themeId: string,
   ): Promise<ThemeSkillStatus> {
     const theme = this.#registry.resolve(themeId).manifest
-    const statuses = await this.inspect(harness)
-    const base = statuses.find((status) => status.kind === 'base')
-    const themeSkill = statuses.find((status) => status.themeId === themeId)
-    if (!base || !themeSkill)
+    const artifacts = this.#artifacts()
+    const baseArtifact = artifacts.find((artifact) => artifact.id === 'fastppt')
+    const themeArtifact = artifacts.find(
+      (artifact) => artifact.themeId === themeId,
+    )
+    if (!baseArtifact || !themeArtifact)
       throw new Error(`Missing install plan for ${themeId}`)
+    const [base, themeSkill] = await Promise.all([
+      this.#inspectArtifact(harness, baseArtifact),
+      this.#inspectArtifact(harness, themeArtifact),
+    ])
     return ThemeSkillStatusSchema.parse({
       harness,
       themeId,
@@ -209,9 +217,68 @@ export class ManagedSkillInstaller {
   }
 
   async reconcile(
-    options: { dryRun?: boolean; cleanStale?: boolean } = {},
+    options: {
+      dryRun?: boolean
+      cleanStale?: boolean
+      unloadThemes?: boolean
+    } = {},
   ): Promise<SkillInstallReport> {
+    return this.#serialize(() => this.#reconcile(options))
+  }
+
+  /** Materialize only the requested theme before its Harness session starts. */
+  async ensureTheme(
+    harness: HarnessKind,
+    themeId: string,
+  ): Promise<ThemeSkillStatus> {
+    this.#registry.resolve(themeId)
+    return this.#serialize(async () => {
+      for (const artifact of this.#artifacts().filter(
+        (item) => item.kind !== 'theme' || item.themeId === themeId,
+      )) {
+        const status = await this.#inspectArtifact(harness, artifact)
+        if (
+          this.#enabled &&
+          ['missing', 'on-demand', 'update-available'].includes(status.state)
+        )
+          await this.#installArtifact(harness, artifact)
+      }
+      return this.themeStatus(harness, themeId)
+    })
+  }
+
+  #serialize<T>(operation: () => Promise<T>): Promise<T> {
+    const result = this.#installationTail.then(operation)
+    this.#installationTail = result.then(
+      () => undefined,
+      () => undefined,
+    )
+    return result
+  }
+
+  async #reconcile(options: {
+    dryRun?: boolean
+    cleanStale?: boolean
+    unloadThemes?: boolean
+  }): Promise<SkillInstallReport> {
     const dryRun = options.dryRun ?? false
+    // Migrate legacy eager installations only at startup, before any run can
+    // be using them. Edited or user-owned skills are never removed.
+    const unloadedThemeDirectories =
+      this.#enabled && !dryRun && options.unloadThemes
+        ? await this.#cleanUnmodifiedStaleDirectories(
+            (['claude', 'codex'] as const).flatMap((harness) =>
+              this.#artifacts()
+                .filter((artifact) => artifact.kind === 'theme')
+                .map((artifact) =>
+                  join(
+                    rootForHarness(this.#workspaceRoot, harness),
+                    artifact.id,
+                  ),
+                ),
+            ),
+          )
+        : []
     const statuses: SkillInstallStatus[] = []
     for (const harness of ['claude', 'codex'] as const) {
       for (const artifact of this.#artifacts()) {
@@ -247,6 +314,7 @@ export class ManagedSkillInstaller {
         (path) => !cleanedStaleDirectories.includes(path),
       ),
       cleanedStaleDirectories,
+      unloadedThemeDirectories,
     }
   }
 
@@ -281,6 +349,16 @@ export class ManagedSkillInstaller {
         sourceDir: join(this.#commonSkillRoot, 'editable-visuals'),
         registryVersion: this.#registry.version,
       },
+      ...[
+        ['fastppt-theme-create', 'theme-create'],
+        ['fastppt-ppt-generate', 'ppt-generate'],
+      ].map(([id, directory]) => ({
+        id: id!,
+        kind: 'capability' as const,
+        version: '0.1.0',
+        sourceDir: join(this.#commonSkillRoot, directory!),
+        registryVersion: this.#registry.version,
+      })),
       ...this.#registry.themes.map((theme) => ({
         id: theme.manifest.skill.id,
         kind: 'theme' as const,
@@ -311,7 +389,7 @@ export class ManagedSkillInstaller {
     if (!(await exists(targetPath)))
       return SkillInstallStatusSchema.parse({
         ...base,
-        state: 'missing',
+        state: artifact.kind === 'theme' ? 'on-demand' : 'missing',
         managed: false,
       })
     const marker = await readMarker(targetPath)

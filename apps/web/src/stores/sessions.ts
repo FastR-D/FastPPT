@@ -548,7 +548,7 @@ export const useSessionsStore = defineStore('sessions', () => {
   async function send(themeId?: string): Promise<void> {
     const content = draft.value.trim()
     const sessionId = selectedSessionId.value
-    if (!content || !sessionId || sending.value) return
+    if (!content || !sessionId || sending.value || activeRun.value) return
     const configuredThemeId =
       selectedProfile.value?.profile.theme.mode === 'registered'
         ? selectedProfile.value.profile.theme.themeId

@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "font": "Noto Sans CJK SC",
+  "canvas": {
+    "width": 12192000,
+    "height": 6858000
+  },
+  "placeholders": [
+    {
+      "index": 0,
+      "type": "title",
+      "x": 609600,
+      "y": 457200,
+      "width": 10972800,
+      "height": 1600200
+    },
+    {
+      "index": 1,
+      "type": "body",
+      "x": 609600,
+      "y": 2438400,
+      "width": 10972800,
+      "height": 3048000
+    }
+  ],
+  "fixedObjects": [
+    {
+      "name": "Brand rule",
+      "x": 609600,
+      "y": 6248400,
+      "width": 10972800,
+      "height": 25400,
+      "fill": "00A98F"
+    }
+  ],
+  "pages": [
+    {
+      "id": "golden-1",
+      "title": "同源模板保留中文长标题与正文，并提供可核验的可编辑交付",
+      "paragraphs": [
+        "来源事实与生成提案分别保存。",
+        "布局、字体与颜色从已审查的模板继承。",
+        "Source → Template → Editable PPTX"
+      ]
+    },
+    {
+      "id": "golden-2",
+      "title": "新增页面继承相同布局，正文仍可编辑",
+      "paragraphs": [
+        "第二页使用同一套母版与占位符。",
+        "更新文字后保留段落结构和原始字符。",
+        "Review before delivery: 2026 Q4"
+      ]
+    }
+  ],
+  "sourceSha256": "049211d3a6439e26d05fe62f83a3606a584d8fd3bb506082302552f02d3576d5"
+}

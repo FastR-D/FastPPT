@@ -229,7 +229,10 @@ export function cssFontWeight(value: string): number {
 
 export function cssTextAlign(
   value: string,
+  direction: string = 'ltr',
 ): 'left' | 'center' | 'right' | 'justify' {
+  if (value === 'start') return direction === 'rtl' ? 'right' : 'left'
+  if (value === 'end') return direction === 'rtl' ? 'left' : 'right'
   if (value === 'center' || value === 'right' || value === 'justify')
     return value
   return 'left'

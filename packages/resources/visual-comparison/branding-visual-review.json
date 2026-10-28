@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "reviewedIds": [
+    "e888597c48f2-0020",
+    "71caabc93d70-0023",
+    "c9f1632d31e4-0006",
+    "9475bb7ff164-0003",
+    "5e206af1d674-0018",
+    "d63a197fd23d-0131"
+  ],
+  "scope": "Model visual checks of documented representative cases; automated DOM and exact retained-object checks cover every affected page.",
+  "findings": [
+    "Removed complete template logo image/mask pairs.",
+    "Removed the last footer outline glyph and logo separator after visual follow-up.",
+    "Preserved background textures, frame geometry, content text and data.",
+    "Neutralized source company samples; removed vertical branded labels."
+  ],
+  "artifact": "branding-before-after.jpg",
+  "sourceIndexSha256": "8fa98d68a66ee9f7e0bb61df45705ae62dfdd0fa809c2e33e2633c63d46f76de"
+}

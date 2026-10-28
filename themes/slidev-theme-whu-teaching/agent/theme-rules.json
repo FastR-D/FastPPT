@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "whu-teaching.cover-position",
+      "kind": "layout-position",
+      "layout": "cover",
+      "positions": [
+        "first"
+      ],
+      "severity": "warning",
+      "provenance": "derived",
+      "message": "校园封面用于课程开场。"
+    }
+  ]
+}

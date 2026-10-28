@@ -1,0 +1,9 @@
+{
+  "id": "573f07533505",
+  "source": "references/GordenPPTSkill/templates/report-massive-models/template.pptx",
+  "sourceSha256": "2ef2d8446af183ed78c108ea6587417ded72068a8eb53d666c9687058988bf5a",
+  "pages": 38,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "849d2d32fb5f",
+  "source": "references/GordenPPTSkill/templates/competition-speech/template.pptx",
+  "sourceSha256": "3ac9bbdb0107fd90b8cdca088e3408f2c41d7bf13b4e9fc1a4d2fd177808d0a7",
+  "pages": 59,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

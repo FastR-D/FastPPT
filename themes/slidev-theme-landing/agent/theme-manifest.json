@@ -7,6 +7,7 @@
   "repositoryUrl": "https://github.com/GuGuMur/slidev-theme-whu-landing",
   "rootDir": ".",
   "rulesFile": "agent/theme-rules.md",
+  "machineRulesFile": "agent/theme-rules.json",
   "skill": {
     "id": "fastppt-theme-landing",
     "sourceDir": "agent",

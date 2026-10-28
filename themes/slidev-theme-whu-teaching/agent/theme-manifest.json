@@ -1,0 +1,112 @@
+{
+  "id": "slidev-theme-whu-teaching",
+  "packageName": "slidev-theme-whu-teaching",
+  "displayName": "WHU Teaching · 武大教学",
+  "version": "0.2.0",
+  "description": "参考《第三章 数据的运算和运算部件》构建的教学主题：深绿标题、青绿标记、白底双栏、表格推演与校园封面。",
+  "repositoryUrl": "https://github.com/FastR-D/FastPPT",
+  "rootDir": ".",
+  "rulesFile": "agent/theme-rules.md",
+  "machineRulesFile": "agent/theme-rules.json",
+  "skill": {
+    "id": "fastppt-theme-whu-teaching",
+    "sourceDir": "agent",
+    "version": "0.2.0"
+  },
+  "layouts": [
+    {
+      "id": "cover",
+      "label": "校园封面",
+      "description": "照片与渐变蒙版，白色两行标题。"
+    },
+    {
+      "id": "agenda",
+      "label": "教学目录",
+      "description": "左侧深绿标签与两栏知识目录。"
+    },
+    {
+      "id": "default",
+      "label": "正文",
+      "description": "单栏讲解、公式、原生 Markdown 表格。"
+    },
+    {
+      "id": "two-cols",
+      "label": "双栏讲解",
+      "description": "标题通栏，left / right 两栏与细分隔线。"
+    },
+    {
+      "id": "diagram",
+      "label": "图解",
+      "description": "figure 图示与 notes 说明，支持 caption。"
+    },
+    {
+      "id": "example",
+      "label": "例题推演",
+      "description": "work 运算表格与 explanation 分步解析。"
+    },
+    {
+      "id": "exercise",
+      "label": "思考题",
+      "description": "question 题目与 answer 分析。"
+    },
+    {
+      "id": "section",
+      "label": "章节过渡",
+      "description": "深绿底、章节编号与金色短线。"
+    },
+    {
+      "id": "end",
+      "label": "课程小结",
+      "description": "白底大标题与总结；沿用正文视觉体系。"
+    },
+    {
+      "id": "content",
+      "label": "学术正文",
+      "description": "default 别名，支持密度与节奏控制。"
+    },
+    {
+      "id": "split",
+      "label": "可调双栏",
+      "description": "two-cols 别名，支持 ratio 与 gap。"
+    },
+    {
+      "id": "toc",
+      "label": "自动课程目录",
+      "description": "由 section / sectionStart 自动生成可点击目录。"
+    }
+  ],
+  "defaultAspectRatio": "16/9",
+  "supportedFeatures": [
+    {
+      "id": "source-palette",
+      "label": "源课件配色",
+      "description": "深绿 #00523A、青绿 #00A98F、金色 #C79B45、白色底。"
+    },
+    {
+      "id": "teaching-layouts",
+      "label": "教学版式",
+      "description": "目录、双栏、图解、例题与思考题；内容使用可编辑 HTML/Markdown。"
+    },
+    {
+      "id": "source-cover",
+      "label": "校园封面",
+      "description": "复用源 PPTX 内照片与标识，支持替换或隐藏标识。"
+    },
+    {
+      "id": "local-fonts",
+      "label": "本地中文字体",
+      "description": "微软雅黑优先，内置 Noto Sans SC 回退，无需 Google Fonts。"
+    },
+    {
+      "id": "academic-hierarchy",
+      "label": "Academy 学术层次",
+      "description": "课程章节导航、深绿页脚、三档密度与可调双栏。"
+    },
+    {
+      "id": "semantic-blocks",
+      "label": "学术内容组件",
+      "description": "定义框、轻量说明、核心结论、图表标题与页内引用。"
+    }
+  ],
+  "motionPreset": "teaching"
+}
