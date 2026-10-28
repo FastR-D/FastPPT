@@ -38,6 +38,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ['packages/slidewave/src/primitives/native-motion.mjs'],
+    languageOptions: {
+      globals: globals.browser,
+    },
+  },
+  {
     ...tseslint.configs.disableTypeChecked,
     files: ['**/*.config.ts'],
     languageOptions: {

@@ -5,6 +5,8 @@ import JSZip from 'jszip'
 import {writeEditablePptx}from'@fastppt/slidewave/server'
 import {HtmlDeckSnapshotSchema}from'@fastppt/slidewave/snapshot'
 import {validateSlideAnimationXml}from'@fastppt/slidewave/xml'
+import {CreativeAnimationDetailSchema}from'@fastppt/protocol'
+import type{AnimationDocumentV1}from'@fastppt/protocol'
 import type{HtmlSlideSnapshot}from'@fastppt/slidewave/snapshot'
 const root=fileURLToPath(new URL('../../../',import.meta.url))
 test('searches creative effects and scrubs executable motion in an opaque sandbox',async({page})=>{
@@ -17,13 +19,17 @@ test('searches creative effects and scrubs executable motion in an opaque sandbo
  await page.screenshot({path:'/tmp/fastppt-creative-animations.png'});const cycles=Number(await frame.locator('main').getAttribute('data-motion-cycles'));await frame.getByRole('button',{name:'播放',exact:true}).click();await expect.poll(async()=>Number(await frame.locator('main').getAttribute('data-motion-cycles'))).toBeGreaterThan(cycles);expect(errors).toEqual([])
 })
 test('exports captured creative objects as native animated groups with original formulas',async({page})=>{
- const response=await page.request.get('http://127.0.0.1:4317/api/v1/animations/c9f1632d31e4-0006');const value=await response.json()
+ const response=await page.request.get('http://127.0.0.1:4317/api/v1/animations/c9f1632d31e4-0006');const value=CreativeAnimationDetailSchema.parse(await response.json())
  const body=String(value.markdown).replace(/^---\n[\s\S]*?\n---\n/,'')
  await page.goto('/');await page.setContent(`<style>body{margin:0}#creative-root{position:relative;width:960px;height:540px;font:20px Arial}</style><div id="creative-root">${body}</div>`)
  const path=`http://127.0.0.1:4318/@fs${root}packages/slidewave/src/slidev/capture.ts`
  const slide=await page.evaluate(async path=>{const{captureHtmlSlide}=await import(path) as {captureHtmlSlide:(el:HTMLElement,opts:{snapshotVersion:number})=>Promise<HtmlSlideSnapshot>};return captureHtmlSlide(document.querySelector<HTMLElement>('#creative-root')!,{snapshotVersion:2})},path)
  const snapshot=HtmlDeckSnapshotSchema.parse({version:2,source:'slidev',slides:[slide],warnings:[]})
- const effects=value.motion.groups.flatMap((g:{effects:Array<{target:string;kind:'native';params:{nativeXml:string;sourceDurationMs:number};durationMs:number;delayMs:number;trigger:'with-previous'}>})=>g.effects).map((e:{target:string;kind:'native';params:{nativeXml:string;sourceDurationMs:number};durationMs:number;delayMs:number;trigger:'with-previous'})=>({slide:1,target:e.target,kind:e.kind,nativeXml:e.params.nativeXml,nativeDurationMs:e.params.sourceDurationMs,durationMs:e.durationMs,delayMs:e.delayMs,trigger:e.trigger}))
+ const effects=value.motion.groups.flatMap(group=>group.effects).map(effect=>{
+   const {nativeXml,sourceDurationMs}=effect.params
+   if(effect.kind!=='native'||typeof nativeXml!=='string'||typeof sourceDurationMs!=='number')throw new Error('Expected native animation metadata')
+   return{slide:1,target:effect.target,kind:effect.kind,nativeXml,nativeDurationMs:sourceDurationMs,durationMs:effect.durationMs,delayMs:effect.delayMs,trigger:effect.trigger}
+ })
  const output='/tmp/fastppt-creative-native.pptx',result=await writeEditablePptx(snapshot,output,{embedFonts:false,policy:'editable',objectAnimations:effects})
  expect(result.qa.ok).toBe(true)
  const zip=await JSZip.loadAsync(await readFile(output)),xml=await zip.file('ppt/slides/slide1.xml')!.async('string')
@@ -47,8 +53,8 @@ test('plays imported metadata inside the actual Slidev runtime and restores geom
   await expect.poll(()=>page.locator('[data-fastppt-group="s3"]').first().evaluate(el=>el.getAnimations().length)).toBeGreaterThan(0)
   await page.screenshot({path:'/tmp/fastppt-creative-slidev-runtime.png'})
   await page.evaluate(()=>{
-    const motion=JSON.parse(document.querySelector('[data-fastppt-motion]')!.getAttribute('data-fastppt-motion')!)
-    const effect=motion.groups[0].effects[0]
+    const motion=JSON.parse(document.querySelector('[data-fastppt-motion]')!.getAttribute('data-fastppt-motion')!) as AnimationDocumentV1
+    const effect=motion.groups[0]!.effects[0]!
     window.dispatchEvent(new MessageEvent('message',{source:window.parent,origin:location.origin,data:{target:'fastppt-preview',type:'fastppt.slidewave.animation.preview',version:1,slide:1,effect,elapsedMs:500}}))
   })
   await page.evaluate(()=>window.dispatchEvent(new MessageEvent('message',{source:window.parent,origin:location.origin,data:{target:'fastppt-preview',type:'fastppt.slidewave.animation.preview',version:1,slide:1,effect:{id:'mixed-basic',target:'s3',kind:'entrance_fade',durationMs:400},elapsedMs:200}})))

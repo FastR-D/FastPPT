@@ -5,7 +5,7 @@ import JSZip from 'jszip'
 import { HtmlDeckSnapshotSchema } from '@fastppt/slidewave/snapshot'
 import { writeEditablePptx } from '@fastppt/slidewave/server'
 import type { HtmlSlideSnapshot } from '@fastppt/slidewave/snapshot'
-import { ResourceLibrary } from '../../../packages/resources/src/index.ts'
+import { ResourceLibrary } from '../../../packages/resources/src/index.js'
 
 const root=fileURLToPath(new URL('../../../',import.meta.url))
 test('captures an HTML compound polygon once and exports an editable hole with correct opacity',async({page})=>{

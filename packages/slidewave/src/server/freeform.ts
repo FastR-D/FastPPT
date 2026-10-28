@@ -13,7 +13,7 @@ function contains(points: Point[], point: Point): boolean {
 }
 /** Normalize even/odd holes to DrawingML's nonzero winding without rasterization. */
 export function freeformGeometryXml(input: NativePaths): string {
-  const geometry=NativePathsSchema.parse(input) as NativePaths
+  const geometry=NativePathsSchema.parse(input)
   const contours=geometry.paths.filter(path=>path.points.length>=3)
   const paths=geometry.paths.map(path=>{
     let points=path.points
