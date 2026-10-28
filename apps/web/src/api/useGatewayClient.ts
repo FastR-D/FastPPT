@@ -1,8 +1,15 @@
 import {
+  PaletteSearchResponseSchema,
+  PaletteRecommendationSchema,
+  ResourceSearchResultSchema,
+  CreativeAnimationSearchSchema,
+  CreativeAnimationDetailSchema,
+  ResourceDetailSchema,
   ApiErrorBodySchema,
   ApplicationStateSchema,
   BrowserInspectionJobSchema,
   DeckSummarySchema,
+  DeckValidationResultSchema,
   ExportJobSchema,
   FileContentSchema,
   FileNodeSchema,
@@ -16,12 +23,23 @@ import {
   SlidewaveSnapshotSchema,
   ThemeSummarySchema,
   ThemeSkillDocumentSchema,
+  ThemeRuleApprovalReportSchema,
+  ThemeRuleExceptionReviewSchema,
+  ThemeRuleExceptionSchema,
+  ThemeRuleExceptionContextRequestSchema,
+  ApproveThemeRuleExceptionSchema,
   UnifiedSessionSchema,
   WorkspaceInfoSchema,
   WorkspaceImageAssetSchema,
   ImportPptxThemeResultSchema,
   ImportPptxThemeStatusSchema,
   SessionProfileRecordSchema,
+  DeckNotesDocumentSchema,
+  DeckAnimationsDocumentSchema,
+  ExportCapabilityReportSchema,
+  CreationWizardSchema,
+  ImportAnalysisV1Schema,
+  MasterSnapshotV1Schema,
 } from '@fastppt/protocol'
 import { z } from 'zod'
 
@@ -29,9 +47,11 @@ import type {
   FileContent,
   FileNode,
   DeckSummary,
+  DeckValidationResult,
   SlidevProcessState,
   ThemeSummary,
   ThemeSkillDocument,
+  ThemeRuleApprovalReport,
   WorkspaceInfo,
   WorkspaceImageAsset,
   WriteFileRequest,
@@ -51,6 +71,12 @@ import type {
   ImportPptxThemeStatus,
   SessionDeckProfile,
   SessionProfileRecord,
+  DeckNotesDocument,
+  DeckAnimationsDocument,
+  ExportCapabilityReport,
+  CreationWizard,
+  ImportAnalysisV1,
+  MasterSnapshotV1,
 } from '@fastppt/protocol'
 
 // 本地 gateway 固定跑在 http://127.0.0.1:4317(见 @fastppt/config 的 loadGatewayConfig)。
@@ -119,6 +145,24 @@ export function useGatewayClient() {
     })
   }
 
+  function validateDeck(deckId: string): Promise<DeckValidationResult> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/validate`,
+      DeckValidationResultSchema,
+      { method: 'POST' },
+    )
+  }
+
+  function reviewRuleExceptions(deckId: string, input: z.input<typeof ThemeRuleExceptionContextRequestSchema>) {
+    return request(`/api/v1/decks/${encodeURIComponent(deckId)}/rule-exceptions/review`, ThemeRuleExceptionReviewSchema, { method: 'POST', body: JSON.stringify(ThemeRuleExceptionContextRequestSchema.parse(input)) })
+  }
+  function approveRuleException(deckId: string, input: z.input<typeof ApproveThemeRuleExceptionSchema>) {
+    return request(`/api/v1/decks/${encodeURIComponent(deckId)}/rule-exceptions`, ThemeRuleExceptionSchema, { method: 'POST', body: JSON.stringify(ApproveThemeRuleExceptionSchema.parse(input)) })
+  }
+  function revokeRuleException(deckId: string, exceptionId: string) {
+    return request(`/api/v1/decks/${encodeURIComponent(deckId)}/rule-exceptions/${encodeURIComponent(exceptionId)}/revoke`, ThemeRuleExceptionSchema, { method: 'POST' })
+  }
+
   function readFile(path: string, signal?: AbortSignal): Promise<FileContent> {
     return request(
       `/api/v1/workspace/files/content?path=${encodeURIComponent(path)}`,
@@ -181,6 +225,222 @@ export function useGatewayClient() {
     })
   }
 
+  function getNotes(deckId: string): Promise<DeckNotesDocument> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/notes`,
+      DeckNotesDocumentSchema,
+    )
+  }
+  function putNotes(
+    deckId: string,
+    document: DeckNotesDocument,
+  ): Promise<DeckNotesDocument> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/notes`,
+      DeckNotesDocumentSchema,
+      { method: 'PUT', body: JSON.stringify(document) },
+    )
+  }
+  function getAnimations(deckId: string): Promise<DeckAnimationsDocument> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/animations`,
+      DeckAnimationsDocumentSchema,
+    )
+  }
+  function putAnimations(
+    deckId: string,
+    document: DeckAnimationsDocument,
+  ): Promise<DeckAnimationsDocument> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/animations`,
+      DeckAnimationsDocumentSchema,
+      { method: 'PUT', body: JSON.stringify(document) },
+    )
+  }
+  function getExportCapabilities(
+    deckId: string,
+  ): Promise<ExportCapabilityReport> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/export-capabilities`,
+      ExportCapabilityReportSchema,
+    )
+  }
+  function getExportCapabilityHistory(
+    deckId: string,
+  ): Promise<{
+    deckId: string
+    savedAt: string | null
+    report: ExportCapabilityReport | null
+  }> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/export-capabilities/history`,
+      z.object({
+        deckId: z.string(),
+        savedAt: z.string().nullable(),
+        report: ExportCapabilityReportSchema.nullable(),
+      }),
+    )
+  }
+  function getDeckMaster(deckId: string): Promise<MasterSnapshotV1> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/master`,
+      MasterSnapshotV1Schema,
+    )
+  }
+  function createCreationWizard(): Promise<CreationWizard> {
+    return request('/api/v1/creation-wizards', CreationWizardSchema, {
+      method: 'POST',
+      body: '{}',
+    })
+  }
+  function getCreationWizard(id: string): Promise<CreationWizard> {
+    return request(
+      `/api/v1/creation-wizards/${encodeURIComponent(id)}`,
+      CreationWizardSchema,
+    )
+  }
+  function updateCreationWizard(
+    id: string,
+    input: { currentStep?: string; decision?: unknown },
+  ): Promise<CreationWizard> {
+    return request(
+      `/api/v1/creation-wizards/${encodeURIComponent(id)}/steps`,
+      CreationWizardSchema,
+      { method: 'PATCH', body: JSON.stringify(input) },
+    )
+  }
+  function commitCreationWizard(id: string): Promise<CreationWizard> {
+    return request(
+      `/api/v1/creation-wizards/${encodeURIComponent(id)}/commit`,
+      CreationWizardSchema,
+      { method: 'POST', body: '{}' },
+    )
+  }
+  function validateDiagram(
+    document: unknown,
+  ): Promise<{ ok: boolean; issues: string[] }> {
+    return request(
+      '/api/v1/diagrams/validate',
+      z.object({ ok: z.boolean(), issues: z.array(z.string()) }),
+      { method: 'POST', body: JSON.stringify({ document }) },
+    )
+  }
+  function renderDiagram(document: unknown): Promise<{ svg: string }> {
+    return request('/api/v1/diagrams/render', z.object({ svg: z.string() }), {
+      method: 'POST',
+      body: JSON.stringify({ document }),
+    })
+  }
+  function getDiagram(
+    deckId: string,
+    diagramId: string,
+  ): Promise<Record<string, unknown>> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/diagrams/${encodeURIComponent(diagramId)}`,
+      z.record(z.string(), z.unknown()),
+    )
+  }
+  function putDiagram(
+    deckId: string,
+    diagramId: string,
+    document: unknown,
+  ): Promise<Record<string, unknown>> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/diagrams/${encodeURIComponent(diagramId)}`,
+      z.record(z.string(), z.unknown()),
+      { method: 'PUT', body: JSON.stringify({ document }) },
+    )
+  }
+  function insertDiagram(
+    deckId: string,
+    diagramId: string,
+  ): Promise<{ assetPath: string }> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/diagrams/${encodeURIComponent(diagramId)}/insert`,
+      z.object({ assetPath: z.string() }),
+      { method: 'POST', body: '{}' },
+    )
+  }
+  function initializeDeckIdentities(
+    deckId: string,
+  ): Promise<{
+    deckId: string
+    revision: string
+    slides: Array<{ slideId: string; anchors: string[] }>
+  }> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/identities`,
+      z.object({
+        deckId: z.string(),
+        revision: z.string(),
+        slides: z.array(
+          z.object({ slideId: z.string(), anchors: z.array(z.string()) }),
+        ),
+      }),
+      { method: 'POST' },
+    )
+  }
+  function getDeckIr(
+    deckId: string,
+  ): Promise<{
+    deckId: string
+    revision: string
+    motionPreset?: 'static' | 'business' | 'teaching' | 'reveal' | undefined
+    slides: unknown[]
+  }> {
+    return request(
+      `/api/v1/decks/${encodeURIComponent(deckId)}/ir`,
+      z.object({
+        deckId: z.string(),
+        revision: z.string(),
+        motionPreset: z
+          .enum(['static', 'business', 'teaching', 'reveal'])
+          .optional(),
+        slides: z.array(z.unknown()),
+      }),
+    )
+  }
+  function getThemeImportAnalysis(themeId: string): Promise<ImportAnalysisV1> {
+    return request(
+      `/api/v1/imports/pptx-theme/${encodeURIComponent(themeId)}/analysis`,
+      ImportAnalysisV1Schema,
+    )
+  }
+  function saveThemeImportDecisions(
+    themeId: string,
+    decisions: unknown[],
+  ): Promise<{ themeId: string; decisions: unknown[] }> {
+    return request(
+      `/api/v1/imports/pptx-theme/${encodeURIComponent(themeId)}/decisions`,
+      z.object({ themeId: z.string(), decisions: z.array(z.unknown()) }),
+      { method: 'POST', body: JSON.stringify(decisions) },
+    )
+  }
+  function approveThemeImport(
+    themeId: string,
+  ): Promise<{ themeId: string; approvedAt: string }> {
+    return request(
+      `/api/v1/imports/pptx-theme/${encodeURIComponent(themeId)}/approve`,
+      z.object({ themeId: z.string(), approvedAt: z.string() }),
+      { method: 'POST', body: '{}' },
+    )
+  }
+  function getThemeImportRuleReview(themeId: string): Promise<ThemeRuleApprovalReport | null> {
+    return request(`/api/v1/imports/pptx-theme/${encodeURIComponent(themeId)}/rule-review`, ThemeRuleApprovalReportSchema.nullable())
+  }
+  function getPptxImportJob(jobId: string): Promise<unknown> {
+    return request(
+      `/api/v1/imports/jobs/${encodeURIComponent(jobId)}`,
+      z.record(z.string(), z.unknown()),
+    )
+  }
+  function listPptxImportJobs(themeId?: string): Promise<unknown[]> {
+    return request(
+      `/api/v1/imports/jobs${themeId ? `?themeId=${encodeURIComponent(themeId)}` : ''}`,
+      z.array(z.record(z.string(), z.unknown())),
+    )
+  }
+
   function previewAction(
     deckId: string,
     action: 'start' | 'restart' | 'stop',
@@ -219,13 +479,25 @@ export function useGatewayClient() {
     deckId: string,
     outputName: string,
     review?: boolean,
+    options?: {
+      policy?: 'editable' | 'strict-editable' | 'visual-fidelity'
+      master?: boolean
+      notes?: boolean
+      animations?: boolean
+      diagrams?: boolean
+    },
   ): Promise<ExportJob> {
     return request(
       `/api/v1/decks/${encodeURIComponent(deckId)}/exports`,
       ExportJobSchema,
       {
         method: 'POST',
-        body: JSON.stringify({ format: 'editable-pptx', outputName, review }),
+        body: JSON.stringify({
+          format: 'editable-pptx',
+          outputName,
+          review,
+          options,
+        }),
       },
     )
   }
@@ -238,7 +510,10 @@ export function useGatewayClient() {
     )
   }
 
-  function reviewExport(exportId: string, approved: boolean): Promise<ExportJob> {
+  function reviewExport(
+    exportId: string,
+    approved: boolean,
+  ): Promise<ExportJob> {
     return request(
       `/api/v1/exports/${encodeURIComponent(exportId)}/review`,
       ExportJobSchema,
@@ -250,15 +525,13 @@ export function useGatewayClient() {
     fileName: string,
     dataBase64: string,
     themeName?: string,
+    harness?: HarnessKind,
+    model?: string,
   ): Promise<ImportPptxThemeResult> {
-    return request(
-      '/api/v1/imports/pptx-theme',
-      ImportPptxThemeResultSchema,
-      {
-        method: 'POST',
-        body: JSON.stringify({ fileName, dataBase64, themeName }),
-      },
-    )
+    return request('/api/v1/imports/pptx-theme', ImportPptxThemeResultSchema, {
+      method: 'POST',
+      body: JSON.stringify({ fileName, dataBase64, themeName, harness, model }),
+    })
   }
 
   function getThemeImportStatus(
@@ -504,6 +777,7 @@ export function useGatewayClient() {
     content: string,
     themeId: string,
     attachments: readonly WorkspaceImageAsset[],
+    model?: string,
   ): Promise<{ runId?: string | undefined }> {
     return request(
       `/api/v1/sessions/${harness}/${encodeURIComponent(sessionId)}/messages`,
@@ -517,6 +791,7 @@ export function useGatewayClient() {
             path: attachment.path,
           })),
           themeId,
+          ...(model ? { model } : {}),
         }),
       },
     )
@@ -565,16 +840,74 @@ export function useGatewayClient() {
     )
   }
 
+  function getResourceFacets(signal?: AbortSignal) {
+    return request('/api/v1/resources/facets', z.object({ sources: z.array(z.object({ path: z.string(), label: z.string(), count: z.number() })) }), signal ? { signal } : {})
+  }
+  function searchResources(params: { query?: string; kind?: string; density?: string; source?: string; status?: string; offset?: number; limit?: number } = {}, signal?: AbortSignal) {
+    const search = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== '').map(([key, value]) => [key, String(value)]))
+    return request(`/api/v1/resources?${search}`, ResourceSearchResultSchema, signal ? { signal } : {})
+  }
+  function readResource(id: string, signal?: AbortSignal) {
+    return request(`/api/v1/resources/${encodeURIComponent(id)}`, ResourceDetailSchema, signal ? { signal } : {})
+  }
+  function searchCreativeAnimations(params: { query?:string;category?:string;scope?:string;offset?:number;limit?:number }={},signal?:AbortSignal) {
+    const search=new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!=='').map(([k,v])=>[k,String(v)]))
+    return request(`/api/v1/animations?${search}`,CreativeAnimationSearchSchema,signal?{signal}:{})
+  }
+  function readCreativeAnimation(id:string,signal?:AbortSignal){return request(`/api/v1/animations/${encodeURIComponent(id)}`,CreativeAnimationDetailSchema,signal?{signal}:{})}
   return {
+    searchPalettes(params: { query?: string; source?: string; kind?: string; count?: number; offset?: number; limit?: number } = {}, signal?: AbortSignal) {
+      const search = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== '').map(([key, value]) => [key, String(value)]))
+      return request(`/api/v1/palettes?${search}`, PaletteSearchResponseSchema, signal ? { signal } : {})
+    },
+    getPaletteFacets(signal?: AbortSignal) {
+      return request('/api/v1/palettes/facets', z.object({ total: z.number(), sources: z.array(z.string()), kinds: z.array(z.string()) }), signal ? { signal } : {})
+    },
+    recommendPalettes(query: string, harness: HarnessKind, signal?: AbortSignal, filters: { source?: string; kind?: string } = {}) {
+      return request('/api/v1/palettes/recommend', PaletteRecommendationSchema, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, harness, ...(filters.source ? { source: filters.source } : {}), ...(filters.kind ? { kind: filters.kind } : {}) }), ...(signal ? { signal } : {}) })
+    },
+    searchCreativeAnimations,
+    readCreativeAnimation,
+    getResourceFacets,
+    searchResources,
+    readResource,
     getWorkspace,
     getApplicationState,
     listFiles,
+    validateDeck,
+    reviewRuleExceptions,
+    approveRuleException,
+    revokeRuleException,
     readFile,
     writeFile,
     uploadImageAsset,
     listThemes,
     getThemeSkill,
     listDecks,
+    getNotes,
+    putNotes,
+    getAnimations,
+    putAnimations,
+    getExportCapabilities,
+    getExportCapabilityHistory,
+    getDeckMaster,
+    createCreationWizard,
+    getCreationWizard,
+    updateCreationWizard,
+    commitCreationWizard,
+    validateDiagram,
+    renderDiagram,
+    getDiagram,
+    putDiagram,
+    insertDiagram,
+    getDeckIr,
+    initializeDeckIdentities,
+    getThemeImportAnalysis,
+    saveThemeImportDecisions,
+    approveThemeImport,
+    getThemeImportRuleReview,
+    getPptxImportJob,
+    listPptxImportJobs,
     previewAction,
     getPreviewStatus,
     formatDeck,

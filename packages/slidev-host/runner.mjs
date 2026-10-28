@@ -1,3 +1,4 @@
+import { preserveTextFrameTabs } from './text-frame-tabs.mjs'
 import { createRequire } from 'node:module'
 import { lstat, readdir, rmdir, unlink } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -105,11 +106,20 @@ if (
     'dev',
   )
   options.roots.push(dirname(fileURLToPath(import.meta.url)))
+  // External themes still need the bundled font assets. Keep the grant scoped
+  // to this installed package instead of widening access to the repository.
+  options.roots.push(
+    join(
+      dirname(dirname(require.resolve('@fastppt/fonts/registry'))),
+      'assets',
+    ),
+  )
   const server = await createServer(
     options,
     {
       base: basePath,
       clearScreen: false,
+      slidev: { markdown: { transforms: { after: preserveTextFrameTabs } } },
       ...(Object.keys(optimizeDependencyAliases).length
         ? {
             resolve: { alias: optimizeDependencyAliases },

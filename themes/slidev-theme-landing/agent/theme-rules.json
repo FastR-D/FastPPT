@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "landing.cover-position",
+      "kind": "layout-position",
+      "layout": "cover",
+      "positions": ["first", "last"],
+      "severity": "warning",
+      "provenance": "derived",
+      "message": "Reserve the cover layout for opening or closing pages."
+    }
+  ]
+}

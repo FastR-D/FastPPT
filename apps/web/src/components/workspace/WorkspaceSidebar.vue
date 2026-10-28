@@ -1,28 +1,26 @@
 <script setup lang="ts">
-import { computed, shallowRef } from 'vue'
+import {
+  Aside,
+  Box,
+  Button,
+  Form,
+  Panel,
+  Text,
+  TextField,
+} from '@fastppt/components'
+import { computed, nextTick, shallowRef } from 'vue'
 
-import AppSelect, { type SelectOption } from '../AppSelect.vue'
-import FileTree from '../files/FileTree.vue'
+import { Select as AppSelect, type SelectItem } from '@fastppt/components'
+import EditorNavigation from './EditorNavigation.vue'
+import { Icon as AppIcon } from '@fastppt/components'
 
-import type {
-  FileNode,
-  ServerEvent,
-  SessionSummary,
-  WorkspaceInfo,
-  HarnessKind,
-} from '@fastppt/protocol'
+import type { SessionSummary, HarnessKind } from '@fastppt/protocol'
 import type { DeepReadonly } from 'vue'
 
 const props = defineProps<{
-  mode: 'chat' | 'files'
-  workspace: WorkspaceInfo | undefined
-  workspaceLoading: boolean
-  workspaceError: string | undefined
-  files: readonly FileNode[]
-  filesLoading: boolean
-  selectedPath: string | undefined
-  connectionStatus: 'disconnected' | 'connecting' | 'connected'
-  latestEvent: ServerEvent | undefined
+  markdown?: string
+  deckPath?: string | undefined
+  selectedPage?: number
   sessions: readonly DeepReadonly<SessionSummary>[]
   selectedSessionId: string | undefined
   sessionsLoading: boolean
@@ -44,21 +42,43 @@ const filteredSessions = computed(() => {
   )
 })
 
-function requestSessionAlias(): void {
+const renaming = shallowRef(false)
+const sessionAlias = shallowRef('')
+const aliasInput = shallowRef<HTMLInputElement>()
+async function requestSessionAlias(): Promise<void> {
   const current = props.sessions.find(
     (session) => session.id === props.selectedSessionId,
   )
   if (!current) return
-  const alias = window
-    .prompt('输入会话别名', current.title ?? current.preview)
-    ?.trim()
-  if (alias) emit('renameSession', alias)
+  sessionAlias.value = current.title ?? current.preview
+  renaming.value = true
+  await nextTick()
+  aliasInput.value?.focus()
+  aliasInput.value?.select()
 }
+function rename(): void {
+  if (sessionAlias.value.trim())
+    emit('renameSession', sessionAlias.value.trim())
+  renaming.value = false
+}
+const statusLabels: Record<string, string> = {
+  idle: '就绪',
+  running: '运行中',
+  'waiting-approval': '等待确认',
+  failed: '失败',
+}
+const dateFormat = new Intl.DateTimeFormat('zh-CN', {
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+})
 
 const emit = defineEmits<{
-  retryWorkspace: []
-  retryFiles: []
-  selectFile: [path: string]
+  selectPage: [page: number]
+  editPage: [page: number]
+  remakePage: [page: number]
   selectSession: [sessionId: string]
   createSession: []
   renameSession: [alias: string]
@@ -68,144 +88,162 @@ const emit = defineEmits<{
   selectHarness: [harness: HarnessKind]
 }>()
 
-const harnessOptions: readonly SelectOption[] = [
+const harnessOptions: readonly SelectItem[] = [
   { value: 'claude', label: 'Claude' },
   { value: 'codex', label: 'Codex' },
 ]
 </script>
 
 <template>
-  <aside class="sidebar panel-surface">
-    <section v-if="mode === 'chat'" class="sessions-panel">
-      <div class="files-heading">
-        <label class="harness-picker">
-          <span>{{ harnessLabel }}</span>
+  <Aside
+    class="sidebar panel-surface"
+    :class="{ 'with-pages': Boolean(markdown) }"
+    aria-label="会话导航"
+  >
+    <Panel class="sessions-panel">
+      <Box class="files-heading">
+        <Text>
+          会话 <Text as="small">{{ sessions.length }}</Text>
+        </Text>
+        <Box class="session-actions">
+          <Button
+            variant="icon"
+            type="button"
+            class="icon-button"
+            aria-label="刷新会话"
+            title="刷新会话"
+            :disabled="sessionsLoading"
+            @click="emit('retrySessions')"
+          >
+            <AppIcon name="refresh" />
+          </Button>
+          <Button
+            variant="icon"
+            type="button"
+            class="icon-button"
+            aria-label="重命名当前会话"
+            title="重命名当前会话"
+            :disabled="!selectedSessionId"
+            @click="requestSessionAlias"
+          >
+            <AppIcon name="edit" />
+          </Button>
+          <Button
+            variant="icon"
+            type="button"
+            class="icon-button"
+            aria-label="分叉当前会话"
+            title="分叉当前会话"
+            :disabled="!selectedSessionId || !canForkSession"
+            @click="emit('forkSession')"
+          >
+            <AppIcon name="branch" />
+          </Button>
+          <Button
+            variant="icon"
+            type="button"
+            class="icon-button"
+            aria-label="新建会话"
+            title="新建会话"
+            @click="emit('createSession')"
+          >
+            <AppIcon name="plus" />
+          </Button>
+        </Box>
+      </Box>
+      <Box class="session-filters">
+        <Box class="harness-picker">
           <AppSelect
             id="fastppt-harness"
             :value="selectedHarness"
             :options="harnessOptions"
             size="sm"
             aria-label="Agent harness"
-            @change="
-              (harness: string) =>
-                $emit('selectHarness', harness as HarnessKind)
-            "
-          />
-        </label>
-        <div class="session-actions">
-          <button
-            type="button"
-            aria-label="刷新会话"
-            title="刷新会话"
-            @click="$emit('retrySessions')"
-          >
-            ↻
-          </button>
-          <button
-            type="button"
-            aria-label="重命名当前会话"
-            title="重命名当前会话"
-            :disabled="!selectedSessionId"
-            @click="requestSessionAlias"
-          >
-            ✎
-          </button>
-          <button
-            type="button"
-            aria-label="分叉当前会话"
-            title="分叉当前会话"
-            :disabled="!selectedSessionId || !canForkSession"
-            @click="$emit('forkSession')"
-          >
-            ⑂
-          </button>
-          <button
-            type="button"
-            aria-label="新建会话"
-            title="新建会话"
-            @click="$emit('createSession')"
-          >
-            ＋
-          </button>
-        </div>
-      </div>
-      <div class="session-list">
-        <input
+            @change="emit('selectHarness', $event as HarnessKind)"
+          /><Text :title="harnessLabel">
+            {{ selectedHarness === 'claude' ? 'Claude Code' : 'OpenAI Codex' }}
+          </Text>
+        </Box>
+        <TextField
           v-model="sessionQuery"
           class="session-search"
           type="search"
           placeholder="搜索会话…"
           aria-label="搜索会话"
         />
-        <button
+        <Form v-if="renaming" class="rename-session" @submit.prevent="rename">
+          <TextField
+            ref="aliasInput"
+            v-model="sessionAlias"
+            aria-label="会话别名"
+            @keydown.esc="renaming = false"
+          /><Button variant="quiet" type="submit">保存</Button
+          ><Button
+            variant="quiet"
+            type="button"
+            aria-label="取消重命名"
+            @click="renaming = false"
+          >
+            ×
+          </Button>
+        </Form>
+      </Box>
+      <Box class="session-list" :aria-busy="sessionsLoading">
+        <Button
           v-for="session in filteredSessions"
           :key="session.id"
+          variant="quiet"
           class="session-item"
           :class="{ 'session-item-active': session.id === selectedSessionId }"
+          :aria-pressed="session.id === selectedSessionId"
+          :title="session.cwd"
           type="button"
-          @click="$emit('selectSession', session.id)"
+          @click="emit('selectSession', session.id)"
         >
-          <span>{{
-            (session.title ?? session.preview) || `${selectedHarness} session`
-          }}</span>
-          <small>
-            {{ session.status }} ·
-            {{ new Date(session.updatedAt).toLocaleString() }}
-          </small>
-          <small class="session-cwd" :title="session.cwd">{{
-            session.cwd
-          }}</small>
-        </button>
-        <div v-if="!filteredSessions.length" class="files-empty">
+          <Text>{{ (session.title ?? session.preview) || '未命名会话' }}</Text>
+          <Text as="small">
+            <Text>{{ statusLabels[session.status] ?? session.status }}</Text
+            ><Text as="time">
+              {{ dateFormat.format(new Date(session.updatedAt)) }}
+            </Text>
+          </Text>
+        </Button>
+        <Box v-if="!filteredSessions.length" class="files-empty">
           {{
             sessionsLoading
               ? '读取会话…'
               : sessionQuery
                 ? '没有匹配的会话'
-                : `尚无 ${selectedHarness} 会话`
+                : '暂无会话，点击 + 开始创建'
           }}
-        </div>
-        <button
+        </Box>
+        <Button
           v-if="hasMoreSessions && !sessionQuery"
+          variant="quiet"
           class="load-more-sessions"
           type="button"
           :disabled="sessionsLoading || sessionsLoadingMore"
-          @click="$emit('loadMoreSessions')"
+          @click="emit('loadMoreSessions')"
         >
           {{ sessionsLoadingMore ? '加载中…' : '加载更多会话' }}
-        </button>
-      </div>
-    </section>
-    <section v-else class="files-panel">
-      <div class="files-heading">
-        <span class="explorer-title">Explorer</span>
-        <button
-          type="button"
-          aria-label="刷新工作区文件"
-          :disabled="filesLoading"
-          @click="$emit('retryFiles')"
-        >
-          ↻
-        </button>
-      </div>
-      <div class="explorer-workspace" :title="workspace?.root">
-        <span aria-hidden="true">▾</span>
-        <strong>{{ workspace?.name ?? 'Workspace' }}</strong>
-      </div>
-      <FileTree
-        v-if="files.length"
-        :nodes="files"
-        :selected-path="selectedPath"
-        @select="$emit('selectFile', $event)"
-      />
-      <div v-else class="files-empty">
-        {{ filesLoading ? '读取文件…' : '工作区为空' }}
-      </div>
-      <div v-if="latestEvent" class="file-event" :title="latestEvent.type">
-        {{ latestEvent.type }} · {{ latestEvent.sequence }}
-      </div>
-    </section>
-  </aside>
+        </Button>
+      </Box>
+    </Panel>
+    <EditorNavigation
+      v-if="markdown"
+      class="current-deck-pages"
+      embedded
+      activity="slidev"
+      :files="[]"
+      :selected-path="deckPath"
+      :markdown="markdown"
+      :selected-page="selectedPage ?? 1"
+      :loading="false"
+      @select-page="emit('selectPage', $event)"
+      @edit-page="emit('editPage', $event)"
+      @remake-page="emit('remakePage', $event)"
+    />
+  </Aside>
 </template>
 
 <style scoped>
@@ -214,257 +252,138 @@ const harnessOptions: readonly SelectOption[] = [
   grid-template-rows: minmax(0, 1fr);
   min-width: 0;
   overflow: hidden;
-  padding: 12px;
-}
-.sidebar-header,
-.workspace-title,
-.nav-item,
-.files-heading {
-  display: flex;
-  align-items: center;
-}
-.sidebar-header {
-  gap: 11px;
-}
-.brand-mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 10px;
-  background: var(--color-accent);
-  color: #071612;
-  font-weight: 800;
-}
-.brand-copy {
-  display: grid;
-  gap: 1px;
-}
-.brand-copy span,
-.muted,
-.files-empty {
-  color: var(--color-muted);
-  font-size: 12px;
-}
-.workspace-card {
-  padding: 14px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
   background: var(--color-panel-raised);
 }
-.eyebrow {
-  margin-bottom: 9px;
-  color: var(--color-muted);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.workspace-title {
-  gap: 8px;
-  font-weight: 650;
-}
-.workspace-path {
-  margin-top: 7px;
-  overflow: hidden;
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.error-block {
-  display: grid;
-  gap: 9px;
-  color: var(--color-danger);
-  font-size: 12px;
-}
-.error-block button {
-  width: fit-content;
-  color: var(--color-text);
-}
-.sidebar-nav {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  border-bottom: 1px solid var(--color-border);
-}
-.nav-item {
-  justify-content: space-between;
-  min-width: 0;
-  padding: 8px 10px 9px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-muted);
-  text-align: left;
-}
-.nav-item-active {
-  border-bottom-color: var(--color-accent);
-  background: transparent;
-  color: var(--color-text);
-}
-.nav-count,
-.connection-state,
-.file-event {
-  font-family: var(--font-mono);
-  font-size: 9px;
-}
-.connection-state {
-  color: #fcd34d;
-}
-.connection-connected {
-  color: var(--color-accent);
-}
-.files-panel {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-  min-height: 0;
-  margin: -12px;
-  overflow: hidden;
+.sidebar.with-pages {
+  grid-template-rows: minmax(160px, 1fr) minmax(140px, 38%);
 }
 .sessions-panel {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: 36px auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
+}
+.files-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+.files-heading small {
+  margin-left: 5px;
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 400;
 }
 .session-actions {
   display: flex;
   flex: 0 0 auto;
-  gap: 2px;
+  gap: 0;
 }
 .session-actions button {
-  display: grid;
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-  padding: 0;
-  place-items: center;
+  width: 25px;
+  height: 25px;
 }
-.sessions-panel > .files-heading {
+.session-actions :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+.session-filters {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
+  padding: 10px;
 }
 .harness-picker {
-  display: grid;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   min-width: 0;
-  gap: 6px;
 }
 .harness-picker > span {
   overflow: hidden;
-  max-width: 100%;
+  color: var(--color-muted);
+  font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.session-search,
+.rename-session input {
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+}
+.rename-session {
+  display: flex;
+  gap: 4px;
+}
+.rename-session button {
+  flex-shrink: 0;
 }
 .session-list {
   min-height: 0;
   overflow: auto;
+  padding: 0 6px 6px;
 }
-.session-search {
+.session-item {
+  justify-content: stretch;
+  justify-items: stretch;
+  display: grid;
+  gap: 5px;
   width: 100%;
-  padding: 7px 9px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  outline: none;
-  background: var(--color-panel-raised);
-  color: var(--color-text);
-  font-size: 11px;
+  margin-bottom: 2px;
+  text-align: left;
 }
-.session-search:focus {
-  border-color: var(--color-accent);
+.session-item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.session-item small {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 10px;
+}
+.session-item-active {
+  background: var(--color-selected);
+  border-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+.session-item-active > span {
+  color: var(--color-accent-strong);
 }
 .load-more-sessions {
   width: 100%;
-  padding: 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  color: var(--color-muted);
-}
-.session-cwd {
-  overflow: hidden;
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.session-item {
-  display: grid;
-  width: 100%;
-  gap: 3px;
-  padding: 8px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--color-muted);
-  text-align: left;
-}
-.session-item span {
-  overflow: hidden;
-  color: var(--color-text);
-  font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.session-item small {
-  font-family: var(--font-mono);
-  font-size: 9px;
-}
-.session-item-active {
-  background: var(--color-panel-raised);
-}
-.files-heading {
-  justify-content: space-between;
-  padding: 0 7px 7px;
-  color: var(--color-muted);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.files-panel .files-heading {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-  height: 34px;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-panel-raised);
-  letter-spacing: 0;
-}
-.explorer-title {
-  color: var(--color-text);
-}
-.explorer-workspace {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  height: 22px;
-  gap: 4px;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text);
-  font-size: 10px;
-  text-transform: uppercase;
-}
-.explorer-workspace strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.files-heading button {
-  color: var(--color-muted);
 }
 .files-empty {
-  padding: 12px 8px;
-}
-.file-event {
-  overflow: hidden;
-  padding: 6px 7px 0;
+  padding: 16px 8px;
   color: var(--color-muted);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 12px;
+}
+.current-deck-pages {
+  min-height: 0;
+  border-top: 1px solid var(--color-border);
+}
+@media (max-width: 600px) {
+  .sidebar.with-pages {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .current-deck-pages {
+    display: none;
+  }
+  .session-filters {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 6px 10px;
+    gap: 8px;
+  }
+  .harness-picker > span {
+    display: none;
+  }
 }
 </style>

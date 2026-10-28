@@ -52,8 +52,6 @@ import type {
 
 const execFileAsync = promisify(execFile)
 
-export const CODEX_VERIFIED_VERSION_RANGE = '>=0.144.0 <0.147.0'
-
 const ThreadSchema = z
   .object({
     id: z.string(),
@@ -143,13 +141,6 @@ function minimalEnvironment(source: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
       source[key] === undefined ? [] : [[key, source[key]]],
     ),
   )
-}
-
-function versionIsCompatible(version: string): boolean {
-  const match = /(?:codex-cli\s+)?(\d+)\.(\d+)\.(\d+)/.exec(version)
-  if (match?.[1] !== '0') return false
-  const minor = Number(match[2])
-  return minor >= 144 && minor < 147
 }
 
 function timestamp(seconds: number): string {
@@ -326,26 +317,18 @@ export class CodexAdapter implements HarnessAdapter {
     })
     try {
       const version = await this.#readVersion()
-      const compatible = versionIsCompatible(version)
       return HarnessStatusSchema.parse({
         kind: 'codex',
-        status: compatible ? 'available' : 'degraded',
+        status: 'available',
         version,
-        verifiedVersionRange: CODEX_VERIFIED_VERSION_RANGE,
-        compatible,
-        capabilities: compatible
-          ? capabilities
-          : { ...capabilities, perRunSkillInvocation: false },
-        ...(compatible
-          ? {}
-          : { message: `Unverified Codex version: ${version}` }),
+        compatible: true,
+        capabilities,
       })
     } catch (cause) {
       return HarnessStatusSchema.parse({
         kind: 'codex',
         status: 'unavailable',
         compatible: false,
-        verifiedVersionRange: CODEX_VERIFIED_VERSION_RANGE,
         capabilities: {
           ...capabilities,
           skillDiscovery: false,
@@ -512,12 +495,6 @@ export class CodexAdapter implements HarnessAdapter {
     if (this.#initialized && this.#rpc.running) return
     if (this.#connecting) return await this.#connecting
     this.#connecting = (async () => {
-      const status = await this.getStatus()
-      if (!status.compatible)
-        throw new RpcError(
-          status.message ?? 'Codex app-server version is unavailable',
-          'UNSUPPORTED_VERSION',
-        )
       this.#rpc.start()
       await this.#rpc.request('initialize', {
         clientInfo: {

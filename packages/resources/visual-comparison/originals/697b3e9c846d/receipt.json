@@ -1,0 +1,9 @@
+{
+  "id": "697b3e9c846d",
+  "source": "references/GordenPPTSkill/templates/red-patriot-general/template.pptx",
+  "sourceSha256": "bab045bca75ab5bd99db2aaafa9641cb9a45c2baa9c1644b79ae5925c7a95295",
+  "pages": 25,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+  "rasterizer": "PyMuPDF at 960px width"
+}

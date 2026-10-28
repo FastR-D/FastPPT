@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "policy": "Generated screenshots and thumbnails removed; page assets and source PPTX/PDF preserved. Gallery previews render source HTML on demand. Existing visual measurements are historical records, not stored screenshots.",
+  "libraries": [
+    {
+      "library": "resources",
+      "files": 10923,
+      "bytes": 815230209,
+      "pathsSha256": "2227582dcf8a62c9036c637c722f241cd69c0490be480a7f81ded5979594f1a3"
+    },
+    {
+      "library": "animations",
+      "files": 650,
+      "bytes": 22132184,
+      "pathsSha256": "144e328329469997788dac86d9cc0375e768d69a7373975049aca74a99757b99"
+    }
+  ]
+}

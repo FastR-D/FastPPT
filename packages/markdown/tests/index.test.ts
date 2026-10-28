@@ -57,3 +57,11 @@ describe('formatSlidevMarkdown', () => {
     ).rejects.toMatchObject({ location: { line: 2, column: 1 } })
   })
 })
+
+it('preserves ordinary page delimiters through formatting and identity initialization', async () => {
+  const source = '---\ntheme: test\n---\n# A\n\n---\n\n# B\n\n---\n\n# C\n'
+  const formatted = await formatSlidevMarkdown(source)
+  expect(formatted).toContain('---\n\n# B')
+  expect(formatted).toContain('---\n\n# C')
+  expect(await formatSlidevMarkdown(formatted)).toBe(formatted)
+})

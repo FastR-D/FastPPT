@@ -1,6 +1,7 @@
 export {
   SLIDEWAVE_CAPTURE_PROTOCOL_VERSION,
   isSlidewaveCaptureMessage,
+  negotiateSnapshotVersion,
   type SlidewaveCaptureCompleted,
   type SlidewaveCaptureFailed,
   type SlidewaveCaptureMessage,

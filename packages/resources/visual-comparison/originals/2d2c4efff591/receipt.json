@@ -1,0 +1,9 @@
+{
+  "id": "2d2c4efff591",
+  "source": "references/GordenPPTSkill/templates/geometric-summary/template.pptx",
+  "sourceSha256": "94c24c9cb259caf88bbbf86f47771b69ef36873491c2cfe8161f54ec56fcaebd",
+  "pages": 21,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slide visibility enabled in a temporary copy when required",
+  "rasterizer": "PyMuPDF at 960px width"
+}

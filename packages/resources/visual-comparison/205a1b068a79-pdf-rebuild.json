@@ -1,0 +1,204 @@
+{
+  "source": {
+    "path": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+    "id": "205a1b068a79",
+    "sha256": "1e8d3cac61b7b6fa2efb2e9c0f4e100a9fea22deff66b8fe971d543b65ec3ed4",
+    "pages": 16,
+    "entries": [
+      "205a1b068a79-0001",
+      "205a1b068a79-0002",
+      "205a1b068a79-0003",
+      "205a1b068a79-0004",
+      "205a1b068a79-0005",
+      "205a1b068a79-0006",
+      "205a1b068a79-0007",
+      "205a1b068a79-0008",
+      "205a1b068a79-0009",
+      "205a1b068a79-0010",
+      "205a1b068a79-0011",
+      "205a1b068a79-0012",
+      "205a1b068a79-0013",
+      "205a1b068a79-0014",
+      "205a1b068a79-0015",
+      "205a1b068a79-0016"
+    ]
+  },
+  "records": [
+    {
+      "id": "205a1b068a79-0001",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 1,
+      "markdownSha256": "63b36dc3e44cfc27b5e47f4dbfab74015134eb13f128693d58b72d7051aa24ba",
+      "layers": 7,
+      "textSpans": 8,
+      "original": "originals/205a1b068a79/0001.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0002",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 2,
+      "markdownSha256": "5f100384ecf7952c343b5aa2a4267ad65465592b5037bbefbfa132214ee01e8d",
+      "layers": 4,
+      "textSpans": 17,
+      "original": "originals/205a1b068a79/0002.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0003",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 3,
+      "markdownSha256": "7729be792c58f32c7409c849df0e778b4d072486e7198736cfdbf195712dd69e",
+      "layers": 5,
+      "textSpans": 5,
+      "original": "originals/205a1b068a79/0003.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0004",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 4,
+      "markdownSha256": "4d8dbba7e1c25aa14bad16a11a4e3d16bd5606c1fdadeafc159d5a9b0c4c03d2",
+      "layers": 7,
+      "textSpans": 14,
+      "original": "originals/205a1b068a79/0004.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0005",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 5,
+      "markdownSha256": "942274b2226ad9fa8d5abdbbecaf1e9c252972da70f6321c295c5d897efe389b",
+      "layers": 4,
+      "textSpans": 17,
+      "original": "originals/205a1b068a79/0005.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0006",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 6,
+      "markdownSha256": "7fb9c25c7245542a46640db0a59a1d7d0ea5f7f54d4fc4f8c24c016229be5b10",
+      "layers": 7,
+      "textSpans": 12,
+      "original": "originals/205a1b068a79/0006.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0007",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 7,
+      "markdownSha256": "9cbc90352098f934315abaf85425a489e26688a84d6e4447c91a9b25ff91bded",
+      "layers": 5,
+      "textSpans": 5,
+      "original": "originals/205a1b068a79/0007.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0008",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 8,
+      "markdownSha256": "49810c8d7f75b09596e4c1052564e7d41fed2240f8cb263e3695b29bbbca41b8",
+      "layers": 3,
+      "textSpans": 17,
+      "original": "originals/205a1b068a79/0008.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0009",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 9,
+      "markdownSha256": "ba96ca7cbddd78a83913792126130e85951a38b6038a9982faff2b6ba39786d1",
+      "layers": 11,
+      "textSpans": 19,
+      "original": "originals/205a1b068a79/0009.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0010",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 10,
+      "markdownSha256": "e0f25c4d4c23272bb694bc1c8e3de82a47c6b635b3f5fbe0213b92be4ac7a338",
+      "layers": 6,
+      "textSpans": 7,
+      "original": "originals/205a1b068a79/0010.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0011",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 11,
+      "markdownSha256": "0bf2d1c861b1daff37e9729d59fe89764036b51340975edaa9ab1fe94c8aa794",
+      "layers": 5,
+      "textSpans": 5,
+      "original": "originals/205a1b068a79/0011.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0012",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 12,
+      "markdownSha256": "72412ce4f939fcf8107e542e3f0a1ca5001ce16a220ac6d6a5c5744c96ad7b57",
+      "layers": 10,
+      "textSpans": 11,
+      "original": "originals/205a1b068a79/0012.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0013",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 13,
+      "markdownSha256": "0aedb8e88c9ea2aaa59a3acb77665855d506817700710870d21bffae09afdc20",
+      "layers": 11,
+      "textSpans": 21,
+      "original": "originals/205a1b068a79/0013.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0014",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 14,
+      "markdownSha256": "98a70dda2057ee4eaf19f3f2e0570c9b974046e76456a3edb1d385471e38296e",
+      "layers": 5,
+      "textSpans": 11,
+      "original": "originals/205a1b068a79/0014.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0015",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 15,
+      "markdownSha256": "18589a036b61ee74af9eb802bf0e4710ed95c9685186d410ce8399e3954edbe2",
+      "layers": 7,
+      "textSpans": 8,
+      "original": "originals/205a1b068a79/0015.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "205a1b068a79-0016",
+      "source": "references/GordenPPTSkill/templates/red-patriot-youth/template.pptx",
+      "sourcePage": 16,
+      "markdownSha256": "b342cedb23ff9996a551295c780d489ed996478be4b5e9b51f61f20d6706fabd",
+      "layers": 9,
+      "textSpans": 34,
+      "original": "originals/205a1b068a79/0016.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    }
+  ]
+}

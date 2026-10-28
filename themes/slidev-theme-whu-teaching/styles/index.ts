@@ -1,0 +1,5 @@
+import '@fastppt/fonts/noto-sans-sc'
+import '@fastppt/fonts/fira-code'
+import './base.css'
+import './layouts.css'
+import './academic.css'

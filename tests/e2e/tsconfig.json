@@ -6,7 +6,6 @@
       "DOM"
     ],
     "noEmit": true,
-    "rootDir": ".",
     "types": [
       "node"
     ]

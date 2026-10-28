@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./cli": "./src/cli.ts"
+    "./cli": "./src/cli.ts",
+    "./theme-design": "./src/theme-design.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -22,7 +23,11 @@
     "@fastppt/theme-registry": "workspace:*",
     "@fastppt/workspace": "workspace:*",
     "@modelcontextprotocol/sdk": "1.30.0",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@fastppt/slidewave": "workspace:*",
+    "@fastppt/resources": "workspace:*",
+    "@fastppt/animations": "workspace:*",
+    "@fastppt/palettes": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

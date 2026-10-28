@@ -1,0 +1,9 @@
+{
+  "id": "47f5918bdc82",
+  "source": "references/GordenPPTSkill/templates/operations-deck/template.pptx",
+  "sourceSha256": "1b5878e724e0177bae812e7c8e3b41fabfcdd5bb8b9e4af2c9506595437f16ca",
+  "pages": 52,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

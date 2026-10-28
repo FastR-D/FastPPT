@@ -1,3 +1,8 @@
+import { fontScript } from './font-script.js'
+import { posix } from 'node:path'
+import { parseXml } from '../server/slide-xml.js'
+import { themeFontAliases } from './theme-fonts.js'
+import { layoutFontRuns } from './layout-fonts.js'
 /**
  * PPTX font embedding.
  *
@@ -64,6 +69,22 @@ const FNTDATA_CONTENT_TYPE = 'application/x-fontdata'
 
 interface TypefaceUsage {
   faces: Record<FontFaceKey, string>
+  /** Display capitalization may select glyphs absent from the source string. */
+  completeFaces: Set<FontFaceKey>
+}
+
+let completeUnicode: string | undefined
+function completeUnicodeRepertoire(): string {
+  // The subset library accepts text, not a retain-all flag. Enumerate scalar
+  // values only when an instantiated variable face needs every mapped glyph.
+  // Chunk construction avoids argument limits; the immutable result is shared.
+  if (completeUnicode === undefined) {
+    const chunks: string[] = []
+    for (let start = 0; start < 0x110000; start += 0x800)
+      if (start !== 0xd800) chunks.push(String.fromCodePoint(...Array.from({ length: 0x800 }, (_, offset) => start + offset)))
+    completeUnicode = chunks.join('')
+  }
+  return completeUnicode
 }
 
 function faceKeyOf(bold: boolean, italic: boolean): FontFaceKey {
@@ -71,20 +92,6 @@ function faceKeyOf(bold: boolean, italic: boolean): FontFaceKey {
   if (bold) return 'bold'
   if (italic) return 'italic'
   return 'regular'
-}
-
-/** Rough CJK / East-Asian code-point ranges. */
-function isCjkCodePoint(codePoint: number): boolean {
-  return (
-    (codePoint >= 0x2e80 && codePoint <= 0x2eff) ||
-    (codePoint >= 0x3000 && codePoint <= 0x303f) ||
-    (codePoint >= 0x3040 && codePoint <= 0x30ff) ||
-    (codePoint >= 0x3400 && codePoint <= 0x4dbf) ||
-    (codePoint >= 0x4e00 && codePoint <= 0x9fff) ||
-    (codePoint >= 0xf900 && codePoint <= 0xfaff) ||
-    (codePoint >= 0xff00 && codePoint <= 0xffef) ||
-    (codePoint >= 0x20000 && codePoint <= 0x2fffd)
-  )
 }
 
 function decodeXmlEntities(text: string): string {
@@ -110,7 +117,7 @@ function escapeXml(value: string): string {
 }
 
 /** Scan one slide part for `a:r` runs and accumulate text per typeface + face. */
-function collectTypefaces(slideXml: string, usage: Map<string, TypefaceUsage>): void {
+function collectTypefaces(slideXml: string, usage: Map<string, TypefaceUsage>, aliases = new Map<string, string>()): void {
   const runRe = /<a:r\b[^>]*>([\s\S]*?)<\/a:r>/g
   let match: RegExpExecArray | null
   while ((match = runRe.exec(slideXml))) {
@@ -129,18 +136,25 @@ function collectTypefaces(slideXml: string, usage: Map<string, TypefaceUsage>): 
     if (!text) continue
 
     const faceKey = faceKeyOf(bold, italic)
+    let preceding: ReturnType<typeof fontScript> = 'latin'
     for (const char of text) {
-      const cjk = isCjkCodePoint(char.codePointAt(0)!)
+      const script = fontScript(char, preceding)
+      preceding = script
       // East-Asian characters use the ea font; complex scripts the cs font;
       // everything else (Latin, digits, punctuation) the latin font.
-      const family = cjk ? ea ?? latin : cs ?? latin ?? ea
-      if (!family) continue
+      const rawFamily = script === 'ea' ? ea ?? latin ?? cs : script === 'cs' ? cs ?? latin ?? ea : latin ?? ea ?? cs
+      if (!rawFamily) continue
+      const decoded = decodeXmlEntities(rawFamily)
+      const family = aliases.get(decoded) ?? decoded
       let entry = usage.get(family)
       if (!entry) {
-        entry = { faces: { regular: '', bold: '', italic: '', boldItalic: '' } }
+        entry = { faces: { regular: '', bold: '', italic: '', boldItalic: '' }, completeFaces: new Set() }
         usage.set(family, entry)
       }
       entry.faces[faceKey] += char
+      // Preserve case mappings and OpenType small-cap substitutions. A text-only
+      // subset is unsafe across application/language-specific case mappings.
+      if (/\bcap="(?:all|small)"/.test(rPr)) entry.completeFaces.add(faceKey)
     }
   }
 }
@@ -232,8 +246,19 @@ async function injectEmbeddedFontLst(
       : '</p:sldIdLst>'
   if (!xml.includes(anchor)) return
   xml = xml.replace(anchor, `${anchor}${lst}`)
-  xml = xml.replace(/<p:presentation\b/, '<p:presentation embedTrueTypeFonts="1" saveSubsetFonts="1"')
+  xml = xml.replace(/<p:presentation\b[^>]*>/, (tag) =>
+    tag.replace(/\s+(?:embedTrueTypeFonts|saveSubsetFonts)\s*=\s*(?:"[^"]*"|'[^']*')/g, '')
+      .replace(/>$/, ' embedTrueTypeFonts="1" saveSubsetFonts="1">'),
+  )
   zip.file(path, xml)
+}
+
+async function relatedPart(zip: JSZip, source: string, role: string): Promise<string | undefined> {
+  const file = zip.file(`${posix.dirname(source)}/_rels/${posix.basename(source)}.rels`)
+  if (!file) return undefined
+  const relation = parseXml(await file.async('string')).children.find(node => node.namespace === 'http://schemas.openxmlformats.org/package/2006/relationships' && node.local === 'Relationship' && node.attributes.Type === `http://schemas.openxmlformats.org/officeDocument/2006/relationships/${role}` && node.attributes.TargetMode !== 'External')
+  const target = relation?.attributes.Target
+  return target ? target.startsWith('/') ? target.slice(1) : posix.normalize(posix.join(posix.dirname(source), target)) : undefined
 }
 
 export async function embedFonts(
@@ -243,9 +268,18 @@ export async function embedFonts(
   const zip = await JSZip.loadAsync(pptx)
   const usage = new Map<string, TypefaceUsage>()
   for (const name of Object.keys(zip.files)) {
-    if (!/^ppt\/slides\/slide\d+\.xml$/.test(name)) continue
+    if (!/^ppt\/(?:slides\/slide|slideLayouts\/slideLayout|slideMasters\/slideMaster)\d+\.xml$/.test(name)) continue
     const xml = await zip.files[name]!.async('string')
-    collectTypefaces(xml, usage)
+    const layoutPath = name.startsWith('ppt/slides/') ? await relatedPart(zip, name, 'slideLayout') : undefined
+    const masterPath = await relatedPart(zip, layoutPath ?? name, 'slideMaster')
+    const layoutXml = layoutPath ? await zip.file(layoutPath)?.async('string') : undefined
+    const masterXml = masterPath ? await zip.file(masterPath)?.async('string') : undefined
+    const themePath = await relatedPart(zip, masterPath ?? name, 'theme')
+    const themeXml = themePath ? await zip.file(themePath)?.async('string') : undefined
+    const aliases = themeXml ? themeFontAliases(themeXml) : new Map<string, string>()
+    collectTypefaces(layoutFontRuns(xml, layoutXml, masterXml), usage, aliases)
+    // Preserve coverage of runs in charts/tables and other non-shape containers.
+    collectTypefaces(xml, usage, aliases)
   }
   if (usage.size === 0) return { buffer: pptx, embeddedFaces: 0, warnings: [] }
 
@@ -288,9 +322,9 @@ export async function embedFonts(
       let subset: Uint8Array
       try {
         subset =
-          faceSource.subset === false
+          faceSource.subset === false || (typefaceUsage.completeFaces.has(face) && !isVariable)
             ? font
-            : await subsetFont(font, text, {
+            : await subsetFont(font, typefaceUsage.completeFaces.has(face) ? completeUnicodeRepertoire() : text, {
                 targetFormat: 'sfnt',
                 ...(isVariable ? { variationAxes: { wght: weight } } : {}),
               })

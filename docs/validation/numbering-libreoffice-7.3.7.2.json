@@ -1,0 +1,301 @@
+{
+  "reproducer": "tests/e2e/scripts/numbering-compatibility.ts",
+  "reproducerSha256": "79655244ac70726aac26a1e99c4a017ca9b165b50c1cb2b990d877187f1dc03e",
+  "renderer": "LibreOffice 7.3.7.2 30(Build:2)",
+  "generatedAt": "2026-10-08T21:48:50.570Z",
+  "pptxSha256": "978f16afd3dff3384d4f45d5cf25d411c944d830556b08f95d8bebeb00b5d13b",
+  "pdfSha256": "59b27a0c95bee586e267df25e4ec95ba01977b6cb4ebda632ad831cb54f4fa8c",
+  "applicationScope": "LibreOffice PDF export only; no PowerPoint/WPS/Keynote editing or save/reopen claims.",
+  "pageCount": 21,
+  "warnings": [
+    {
+      "code": "numbering-compatibility",
+      "elementId": "body",
+      "message": "Paragraph 3: explicit numbering restart is preserved in buAutoNum; Empty paragraphs and repeated starts may be ignored; LibreOffice may continue at startAt=1. Verify numbering in the target application."
+    },
+    {
+      "code": "numbering-compatibility",
+      "elementId": "body",
+      "message": "Paragraph 5: explicit numbering restart is preserved in buAutoNum; Empty paragraphs and repeated starts may be ignored; LibreOffice may continue at startAt=1. Verify numbering in the target application."
+    },
+    {
+      "code": "numbering-compatibility",
+      "elementId": "body",
+      "message": "Paragraph 2: explicit numbering restart is preserved in buAutoNum; Empty paragraphs and repeated starts may be ignored; LibreOffice may continue at startAt=1. Verify numbering in the target application."
+    }
+  ],
+  "results": [
+    {
+      "name": "nesting-empty-and-plain",
+      "page": 1,
+      "intended": [
+        "5. A",
+        "6. B",
+        "3. C",
+        "Plain",
+        "4. D",
+        "7. E",
+        "3. F",
+        "8. G"
+      ],
+      "observed": [
+        "5. A",
+        "6. B",
+        "3. C",
+        "Plain",
+        "4. D",
+        "7. E",
+        "3. F",
+        "8. G"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "restart-after-continuation",
+      "page": 2,
+      "intended": [
+        "5. A",
+        "6. B",
+        "2. C",
+        "3. D",
+        "5. E",
+        "6. F"
+      ],
+      "observed": [
+        "5. A",
+        "6. B",
+        "2. C",
+        "3. D",
+        "5. E",
+        "6. F"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "restart-at-one",
+      "page": 3,
+      "intended": [
+        "5. A",
+        "6. B",
+        "1. C",
+        "2. D"
+      ],
+      "observed": [
+        "5. A",
+        "6. B",
+        "7. C",
+        "8. D"
+      ],
+      "status": "known-difference"
+    },
+    {
+      "name": "adjacent-identical-starts",
+      "page": 4,
+      "intended": [
+        "5. A",
+        "5. B",
+        "6. C"
+      ],
+      "observed": [
+        "5. A",
+        "6. B",
+        "7. C"
+      ],
+      "status": "known-difference"
+    },
+    {
+      "name": "character-interruption",
+      "page": 5,
+      "intended": [
+        "5. A",
+        "• Char",
+        "5. B",
+        "6. C"
+      ],
+      "observed": [
+        "5. A",
+        "• Char",
+        "5. B",
+        "6. C"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "arabicPeriod",
+      "page": 6,
+      "intended": [
+        "27. Format"
+      ],
+      "observed": [
+        "27. Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "arabicParenR",
+      "page": 7,
+      "intended": [
+        "27) Format"
+      ],
+      "observed": [
+        "27) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "arabicParenBoth",
+      "page": 8,
+      "intended": [
+        "(27) Format"
+      ],
+      "observed": [
+        "(27) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "arabicPlain",
+      "page": 9,
+      "intended": [
+        "27 Format"
+      ],
+      "observed": [
+        "27 Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "alphaLcPeriod",
+      "page": 10,
+      "intended": [
+        "aa. Format"
+      ],
+      "observed": [
+        "aa. Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "alphaUcPeriod",
+      "page": 11,
+      "intended": [
+        "AA. Format"
+      ],
+      "observed": [
+        "AA. Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "alphaLcParenR",
+      "page": 12,
+      "intended": [
+        "aa) Format"
+      ],
+      "observed": [
+        "aa) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "alphaUcParenR",
+      "page": 13,
+      "intended": [
+        "AA) Format"
+      ],
+      "observed": [
+        "AA) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "alphaLcParenBoth",
+      "page": 14,
+      "intended": [
+        "(aa) Format"
+      ],
+      "observed": [
+        "(aa) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "alphaUcParenBoth",
+      "page": 15,
+      "intended": [
+        "(AA) Format"
+      ],
+      "observed": [
+        "(AA) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "romanLcPeriod",
+      "page": 16,
+      "intended": [
+        "xxvii. Format"
+      ],
+      "observed": [
+        "xxvii. Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "romanUcPeriod",
+      "page": 17,
+      "intended": [
+        "XXVII. Format"
+      ],
+      "observed": [
+        "XXVII. Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "romanLcParenR",
+      "page": 18,
+      "intended": [
+        "xxvii) Format"
+      ],
+      "observed": [
+        "xxvii) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "romanUcParenR",
+      "page": 19,
+      "intended": [
+        "XXVII) Format"
+      ],
+      "observed": [
+        "XXVII) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "romanLcParenBoth",
+      "page": 20,
+      "intended": [
+        "(xxvii) Format"
+      ],
+      "observed": [
+        "(xxvii) Format"
+      ],
+      "status": "matched"
+    },
+    {
+      "name": "romanUcParenBoth",
+      "page": 21,
+      "intended": [
+        "(XXVII) Format"
+      ],
+      "observed": [
+        "(XXVII) Format"
+      ],
+      "status": "matched"
+    }
+  ],
+  "localArtifacts": ".fastppt/validation/numbering/"
+}

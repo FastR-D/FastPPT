@@ -1,0 +1,9 @@
+{
+  "id": "7a46cee65826",
+  "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+  "sourceSha256": "156cb8939fc43f96559b525c673c8bebb338f1fca77ce6b2e823b2a16d46befc",
+  "pages": 16,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

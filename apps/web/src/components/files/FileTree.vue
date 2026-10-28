@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Box } from '@fastppt/components'
 import FileTreeNode from './FileTreeNode.vue'
 
 import type { FileNode } from '@fastppt/protocol'
@@ -12,7 +13,7 @@ defineEmits<{ select: [path: string] }>()
 </script>
 
 <template>
-  <div class="file-tree">
+  <Box class="file-tree">
     <FileTreeNode
       v-for="node in nodes"
       :key="node.path"
@@ -21,7 +22,7 @@ defineEmits<{ select: [path: string] }>()
       :depth="0"
       @select="$emit('select', $event)"
     />
-  </div>
+  </Box>
 </template>
 
 <style scoped>

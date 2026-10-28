@@ -1,3 +1,6 @@
+import { AnimationLibrary } from '@fastppt/animations'
+import { ResourceLibrary, summarizeComposition } from '@fastppt/resources'
+import { PaletteLibrary, PaletteSearchSchema } from '@fastppt/palettes'
 import { access, readFile, realpath, stat } from 'node:fs/promises'
 import { isIP } from 'node:net'
 import { basename, extname, join, posix, resolve } from 'node:path'
@@ -5,13 +8,21 @@ import { basename, extname, join, posix, resolve } from 'node:path'
 import { listCollections, searchIcons } from '@fastppt/icons'
 import { ManagedSkillInstaller } from '@fastppt/fastppt-skill'
 import { formatSlidevMarkdown } from '@fastppt/markdown'
+import { parseSlidevDocument } from '@fastppt/markdown/parser'
 import { runThemeExtraction } from './theme-extraction.js'
-import { designThemeLayouts } from './theme-design.js'
+import { createTheme } from './theme-create.js'
+import {
+  designThemeLayouts,
+  designThemeSystem,
+  themeDesignSampleDeck,
+  themeDesignSamplePath,
+  ThemeDesignSpecSchema,
+} from './theme-design.js'
 import { isContained, resolveExistingPath } from '@fastppt/workspace'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
-import type { ThemeRegistry } from '@fastppt/theme-registry'
+import { ThemeRulesDocumentSchema, themeRulesDigest, themeRuleEvidenceRequirements, type ThemeRegistry } from '@fastppt/theme-registry'
 import type { WorkspaceService } from '@fastppt/workspace'
 
 export const FASTPPT_MCP_TOOL_NAMES = [
@@ -21,7 +32,11 @@ export const FASTPPT_MCP_TOOL_NAMES = [
   'get_theme_rules',
   'get_theme_skill',
   'import_theme_from_pptx',
+  'create_theme',
   'design_theme_layouts',
+  'design_theme_system',
+  'create_theme_design_samples',
+  'review_theme_design_samples',
   'read_slides',
   'write_slides',
   'format_slides',
@@ -42,6 +57,12 @@ export const FASTPPT_MCP_TOOL_NAMES = [
   'export_editable_pptx',
   'list_icon_collections',
   'search_icons',
+  'search_resources',
+  'read_resource',
+  'search_animations',
+  'read_animation',
+  'search_palettes',
+  'read_palette',
 ] as const
 
 const DeckPathSchema = z.object({
@@ -51,6 +72,7 @@ const FormatSlidesInputSchema = DeckPathSchema.extend({
   dryRun: z.boolean().default(false),
 })
 const ThemeInputSchema = z.object({ themeId: z.string().min(1) })
+const THEME_ID = /^slidev-theme-[a-z0-9-]+$/
 const ThemeSkillInputSchema = ThemeInputSchema.extend({
   harness: z.enum(['claude', 'codex']),
 })
@@ -290,23 +312,7 @@ function result(data: unknown) {
 }
 
 function slideChunks(source: string): string[] {
-  const delimiter = /\r?\n---\r?\n/g
-  const chunks: string[] = []
-  let start = 0
-  let match: RegExpExecArray | null
-  let inFrontmatter = source.startsWith('---\n') || source.startsWith('---\r\n')
-  while ((match = delimiter.exec(source))) {
-    if (inFrontmatter) {
-      inFrontmatter = false
-      continue
-    }
-    chunks.push(source.slice(start, match.index).trim())
-    start = match.index + match[0].length
-    const next = source.slice(start, source.indexOf('\n', start)).trim()
-    inFrontmatter = /^(layout|class|clicks|background|transition):/.test(next)
-  }
-  chunks.push(source.slice(start).trim())
-  return chunks.filter(Boolean)
+  return parseSlidevDocument(source).map(slide => slide.raw)
 }
 
 function imagePaths(source: string): string[] {
@@ -320,6 +326,9 @@ function imagePaths(source: string): string[] {
 }
 
 export class FastPptMcpService {
+  readonly resources = new ResourceLibrary()
+  readonly animations = new AnimationLibrary()
+  readonly palettes = new PaletteLibrary()
   readonly #options: FastPptMcpServiceOptions
   readonly #installer: ManagedSkillInstaller
   readonly #browserCapture: BrowserCaptureDelegate | undefined
@@ -388,11 +397,26 @@ export class FastPptMcpService {
 
   async getThemeRules(themeId: string) {
     const theme = this.#options.registry.resolve(themeId)
+    const document = theme.machineRulesPath
+      ? ThemeRulesDocumentSchema.parse(JSON.parse(await readFile(
+          await resolveExistingPath(theme.packageRoot, theme.manifest.machineRulesFile!),
+          'utf8',
+        )))
+      : null
+    const digest = document ? themeRulesDigest(document) : null
+    if (digest !== (theme.machineRulesDigest ?? null))
+      throw new Error('Theme machine rules changed after registration. Reload the theme registry before authoring.')
     return {
       themeId,
       skillId: theme.manifest.skill.id,
       skillVersion: theme.manifest.skill.version,
       rules: await readFile(theme.rulesPath, 'utf8'),
+      contentDigest: theme.contentDigest,
+      machineRules: document,
+      machineRulesDigest: digest,
+      machineRulesSource: theme.manifest.machineRulesFile ?? null,
+      machineRulesStatus: document ? document.rules.length ? 'available' : 'empty' : 'absent',
+      evidenceRequirements: document ? themeRuleEvidenceRequirements(document).map(requirement => ({ ...requirement, source: `${theme.manifest.machineRulesFile}#${requirement.ruleId}` })) : [],
     }
   }
 
@@ -403,11 +427,15 @@ export class FastPptMcpService {
       skillId: theme.manifest.skill.id,
       version: theme.manifest.skill.version,
       source: theme.skillSourceDir,
-      installation: await this.#installer.themeStatus(harness, themeId),
+      installation: await this.#installer.ensureTheme(harness, themeId),
     }
   }
 
   /** Extract a theme from a workspace PPTX and create a Slidev theme package. */
+  async createTheme(themeId: string, displayName: string, design: z.input<typeof ThemeDesignSpecSchema>) {
+    return createTheme({ themesRoot: this.#themesRoot, themeId, displayName, design })
+  }
+
   async importThemeFromPptx(filePath: string, themeName?: string) {
     const absolute = resolve(this.#options.workspace.root, filePath)
     if (!isContained(this.#options.workspace.root, absolute)) {
@@ -446,9 +474,66 @@ export class FastPptMcpService {
       hint?: string | undefined
     }>,
   ) {
-    const themeDir = join(this.#themesRoot, themeId)
+    const themeDir = this.#themeDirectory(themeId)
     await access(join(themeDir, 'package.json'))
     return designThemeLayouts({ themeDir, layouts, components })
+  }
+
+  /** Compile an agent-authored design contract into a portable theme system. */
+  async designThemeSystem(
+    themeId: string,
+    design: z.input<typeof ThemeDesignSpecSchema>,
+  ) {
+    const themeDir = this.#themeDirectory(themeId)
+    await access(join(themeDir, 'package.json'))
+    return designThemeSystem({ themeDir, design })
+  }
+
+  /** Write a five-slide visual-review deck for a compiled design system. */
+  async createThemeDesignSamples(themeId: string) {
+    const themeDir = this.#themeDirectory(themeId)
+    const spec = ThemeDesignSpecSchema.parse(
+      JSON.parse(
+        await readFile(join(themeDir, 'agent', 'theme-design.json'), 'utf8'),
+      ),
+    )
+    const path = themeDesignSamplePath(themeId)
+    const written = await this.#options.workspace.writeTextFile({
+      path,
+      content: themeDesignSampleDeck(themeId, spec),
+    })
+    return { path: written.path, revision: written.revision, slides: 5 }
+  }
+
+  /**
+   * Inspect all design fixtures only when the normal preview is already ready.
+   * This avoids spawning browser-delegation jobs from a background harness with
+   * no browser client available to complete them.
+   */
+  async reviewThemeDesignSamples(themeId: string) {
+    this.#themeDirectory(themeId)
+    const path = themeDesignSamplePath(themeId)
+    await this.#options.workspace.readTextFile(path)
+    const preview = await this.getPreviewStatus(path)
+    if (preview.status !== 'ready')
+      return {
+        path,
+        reviewAvailable: false,
+        preview,
+        message:
+          'Open the theme sample deck in FastPPT Preview, then call this tool again.',
+      }
+    const slides: Array<{
+      slide: number
+      quality: unknown
+      overflow: unknown
+    }> = []
+    for (let slide = 1; slide <= 5; slide++) {
+      const quality = await this.inspectQuality(path, slide)
+      const overflow = await this.inspectOverflow(path, slide)
+      slides.push({ slide, quality, overflow })
+    }
+    return { path, reviewAvailable: true, slides }
   }
 
   readSlides(path = 'slides.md') {
@@ -771,10 +856,19 @@ export class FastPptMcpService {
   dispose(): Promise<void> {
     return Promise.resolve()
   }
+
+  #themeDirectory(themeId: string): string {
+    if (!THEME_ID.test(themeId)) throw new Error(`Invalid theme id: ${themeId}`)
+    return join(this.#themesRoot, themeId)
+  }
 }
 
 export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
   const server = new McpServer({ name: 'fastppt-mcp', version: '0.1.0' })
+  server.registerTool('create_theme', {
+    description: 'Create a new Slidev theme from a complete design contract without a source PPTX. Existing themes are never overwritten.',
+    inputSchema: { themeId: z.string().regex(THEME_ID), displayName: z.string().trim().min(1).max(120), design: ThemeDesignSpecSchema },
+  }, async ({ themeId, displayName, design }) => result(await service.createTheme(themeId, displayName, design)))
   server.registerTool(
     'get_workspace',
     { description: 'Get the fixed FastPPT workspace.' },
@@ -796,7 +890,7 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
   server.registerTool(
     'get_theme_rules',
     {
-      description: 'Read rules for one registered theme.',
+      description: 'Read human guidance, machine rules, their digest and evidence requirements for one registered theme. Absence or an empty rule set is not a compliance result.',
       inputSchema: ThemeInputSchema,
     },
     async ({ themeId }) => result(await service.getThemeRules(themeId)),
@@ -880,6 +974,53 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
           components ?? [],
         ),
       ),
+  )
+  server.registerTool(
+    'design_theme_system',
+    {
+      description:
+        'Compile an agent-designed visual system into a theme. Submit a structured design contract with palette, typography, geometry, signature components, and semantic layouts; the server generates safe token-based Vue/CSS sources and updates the Theme Skill.',
+      inputSchema: {
+        themeId: z
+          .string()
+          .describe('The imported theme id, e.g. slidev-theme-<slug>'),
+        design: ThemeDesignSpecSchema.describe(
+          'The complete, versioned design contract to materialize.',
+        ),
+      },
+    },
+    async ({ themeId, design }) =>
+      result(await service.designThemeSystem(themeId, design)),
+  )
+  server.registerTool(
+    'create_theme_design_samples',
+    {
+      description:
+        'Create or refresh a five-slide workspace deck for visual review of a compiled theme design system. The deck exercises cover, narrative, metrics, media, and closing treatments and can be opened in the normal FastPPT preview.',
+      inputSchema: {
+        themeId: z
+          .string()
+          .describe('The theme id that already has agent/theme-design.json'),
+      },
+    },
+    async ({ themeId }) =>
+      result(await service.createThemeDesignSamples(themeId)),
+  )
+  server.registerTool(
+    'review_theme_design_samples',
+    {
+      description:
+        'Run quality and overflow inspections across the five generated theme-design samples. First open that sample deck in FastPPT Preview. Use returned issues to revise the design contract with design_theme_system.',
+      inputSchema: {
+        themeId: z
+          .string()
+          .describe(
+            'The theme id whose generated sample deck should be reviewed',
+          ),
+      },
+    },
+    async ({ themeId }) =>
+      result(await service.reviewThemeDesignSamples(themeId)),
   )
   server.registerTool(
     'read_slides',
@@ -1074,5 +1215,47 @@ export function createFastPptMcpServer(service: FastPptMcpService): McpServer {
         }),
       ),
   )
+  server.registerTool('search_resources', {
+    description: 'Search reusable Slidev page layouts and logic diagrams by slide purpose, relationship, density and keywords. Returns ranked summaries and conversion limitations; read candidates before composing with the active theme.',
+    inputSchema: z.object({ query: z.string().max(2000).default(''), kind: z.enum(['layout', 'diagram']).optional(), density: z.enum(['airy', 'balanced', 'dense']).optional(), limit: z.number().int().min(1).max(20).default(6), offset: z.number().int().min(0).default(0) }),
+  }, async (input) => result(await service.resources.search(input)))
+  server.registerTool('read_resource', {
+    description: 'Read one Slidev composition reference, its source/licensing and reconstruction warnings. Adapt its structure to the active theme; copy local assets into the deck and preserve factual content.',
+    inputSchema: z.object({ id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,100}$/), maxChars: z.number().int().min(4000).max(300000).default(60000) }),
+  }, async ({ id, maxChars }) => {
+    const value = await service.resources.read(id)
+    if (!value) return { content: [{ type: 'text' as const, text: 'Resource not found' }], isError: true }
+    const assets = [...value.markdown.matchAll(/(?:src|href|xlink:href)="(\.\.\/assets\/[^"<>]+)"/g), ...value.markdown.matchAll(/url\(["']?(\.\.\/assets\/[a-f0-9]+\.[a-z0-9]+)["']?\)/g)]
+    const assetPaths = await Promise.all([...new Set(assets.map(match => match[1]!))].map(async path => ({ reference: path, localPath: await service.resources.filePath(path.slice(3)) })))
+    const sourcePath = await service.resources.filePath(value.resource.file)
+    const { searchText, ...resource } = value.resource
+    void searchText
+    return result({ resource, sourcePath, compositionPath: value.compositionPath, composition: value.composition ? summarizeComposition(value.composition) : null, compositionWarning: value.compositionWarning, sourceChars: value.markdown.length, markdown: value.markdown.length <= maxChars ? value.markdown : null,
+      ...(value.markdown.length > maxChars ? { notice: 'Source exceeds response budget. Read sourcePath locally or request a larger maxChars. Do not treat a partial source as a complete page.' } : {}), assets: assetPaths })
+  })
+  server.registerTool('search_animations', {
+    description: 'Find creative text/image/reveal/elastic/path/choreography effects. These are object motion references, not page layouts. Inspect candidates before binding effects to actual object anchors.',
+    inputSchema: z.object({ query:z.string().max(2000).default(''),category:z.string().optional(),scope:z.enum(['object','multi-object']).optional(),offset:z.number().int().min(0).default(0),limit:z.number().int().min(1).max(20).default(6) }),
+  }, async input => result(await service.animations.search(input)))
+  server.registerTool('read_animation', {
+    description: 'Read a creative motion reference, native timing and browser limitations. Bind source targets explicitly to the destination object anchors; keep the existing theme and page. Do not insert the whole demo page unless requested.',
+    inputSchema: z.object({id:z.string().regex(/^[a-f\d]{12}-\d{4}$/),maxChars:z.number().int().min(4000).max(300000).default(60000)}),
+  }, async ({id,maxChars}) => {
+    const value=await service.animations.read(id)
+    if(!value)return {content:[{type:'text' as const,text:'Animation not found'}],isError:true}
+    const sourcePath=await service.animations.filePath(value.resource.motionFile)
+    return result({resource:value.resource,sourcePath,motion:JSON.stringify(value.motion).length<=maxChars?value.motion:null,notice:'Bind the selected motion targets to actual page anchors. Native timing exports via Slidewave; browser preview limits are listed in warnings.'})
+  })
+  server.registerTool('search_palettes', {
+    description: 'Search sourced color palettes by mood, hue, design intent, source, scheme type and color count. Read candidates before assigning background/text/accent roles; preserve the confirmed theme unless recoloring is requested.',
+    inputSchema: PaletteSearchSchema,
+  }, async input => result(await service.palettes.search(input)))
+  server.registerTool('read_palette', {
+    description: 'Read exact palette hex colors, provenance and design tags. Verify text/background contrast for the chosen roles.',
+    inputSchema: z.object({ id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,100}$/) }),
+  }, async ({ id }) => {
+    const palette = await service.palettes.read(id)
+    return palette ? result(palette) : { content: [{ type: 'text' as const, text: 'Palette not found' }], isError: true }
+  })
   return server
 }

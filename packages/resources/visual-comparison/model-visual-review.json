@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "scope": "Model visual inspection of representative/problem pages, with final residual-difference pairs; automated comparison separately covers all 3708 pages.",
+  "remainingDifferences": [
+    {
+      "id": "11ebacee969e-0023",
+      "markdownSha256": "31298c4893d000712c03b51444c7f790947f9d5c311803554c4bcc71277ae4d6",
+      "sourceImageSha256": "054eef385ce2a036d3a51dfbbe610958e7bde1bc57ab26bc5604a9c01ac6157a",
+      "replicaImageSha256": "a4059db599903bec25d697f88933716abe62f1a7a6037d991fe19bcaca49ac46",
+      "blockSsim": 0.907502,
+      "normalizedMae": 0.016135,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "文字和结构完整；部分细线、描边与浏览器抗锯齿仍有差异。"
+      }
+    },
+    {
+      "id": "560c86eda0e3-0009",
+      "markdownSha256": "632c912e5becbe0e4ceb7d37ef3732f8ff9482a7c4674c6b4a6bf165780c3c06",
+      "sourceImageSha256": "e89217648991f48fa08fb02ed360f5e480e0a5cc767b066ec5a47d4d1cad4b3d",
+      "replicaImageSha256": "344cd6560d1f54179a2daf075e267b968505002816dee58c7ec8026db0658df6",
+      "blockSsim": 0.916088,
+      "normalizedMae": 0.01102,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "图文位置与遮挡顺序完整；照片纹理采样、少量字形边缘有轻微差异。"
+      }
+    },
+    {
+      "id": "71caabc93d70-0016",
+      "markdownSha256": "371fec964add706fa14fc0ec1086c888feb27c469377e71f167ac7260f7471d4",
+      "sourceImageSha256": "615dfd208f2c24af4d794499bcee97fec08a57c019affb9135af08c524633067",
+      "replicaImageSha256": "61dc7817c87a3d61656ac31fa466941adf0482542b83a172dfe9ab1e4cf5962b",
+      "blockSsim": 0.892332,
+      "normalizedMae": 0.019428,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "封面构图、裁切和文字位置完整；高频曲线在两种渲染器中的像素边缘有差异。"
+      }
+    },
+    {
+      "id": "c9f1632d31e4-0211",
+      "markdownSha256": "cc9a7f412d8126bc3aae620886952ad1649591bc21d5e2ef12d388c79dc59b16",
+      "sourceImageSha256": "03a5eddd472e83a2f8884098bf9cf42ee5c97b8bc53ae1e901429e383be30f55",
+      "replicaImageSha256": "034e852b39db0bf74326e3c127bd135cd7d936fd4f7881f1b51720414831f92d",
+      "blockSsim": 0.916653,
+      "normalizedMae": 0.025059,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "照片内容与裁切完整；树枝和雪景细节的缩放采样存在差异。"
+      }
+    },
+    {
+      "id": "e888597c48f2-0097",
+      "markdownSha256": "8fba1f551e1ae68a71503b93a539a6a3a3038bdde936c00366aebe9a3359ca24",
+      "sourceImageSha256": "4b25b3c4639f50154dd17629368d0a730c6f6946e337b2948f6da65edbe1cfe9",
+      "replicaImageSha256": "1ae370bf787d0ab19d74fa9c595721650518bc1f6d98746c7a884c5ef430ad1d",
+      "blockSsim": 0.909953,
+      "normalizedMae": 0.015447,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "图文结构、内容和裁切完整；细线、字体栅格化与照片采样仍有轻微差异。"
+      }
+    },
+    {
+      "id": "e888597c48f2-0107",
+      "markdownSha256": "18e0db60a4512dc2b06fcd5f8bc1c636ddec4362c3e0a470d0d76f9d60dbf86e",
+      "sourceImageSha256": "2afa1f209a1cf32a0ad5bc627bc6e431ea1f269185b7b5d71d72cee0859579f7",
+      "replicaImageSha256": "38c2ca14e3d4c2f17eca00cd9f6dfe8039f73d8c8e20906a040d894d316dd55d",
+      "blockSsim": 0.906627,
+      "normalizedMae": 0.019945,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "图文结构、内容和裁切完整；细线、字体栅格化与照片采样仍有轻微差异。"
+      }
+    },
+    {
+      "id": "e888597c48f2-0185",
+      "markdownSha256": "5e5b6f76891070600bcb6deba3d159fbcc0ce3832c5a33344ff17a121da7d100",
+      "sourceImageSha256": "f1486d02e903b5ee1df6d30a797dbc075effb11fc39f43a78a42723103e64722",
+      "replicaImageSha256": "0a3d49d45e6b84a3a45480a4bf0438a53c21e3e85c5fc2c0aa3ebcec0f0defe3",
+      "blockSsim": 0.900302,
+      "normalizedMae": 0.017116,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "图文结构、内容和裁切完整；细线、字体栅格化与照片采样仍有轻微差异。"
+      }
+    },
+    {
+      "id": "e888597c48f2-0216",
+      "markdownSha256": "37a62a1f50d60993255de3594d5fdb4e6e8d5e487835b62333c4a68a20b16b68",
+      "sourceImageSha256": "d65763124b05daf7a2dcad1f7c1a2930bc888fce7c8a813e91d0d5dc2f8eac0c",
+      "replicaImageSha256": "29f500168a1ecd45c6f169ab1deb67d024412fcacd8e86b48dcbf0e6d0edab53",
+      "blockSsim": 0.913325,
+      "normalizedMae": 0.018962,
+      "visualReview": {
+        "reviewer": "Codex model with view_image",
+        "status": "reviewed-minor-renderer-differences-retained",
+        "note": "图文结构、内容和裁切完整；细线、字体栅格化与照片采样仍有轻微差异。"
+      }
+    }
+  ],
+  "slidevRuntimeCheck": "slidev-runtime-check.json",
+  "fontValidation": {
+    "fonts": 67,
+    "unicodeMappings": 13033,
+    "errors": 0
+  }
+}

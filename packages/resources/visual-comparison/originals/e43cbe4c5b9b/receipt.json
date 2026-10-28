@@ -1,0 +1,9 @@
+{
+  "id": "e43cbe4c5b9b",
+  "source": "references/GordenPPTSkill/templates/data-viz-deck/template.pptx",
+  "sourceSha256": "ceb16faad8ac784b514a2dcc140933077049dcb744a2fa7be89a3a7a7da24923",
+  "pages": 41,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

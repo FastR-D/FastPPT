@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "slideId": "e888597c48f2-0263",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s5",
+      "label": "s5",
+      "static": false,
+      "effects": [
+        {
+          "id": "e888597c48f2-0263-effect-1",
+          "kind": "native",
+          "target": "s5",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 2000.0,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 2000.0,
+              "repeat": 1.0,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 1.0
+            },
+            "sourceDurationMs": 2000.0,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"6\" presetClass=\"emph\" presetSubtype=\"0\" decel=\"100000\" fill=\"hold\" nodeType=\"withEffect\"><p:childTnLst><p:animScale><p:cBhvr><p:cTn id=\"6\" dur=\"2000\" fill=\"hold\"/><p:tgtEl><p:spTgt spid=\"5\"/></p:tgtEl></p:cBhvr><p:by x=\"105000\" y=\"105000\"/></p:animScale></p:childTnLst></p:cTn>",
+            "sourceSpid": "5",
+            "sourceOrder": 0,
+            "class": "emph",
+            "presetId": "6",
+            "behaviors": [
+              {
+                "type": "animScale",
+                "attribute": null,
+                "durationMs": 2000.0,
+                "delayMs": 0,
+                "frames": [],
+                "from": null,
+                "to": null,
+                "by": {
+                  "x": 1.05,
+                  "y": 1.05
+                },
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": []
+}

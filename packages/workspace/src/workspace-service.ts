@@ -11,6 +11,7 @@ import {
   stat,
   unlink,
 } from 'node:fs/promises'
+import { spawn } from 'node:child_process'
 import { basename, dirname, join, relative, sep } from 'node:path'
 
 import type {
@@ -30,6 +31,56 @@ import {
 } from './path-policy.js'
 import { createRevision, isBinaryContent } from './revision.js'
 
+async function isGitRepositoryRoot(root: string): Promise<boolean> {
+  const toplevel = await new Promise<string | undefined>((resolve) => {
+    const child = spawn('git', ['rev-parse', '--show-toplevel'], {
+      cwd: root,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+    const chunks: Buffer[] = []
+    child.stdout.on('data', (chunk: Buffer) => chunks.push(chunk))
+    child.once('error', () => resolve(undefined))
+    child.once('close', (code) =>
+      resolve(
+        code === 0
+          ? Buffer.concat(chunks).toString('utf8').trim() || undefined
+          : undefined,
+      ),
+    )
+  })
+  if (!toplevel) return false
+  try {
+    return (await realpath(toplevel)) === root
+  } catch {
+    return false
+  }
+}
+
+async function gitIgnoredPaths(
+  root: string,
+  paths: readonly string[],
+): Promise<Set<string>> {
+  if (!paths.length) return new Set()
+  return await new Promise((resolve) => {
+    const child = spawn('git', ['check-ignore', '--no-index', '--stdin', '-z'], {
+      cwd: root,
+      stdio: ['pipe', 'pipe', 'ignore'],
+    })
+    const chunks: Buffer[] = []
+    child.stdout.on('data', (chunk: Buffer) => chunks.push(chunk))
+    child.once('error', () => resolve(new Set()))
+    child.once('close', (code) => {
+      if (code !== 0 && code !== 1) {
+        resolve(new Set())
+        return
+      }
+      const output = Buffer.concat(chunks).toString('utf8')
+      resolve(new Set(output.split('\0').filter(Boolean)))
+    })
+    child.stdin.end(`${paths.join('\0')}\0`)
+  })
+}
+
 export interface WorkspaceServiceOptions {
   maxReadBytes?: number
   ignorePatterns?: readonly string[]
@@ -43,13 +94,19 @@ export class WorkspaceService {
   private readonly maxTreeDepth: number
   private readonly maxTreeEntries: number
   private readonly isIgnored: (path: string) => boolean
+  private readonly gitIgnoreEnabled: boolean
 
-  private constructor(root: string, options: WorkspaceServiceOptions) {
+  private constructor(
+    root: string,
+    options: WorkspaceServiceOptions,
+    gitIgnoreEnabled: boolean,
+  ) {
     this.root = root
     this.maxReadBytes = options.maxReadBytes ?? 2 * 1024 * 1024
     this.maxTreeDepth = options.maxTreeDepth ?? 12
     this.maxTreeEntries = options.maxTreeEntries ?? 10_000
     this.isIgnored = createIgnoreMatcher(options.ignorePatterns)
+    this.gitIgnoreEnabled = gitIgnoreEnabled
   }
 
   static async create(
@@ -57,7 +114,12 @@ export class WorkspaceService {
     options: WorkspaceServiceOptions = {},
   ): Promise<WorkspaceService> {
     try {
-      return new WorkspaceService(await realpath(workspaceRoot), options)
+      const root = await realpath(workspaceRoot)
+      return new WorkspaceService(
+        root,
+        options,
+        await isGitRepositoryRoot(root),
+      )
     } catch (cause) {
       const code = (cause as NodeJS.ErrnoException).code
       if (code === 'ENOENT' || code === 'ENOTDIR') {
@@ -85,9 +147,24 @@ export class WorkspaceService {
       if (depth > this.maxTreeDepth) return []
       const entries = await readdir(directory, { withFileTypes: true })
       const nodes: FileNode[] = []
-      for (const entry of entries.sort((left, right) =>
-        left.name.localeCompare(right.name),
-      )) {
+      const candidates = entries
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((entry) => ({
+          entry,
+          absolutePath: join(directory, entry.name),
+          relativePath: relative(this.root, join(directory, entry.name))
+            .split(sep)
+            .join('/'),
+        }))
+        .filter(({ relativePath }) => !this.isIgnored(relativePath))
+      const ignored = this.gitIgnoreEnabled
+        ? await gitIgnoredPaths(
+            this.root,
+            candidates.map(({ relativePath }) => relativePath),
+          )
+        : new Set<string>()
+      for (const { entry, absolutePath, relativePath } of candidates) {
+        if (ignored.has(relativePath)) continue
         if (++visited > this.maxTreeEntries) {
           throw new WorkspaceError(
             'FILE_TOO_LARGE',
@@ -95,12 +172,6 @@ export class WorkspaceService {
             413,
           )
         }
-        const absolutePath = join(directory, entry.name)
-        const relativePath = relative(this.root, absolutePath)
-          .split(sep)
-          .join('/')
-        if (this.isIgnored(relativePath)) continue
-
         const metadata = await lstat(absolutePath)
         let resolved: string
         try {

@@ -1,0 +1,9 @@
+{
+  "id": "e46aa4161157",
+  "source": "references/GordenPPTSkill/templates/report-massive-charts/template.pptx",
+  "sourceSha256": "09be8eaf86127e3619089b4465a8f235159efdb91b4bcc99b7ed0bead65feea2",
+  "pages": 38,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

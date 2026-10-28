@@ -10,6 +10,8 @@ import { loadGatewayConfig } from '@fastppt/config'
 import { CLI_HELP, parseCliArguments } from './arguments.js'
 import { resolveCliRuntimePaths } from './paths.js'
 import { installBundledThemes } from './themes.js'
+import { CORE_HELP, isCoreCommand, parseCoreArguments } from './core-arguments.js'
+import { coreResultFailed, runCoreCommand } from './core.js'
 
 interface GatewayRuntime {
   version: number
@@ -269,6 +271,51 @@ async function runStop(workspaceInput: string, json: boolean): Promise<void> {
   if (!stopped) process.exitCode = 1
 }
 
+async function runDiagnose(workspaceInput: string, json: boolean): Promise<void> {
+  const root = await workspaceDirectory(workspaceInput)
+  const status = await gatewayStatus(root)
+  if (!status.running || !status.runtime) throw new Error(status.message)
+  const decks = await requestJson(`${status.runtime.url}/api/v1/decks`)
+  if (!Array.isArray(decks)) throw new Error('Gateway returned an invalid deck list.')
+  const narrationProviders = await requestJson(`${status.runtime.url}/api/v1/narration/providers`)
+  const deckList: unknown[] = decks
+  const reports = await Promise.all(deckList.map(async (deck) => {
+    if (!deck || typeof deck !== 'object' || !('id' in deck) || typeof deck.id !== 'string' || !deck.id) return { deck, deckId: 'unknown', error: 'Invalid deck summary.' }
+    const id = deck.id
+    try {
+      return { deck, deckId: id, capabilities: await requestJson(`${status.runtime!.url}/api/v1/decks/${encodeURIComponent(id)}/export-capabilities`) }
+    } catch (cause) {
+      return {
+        deck,
+        deckId: id,
+        error: cause instanceof Error ? cause.message : String(cause),
+      }
+    }
+  }))
+  const human = [`narration: ${JSON.stringify(narrationProviders)}`, ...reports.map((item) => {
+    if ('error' in item) return `${item.deckId}: ERROR ${item.error}`
+    const deckId = item.deckId
+    const capabilities = item.capabilities as { capabilities?: Record<string, string>; warnings?: string[]; blocks?: string[] }
+    const states = Object.entries(capabilities.capabilities ?? {}).map(([name, value]) => `${name}=${value}`).join(' ')
+    const blocks = capabilities.blocks?.length ? ` blocks=${capabilities.blocks.join(',')}` : ''
+    const warnings = capabilities.warnings?.length ? ` warnings=${capabilities.warnings.length}` : ''
+    return `${deckId}: ${states}${blocks}${warnings}`.trim()
+  })].join('\n')
+  printValue(json ? { workspaceRoot: root, narrationProviders, reports } : human, json)
+  const blocked = reports.some((report) => {
+    if ('error' in report) return true
+    const capabilities = report.capabilities
+    return (
+      typeof capabilities === 'object' &&
+      capabilities !== null &&
+      'blocks' in capabilities &&
+      Array.isArray(capabilities.blocks) &&
+      capabilities.blocks.length > 0
+    )
+  })
+  if (blocked) process.exitCode = 1
+}
+
 async function runStart(
   input: ReturnType<typeof parseCliArguments>,
   paths: ReturnType<typeof resolveCliRuntimePaths>,
@@ -328,9 +375,22 @@ async function runStart(
 
 async function main(): Promise<void> {
   const paths = resolveCliRuntimePaths(import.meta.url)
+  const argv = process.argv.slice(2)
+  if (isCoreCommand(argv)) {
+    const input = parseCoreArguments(argv, process.cwd())
+    if (input.help) {
+      process.stdout.write(CORE_HELP)
+      return
+    }
+    const value = await runCoreCommand(input, paths)
+    // Preserve structured results in both modes; --json also structures errors.
+    process.stdout.write(`${JSON.stringify(value, null, 2)}\n`)
+    if (coreResultFailed(value)) process.exitCode = 1
+    return
+  }
   const input = parseCliArguments(process.argv.slice(2), process.cwd())
   if (input.help) {
-    process.stdout.write(CLI_HELP)
+    process.stdout.write(CLI_HELP + '\n' + CORE_HELP)
     return
   }
   if (input.version) {
@@ -347,6 +407,9 @@ async function main(): Promise<void> {
     case 'stop':
       await runStop(input.workspaceRoot, input.json)
       break
+    case 'diagnose':
+      await runDiagnose(input.workspaceRoot, input.json)
+      break
     case 'start':
       await runStart(input, paths)
       break
@@ -354,8 +417,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((cause: unknown) => {
-  process.stderr.write(
-    `FastPPT command failed: ${cause instanceof Error ? cause.message : String(cause)}\n`,
-  )
+  const message = cause instanceof Error ? cause.message : String(cause)
+  if (process.argv.includes('--json')) process.stdout.write(`${JSON.stringify({ error: { message } })}\n`)
+  else process.stderr.write(`FastPPT command failed: ${message}\n`)
   process.exitCode = 1
 })

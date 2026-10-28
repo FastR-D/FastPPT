@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "slideId": "c9f1632d31e4-0192",
+  "transition": {
+    "kind": "none",
+    "durationMs": 500
+  },
+  "groups": [
+    {
+      "id": "s2",
+      "label": "s2",
+      "static": false,
+      "effects": [
+        {
+          "id": "c9f1632d31e4-0192-effect-1",
+          "kind": "native",
+          "target": "s2",
+          "trigger": "with-previous",
+          "delayMs": 0.0,
+          "durationMs": 59.4,
+          "params": {
+            "rootTiming": {
+              "baseDurationMs": 60.0,
+              "repeat": 0.99,
+              "autoReverse": false,
+              "accel": 0.0,
+              "decel": 0.0
+            },
+            "sourceDurationMs": 59.4,
+            "nativeXml": "<p:cTn xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\" id=\"5\" presetID=\"11\" presetClass=\"entr\" presetSubtype=\"0\" repeatCount=\"990\" fill=\"hold\" grpId=\"0\" nodeType=\"withEffect\"><p:iterate type=\"wd\"><p:tmPct val=\"50000\"/></p:iterate><p:childTnLst><p:set><p:cBhvr><p:cTn id=\"6\" dur=\"60\"><p:stCondLst><p:cond delay=\"0\"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid=\"2\"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val=\"visible\"/></p:to></p:set></p:childTnLst></p:cTn>",
+            "sourceSpid": "2",
+            "sourceOrder": 0,
+            "class": "entr",
+            "presetId": "11",
+            "behaviors": [
+              {
+                "type": "set",
+                "attribute": "style.visibility",
+                "durationMs": 60.0,
+                "delayMs": 0.0,
+                "frames": [],
+                "from": null,
+                "to": "visible",
+                "by": null,
+                "filter": null,
+                "transition": null,
+                "path": null,
+                "autoReverse": false,
+                "repeat": 1.0,
+                "accel": 0.0,
+                "decel": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "source": "system",
+  "diagnostics": [
+    "browser-whole-object-iteration; native-pptx-retains-iterate"
+  ]
+}

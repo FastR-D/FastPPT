@@ -1,4 +1,5 @@
 import { format } from 'prettier'
+import { parseSlidevDocument, parseSlidevPage } from './parser.js'
 import slidevPlugin from 'prettier-plugin-slidev'
 
 import type { ParserOptions } from 'prettier'
@@ -35,34 +36,30 @@ function formatLocation(cause: unknown): SlidevFormatLocation | undefined {
 }
 
 function normalizeFrontmatterSpacing(source: string): string {
-  const lines = source.split(/\r?\n/)
-  let inFrontmatter = false
-  let justOpened = false
-  const output: string[] = []
-  for (const line of lines) {
-    const delimiter = /^\s*---\s*$/.test(line)
-    if (delimiter) {
-      if (inFrontmatter) {
-        while (output.length > 0 && output.at(-1)?.trim() === '') output.pop()
-        output.push('---')
-        inFrontmatter = false
-        justOpened = false
-      } else if (output.length === 0 || output.at(-1)?.trim() === '') {
-        output.push('---')
-        inFrontmatter = true
-        justOpened = true
-      } else {
-        output.push('---')
-        inFrontmatter = true
-        justOpened = true
-      }
-      continue
-    }
-    if (inFrontmatter && justOpened && line.trim() === '') continue
-    if (inFrontmatter) justOpened = false
-    output.push(line)
+  // Whitespace after a page delimiter is significant to Slidev. Only trim
+  // inside parsed YAML headers, never after a plain slide separator.
+  const trimHeader = (raw: string): string =>
+    raw.replace(
+      /^(---\r?\n)([\s\S]*?)(\r?\n---)(?=\r?\n|$)/,
+      (_match: string, opening: string, body: string, closing: string) =>
+        `${opening}${body.trim()}${closing}`,
+    )
+  const prepared =
+    parseSlidevPage(source).frontmatterStyle === 'frontmatter'
+      ? trimHeader(source)
+      : source
+  const lines = prepared.split('\n')
+  for (const page of parseSlidevDocument(prepared).reverse()) {
+    if (page.frontmatterStyle !== 'frontmatter') continue
+    const replacement = trimHeader(page.raw)
+    if (replacement !== page.raw)
+      lines.splice(
+        page.start,
+        page.end - page.start,
+        ...replacement.split('\n'),
+      )
   }
-  return output.join('\n')
+  return lines.join('\n')
 }
 
 function mergeLeadingAdjacentFrontmatter(source: string): string {

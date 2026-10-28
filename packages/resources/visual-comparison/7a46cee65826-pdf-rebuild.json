@@ -1,0 +1,204 @@
+{
+  "source": {
+    "path": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+    "id": "7a46cee65826",
+    "sha256": "156cb8939fc43f96559b525c673c8bebb338f1fca77ce6b2e823b2a16d46befc",
+    "pages": 16,
+    "entries": [
+      "7a46cee65826-0001",
+      "7a46cee65826-0002",
+      "7a46cee65826-0003",
+      "7a46cee65826-0004",
+      "7a46cee65826-0005",
+      "7a46cee65826-0006",
+      "7a46cee65826-0007",
+      "7a46cee65826-0008",
+      "7a46cee65826-0009",
+      "7a46cee65826-0010",
+      "7a46cee65826-0011",
+      "7a46cee65826-0012",
+      "7a46cee65826-0013",
+      "7a46cee65826-0014",
+      "7a46cee65826-0015",
+      "7a46cee65826-0016"
+    ]
+  },
+  "records": [
+    {
+      "id": "7a46cee65826-0001",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 1,
+      "markdownSha256": "2db0c540df8d3094cdc6853c82e1209d86e6b275f6bc3000d48e18b224da9c90",
+      "layers": 11,
+      "textSpans": 2,
+      "original": "originals/7a46cee65826/0001.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0002",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 2,
+      "markdownSha256": "1c0a44b86aa9ea56af7679226918465bdb8069357f4d9c911ceef1dc4c269fe1",
+      "layers": 12,
+      "textSpans": 14,
+      "original": "originals/7a46cee65826/0002.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0003",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 3,
+      "markdownSha256": "e4157d529fb3996951d603ee88e25484f19c5b3ff51f96313acb4265bb306ee4",
+      "layers": 8,
+      "textSpans": 3,
+      "original": "originals/7a46cee65826/0003.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0004",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 4,
+      "markdownSha256": "47fd27e0f43c0ecda3085cdf4d0a8f92dd2f8a6447f38fdb2da52b8dca585aba",
+      "layers": 21,
+      "textSpans": 17,
+      "original": "originals/7a46cee65826/0004.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0005",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 5,
+      "markdownSha256": "25d165ebace0644b96a13dcfd66b731fa682cbdae76d1d71c7173e9ecdb43a86",
+      "layers": 20,
+      "textSpans": 22,
+      "original": "originals/7a46cee65826/0005.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0006",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 6,
+      "markdownSha256": "3275cdcc98da2621fab8a62c3f44aa1c1af20bbc256414b9ef4eeae251c9549c",
+      "layers": 25,
+      "textSpans": 22,
+      "original": "originals/7a46cee65826/0006.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0007",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 7,
+      "markdownSha256": "b82f1f8921672366376a9569b33ce8ca23272a45816bbb8b0e183d1151576038",
+      "layers": 8,
+      "textSpans": 3,
+      "original": "originals/7a46cee65826/0007.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0008",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 8,
+      "markdownSha256": "097320319b19bc50557884a57d8f2f5245e9499786dadd4dfe2450f93010159a",
+      "layers": 14,
+      "textSpans": 12,
+      "original": "originals/7a46cee65826/0008.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0009",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 9,
+      "markdownSha256": "3e6dc362d140cfeb3671136bc93b0266633e9b9e93c8bf2723eee474c1df5f17",
+      "layers": 16,
+      "textSpans": 23,
+      "original": "originals/7a46cee65826/0009.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0010",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 10,
+      "markdownSha256": "e66fafac4b9dc76e4444230e4c2b1585acc9eba5079aab584279835fd13449a1",
+      "layers": 8,
+      "textSpans": 3,
+      "original": "originals/7a46cee65826/0010.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0011",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 11,
+      "markdownSha256": "0122a586d300ec83cd5178714d316e6da65d8c3583bc9a2c394e6a5c1ac6dbb8",
+      "layers": 26,
+      "textSpans": 22,
+      "original": "originals/7a46cee65826/0011.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0012",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 12,
+      "markdownSha256": "b26c72de5686201761ecaafc8c2d5aa7163a7673903e4977fcc81397ab61459e",
+      "layers": 12,
+      "textSpans": 22,
+      "original": "originals/7a46cee65826/0012.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0013",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 13,
+      "markdownSha256": "decbe3abeaed07bf0da925c2a41f3dc0ea3ccc7e5492ae4dd6d21e9744b21e1b",
+      "layers": 8,
+      "textSpans": 3,
+      "original": "originals/7a46cee65826/0013.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0014",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 14,
+      "markdownSha256": "43f1b3191aad45531dc5926e25bc649ca09e48a5357ff4fb7ef3e9ee3a44ac32",
+      "layers": 100,
+      "textSpans": 18,
+      "original": "originals/7a46cee65826/0014.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0015",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 15,
+      "markdownSha256": "8f877a65133e641f02ba52e812da622663c061e457697f3a99743bf01cb9e16b",
+      "layers": 14,
+      "textSpans": 15,
+      "original": "originals/7a46cee65826/0015.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "7a46cee65826-0016",
+      "source": "references/GordenPPTSkill/templates/minimal-business-summary/template.pptx",
+      "sourcePage": 16,
+      "markdownSha256": "e358e0c823ccfbf3a512fac2ac5e321d706cf67ef6bb345a20fb645244d32c82",
+      "layers": 11,
+      "textSpans": 2,
+      "original": "originals/7a46cee65826/0016.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    }
+  ]
+}

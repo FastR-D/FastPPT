@@ -38,6 +38,9 @@ describe('database', () => {
       { name: '0004_image_production.sql' },
       { name: '0005_image_asset_status.sql' },
       { name: '0006_image_asset_provenance.sql' },
+      { name: '0007_presentation_documents.sql' },
+      { name: '0008_creation_wizards.sql' },
+      { name: '0009_pptx_import_jobs.sql' },
     ])
     first.recordWorkspace({
       id: 'workspace-1',
@@ -55,7 +58,7 @@ describe('database', () => {
       reopened.sqlite
         .prepare('SELECT COUNT(*) AS count FROM schema_migrations')
         .get(),
-    ).toEqual({ count: 7 })
+    ).toEqual({ count: 10 })
     reopened.close()
   })
 
@@ -104,6 +107,35 @@ describe('database', () => {
       status: 'accepted',
       accepted: true,
     })
+    database.close()
+  })
+
+  it('lists PPTX import jobs newest first and filters by theme', () => {
+    const database = createDatabase(':memory:')
+    database.recordPptxImportJob({ id: '00000000-0000-4000-8000-000000000001', themeId: 'theme-a', status: 'upload', decisions: [], createdAt: '2026-09-01T00:00:00.000Z', updatedAt: '2026-09-01T00:00:00.000Z' })
+    database.recordPptxImportJob({ id: '00000000-0000-4000-8000-000000000002', themeId: 'theme-b', status: 'ready', decisions: [], createdAt: '2026-09-03T00:00:00.000Z', updatedAt: '2026-09-03T00:00:00.000Z' })
+    database.recordPptxImportJob({ id: '00000000-0000-4000-8000-000000000003', themeId: 'theme-a', status: 'approved', decisions: [], createdAt: '2026-09-02T00:00:00.000Z', updatedAt: '2026-09-02T00:00:00.000Z' })
+    expect(database.listPptxImportJobs().map((job) => job.id)).toEqual(['00000000-0000-4000-8000-000000000002', '00000000-0000-4000-8000-000000000003', '00000000-0000-4000-8000-000000000001'])
+    expect(database.listPptxImportJobs('theme-a').map((job) => job.id)).toEqual(['00000000-0000-4000-8000-000000000003', '00000000-0000-4000-8000-000000000001'])
+    database.close()
+  })
+
+  it('persists PPTX import jobs', () => {
+    const database = createDatabase(':memory:')
+    const job = { id: 'job-1', themeId: 'slidev-theme-imported', status: 'propose', sourceHash: 'a'.repeat(64), analysisPath: 'IMPORT_ANALYSIS.json', decisions: [{ stepId: 'layout', selected: 'keep' }], createdAt: '2026-09-16T00:00:00.000Z', updatedAt: '2026-09-16T00:01:00.000Z' }
+    database.recordPptxImportJob(job)
+    expect(database.getPptxImportJob(job.id)).toMatchObject(job)
+    expect(database.getLatestPptxImportJob(job.themeId)).toMatchObject(job)
+    database.recordPptxImportJob({ ...job, status: 'approved', approvedAt: '2026-09-16T00:02:00.000Z' })
+    expect(database.getPptxImportJob(job.id)).toMatchObject({ status: 'approved', approvedAt: '2026-09-16T00:02:00.000Z' })
+  })
+
+  it('updates the theme id when an import leaves the pending stage', () => {
+    const database = createDatabase(':memory:')
+    const job = { id: 'job-pending', themeId: 'pending', status: 'upload', decisions: [], createdAt: '2026-09-16T00:00:00.000Z', updatedAt: '2026-09-16T00:00:00.000Z' }
+    database.recordPptxImportJob(job)
+    database.recordPptxImportJob({ ...job, themeId: 'slidev-theme-resolved', status: 'ready', updatedAt: '2026-09-16T00:01:00.000Z' })
+    expect(database.getPptxImportJob(job.id)).toMatchObject({ themeId: 'slidev-theme-resolved', status: 'ready' })
     database.close()
   })
 

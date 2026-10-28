@@ -1,0 +1,9 @@
+{
+  "id": "9facdc1b042c",
+  "source": "references/GordenPPTSkill/templates/red-teaching-framework/template.pptx",
+  "sourceSha256": "f083a1799e2a4ce2f66135c250977d1c348f582d6f004cca549f4a3b027fa256",
+  "pages": 30,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

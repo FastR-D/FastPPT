@@ -1,10 +1,10 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { ManagedSkillInstaller } from '@fastppt/fastppt-skill'
-import { loadThemeRegistry } from '@fastppt/theme-registry'
+import { loadThemeRegistry, ThemeRulesDocumentSchema, themeRulesDigest } from '@fastppt/theme-registry'
 import { WorkspaceService } from '@fastppt/workspace'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
@@ -95,6 +95,63 @@ layout: content
 }
 
 describe('FastPPT MCP', () => {
+  it('resolves SVG href and CSS webfont assets even when a resource exceeds the inline source budget', async () => {
+    const { service } = await fixture()
+    const reference = await service.resources.read('9a04224856b0-0134')
+    expect(reference).toBeDefined()
+    const hrefs = [...reference!.markdown.matchAll(/xlink:href="(\.\.\/assets\/[^"<>]+)"/g)].map(match => match[1]!)
+    expect(hrefs.length).toBeGreaterThan(0)
+    const fonts = [...reference!.markdown.matchAll(/url\("(\.\.\/assets\/[a-f0-9]+\.woff2)"\)/g)].map(match => match[1]!)
+    expect(fonts.length).toBeGreaterThan(0)
+    const server = createFastPptMcpServer(service)
+    const client = new Client({ name: 'resource-test', version: '0.1.0' })
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+    await Promise.all([server.connect(serverTransport), client.connect(clientTransport)])
+    try {
+      const response = await client.callTool({ name: 'read_resource', arguments: { id: '9a04224856b0-0134', maxChars: 4000 } })
+      const data = response.structuredContent as { markdown: string | null; sourceChars: number; assets: { reference: string; localPath: string }[] }
+      expect(data.sourceChars).toBe(reference!.markdown.length)
+      expect(data.markdown).toBeNull()
+      for (const href of new Set([...hrefs, ...fonts])) expect(data.assets).toContainEqual({ reference: href, localPath: await service.resources.filePath(href.slice(3)) })
+    } finally { await client.close(); await server.close() }
+  })
+  it('exposes machine rules and missing evidence without confusing absent, empty and available coverage', async () => {
+    const { workspaceRoot } = await fixture()
+    const copiedThemes = await temporaryDirectory('fastppt-rules-catalog-')
+    const copiedTheme = join(copiedThemes, 'slidev-theme-academy')
+    await cp(join(themesRoot, 'slidev-theme-academy'), copiedTheme, { recursive: true, filter: path => !path.split('/').includes('node_modules') })
+    const manifestPath = join(copiedTheme, 'agent/theme-manifest.json')
+    const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as Record<string, unknown>
+    delete manifest.machineRulesFile
+    await writeFile(manifestPath, JSON.stringify(manifest))
+    const workspace = await WorkspaceService.create(workspaceRoot)
+    const createService = async () => new FastPptMcpService({ workspace, workspaceName: 'rules', registry: await loadThemeRegistry(copiedThemes), commonSkillRoot, themesRoot: copiedThemes, extractorPath: resolve('extract-theme.mjs') })
+    await expect((await createService()).getThemeRules('slidev-theme-academy')).resolves.toMatchObject({ machineRules: null, machineRulesDigest: null, machineRulesStatus: 'absent', evidenceRequirements: [] })
+    manifest.machineRulesFile = 'agent/constraints.json'
+    await writeFile(manifestPath, JSON.stringify(manifest))
+    const rulePath = join(copiedTheme, 'agent/constraints.json')
+    const document = ThemeRulesDocumentSchema.parse({ version: 1, rules: [
+      { id: 'cover.layout', kind: 'first-layout', layout: 'cover', severity: 'error' },
+      { id: 'body.lines', kind: 'max-text-lines', value: 12, severity: 'error' },
+      { id: 'brand.token', kind: 'required-token', token: '--brand-primary', severity: 'warning' },
+    ] })
+    await writeFile(rulePath, JSON.stringify(document))
+    const withRules = await createService()
+    const result = await withRules.getThemeRules('slidev-theme-academy')
+    expect(result.rules).toContain('Academy theme rules')
+    expect(result).toMatchObject({ machineRules: document, machineRulesDigest: themeRulesDigest(document), machineRulesSource: 'agent/constraints.json', machineRulesStatus: 'available', evidenceRequirements: [
+      { ruleId: 'cover.layout', source: 'agent/constraints.json#cover.layout', authoring: 'compiled-structure', approval: 'catalog-structure', readback: { evidence: 'pptx-xml', providerAvailable: true } },
+      { ruleId: 'body.lines', authoring: 'browser-measurement', approval: 'unverified', readback: { evidence: 'pptx-render', providerAvailable: false } },
+      { ruleId: 'brand.token', readback: { evidence: 'output-token-mapping', providerAvailable: false } },
+    ] })
+    // An authoring response must not pair changed rules with the old theme lock.
+    await writeFile(rulePath, JSON.stringify({ version: 1, rules: [] }))
+    await expect(withRules.getThemeRules('slidev-theme-academy')).rejects.toThrow('changed after registration')
+    await expect((await createService()).getThemeRules('slidev-theme-academy')).resolves.toMatchObject({ machineRulesStatus: 'empty', machineRules: { version: 1, rules: [] }, evidenceRequirements: [] })
+    await writeFile(rulePath, '{invalid')
+    await expect(withRules.getThemeRules('slidev-theme-academy')).rejects.toThrow()
+  })
+
   it('exposes the complete stable tool catalog through the official protocol', async () => {
     const { service } = await fixture()
     const server = createFastPptMcpServer(service)
@@ -124,6 +181,19 @@ describe('FastPPT MCP', () => {
     })
     await client.close()
     await server.close()
+  })
+
+  it('inspects stable-ID pages using the same fenced-code and notes grammar as Slidev', async () => {
+    const { service, workspaceRoot } = await fixture()
+    await writeFile(join(workspaceRoot, 'slides.md'), [
+      '---', 'theme: slidev-theme-academy', 'fastpptId: first', '---',
+      '# First', '```md', '---', '# Code example', '```', '',
+      '---', 'fastpptId: second', 'layout: content', '---', '# Second',
+      '<!--', 'Speaker notes', '---', 'Still notes', '-->',
+    ].join('\r\n'))
+    await expect(service.validateSlides()).resolves.toMatchObject({ slideCount: 2 })
+    await expect(service.inspectSlide('slides.md', 2)).resolves.toMatchObject({ slide: 2, headings: ['Second'] })
+    await expect(service.inspectSlide('slides.md', 3)).rejects.toThrow('does not exist')
   })
 
   it('reads, formats and validates a registered workspace deck', async () => {
@@ -613,7 +683,10 @@ describe('FastPPT MCP', () => {
     )
     await writeFile(
       join(themeDir, 'agent', 'theme-manifest.json'),
-      JSON.stringify({ id: 'slidev-theme-test', layouts: [] }),
+      JSON.stringify({
+        id: 'slidev-theme-test',
+        layouts: [{ id: 'default', label: 'Default' }],
+      }),
     )
     await writeFile(
       join(themeDir, 'agent', 'SKILL.md'),
@@ -646,6 +719,140 @@ describe('FastPPT MCP', () => {
     await expect(
       readFile(join(themeDir, 'agent', 'SKILL.md'), 'utf8'),
     ).resolves.toContain('`data`: chart-heavy')
+    await service.dispose()
+  })
+
+  it('compiles a complete agent design contract into portable theme sources', async () => {
+    const fixtureThemes = await temporaryDirectory('fastppt-design-system-')
+    const themeDir = join(fixtureThemes, 'slidev-theme-test')
+    await mkdir(join(themeDir, 'agent'), { recursive: true })
+    await mkdir(join(themeDir, 'styles'), { recursive: true })
+    await writeFile(
+      join(themeDir, 'package.json'),
+      JSON.stringify({ name: 'slidev-theme-test', version: '0.1.0' }),
+    )
+    await writeFile(
+      join(themeDir, 'styles', 'index.ts'),
+      "import './base.css'\n",
+    )
+    await writeFile(join(themeDir, 'styles', 'base.css'), ':root {}\n')
+    await writeFile(
+      join(themeDir, 'agent', 'theme-manifest.json'),
+      JSON.stringify({
+        id: 'slidev-theme-test',
+        layouts: [{ id: 'default', label: 'Default' }],
+      }),
+    )
+    await writeFile(
+      join(themeDir, 'agent', 'SKILL.md'),
+      '---\nname: fastppt-theme-test\ndescription: Test theme.\n---\n\n## Registered layouts\n\n- `default`\n',
+    )
+    const { service, workspaceRoot } = await fixture({
+      themesRoot: fixtureThemes,
+    })
+    const result = await service.designThemeSystem('slidev-theme-test', {
+      motionPreset: 'business',
+      version: 1,
+      foundation: {
+        colors: {
+          canvas: '#FAF7F0',
+          ink: '#172033',
+          muted: '#667085',
+          primary: '#4059D6',
+          accent: '#E46A42',
+          surface: '#FFFFFF',
+          border: '#D9DEEA',
+        },
+        typography: { heading: 'Inter', body: 'Noto Sans SC' },
+        geometry: {
+          margin: '2.5rem',
+          gap: '1.25rem',
+          radius: '1rem',
+          ruleWidth: '3px',
+        },
+      },
+      components: [
+        {
+          name: 'InsightPanel',
+          purpose: 'Pairs a concise conclusion with supporting evidence.',
+          archetype: 'panel',
+          variants: ['quiet'],
+        },
+      ],
+      layouts: [
+        {
+          id: 'hero-media',
+          label: 'Hero media',
+          purpose: 'Open a chapter with a short narrative and dominant image.',
+          composition: 'media-right',
+          regions: ['content', 'media'],
+          nativePlaceholders: [{ index: 0, type: 'title', x: 100, y: 200, width: 3000, height: 400, textStyle: { language: 'zh-Hant', alternativeLanguage: '', fontFamily: 'Inter', fontSize: 28, color: '223344', bold: true, paragraph: { bullet: { kind: 'character', character: '•' }, bulletFont: { kind: 'font', fontFamily: 'Symbol' }, bulletSize: { kind: 'percent', value: 80 }, bulletColor: { kind: 'text' }, marginLeft: 500, indent: -200, tabStops: [{ position: 800, align: 'decimal' }], decimalTab: { separator: ',', provenance: 'user-declared', reason: 'Author confirms comma alignment', targetProfile: 'libreoffice-7.3.7.2-linux-fr-FR' } } }, textBody: { insets: { left: 0, bottom: 100 }, verticalAlign: 'middle', wrap: false, autoFit: 'none' } }],
+          nativeCanvas: { width: 10000, height: 5000 },
+          nativeFixedObjects: [{ name: 'Brand', x: 1000, y: 500, width: 2000, height: 500, fill: '112233', text: 'Brand {{ literal }} <text>', language: 'de-DE', alternativeLanguage: '' }],
+        },
+      ],
+      rules: {
+        density: 'airy',
+        imageTreatment: 'cropped editorial photography',
+        maxColorsPerSlide: 3,
+      },
+    })
+    expect(result.specFile).toBe('agent/theme-design.json')
+    expect(JSON.parse(await readFile(join(themeDir, 'agent', 'native-layouts.json'), 'utf8'))).toEqual([{ name: 'hero-media', canvas: { width: 10000, height: 5000 }, fixedObjects: [{ name: 'Brand', x: 1000, y: 500, width: 2000, height: 500, fill: '112233', text: 'Brand {{ literal }} <text>', language: 'de-DE', alternativeLanguage: '', fontFamily: 'Noto Sans SC', fontSize: 12, color: '172033' }], placeholders: [{ index: 0, type: 'title', x: 100, y: 200, width: 3000, height: 400, textStyle: { language: 'zh-Hant', alternativeLanguage: '', fontFamily: 'Inter', fontSize: 28, color: '223344', bold: true, paragraph: { bullet: { kind: 'character', character: '•' }, bulletFont: { kind: 'font', fontFamily: 'Symbol' }, bulletSize: { kind: 'percent', value: 80 }, bulletColor: { kind: 'text' }, marginLeft: 500, indent: -200, tabStops: [{ position: 800, align: 'decimal' }], decimalTab: { separator: ',', provenance: 'user-declared', reason: 'Author confirms comma alignment', targetProfile: 'libreoffice-7.3.7.2-linux-fr-FR' } } }, textBody: { insets: { left: 0, bottom: 100 }, verticalAlign: 'middle', wrap: false, autoFit: 'none' } }] }])
+    expect(result.layouts).toEqual([{ id: 'hero-media', label: 'Hero media' }])
+    const browserLayout = await readFile(join(themeDir, 'layouts', 'hero-media.vue'), 'utf8')
+    expect(browserLayout).toContain('data-fastppt-layout-object="Brand"')
+    expect(browserLayout).toContain('left:10%;top:10%;width:20%;height:10%')
+    expect(browserLayout).toContain('<div v-pre')
+    expect(browserLayout).toContain('Brand {{ literal }} &lt;text&gt;')
+    expect(browserLayout).toContain('font-family:&quot;Noto Sans SC&quot;')
+    expect(browserLayout).toContain('color:#172033')
+    await expect(
+      readFile(join(themeDir, 'agent', 'theme-design.json'), 'utf8'),
+    ).resolves.toContain('cropped editorial photography')
+    await expect(
+      readFile(join(themeDir, 'styles', 'agent-design-tokens.css'), 'utf8'),
+    ).resolves.toContain('--fastppt-design-primary: #4059D6')
+    await expect(
+      readFile(join(themeDir, 'styles', 'index.ts'), 'utf8'),
+    ).resolves.toContain("import './agent-design-tokens.css'")
+    await expect(
+      readFile(join(themeDir, 'layouts', 'hero-media.vue'), 'utf8'),
+    ).resolves.toContain('slot name="media"')
+    await expect(
+      readFile(join(themeDir, 'components', 'InsightPanel.vue'), 'utf8'),
+    ).resolves.toContain('fastppt-component-insight-panel')
+    const manifest = JSON.parse(
+      await readFile(join(themeDir, 'agent', 'theme-manifest.json'), 'utf8'),
+    ) as { designSystem?: { specFile: string }; layouts: Array<{ id: string }> }
+    expect(manifest).toMatchObject({ motionPreset: 'business' })
+    expect(manifest.designSystem?.specFile).toBe('agent/theme-design.json')
+    expect(manifest.layouts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'default' }),
+        expect.objectContaining({ id: 'hero-media' }),
+      ]),
+    )
+    await expect(
+      readFile(join(themeDir, 'agent', 'SKILL.md'), 'utf8'),
+    ).resolves.toContain('## Design system')
+    const sample = await service.createThemeDesignSamples('slidev-theme-test')
+    expect(sample).toMatchObject({
+      path: 'theme-samples/slidev-theme-test.md',
+      slides: 5,
+    })
+    const sampleContent = await readFile(
+      join(workspaceRoot, sample.path),
+      'utf8',
+    )
+    expect(sampleContent).toContain('theme: slidev-theme-test')
+    expect(sampleContent.match(/^layout:/gm)).toHaveLength(5)
+    await expect(
+      service.reviewThemeDesignSamples('slidev-theme-test'),
+    ).resolves.toMatchObject({
+      path: 'theme-samples/slidev-theme-test.md',
+      reviewAvailable: false,
+    })
     await service.dispose()
   })
 })

@@ -5,6 +5,10 @@ import { join } from 'node:path'
 export interface RunThemeExtractionOptions {
   /** Absolute path to the uploaded PPTX file. */
   pptxPath: string
+  /** Precomputed, validated source analysis used by the extractor. */
+  analysisPath?: string
+  /** Explicit source-bound decimal tab declaration; requires analysisPath. */
+  decimalTabsPath?: string
   /** Preferred theme name; a unique slug is derived from it. */
   themeName?: string
   /** Directory that receives `slidev-theme-<slug>` (the workspace themes root). */
@@ -65,6 +69,8 @@ export async function runThemeExtraction(
         slug,
         '--out',
         options.themesRoot,
+        ...(options.analysisPath ? ['--analysis', options.analysisPath] : []),
+        ...(options.decimalTabsPath ? ['--decimal-tabs', options.decimalTabsPath] : []),
       ],
       { stdio: ['ignore', 'ignore', 'pipe'] },
     )

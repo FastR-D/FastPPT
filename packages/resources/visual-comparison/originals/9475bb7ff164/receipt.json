@@ -1,0 +1,9 @@
+{
+  "id": "9475bb7ff164",
+  "source": "references/GordenPPTSkill/templates/quarterly-illust/template.pptx",
+  "sourceSha256": "558ce85c0d64cd2a06faf88d6a4aa331e8cd4c685c59101c835ded2fbc87696d",
+  "pages": 19,
+  "pdf": "template.pdf",
+  "renderer": "LibreOffice Impress PDF export; hidden slides included",
+  "rasterizer": "PyMuPDF at 960px width"
+}

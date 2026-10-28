@@ -1,0 +1,216 @@
+{
+  "source": {
+    "path": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+    "id": "ddefe998440f",
+    "sha256": "0e34ee4df6f9d1bbb7529bad71d3f75ec1181504e1694b96f8d4a13d9a3a072f",
+    "pages": 17,
+    "entries": [
+      "ddefe998440f-0001",
+      "ddefe998440f-0002",
+      "ddefe998440f-0003",
+      "ddefe998440f-0004",
+      "ddefe998440f-0005",
+      "ddefe998440f-0006",
+      "ddefe998440f-0007",
+      "ddefe998440f-0008",
+      "ddefe998440f-0009",
+      "ddefe998440f-0010",
+      "ddefe998440f-0011",
+      "ddefe998440f-0012",
+      "ddefe998440f-0013",
+      "ddefe998440f-0014",
+      "ddefe998440f-0015",
+      "ddefe998440f-0016",
+      "ddefe998440f-0017"
+    ]
+  },
+  "records": [
+    {
+      "id": "ddefe998440f-0001",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 1,
+      "markdownSha256": "daca436e7f50a1b35a0a3167dde9b978bf3045a5ae1afc7ea93de28890fbda37",
+      "layers": 3,
+      "textSpans": 4,
+      "original": "originals/ddefe998440f/0001.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0002",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 2,
+      "markdownSha256": "577eb29583023596bb7e7498c0dfd35a4f0597ad236ca59106db5c61b4c8af33",
+      "layers": 3,
+      "textSpans": 13,
+      "original": "originals/ddefe998440f/0002.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0003",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 3,
+      "markdownSha256": "8e460469e904b13cd680b4054c3fd31260a268671b96f06ac58aff4b5fa3e162",
+      "layers": 2,
+      "textSpans": 5,
+      "original": "originals/ddefe998440f/0003.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0004",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 4,
+      "markdownSha256": "f05b199f093ba327244beea2cb0fd9e29774e089c5441ac825f16aa211a20645",
+      "layers": 6,
+      "textSpans": 15,
+      "original": "originals/ddefe998440f/0004.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0005",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 5,
+      "markdownSha256": "6dbc1df1fafc833fd641eef82391882c7388c3e36dd688fbcb1985b0384a0d5b",
+      "layers": 9,
+      "textSpans": 9,
+      "original": "originals/ddefe998440f/0005.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0006",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 6,
+      "markdownSha256": "e8838edcf5de1c86868978ce4f25003bb9bf00bc256ad95c94e83428fdeda0a4",
+      "layers": 2,
+      "textSpans": 5,
+      "original": "originals/ddefe998440f/0006.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0007",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 7,
+      "markdownSha256": "0e932db788d2253f4d22aea7c463b776f8a7c6980aeb4f7695e3827c51b621f5",
+      "layers": 6,
+      "textSpans": 14,
+      "original": "originals/ddefe998440f/0007.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0008",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 8,
+      "markdownSha256": "5d81c8f4e6253d9fb7dddf2032bc85459b58dc93fa47d482fe25d951b1256827",
+      "layers": 7,
+      "textSpans": 16,
+      "original": "originals/ddefe998440f/0008.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0009",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 9,
+      "markdownSha256": "c6129480fbb1aa6afbf426c345dc1c65f3d6b6e32213451dac195e3f86f71006",
+      "layers": 10,
+      "textSpans": 16,
+      "original": "originals/ddefe998440f/0009.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0010",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 10,
+      "markdownSha256": "50b3715817dae1fdb5700b5d15cfb7cff3ba42989287d5339e9be8c574baf261",
+      "layers": 2,
+      "textSpans": 5,
+      "original": "originals/ddefe998440f/0010.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0011",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 11,
+      "markdownSha256": "18a6bd19b4decbdcb306b7c9e719cec5c6d0412ab379e9fca20bdf9b11e7332a",
+      "layers": 8,
+      "textSpans": 16,
+      "original": "originals/ddefe998440f/0011.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0012",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 12,
+      "markdownSha256": "3701f876f9703c7d567f7f486a72e7decb30c748e030ea1ef5734fc7ab8498c0",
+      "layers": 14,
+      "textSpans": 15,
+      "original": "originals/ddefe998440f/0012.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0013",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 13,
+      "markdownSha256": "6b73a0fed485d7cd286abfd693f269c4351235bbd2fa383abeb2a38085e01f9a",
+      "layers": 14,
+      "textSpans": 20,
+      "original": "originals/ddefe998440f/0013.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0014",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 14,
+      "markdownSha256": "14960b1bdd72ed06f27569459ec51ed8fc6e788cfbf02818fd57b44e0c14603c",
+      "layers": 2,
+      "textSpans": 5,
+      "original": "originals/ddefe998440f/0014.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0015",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 15,
+      "markdownSha256": "eea4cf953e37ed8d69e11933d6d3a6ee3b3db42b4f4da62b9c275725741e8e3e",
+      "layers": 8,
+      "textSpans": 5,
+      "original": "originals/ddefe998440f/0015.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0016",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 16,
+      "markdownSha256": "9d10c1344b5f0c9b1b119b5dc1e847213ec248f7c36be7d062fc4e9d87de6acd",
+      "layers": 5,
+      "textSpans": 8,
+      "original": "originals/ddefe998440f/0016.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    },
+    {
+      "id": "ddefe998440f-0017",
+      "source": "references/GordenPPTSkill/templates/cute-orange-class/template.pptx",
+      "sourcePage": 17,
+      "markdownSha256": "a826ac09ea9cc5724b666fb009d194ba20bc8db4f7579180ef5b6378ae48ec07",
+      "layers": 2,
+      "textSpans": 3,
+      "original": "originals/ddefe998440f/0017.jpg",
+      "renderer": "source-pdf-vector-html",
+      "changed": true
+    }
+  ]
+}

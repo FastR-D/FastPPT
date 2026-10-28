@@ -19,6 +19,12 @@ const result = {
 }
 
 describe('BrowserInspectionManager', () => {
+  it('rejects rule measurements captured for another slide', () => {
+    const manager = new BrowserInspectionManager({ timeoutMs: 1000 })
+    const job = manager.enqueue('deck', 1, 'quality')
+    expect(manager.submitResult(job.id, { inspectionAvailable: true, slide: 1, slideCount: 2, issues: [], ruleMeasurement: { slide: 2, textLines: 0, density: 0, tokens: [] } })).toMatchObject({ status: 'failed', error: 'Inspection result does not match the requested slide.' })
+    manager.dispose()
+  })
   it('derives overflow evidence from browser snapshots', () => {
     const manager = new BrowserInspectionManager({ timeoutMs: 1000 })
     const job = manager.enqueue('deck', 1)

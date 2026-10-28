@@ -14,6 +14,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@fastppt/presentation-ir": "workspace:*",
     "@fastppt/slidewave": "workspace:*",
     "zod": "catalog:"
   },

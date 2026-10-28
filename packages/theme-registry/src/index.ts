@@ -6,6 +6,19 @@ import { isAbsolute, join, posix, relative, resolve, sep } from 'node:path'
 import { parse as parseYaml } from 'yaml'
 import { z } from 'zod'
 
+export {
+  evaluateThemeRules,
+  themeRulesDigest,
+  themeRuleEvidenceRequirements,
+  ThemeRuleSchema,
+  ThemeRulesDocumentSchema,
+  type ThemeRule,
+  type ThemeRuleIssue,
+  type ThemeRuleSlide,
+  type ThemeRulesDocument,
+} from './rules.js'
+import { ThemeRulesDocumentSchema, themeRulesDigest } from './rules.js'
+
 export const ThemeLayoutSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9-]*$/),
   label: z.string().min(1),
@@ -24,6 +37,17 @@ export const ThemeFeatureSchema = z.object({
   description: z.string().min(1),
 })
 
+/**
+ * Metadata for a design system materialized by FastPPT.  The actual design
+ * specification deliberately lives beside the theme so it can evolve without
+ * making the registry responsible for compiling theme source files.
+ */
+export const ThemeDesignSystemSchema = z.object({
+  specFile: z.string().min(1),
+  tokensFile: z.string().min(1),
+  version: z.literal(1),
+})
+
 export const ThemeManifestSchema = z.object({
   id: z.string().regex(/^slidev-theme-[a-z0-9-]+$/),
   packageName: z.string().min(1),
@@ -33,8 +57,12 @@ export const ThemeManifestSchema = z.object({
   repositoryUrl: z.url(),
   rootDir: z.string().min(1),
   rulesFile: z.string().min(1),
+  /** Optional machine-readable counterpart to the human-facing rulesFile. */
+  machineRulesFile: z.string().min(1).optional(),
   skill: ThemeSkillManifestSchema,
   layouts: z.array(ThemeLayoutSchema).min(1),
+  designSystem: ThemeDesignSystemSchema.optional(),
+  motionPreset: z.enum(['static', 'business', 'teaching', 'reveal']).optional(),
   defaultAspectRatio: z.string().min(1).optional(),
   supportedFeatures: z.array(ThemeFeatureSchema),
 })
@@ -42,6 +70,7 @@ export const ThemeManifestSchema = z.object({
 export type ThemeLayout = z.infer<typeof ThemeLayoutSchema>
 export type ThemeSkillManifest = z.infer<typeof ThemeSkillManifestSchema>
 export type ThemeFeature = z.infer<typeof ThemeFeatureSchema>
+export type ThemeDesignSystem = z.infer<typeof ThemeDesignSystemSchema>
 export type ThemeManifest = z.infer<typeof ThemeManifestSchema>
 
 export interface RegisteredTheme {
@@ -50,6 +79,8 @@ export interface RegisteredTheme {
   packageRoot: string
   manifestPath: string
   rulesPath: string
+  machineRulesPath?: string
+  machineRulesDigest?: string
   skillSourceDir: string
   skillPath: string
 }
@@ -117,6 +148,8 @@ async function computeContentDigest(packageRoot: string): Promise<string> {
   }
   return hash.digest('base64url')
 }
+
+export { computeContentDigest as themeContentDigest }
 
 export class ThemeRegistryError extends Error {
   constructor(
@@ -299,6 +332,31 @@ async function loadTheme(packageRoot: string): Promise<RegisteredTheme> {
     manifest.rulesFile,
     'rulesFile',
   )
+  let machineRulesPath: string | undefined
+  let machineRulesDigest: string | undefined
+  if (manifest.machineRulesFile) {
+    machineRulesPath = await resolveOwnedPath(
+      packageRoot,
+      manifest.machineRulesFile,
+      'machineRulesFile',
+    )
+    try {
+      const machineRules = ThemeRulesDocumentSchema.parse(
+        JSON.parse(await readFile(machineRulesPath, 'utf8')) as unknown,
+      )
+      machineRulesDigest = themeRulesDigest(machineRules)
+    } catch (cause) {
+      throw new ThemeRegistryError(
+        'INVALID_MANIFEST',
+        'Theme machine-readable rules are invalid',
+        {
+          themeId: manifest.id,
+          machineRulesPath,
+          cause: cause instanceof Error ? cause.message : String(cause),
+        },
+      )
+    }
+  }
   const skillSourceDir = await resolveOwnedPath(
     packageRoot,
     manifest.skill.sourceDir,
@@ -369,6 +427,8 @@ async function loadTheme(packageRoot: string): Promise<RegisteredTheme> {
     packageRoot,
     manifestPath,
     rulesPath,
+    ...(machineRulesPath ? { machineRulesPath } : {}),
+    ...(machineRulesDigest ? { machineRulesDigest } : {}),
     skillSourceDir,
     skillPath,
   }

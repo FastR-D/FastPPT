@@ -98,16 +98,15 @@ function adapter(): CodexAdapter {
 }
 
 describe('CodexAdapter', () => {
-  it('recognizes Codex CLI 0.146 as verified', async () => {
+  it('accepts any readable Codex CLI version', async () => {
     const codex = new CodexAdapter({
-      versionProvider: () => Promise.resolve('codex-cli 0.146.0'),
+      versionProvider: () => Promise.resolve('codex-cli 0.149.0'),
     })
 
     await expect(codex.getStatus()).resolves.toMatchObject({
       status: 'available',
-      version: 'codex-cli 0.146.0',
+      version: 'codex-cli 0.149.0',
       compatible: true,
-      verifiedVersionRange: '>=0.144.0 <0.147.0',
     })
     await codex.dispose()
   })

@@ -22,6 +22,7 @@ import type {
   ServerEvent,
   SlidevProcessState,
   ThemeSummary,
+  DeckValidationResult,
 } from '@fastppt/protocol'
 
 export function resolvePreferredThemeId(
@@ -47,6 +48,7 @@ export const usePreviewStore = defineStore('preview', () => {
   const frameRevision = shallowRef(0)
   const exportJob = shallowRef<ExportJob>()
   const inspectionJob = shallowRef<BrowserInspectionJob>()
+  const validation = shallowRef<DeckValidationResult>()
   let exportPoll: ReturnType<typeof setTimeout> | undefined
   let deckRefreshTimer: ReturnType<typeof setTimeout> | undefined
   let previewDesired = true
@@ -80,6 +82,7 @@ export const usePreviewStore = defineStore('preview', () => {
     selectedDeckId.value = deckId
     state.value = undefined
     await startPreview()
+    await refreshValidation()
   }
 
   function deckSelectionFallback(
@@ -102,7 +105,10 @@ export const usePreviewStore = defineStore('preview', () => {
       if (nextSelection === selectedDeckId.value) return
       selectedDeckId.value = nextSelection
       state.value = undefined
-      if (nextSelection) await startPreview()
+      if (nextSelection) {
+        await startPreview()
+        await refreshValidation()
+      }
     } catch (cause) {
       error.value =
         cause instanceof Error ? cause.message : '刷新 Deck 列表失败'
@@ -180,13 +186,13 @@ export const usePreviewStore = defineStore('preview', () => {
 
   async function resyncPreview(): Promise<void> {
     try {
-      const [nextThemes, nextDecks, applicationState] = await Promise.all([
+      const [nextThemes, applicationState] = await Promise.all([
         client.listThemes(),
-        client.listDecks(),
         client.getApplicationState(),
       ])
       themes.value = nextThemes
       reconcilePreferredTheme(nextThemes, applicationState.recentTheme)
+      const nextDecks = await client.listDecks()
       decks.value = nextDecks
       const nextSelection = deckSelectionFallback(
         nextDecks,
@@ -217,6 +223,7 @@ export const usePreviewStore = defineStore('preview', () => {
             selectedDeckId.value,
             'start',
           )
+        await refreshValidation()
       }
       error.value = undefined
     } catch (cause) {
@@ -253,20 +260,23 @@ export const usePreviewStore = defineStore('preview', () => {
     loading.value = true
     error.value = undefined
     try {
-      const [nextThemes, nextDecks, applicationState] = await Promise.all([
+      const [nextThemes, applicationState] = await Promise.all([
         client.listThemes(signal),
-        client.listDecks(signal),
         client.getApplicationState(signal),
       ])
       themes.value = nextThemes
       reconcilePreferredTheme(nextThemes, applicationState.recentTheme)
+      const nextDecks = await client.listDecks(signal)
       decks.value = nextDecks
       selectedDeckId.value = deckSelectionFallback(
         nextDecks,
         applicationState.recentTheme,
       )
       eventStream.connect()
-      if (selectedDeckId.value) await startPreview()
+      if (selectedDeckId.value) {
+        await startPreview()
+        await refreshValidation()
+      }
       retry.reset()
     } catch (cause) {
       if (cause instanceof DOMException && cause.name === 'AbortError') return
@@ -284,19 +294,24 @@ export const usePreviewStore = defineStore('preview', () => {
     }
   }
 
+  let previewOperation = 0
   async function perform(action: 'start' | 'restart' | 'stop'): Promise<void> {
     if (!selectedDeckId.value) return
+    const deckId = selectedDeckId.value, operation = ++previewOperation
+    const current = () => operation === previewOperation && selectedDeckId.value === deckId
     previewDesired = action !== 'stop'
     loading.value = true
     error.value = undefined
     try {
-      state.value = await client.previewAction(selectedDeckId.value, action)
+      const nextState = await client.previewAction(deckId, action)
+      if (!current()) return
+      state.value = nextState
       if (state.value.status === 'failed')
         error.value = state.value.lastError?.message ?? 'Slidev 启动失败'
     } catch (cause) {
-      error.value = cause instanceof Error ? cause.message : '预览操作失败'
+      if (current()) error.value = cause instanceof Error ? cause.message : '预览操作失败'
     } finally {
-      loading.value = false
+      if (current()) loading.value = false
     }
   }
 
@@ -320,23 +335,49 @@ export const usePreviewStore = defineStore('preview', () => {
     state.value = undefined
     exportJob.value = undefined
     inspectionJob.value = undefined
+    validation.value = undefined
     captureRequestIdReset()
     eventStream.setTopics(previewTopics)
     await startPreview()
+    await refreshValidation()
+  }
+
+  let validationRequest = 0
+  async function refreshValidation(): Promise<void> {
+    const request = ++validationRequest, deckId = selectedDeckId.value
+    if (!selectedDeckId.value) {
+      validation.value = undefined
+      return
+    }
+    try {
+      const next = await client.validateDeck(selectedDeckId.value)
+      if (request === validationRequest && deckId === selectedDeckId.value) validation.value = next
+    } catch (cause) {
+      if (request === validationRequest && deckId === selectedDeckId.value) error.value =
+        cause instanceof Error ? cause.message : '读取主题规则校验失败'
+    }
   }
 
   function captureRequestIdReset(): void {
     // Capture request state is owned by PreviewPanel's job-keyed iframe.
   }
 
-  async function startExport(): Promise<void> {
+  async function startExport(options?: {
+    policy?: 'editable' | 'strict-editable' | 'visual-fidelity'
+    master?: boolean
+    notes?: boolean
+    animations?: boolean
+    diagrams?: boolean
+    review?: boolean
+  }): Promise<void> {
     if (!selectedDeckId.value || !selectedDeck.value) return
     error.value = undefined
     try {
       exportJob.value = await client.createExport(
         selectedDeckId.value,
         `${selectedDeck.value.name}.pptx`,
-        true,
+        options?.review ?? true,
+        options,
       )
       eventStream.setTopics([...previewTopics, `export:${exportJob.value.id}`])
       scheduleExportPoll()
@@ -364,19 +405,20 @@ export const usePreviewStore = defineStore('preview', () => {
       exportJob.value = await client.retryExport(exportJob.value.id)
       scheduleExportPoll()
     } catch (cause) {
-      error.value =
-        cause instanceof Error ? cause.message : '重试导出失败'
+      error.value = cause instanceof Error ? cause.message : '重试导出失败'
     }
   }
 
-  async function reviewExport(exportId: string, approved: boolean): Promise<void> {
+  async function reviewExport(
+    exportId: string,
+    approved: boolean,
+  ): Promise<void> {
     if (!exportJob.value) return
     try {
       exportJob.value = await client.reviewExport(exportId, approved)
       scheduleExportPoll()
     } catch (cause) {
-      error.value =
-        cause instanceof Error ? cause.message : '确认导出失败'
+      error.value = cause instanceof Error ? cause.message : '确认导出失败'
     }
   }
 
@@ -496,6 +538,7 @@ export const usePreviewStore = defineStore('preview', () => {
     frameRevision: readonly(frameRevision),
     exportJob: readonly(exportJob),
     inspectionJob: readonly(inspectionJob),
+    validation: readonly(validation),
     connectionStatus: eventStream.status,
     load,
     selectDeck,
@@ -505,6 +548,7 @@ export const usePreviewStore = defineStore('preview', () => {
     refreshFrame,
     startExport,
     inspectQuality,
+    refreshValidation,
     reviewExport,
     retryExport,
     cancelExport,

@@ -4,6 +4,11 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [vue(), UnoCSS()],
+  optimizeDeps: {
+    // Load the editor's optional dark theme before the first editor visit,
+    // so dependency discovery cannot reload a workspace with an unsaved draft.
+    include: ['@codemirror/theme-one-dark'],
+  },
   server: {
     host: '127.0.0.1',
     port: 4318,

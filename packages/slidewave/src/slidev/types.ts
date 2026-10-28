@@ -8,6 +8,8 @@ export type {
 } from './render-types.js'
 
 export interface HtmlCaptureOptions {
+  /** Negotiated transport version; default V1 preserves legacy callers. */
+  snapshotVersion?: import('../snapshot-types.js').HtmlSnapshotVersion
   id?: string
   canvasWidth?: number
   canvasHeight?: number

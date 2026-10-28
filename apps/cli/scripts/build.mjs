@@ -59,10 +59,14 @@ await build({
 })
 
 await Promise.all([
+  cp(join(repositoryRoot, 'packages/palettes/data'), join(outputRoot, 'palettes'), { recursive: true }),
+  ...(process.env.FASTPPT_BUNDLE_REFERENCE_ANIMATIONS === '1' ? [cp(join(repositoryRoot, 'packages/animations'), join(outputRoot, 'animations'), { recursive: true, filter: source => !source.split(/[\\/]/).some(part => ['node_modules', 'dist', 'tests', 'scripts', 'src', 'reference', '.turbo'].includes(part)) })] : []),
+  ...(process.env.FASTPPT_BUNDLE_REFERENCE_RESOURCES === '1' ? [cp(join(repositoryRoot, 'packages/resources'), join(outputRoot, 'resources'), { recursive: true, filter: source => !source.split(/[\\/]/).some(part => ['node_modules', 'dist', 'tests', 'scripts', 'src', '.turbo', 'audit', 'thumbnails', 'visual-comparison', 'validation'].includes(part)) })] : []),
   cp(
     join(repositoryRoot, 'scripts', 'extract-theme.mjs'),
     join(outputRoot, 'scripts', 'extract-theme.mjs'),
   ),
+  cp(join(repositoryRoot, 'scripts', 'lib'), join(outputRoot, 'scripts', 'lib'), { recursive: true }),
   cp(join(repositoryRoot, 'themes'), join(outputRoot, 'themes'), {
     recursive: true,
     filter: (source) =>
@@ -111,6 +115,20 @@ await Promise.all([
   ),
 ])
 
+// Generated themes and the packaged extractor share the portable counter.
+// Replace the repository-relative development bridge after copying scripts/lib.
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-numbering.mjs'), join(outputRoot, 'scripts/lib/text-numbering.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-tabs.mjs'), join(outputRoot, 'scripts/lib/text-tabs.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-bullet-layout.mjs'), join(outputRoot, 'scripts/lib/text-bullet-layout.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-decoration.mjs'), join(outputRoot, 'scripts/lib/text-decoration.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-capitalization.mjs'), join(outputRoot, 'scripts/lib/text-capitalization.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-baseline.mjs'), join(outputRoot, 'scripts/lib/text-baseline.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-kerning.mjs'), join(outputRoot, 'scripts/lib/text-kerning.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-letter-spacing.mjs'), join(outputRoot, 'scripts/lib/text-letter-spacing.mjs'))
+await cp(join(repositoryRoot, 'packages/slidewave/src/primitives/text-language.mjs'), join(outputRoot, 'scripts/lib/text-language.mjs'))
+await cp(join(repositoryRoot, 'packages/slidev-host/text-frame-tabs.mjs'), join(outputRoot, 'scripts/lib/text-frame-tabs.mjs'))
+await cp(join(repositoryRoot, 'packages/slidev-host/text-frame-tabs.mjs'), join(outputRoot, 'text-frame-tabs.mjs'))
+
 const manifest = JSON.parse(
   await readFile(join(packageRoot, 'package.json'), 'utf8'),
 )
@@ -128,13 +146,7 @@ await writeFile(
       name: '@fastppt/slidewave',
       version: slidewaveManifest.version,
       type: 'module',
-      exports: {
-        '.': './dist/core.js',
-        './browser': './dist/browser/index.js',
-        './browser/runtime': './dist/browser/runtime.js',
-        './snapshot': './dist/snapshot.js',
-        './server': './dist/server/index.js',
-      },
+      exports: slidewaveManifest.publishConfig.exports,
       sideEffects: ['./dist/browser/runtime.js'],
     },
     null,

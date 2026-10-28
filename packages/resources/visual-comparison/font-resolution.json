@@ -1,0 +1,110 @@
+[
+  {
+    "name": "MicrosoftYaHei",
+    "flags": 0,
+    "family": "Microsoft YaHei",
+    "file": "/usr/share/fonts/msyh/msyh.ttc",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.898193359375
+  },
+  {
+    "name": "ArialMT",
+    "flags": 0,
+    "family": "Arial",
+    "file": "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.8466796875
+  },
+  {
+    "name": "MicrosoftYaHei-Bold",
+    "flags": 16,
+    "family": "Microsoft YaHei",
+    "file": "/usr/share/fonts/msyh/msyhbd.ttc",
+    "bold": true,
+    "italic": false,
+    "baselineEm": 0.898193359375
+  },
+  {
+    "name": "Arial-BoldMT",
+    "flags": 16,
+    "family": "Arial",
+    "file": "/usr/share/fonts/truetype/msttcorefonts/Arial_Bold.ttf",
+    "bold": true,
+    "italic": false,
+    "baselineEm": 0.8466796875
+  },
+  {
+    "name": "Wingdings-Regular",
+    "flags": 0,
+    "family": "Wingdings",
+    "file": "/usr/share/fonts/truetype/symbol-fonts/wingding.ttf",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.843994140625
+  },
+  {
+    "name": "DejaVuSans",
+    "flags": 0,
+    "family": "DejaVu Sans",
+    "file": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.84619140625
+  },
+  {
+    "name": "NotoSansCJKjp-Regular-VK",
+    "flags": 0,
+    "family": "Noto Sans CJK JP",
+    "file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.9359999999999999
+  },
+  {
+    "name": "DejaVuSans-Bold",
+    "flags": 16,
+    "family": "DejaVu Sans",
+    "file": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "bold": true,
+    "italic": false,
+    "baselineEm": 0.84619140625
+  },
+  {
+    "name": "NotoSansCJKjp-Bold-VKana",
+    "flags": 16,
+    "family": "Noto Sans CJK JP",
+    "file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "bold": true,
+    "italic": false,
+    "baselineEm": 0.9359999999999999
+  },
+  {
+    "name": "Inter-Regular",
+    "flags": 0,
+    "family": "Inter",
+    "file": "/usr/share/fonts/truetype/inter-zorin-os/Inter-Regular.ttf",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.86376953125
+  },
+  {
+    "name": "NimbusSans",
+    "flags": 0,
+    "family": "Nimbus Sans",
+    "file": "/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.729
+  },
+  {
+    "name": "CourierNewPSMT",
+    "flags": 0,
+    "family": "DejaVu Sans",
+    "file": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "bold": false,
+    "italic": false,
+    "baselineEm": 0.84619140625
+  }
+]

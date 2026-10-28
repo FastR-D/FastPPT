@@ -7,6 +7,7 @@
   "repositoryUrl": "https://github.com/FastR-D/FastPPT",
   "rootDir": ".",
   "rulesFile": "agent/theme-rules.md",
+  "machineRulesFile": "agent/theme-rules.json",
   "skill": {
     "id": "fastppt-theme-xiaomi",
     "sourceDir": "agent",

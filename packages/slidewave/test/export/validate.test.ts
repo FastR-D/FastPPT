@@ -127,3 +127,10 @@ describe('validateEditablePptx', () => {
     expect(report.slideCount).toBe(1)
   })
 })
+
+it('allows source pages without text but still rejects lost expected text', async () => {
+  const buffer = await htmlDeckToPresentation(deckWith([])).presentation.toArrayBuffer()
+  expect((await validateEditablePptx(buffer, 1, [false])).ok).toBe(true)
+  expect((await validateEditablePptx(buffer, 1, [true])).issues).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'no-native-text' })]))
+  expect((await validateEditablePptx(buffer, 1)).ok).toBe(false)
+})

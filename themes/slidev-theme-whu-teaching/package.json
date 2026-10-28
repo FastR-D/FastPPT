@@ -1,0 +1,52 @@
+{
+  "name": "slidev-theme-whu-teaching",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "武汉大学教学风格：校园封面、深绿标题、双栏讲解、图解与例题。",
+  "keywords": [
+    "slidev-theme",
+    "slidev",
+    "whu-teaching"
+  ],
+  "license": "MIT",
+  "files": [
+    "agent",
+    "layouts",
+    "components",
+    "styles",
+    "setup",
+    "global-top.vue",
+    "README.md",
+    "assets",
+    "example.md",
+    "THIRD_PARTY_NOTICES.md",
+    "utils"
+  ],
+  "engines": {
+    "node": ">=20.12.0",
+    "slidev": ">=52.0.0"
+  },
+  "slidev": {
+    "defaults": {
+      "aspectRatio": "16/9",
+      "canvasWidth": 1280,
+      "transition": "none",
+      "fonts": {
+        "sans": "Microsoft YaHei,Noto Sans SC",
+        "serif": "Microsoft YaHei,Noto Sans SC",
+        "mono": "Fira Code",
+        "weights": "400,600,700",
+        "local": "Microsoft YaHei,Noto Sans SC,Fira Code"
+      }
+    },
+    "colorSchema": "light"
+  },
+  "scripts": {
+    "test": "node ../../scripts/theme-smoke.mjs . && node --test tests/*.test.mjs",
+    "build": "node ../../scripts/theme-build.mjs ."
+  },
+  "dependencies": {
+    "@fastppt/fonts": "workspace:*"
+  }
+}

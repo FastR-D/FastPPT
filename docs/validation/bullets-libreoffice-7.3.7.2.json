@@ -1,0 +1,7376 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-09T01:09:51.389Z",
+  "comparisonBasis": "target-application-probe",
+  "measurement": "horizontal-marker-and-body-advances-and-row-assignment",
+  "baseline": "unverified",
+  "fontSizePrecision": "Poppler integer approximation, tolerance 1pt",
+  "units": "points",
+  "tolerancePoints": 0.25,
+  "environment": {
+    "application": {
+      "name": "LibreOffice",
+      "version": "7.3.7.2",
+      "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+    },
+    "platform": {
+      "system": "Linux",
+      "release": "6.11.8-10-generic",
+      "architecture": "x86_64"
+    },
+    "locale": {
+      "requested": "en-US",
+      "observed": "en-US",
+      "ui": "en-US",
+      "decimalSeparator": ".",
+      "decimalSeparatorAsLocale": true
+    },
+    "configurationSha256": "6dab98044e83c5e9ace511cc20530381cadafdd9e26c0bc9e8aa00a7bf1cf23b"
+  },
+  "sourcePptxSha256": "d941a5ac28e7a47d7983925bab37127eaaf61cf08dfd44b9dc58c37014b104a2",
+  "reproducers": [
+    {
+      "path": "tests/e2e/scripts/bullet-compatibility.ts",
+      "sha256": "44f638657a3de35772c4ab6fb9d502028b4c02d30aa9785539679ba26934d9aa"
+    },
+    {
+      "path": "tests/e2e/scripts/lib/libreoffice-text-probe.py",
+      "sha256": "ef674f6f70f0b2958cebb08a10413b088a3526f19969d159746ea21110039c93"
+    }
+  ],
+  "artifacts": [
+    {
+      "stage": "actual-native-export",
+      "pptxSha256": "d941a5ac28e7a47d7983925bab37127eaaf61cf08dfd44b9dc58c37014b104a2",
+      "pdfSha256": "6c48e3282d7896ca2e14b8dd3bbf0cd5422de451a84f737612efde0deedf6799",
+      "fontXmlSha256": "d3d6aeec8053716bb9dda51045fc2047282da4d346608cb82cdf1c1251830e5e",
+      "pdfFonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nBAAAAA+LiberationMono                TrueType          WinAnsi          yes yes yes    149  0\nCAAAAA+OpenSymbol                    TrueType          WinAnsi          yes yes yes    159  0\nDAAAAA+LiberationSerif               TrueType          WinAnsi          yes yes yes    154  0\nEAAAAA+LiberationMono-Bold           TrueType          WinAnsi          yes yes yes    144  0\n",
+      "pageCount": 46,
+      "cases": [
+        {
+          "id": "explicit-left--20",
+          "page": 1,
+          "source": {
+            "id": "explicit-left--20",
+            "align": "left",
+            "indent": -20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 60,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 80,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 140,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "y": 44.20065,
+              "end": 72.0168
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "width": 12.007800000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "* AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-left-0",
+          "page": 2,
+          "source": {
+            "id": "explicit-left-0",
+            "align": "left",
+            "indent": 0,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 92,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 152,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 79.994,
+              "y": 44.20065,
+              "end": 139.910187
+            },
+            {
+              "text": "BBBB",
+              "x": 151.897974,
+              "y": 46.97865,
+              "end": 199.909161
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "width": 11.916187000000008,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 91.91018700000001,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 151.897974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-left-20",
+          "page": 3,
+          "source": {
+            "id": "explicit-left-20",
+            "align": "left",
+            "indent": 20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 159.9432
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "y": 46.97865,
+              "end": 219.9822
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 11.93719999999999,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111.94319999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-center--20",
+          "page": 4,
+          "source": {
+            "id": "explicit-center--20",
+            "align": "center",
+            "indent": -20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 79,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 99,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 159,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.002,
+              "y": 44.20065,
+              "end": 91.0098
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "y": 46.97865,
+              "end": 147.0452
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "y": 46.97865,
+              "end": 207.0842
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.002,
+              "width": 12.007800000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "* AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-center-0",
+          "page": 5,
+          "source": {
+            "id": "explicit-center-0",
+            "align": "center",
+            "indent": 0,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 93,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 105,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 165,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 93.005,
+              "y": 44.20065,
+              "end": 153.0262
+            },
+            {
+              "text": "BBBB",
+              "x": 165.034,
+              "y": 46.97865,
+              "end": 213.0652
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 93.005,
+              "width": 12.021199999999993,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 105.02619999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 165.034,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-center-20",
+          "page": 6,
+          "source": {
+            "id": "explicit-center-20",
+            "align": "center",
+            "indent": 20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 103,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 115,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 175,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 103.011,
+              "y": 44.20065,
+              "end": 163.0332
+            },
+            {
+              "text": "BBBB",
+              "x": 175.041,
+              "y": 46.97865,
+              "end": 223.0722
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 103.011,
+              "width": 12.022199999999998,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 115.0332,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 175.041,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-right--20",
+          "page": 7,
+          "source": {
+            "id": "explicit-right--20",
+            "align": "right",
+            "indent": -20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 98,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 97.994,
+              "y": 44.20065,
+              "end": 110.0018
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 97.994,
+              "width": 12.007800000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "* AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-right-0",
+          "page": 8,
+          "source": {
+            "id": "explicit-right-0",
+            "align": "right",
+            "indent": 0,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 106,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 105.987,
+              "y": 44.20065,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 105.987,
+              "width": 12.030187000000012,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.017187,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-right-20",
+          "page": 9,
+          "source": {
+            "id": "explicit-right-20",
+            "align": "right",
+            "indent": 20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 106,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 105.987,
+              "y": 44.20065,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 105.987,
+              "width": 12.030187000000012,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.017187,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-justify--20",
+          "page": 10,
+          "source": {
+            "id": "explicit-justify--20",
+            "align": "justify",
+            "indent": -20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 60,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 80,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "y": 44.20065,
+              "end": 72.0168
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "y": 46.97865,
+              "end": 226.068887
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "width": 12.007800000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "* AAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-justify-0",
+          "page": 11,
+          "source": {
+            "id": "explicit-justify-0",
+            "align": "justify",
+            "indent": 0,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 92,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 79.909,
+              "y": 44.20065,
+              "end": 139.910187
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 177.914874,
+              "y": 46.97865,
+              "end": 225.946074
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.909,
+              "width": 12.001187000000002,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 91.91018700000001,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 177.914874,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA  BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "explicit-justify-20",
+          "page": 12,
+          "source": {
+            "id": "explicit-justify-20",
+            "align": "justify",
+            "indent": 20,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 99.893,
+              "y": 44.20065,
+              "end": 159.9432
+            },
+            {
+              "text": "BBBB",
+              "x": 177.934887,
+              "y": 46.97865,
+              "end": 225.966087
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 99.893,
+              "width": 12.05019999999999,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111.94319999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 177.934887,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA  BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "follow-font-left--20",
+          "page": 13,
+          "source": {
+            "id": "follow-font-left--20",
+            "align": "left",
+            "indent": -20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 60,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 80,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 140,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 60,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 80,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 140,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "y": 43.68965,
+              "end": 67.774044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "y": 46.97865,
+              "end": 188.0642
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-left-0",
+          "page": 14,
+          "source": {
+            "id": "follow-font-left-0",
+            "align": "left",
+            "indent": 0,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 92,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 152,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 87.77,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 147.76999999999998,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "y": 43.68965,
+              "end": 87.759044
+            },
+            {
+              "text": "AAAA",
+              "x": 87.704,
+              "y": 46.97865,
+              "end": 135.715187
+            },
+            {
+              "text": "BBBB",
+              "x": 147.702974,
+              "y": 46.97865,
+              "end": 195.714161
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 87.704,
+              "width": 48.01118699999999,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 147.702974,
+              "width": 48.01118699999998,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-left-20",
+          "page": 15,
+          "source": {
+            "id": "follow-font-left-20",
+            "align": "left",
+            "indent": 20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 107.77,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 167.76999999999998,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "y": 43.68965,
+              "end": 107.771044
+            },
+            {
+              "text": "AAAA",
+              "x": 107.688,
+              "y": 46.97865,
+              "end": 155.7192
+            },
+            {
+              "text": "BBBB",
+              "x": 167.727,
+              "y": 46.97865,
+              "end": 215.7582
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 107.688,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 167.727,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-center--20",
+          "page": 16,
+          "source": {
+            "id": "follow-font-center--20",
+            "align": "center",
+            "indent": -20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 79,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 99,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 159,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 79,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 99,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 159,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.002,
+              "y": 43.68965,
+              "end": 86.767044
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "y": 46.97865,
+              "end": 147.0452
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "y": 46.97865,
+              "end": 207.0842
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.002,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-center-0",
+          "page": 17,
+          "source": {
+            "id": "follow-font-center-0",
+            "align": "center",
+            "indent": 0,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 93,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 105,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 165,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 95.115,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 102.88499999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 162.885,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 95.102,
+              "y": 43.68965,
+              "end": 102.867044
+            },
+            {
+              "text": "AAAA",
+              "x": 102.898,
+              "y": 46.97865,
+              "end": 150.9292
+            },
+            {
+              "text": "BBBB",
+              "x": 162.937,
+              "y": 46.97865,
+              "end": 210.9682
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 95.102,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 102.898,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 162.937,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-center-20",
+          "page": 18,
+          "source": {
+            "id": "follow-font-center-20",
+            "align": "center",
+            "indent": 20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 103,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 115,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 175,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 105.115,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112.88499999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172.885,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 105.109,
+              "y": 43.68965,
+              "end": 112.874044
+            },
+            {
+              "text": "AAAA",
+              "x": 112.904,
+              "y": 46.97865,
+              "end": 160.915187
+            },
+            {
+              "text": "BBBB",
+              "x": 172.902974,
+              "y": 46.97865,
+              "end": 220.914161
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 105.109,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112.904,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172.902974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-right--20",
+          "page": 19,
+          "source": {
+            "id": "follow-font-right--20",
+            "align": "right",
+            "indent": -20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 98,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 98,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 97.994,
+              "y": 43.68965,
+              "end": 105.759044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 97.994,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-right-0",
+          "page": 20,
+          "source": {
+            "id": "follow-font-right-0",
+            "align": "right",
+            "indent": 0,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 106,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 110.22999999999999,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 117.99999999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 110.211,
+              "y": 43.68965,
+              "end": 117.976044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 110.211,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-right-20",
+          "page": 21,
+          "source": {
+            "id": "follow-font-right-20",
+            "align": "right",
+            "indent": 20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 106,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 110.23,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 110.211,
+              "y": 43.68965,
+              "end": 117.976044
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 110.211,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-justify--20",
+          "page": 22,
+          "source": {
+            "id": "follow-font-justify--20",
+            "align": "justify",
+            "indent": -20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 60,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 80,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 60,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 80,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "y": 43.68965,
+              "end": 67.774044
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "y": 46.97865,
+              "end": 128.0252
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "y": 46.97865,
+              "end": 226.068887
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 60.009,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-justify-0",
+          "page": 23,
+          "source": {
+            "id": "follow-font-justify-0",
+            "align": "justify",
+            "indent": 0,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 92,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 87.77,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.909,
+              "y": 43.68965,
+              "end": 87.674044
+            },
+            {
+              "text": "AAAA",
+              "x": 87.704,
+              "y": 46.97865,
+              "end": 135.715187
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 177.922604,
+              "y": 46.97865,
+              "end": 225.953804
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.909,
+              "width": 7.765043999999989,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 87.704,
+              "width": 48.01118699999999,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 177.922604,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "follow-font-justify-20",
+          "page": 24,
+          "source": {
+            "id": "follow-font-justify-20",
+            "align": "justify",
+            "indent": 20,
+            "followFont": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 7.77,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 107.77,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 99.893,
+              "y": 43.68965,
+              "end": 107.658044
+            },
+            {
+              "text": "AAAA",
+              "x": 107.688,
+              "y": 46.97865,
+              "end": 155.7192
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "BBBB",
+              "x": 177.913617,
+              "y": 46.97865,
+              "end": 225.944817
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "y": 76.99665,
+              "end": 226.068887
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 99.893,
+              "width": 7.765044000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 107.688,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 177.913617,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.037687,
+              "width": 48.031199999999984,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "CAAAAA+OpenSymbol",
+              "actualFamily": "CAAAAA+OpenSymbol"
+            },
+            {
+              "text": "AAAA  BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "percent-left-50",
+          "page": 25,
+          "source": {
+            "id": "percent-left-50",
+            "align": "left",
+            "indent": 0,
+            "percent": 50,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 6,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 86,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 146,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "AAAA",
+              "x": 85.89,
+              "y": 46.97865,
+              "end": 133.9212
+            },
+            {
+              "text": "BBBB",
+              "x": 145.929,
+              "y": 46.97865,
+              "end": 193.9602
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "*",
+              "x": 79.994,
+              "y": 50.9853,
+              "end": 85.9976
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "width": 6.003600000000006,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 85.89,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 145.929,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 10,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "percent-left-200",
+          "page": 26,
+          "source": {
+            "id": "percent-left-200",
+            "align": "left",
+            "indent": 0,
+            "percent": 200,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 80,
+              "width": 24,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 104,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 164,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "y": 30.60085,
+              "end": 103.9922
+            },
+            {
+              "text": "AAAA",
+              "x": 103.89,
+              "y": 46.97865,
+              "end": 151.9212
+            },
+            {
+              "text": "BBBB",
+              "x": 163.929,
+              "y": 46.97865,
+              "end": 211.9602
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 79.994,
+              "width": 23.998199999999997,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 103.89,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 163.929,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 39,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "percent-center-50",
+          "page": 27,
+          "source": {
+            "id": "percent-center-50",
+            "align": "center",
+            "indent": 0,
+            "percent": 50,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 96,
+              "width": 6,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 102,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 162,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "AAAA",
+              "x": 101.991,
+              "y": 46.97865,
+              "end": 150.0222
+            },
+            {
+              "text": "BBBB",
+              "x": 162.03,
+              "y": 46.97865,
+              "end": 210.0612
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            },
+            {
+              "text": "*",
+              "x": 96.009,
+              "y": 50.9853,
+              "end": 102.0126
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 96.009,
+              "width": 6.003600000000006,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 101.991,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 162.03,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 10,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "percent-center-200",
+          "page": 28,
+          "source": {
+            "id": "percent-center-200",
+            "align": "center",
+            "indent": 0,
+            "percent": 200,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 87,
+              "width": 24,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 171,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 86.995,
+              "y": 30.60085,
+              "end": 110.9932
+            },
+            {
+              "text": "AAAA",
+              "x": 111.005,
+              "y": 46.97865,
+              "end": 159.016187
+            },
+            {
+              "text": "BBBB",
+              "x": 171.003974,
+              "y": 46.97865,
+              "end": 219.015161
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 86.995,
+              "width": 23.998199999999997,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111.005,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 171.003974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 39,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "percent-right-50",
+          "page": 29,
+          "source": {
+            "id": "percent-right-50",
+            "align": "right",
+            "indent": 0,
+            "percent": 50,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 112,
+              "width": 6,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 111.997,
+              "y": 50.9853,
+              "end": 118.0006
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 111.997,
+              "width": 6.003600000000006,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 10,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "percent-right-200",
+          "page": 30,
+          "source": {
+            "id": "percent-right-200",
+            "align": "right",
+            "indent": 0,
+            "percent": 200,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 94,
+              "width": 24,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 93.997,
+              "y": 30.60085,
+              "end": 117.9952
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 93.997,
+              "width": 23.998199999999997,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 39,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "serif-left",
+          "page": 31,
+          "source": {
+            "id": "serif-left",
+            "align": "left",
+            "indent": 20,
+            "font": "Liberation Serif",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 10,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 110,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 170,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "y": 45.67465,
+              "end": 110.0125
+            },
+            {
+              "text": "AAAA",
+              "x": 110.013,
+              "y": 46.97865,
+              "end": 158.0442
+            },
+            {
+              "text": "BBBB",
+              "x": 170.052,
+              "y": 46.97865,
+              "end": 218.0832
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 10.006500000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 110.013,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 170.052,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "DAAAAA+LiberationSerif",
+              "actualFamily": "DAAAAA+LiberationSerif"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "serif-center",
+          "page": 32,
+          "source": {
+            "id": "serif-center",
+            "align": "center",
+            "indent": 20,
+            "font": "Liberation Serif",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 104,
+              "width": 10,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 114,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 174,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 103.89,
+              "y": 45.67465,
+              "end": 113.8965
+            },
+            {
+              "text": "AAAA",
+              "x": 114.009,
+              "y": 46.97865,
+              "end": 162.0402
+            },
+            {
+              "text": "BBBB",
+              "x": 174.048,
+              "y": 46.97865,
+              "end": 222.0792
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 103.89,
+              "width": 10.006500000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 114.009,
+              "width": 48.0312,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 174.048,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "DAAAAA+LiberationSerif",
+              "actualFamily": "DAAAAA+LiberationSerif"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "serif-right",
+          "page": 33,
+          "source": {
+            "id": "serif-right",
+            "align": "right",
+            "indent": 20,
+            "font": "Liberation Serif",
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 108,
+              "width": 10,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 107.887,
+              "y": 45.67465,
+              "end": 117.8935
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 166.017187
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "y": 46.97865,
+              "end": 226.016161
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 107.887,
+              "width": 10.006500000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "DAAAAA+LiberationSerif",
+              "actualFamily": "DAAAAA+LiberationSerif"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "points-36",
+          "page": 34,
+          "source": {
+            "id": "points-36",
+            "align": "left",
+            "indent": 20,
+            "points": 36,
+            "rows": [
+              "AAAA",
+              "BBBB CCCC",
+              "DDDD EEEE"
+            ],
+            "knownRows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ],
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*"
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 21.6,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 121.6,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 140,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 159.9432
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "y": 46.97865,
+              "end": 219.9822
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 11.93719999999999,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111.94319999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA BBBB ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "long-marker-left",
+          "page": 35,
+          "source": {
+            "id": "long-marker-left",
+            "align": "left",
+            "indent": -20,
+            "label": "1234.",
+            "rows": [
+              "AAAA",
+              "BBBB CCCC",
+              "DDDD EEEE"
+            ],
+            "text": "AAAA BBBB CCCC DDDD EEEE"
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "1234.",
+              "x": 60,
+              "width": 60,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 120,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 140,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "1234.AAAA",
+              "x": 60.009,
+              "y": 46.97865,
+              "end": 167.917187
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "CCCC",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "DDDD",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            },
+            {
+              "text": "EEEE",
+              "x": 140.033,
+              "y": 106.87465,
+              "end": 188.0642
+            }
+          ],
+          "measured": [
+            {
+              "text": "1234.",
+              "x": 60.009,
+              "width": 59.90818700000001,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 119.91718700000001,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "1234.AAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "long-marker-center",
+          "page": 36,
+          "source": {
+            "id": "long-marker-center",
+            "align": "center",
+            "indent": -20,
+            "label": "1234.",
+            "rows": [
+              "AAAA",
+              "BBBB CCCC",
+              "DDDD EEEE"
+            ],
+            "text": "AAAA BBBB CCCC DDDD EEEE"
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "1234.",
+              "x": 89,
+              "width": 60,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 149,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 99,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 159,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 99,
+              "width": 48,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 159,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "1234.AAAA",
+              "x": 89.008,
+              "y": 46.97865,
+              "end": 197.0202
+            },
+            {
+              "text": "BBBB",
+              "x": 99.014,
+              "y": 76.99665,
+              "end": 147.0452
+            },
+            {
+              "text": "CCCC",
+              "x": 159.053,
+              "y": 76.99665,
+              "end": 207.0842
+            },
+            {
+              "text": "DDDD",
+              "x": 99.014,
+              "y": 106.87465,
+              "end": 147.0452
+            },
+            {
+              "text": "EEEE",
+              "x": 159.053,
+              "y": 106.87465,
+              "end": 207.0842
+            }
+          ],
+          "measured": [
+            {
+              "text": "1234.",
+              "x": 89.008,
+              "width": 60.01219999999999,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 149.0202,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 99.014,
+              "width": 48.0312,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 159.053,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "1234.AAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "long-marker-right",
+          "page": 37,
+          "source": {
+            "id": "long-marker-right",
+            "align": "right",
+            "indent": -20,
+            "label": "1234.",
+            "rows": [
+              "AAAA",
+              "BBBB CCCC",
+              "DDDD EEEE"
+            ],
+            "text": "AAAA BBBB CCCC DDDD EEEE"
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "1234.",
+              "x": 118,
+              "width": 60,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 178,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 118,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 178,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 118,
+              "width": 48,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "1234.AAAA",
+              "x": 118.006,
+              "y": 46.97865,
+              "end": 226.0182
+            },
+            {
+              "text": "BBBB",
+              "x": 118.006,
+              "y": 76.99665,
+              "end": 166.017187
+            },
+            {
+              "text": "CCCC",
+              "x": 178.004974,
+              "y": 76.99665,
+              "end": 226.016161
+            },
+            {
+              "text": "DDDD",
+              "x": 118.006,
+              "y": 106.87465,
+              "end": 166.017187
+            },
+            {
+              "text": "EEEE",
+              "x": 178.004974,
+              "y": 106.87465,
+              "end": 226.016161
+            }
+          ],
+          "measured": [
+            {
+              "text": "1234.",
+              "x": 118.006,
+              "width": 60.01220000000001,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 178.0182,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 118.006,
+              "width": 48.01118700000001,
+              "line": 2
+            },
+            {
+              "text": "EEEE",
+              "x": 178.004974,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "1234.AAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB CCCC ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "DDDD EEEE",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "long-word-left",
+          "page": 38,
+          "source": {
+            "id": "long-word-left",
+            "align": "left",
+            "indent": 20,
+            "text": "AAAAAAAAAAAAAAAAAAAA BBBB",
+            "rows": [
+              "AAAAAAAAA",
+              "AAAAAAAAAAA",
+              "BBBB"
+            ],
+            "label": "*"
+          },
+          "importedText": "AAAAAAAAAAAAAAAAAAAA BBBB",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 112,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 80,
+              "width": 132,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAAAAAAA",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 219.9822
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 212.0798
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 11.976200000000006,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 111.9822,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 79.994,
+              "width": 132.0858,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAAAAAAA",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAAAAAAAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "long-word-center",
+          "page": 39,
+          "source": {
+            "id": "long-word-center",
+            "align": "center",
+            "indent": 20,
+            "text": "AAAAAAAAAAAAAAAAAAAA BBBB",
+            "rows": [
+              "AAAAAAAAA",
+              "AAAAAAAAAAA",
+              "BBBB"
+            ],
+            "label": "*"
+          },
+          "importedText": "AAAAAAAAAAAAAAAAAAAA BBBB",
+          "expected": [
+            {
+              "text": "*",
+              "x": 103,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 115,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 87,
+              "width": 132,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 129,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAAAAAAA",
+              "x": 103.011,
+              "y": 44.20065,
+              "end": 223.0722
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 86.995,
+              "y": 76.99665,
+              "end": 219.0808
+            },
+            {
+              "text": "BBBB",
+              "x": 129.005,
+              "y": 106.87465,
+              "end": 177.016187
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 103.011,
+              "width": 12.061200000000014,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 115.07220000000001,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 86.995,
+              "width": 132.0858,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 129.005,
+              "width": 48.01118700000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAAAAAAA",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAAAAAAAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "long-word-right",
+          "page": 40,
+          "source": {
+            "id": "long-word-right",
+            "align": "right",
+            "indent": 20,
+            "text": "AAAAAAAAAAAAAAAAAAAA BBBB",
+            "rows": [
+              "AAAAAAAAA",
+              "AAAAAAAAAAA",
+              "BBBB"
+            ],
+            "label": "*"
+          },
+          "importedText": "AAAAAAAAAAAAAAAAAAAA BBBB",
+          "expected": [
+            {
+              "text": "*",
+              "x": 106,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 118,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 94,
+              "width": 132,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 178,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAAAAAAA",
+              "x": 105.987,
+              "y": 44.20065,
+              "end": 226.016161
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 93.997,
+              "y": 76.99665,
+              "end": 226.0828
+            },
+            {
+              "text": "BBBB",
+              "x": 177.987,
+              "y": 106.87465,
+              "end": 226.0182
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 105.987,
+              "width": 12.029161000000016,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 118.01616100000001,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 93.997,
+              "width": 132.0858,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 177.987,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAAAAAAA",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAAAAAAAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "too-wide-indent",
+          "page": 41,
+          "source": {
+            "id": "too-wide-indent",
+            "align": "left",
+            "indent": 160,
+            "text": "AAAA BBBB",
+            "observationOnly": "Prefix exceeds paragraph width; browser capture rejects this combination.",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB",
+          "expected": [
+            {
+              "text": "*",
+              "x": 240,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 252,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 312,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*A",
+              "x": 240.009,
+              "y": 44.20065,
+              "end": 263.8948
+            },
+            {
+              "text": "AAA",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 116.0174
+            },
+            {
+              "text": "BBBB",
+              "x": 128.0252,
+              "y": 76.99665,
+              "end": 176.0564
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 240.009,
+              "width": 11.885799999999989,
+              "line": 0
+            },
+            {
+              "text": "A",
+              "x": 251.89479999999998,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAA",
+              "x": 79.994,
+              "width": 36.023399999999995,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 128.0252,
+              "width": 48.031199999999984,
+              "line": 1
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*A",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAA BBBB",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "observed-only"
+        },
+        {
+          "id": "soft-break",
+          "page": 42,
+          "source": {
+            "id": "soft-break",
+            "align": "left",
+            "indent": 20,
+            "text": "AAAA\nBBBB CCCC",
+            "rows": [
+              "AAAA",
+              "BBBB CCCC"
+            ],
+            "label": "*"
+          },
+          "importedText": "AAAA\nBBBB CCCC",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAA",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 159.9432
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "CCCC",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 11.93719999999999,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111.94319999999999,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "CCCC",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAA",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB CCCC",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "empty",
+          "page": 43,
+          "source": {
+            "id": "empty",
+            "align": "left",
+            "indent": 20,
+            "text": "",
+            "rows": [],
+            "label": "*"
+          },
+          "importedText": "",
+          "expected": [],
+          "words": [],
+          "measured": [],
+          "fonts": [],
+          "fontMatches": true,
+          "status": "matched"
+        },
+        {
+          "id": "large-marker-long-word",
+          "page": 44,
+          "source": {
+            "id": "large-marker-long-word",
+            "align": "left",
+            "indent": 20,
+            "text": "AAAAAAAAAAAAAAAAAAAA BBBB",
+            "points": 36,
+            "rows": [
+              "AAAAAAAA",
+              "AAAAAAAAAAAA",
+              "BBBB"
+            ],
+            "knownRows": [
+              "AAAAAAAAA",
+              "AAAAAAAAAAA",
+              "BBBB"
+            ],
+            "label": "*"
+          },
+          "importedText": "AAAAAAAAAAAAAAAAAAAA BBBB",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 21.6,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAA",
+              "x": 121.6,
+              "width": 96,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAAA",
+              "x": 80,
+              "width": 144,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 112,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 80,
+              "width": 132,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*AAAAAAAAA",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 219.9822
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 212.0798
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 11.976200000000006,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAA",
+              "x": 111.9822,
+              "width": 108,
+              "line": 0
+            },
+            {
+              "text": "AAAAAAAAAAA",
+              "x": 79.994,
+              "width": 132.0858,
+              "line": 1
+            },
+            {
+              "text": "BBBB",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*AAAAAAAAA",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAAAAAAAAA ",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "BBBB",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        },
+        {
+          "id": "tab-after-marker",
+          "page": 45,
+          "source": {
+            "id": "tab-after-marker",
+            "align": "left",
+            "indent": 20,
+            "text": "A\tB\tC",
+            "observationOnly": "Tab behavior is covered separately by text-flow evidence; this probe records marker interaction.",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "A\tB\tC",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*A",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 123.9198
+            },
+            {
+              "text": "C",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 92.0018
+            },
+            {
+              "text": "B",
+              "x": 151.994,
+              "y": 46.97865,
+              "end": 164.0018
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 11.913799999999995,
+              "line": 0
+            },
+            {
+              "text": "A",
+              "x": 111.9198,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "B",
+              "x": 151.994,
+              "width": 12.007800000000003,
+              "line": 0
+            },
+            {
+              "text": "C",
+              "x": 79.994,
+              "width": 12.007800000000003,
+              "line": 1
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*A B",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "C",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            }
+          ],
+          "fontMatches": true,
+          "status": "observed-only"
+        },
+        {
+          "id": "bold-first-run",
+          "page": 46,
+          "source": {
+            "id": "bold-first-run",
+            "align": "left",
+            "indent": 20,
+            "bold": true,
+            "text": "AAAA BBBB CCCC DDDD EEEE",
+            "label": "*",
+            "rows": [
+              "AAAA BBBB",
+              "CCCC DDDD",
+              "EEEE"
+            ]
+          },
+          "importedText": "AAAA BBBB CCCC DDDD EEEE",
+          "expected": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "known": [
+            {
+              "text": "*",
+              "x": 100,
+              "width": 12,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 112,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 172,
+              "width": 48,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 80,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140,
+              "width": 48,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 80,
+              "width": 48,
+              "line": 2
+            }
+          ],
+          "words": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "y": 44.20065,
+              "end": 112.0138
+            },
+            {
+              "text": "AAAA",
+              "x": 111.912,
+              "y": 46.97865,
+              "end": 159.9432
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "y": 46.97865,
+              "end": 219.9822
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "y": 76.99665,
+              "end": 128.0252
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "y": 76.99665,
+              "end": 188.0642
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "y": 106.87465,
+              "end": 128.0252
+            }
+          ],
+          "measured": [
+            {
+              "text": "*",
+              "x": 100.006,
+              "width": 12.007800000000003,
+              "line": 0
+            },
+            {
+              "text": "AAAA",
+              "x": 111.912,
+              "width": 48.031199999999984,
+              "line": 0
+            },
+            {
+              "text": "BBBB",
+              "x": 171.951,
+              "width": 48.03120000000001,
+              "line": 0
+            },
+            {
+              "text": "CCCC",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "DDDD",
+              "x": 140.033,
+              "width": 48.03120000000001,
+              "line": 1
+            },
+            {
+              "text": "EEEE",
+              "x": 79.994,
+              "width": 48.03120000000001,
+              "line": 2
+            }
+          ],
+          "fonts": [
+            {
+              "text": "*",
+              "size": 20,
+              "family": "BAAAAA+LiberationMono",
+              "actualFamily": "BAAAAA+LiberationMono"
+            },
+            {
+              "text": "AAAA BBBB ",
+              "size": 20,
+              "family": "EAAAAA+LiberationMono",
+              "actualFamily": "EAAAAA+LiberationMono-Bold"
+            },
+            {
+              "text": "CCCC DDDD ",
+              "size": 20,
+              "family": "EAAAAA+LiberationMono",
+              "actualFamily": "EAAAAA+LiberationMono-Bold"
+            },
+            {
+              "text": "EEEE",
+              "size": 20,
+              "family": "EAAAAA+LiberationMono",
+              "actualFamily": "EAAAAA+LiberationMono-Bold"
+            }
+          ],
+          "fontMatches": false,
+          "status": "known-difference"
+        }
+      ]
+    }
+  ]
+}

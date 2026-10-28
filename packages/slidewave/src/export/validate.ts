@@ -1,10 +1,11 @@
+import { validateSlideAnimationXml } from '../server/slide-xml.js'
 /**
  * Editable PPTX export validation.
  *
  * A structural QA pass over the generated PPTX: the package must be a valid
  * OOXML ZIP with the required parts, the slide count must match the manifest,
  * every relationship target must exist, no slide may be dominated by a single
- * full-slide raster, and each slide must carry native editable text. The report
+ * full-slide raster, and slides with source text must carry native editable text. The report
  * is evidence for the export job; it deliberately avoids hashing/fingerprinting.
  */
 
@@ -60,6 +61,8 @@ function slideXmlNames(zip: JSZip): string[] {
 export async function validateEditablePptx(
   pptx: ArrayBuffer | Uint8Array | Buffer,
   expectedSlides?: number,
+  /** Per-page source expectations; omitted entries retain the strict text check. */
+  expectedNativeText?: readonly boolean[],
 ): Promise<ExportQaReport> {
   const issues: ExportQaIssue[] = []
   let zip: JSZip
@@ -142,6 +145,7 @@ export async function validateEditablePptx(
     let xml: string
     try {
       xml = await zip.files[name]!.async('string')
+      for (const message of validateSlideAnimationXml(xml)) issues.push({ code: 'invalid-xml', slide: slideNumber, message })
     } catch (cause) {
       issues.push({
         code: 'invalid-xml',
@@ -160,7 +164,7 @@ export async function validateEditablePptx(
       })
     }
     const hasNativeText = /<a:t\b/.test(xml)
-    if (!hasNativeText) {
+    if (!hasNativeText && (expectedNativeText?.[index] ?? true)) {
       issues.push({
         code: 'no-native-text',
         slide: slideNumber,

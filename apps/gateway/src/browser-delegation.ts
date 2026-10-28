@@ -33,7 +33,7 @@ export class BrowserInspectionManager {
     deckId: string,
     slide: number,
     kind: BrowserInspectionJob['kind'] = 'overflow',
-    context: Pick<BrowserInspectionJob, 'revision' | 'themeId' | 'themeDigest' | 'profileDigest' | 'policy'> = {},
+    context: Pick<BrowserInspectionJob, 'revision' | 'themeId' | 'themeDigest' | 'masterDigest' | 'profileDigest' | 'policy'> = {},
   ): BrowserInspectionJob {
     const job = BrowserInspectionJobSchema.parse({
       id: randomUUID(),
@@ -61,13 +61,13 @@ export class BrowserInspectionManager {
     const pending = this.#pending.get(id)
     if (!pending) throw new Error('Browser inspection is not awaiting capture.')
     try {
+      const result = pending.job.kind === 'quality' ? BrowserQualityResultSchema.parse(input) : BrowserOverflowResultSchema.parse(input)
+      if (result.slide !== pending.job.slide || ('ruleMeasurement' in result && result.ruleMeasurement && result.ruleMeasurement.slide !== pending.job.slide))
+        throw new Error('Inspection result does not match the requested slide.')
       return this.#finish({
         ...pending.job,
         status: 'completed',
-        result:
-          pending.job.kind === 'quality'
-            ? BrowserQualityResultSchema.parse(input)
-            : BrowserOverflowResultSchema.parse(input),
+        result,
       })
     } catch (cause) {
       return this.#finish({

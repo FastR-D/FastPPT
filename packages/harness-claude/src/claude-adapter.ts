@@ -56,9 +56,8 @@ import type {
   UnifiedSession,
 } from '@fastppt/protocol'
 
-export const CLAUDE_AGENT_SDK_VERSION = '0.3.220'
-export const CLAUDE_CODE_BUNDLED_VERSION = '2.1.220'
-export const CLAUDE_VERIFIED_VERSION_RANGE = '>=2.1.215 <2.2.0'
+export const CLAUDE_AGENT_SDK_VERSION = '0.3.221'
+export const CLAUDE_CODE_BUNDLED_VERSION = '2.1.223'
 
 interface ClaudeSdk {
   listSessions: typeof listSessions
@@ -271,11 +270,6 @@ async function* multimodalPrompt(
   }
 }
 
-function compatibleVersion(version: string): boolean {
-  const match = /^(\d+)\.(\d+)\.(\d+)/.exec(version)
-  return match?.[1] === '2' && match[2] === '1' && Number(match[3]) >= 215
-}
-
 export class ClaudeAdapter implements HarnessAdapter {
   readonly kind = 'claude' as const
   readonly #sdk: ClaudeSdk
@@ -301,16 +295,12 @@ export class ClaudeAdapter implements HarnessAdapter {
   }
 
   getStatus(): Promise<HarnessStatus> {
-    const compatible =
-      this.#sdkVersion === CLAUDE_AGENT_SDK_VERSION &&
-      compatibleVersion(this.#claudeCodeVersion)
     return Promise.resolve(
       HarnessStatusSchema.parse({
         kind: 'claude',
-        status: compatible ? 'available' : 'degraded',
+        status: 'available',
         version: `agent-sdk ${this.#sdkVersion} / Claude Code ${this.#claudeCodeVersion}`,
-        verifiedVersionRange: `${CLAUDE_AGENT_SDK_VERSION}; Claude Code ${CLAUDE_VERIFIED_VERSION_RANGE}`,
-        compatible,
+        compatible: true,
         capabilities: HarnessCapabilitiesSchema.parse({
           sessionHistory: true,
           sessionFork: true,
@@ -318,17 +308,12 @@ export class ClaudeAdapter implements HarnessAdapter {
           commandExecution: true,
           fileEdits: true,
           mcp: true,
-          skillDiscovery: compatible,
-          perRunSkillInvocation: compatible,
+          skillDiscovery: true,
+          perRunSkillInvocation: true,
           skillInvocationObservation: false,
           imageInput: false,
           structuredEvents: true,
         }),
-        ...(compatible
-          ? {}
-          : {
-              message: `Unverified Claude Agent SDK or Claude Code version: ${this.#sdkVersion} / ${this.#claudeCodeVersion}`,
-            }),
       }),
     )
   }

@@ -1,0 +1,1052 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-09T01:44:32.685Z",
+  "comparisonBasis": "target-application-probe",
+  "measurement": "single-line-presence-horizontal-extents-and-position-relative-to-text-baseline",
+  "browserPixelEquivalence": "unverified",
+  "units": "points",
+  "tolerancePoints": 0.25,
+  "environment": {
+    "application": {
+      "name": "LibreOffice",
+      "version": "7.3.7.2",
+      "commandVersion": "LibreOffice 7.3.7.2 30(Build:2)"
+    },
+    "platform": {
+      "system": "Linux",
+      "release": "6.11.8-10-generic",
+      "architecture": "x86_64"
+    },
+    "locale": {
+      "requested": "en-US",
+      "observed": "en-US",
+      "ui": "en-US",
+      "decimalSeparator": ".",
+      "decimalSeparatorAsLocale": true
+    },
+    "configurationSha256": "6dab98044e83c5e9ace511cc20530381cadafdd9e26c0bc9e8aa00a7bf1cf23b"
+  },
+  "reader": {
+    "name": "PyMuPDF",
+    "version": "1.28.2"
+  },
+  "sourcePptxSha256": "1247d3fbff099b3bba8ae776e33359be7106d34af017158514e1c6514d41557e",
+  "reproducers": [
+    {
+      "path": "tests/e2e/scripts/decoration-compatibility.ts",
+      "sha256": "e7ddd3d790ae0afb51194dc689febbd24053bf854cff74bd2b96ffb2a33b432a"
+    },
+    {
+      "path": "tests/e2e/scripts/lib/libreoffice-text-probe.py",
+      "sha256": "ef674f6f70f0b2958cebb08a10413b088a3526f19969d159746ea21110039c93"
+    }
+  ],
+  "artifacts": [
+    {
+      "stage": "actual-native-export",
+      "pptxSha256": "1247d3fbff099b3bba8ae776e33359be7106d34af017158514e1c6514d41557e",
+      "pdfSha256": "257f3addab67384d7ce731e3fe5a36e57e9c368948c61dee9d2ee0f086286717",
+      "drawingsSha256": "5abcc15d3f7f3dc3d57d3f85140fb35aa1fe9892242f009d77a5fe9f717bc9ae",
+      "pageCount": 12,
+      "cases": [
+        {
+          "id": "none",
+          "page": 1,
+          "source": {
+            "id": "none",
+            "runs": [
+              {
+                "text": "AAAA",
+                "decoration": []
+              }
+            ],
+            "expected": []
+          },
+          "importedText": "AAAA",
+          "expected": [],
+          "measured": [],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [],
+          "status": "matched"
+        },
+        {
+          "id": "underline",
+          "page": 2,
+          "source": {
+            "id": "underline",
+            "runs": [
+              {
+                "text": "AAAA",
+                "decoration": [
+                  "underline"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "AAAA",
+          "expected": [
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            }
+          ],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "strike",
+          "page": 3,
+          "source": {
+            "id": "strike",
+            "runs": [
+              {
+                "text": "AAAA",
+                "decoration": [
+                  "line-through"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "line-through",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "AAAA",
+          "expected": [
+            {
+              "kind": "line-through",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "line-through",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            }
+          ],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 60.689998626708984,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "both",
+          "page": 4,
+          "source": {
+            "id": "both",
+            "runs": [
+              {
+                "text": "AAAA",
+                "decoration": [
+                  "underline",
+                  "line-through"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              },
+              {
+                "kind": "line-through",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "AAAA",
+          "expected": [
+            {
+              "kind": "line-through",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            },
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "line-through",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            },
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            }
+          ],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 60.689998626708984,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "spaces",
+          "page": 5,
+          "source": {
+            "id": "spaces",
+            "runs": [
+              {
+                "text": "AA  BB",
+                "decoration": [
+                  "underline"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 112,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "AA  BB",
+          "expected": [
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 112,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 111.99700164794922
+            }
+          ],
+          "spans": [
+            {
+              "text": "AA  BB",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                112.04379272460938,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 111.99700164794922,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "tab",
+          "page": 6,
+          "source": {
+            "id": "tab",
+            "runs": [
+              {
+                "text": "A\tB",
+                "decoration": [
+                  "underline"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 52,
+                "line": 0
+              },
+              {
+                "kind": "underline",
+                "left": 112,
+                "right": 124,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "A\tB",
+          "expected": [
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 52,
+              "line": 0
+            },
+            {
+              "kind": "underline",
+              "left": 112,
+              "right": 124,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 51.98800277709961
+            },
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 111.99700164794922,
+              "right": 123.98799896240234
+            }
+          ],
+          "spans": [
+            {
+              "text": "A",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                52.00480270385742,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            },
+            {
+              "text": "B",
+              "origin": [
+                111.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                111.99700164794922,
+                49.98059844970703,
+                124.00480651855469,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 51.98800277709961,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 111.99700164794922,
+              "right": 123.98799896240234,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "soft-break",
+          "page": 7,
+          "source": {
+            "id": "soft-break",
+            "runs": [
+              {
+                "text": "AAAA\nBBBB",
+                "decoration": [
+                  "underline"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              },
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 88,
+                "line": 1
+              }
+            ]
+          },
+          "importedText": "AAAA\nBBBB",
+          "expected": [
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            },
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 88,
+              "line": 1
+            }
+          ],
+          "measured": [
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            },
+            {
+              "kind": "underline",
+              "line": 1,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            }
+          ],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            },
+            {
+              "text": "BBBB",
+              "origin": [
+                39.99700164794922,
+                96.00900268554688
+              ],
+              "box": [
+                39.99700164794922,
+                79.99860382080078,
+                88.0281982421875,
+                100.01160430908203
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 98.41799926757812,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "descenders",
+          "page": 8,
+          "source": {
+            "id": "descenders",
+            "runs": [
+              {
+                "text": "gypsy",
+                "decoration": [
+                  "underline"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 100,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "gypsy",
+          "expected": [
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 100,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 100.00599670410156
+            }
+          ],
+          "spans": [
+            {
+              "text": "gypsy",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                100.03599548339844,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 100.00599670410156,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "empty-defaults",
+          "page": 9,
+          "source": {
+            "id": "empty-defaults",
+            "runs": [],
+            "defaults": [
+              "underline",
+              "line-through"
+            ],
+            "expected": []
+          },
+          "importedText": "",
+          "expected": [],
+          "measured": [],
+          "spans": [],
+          "drawings": [],
+          "status": "matched"
+        },
+        {
+          "id": "independent-cancellation",
+          "page": 10,
+          "source": {
+            "id": "independent-cancellation",
+            "defaults": [
+              "underline",
+              "line-through"
+            ],
+            "runs": [
+              {
+                "text": "AAAA",
+                "decoration": [
+                  "underline"
+                ]
+              },
+              {
+                "text": "BBBB",
+                "decoration": [
+                  "line-through"
+                ]
+              },
+              {
+                "text": "CCCC",
+                "decoration": [
+                  "underline",
+                  "line-through"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "underline",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              },
+              {
+                "kind": "line-through",
+                "left": 88,
+                "right": 184,
+                "line": 0
+              },
+              {
+                "kind": "underline",
+                "left": 136,
+                "right": 184,
+                "line": 0
+              }
+            ]
+          },
+          "importedText": "AAAABBBBCCCC",
+          "expected": [
+            {
+              "kind": "line-through",
+              "left": 88,
+              "right": 184,
+              "line": 0
+            },
+            {
+              "kind": "underline",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            },
+            {
+              "kind": "underline",
+              "left": 136,
+              "right": 184,
+              "line": 0
+            }
+          ],
+          "measured": [
+            {
+              "kind": "line-through",
+              "line": 0,
+              "left": 87.98699951171875,
+              "right": 183.88400268554688
+            },
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            },
+            {
+              "kind": "underline",
+              "line": 0,
+              "left": 135.89300537109375,
+              "right": 183.88400268554688
+            }
+          ],
+          "spans": [
+            {
+              "text": "AAAABBBBCCCC",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                183.9241943359375,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 87.98699951171875,
+              "right": 135.97799682617188,
+              "y": 60.689998626708984,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 135.89300537109375,
+              "right": 183.88400268554688,
+              "y": 68.39999389648438,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 135.89300537109375,
+              "right": 183.88400268554688,
+              "y": 60.689998626708984,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "explicit-none",
+          "page": 11,
+          "source": {
+            "id": "explicit-none",
+            "defaults": [
+              "underline",
+              "line-through"
+            ],
+            "runs": [
+              {
+                "text": "AAAA\nBBBB",
+                "decoration": []
+              }
+            ],
+            "expected": []
+          },
+          "importedText": "AAAA\nBBBB",
+          "expected": [],
+          "measured": [],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            },
+            {
+              "text": "BBBB",
+              "origin": [
+                39.99700164794922,
+                96.00900268554688
+              ],
+              "box": [
+                39.99700164794922,
+                79.99860382080078,
+                88.0281982421875,
+                100.01160430908203
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [],
+          "status": "matched"
+        },
+        {
+          "id": "soft-empty-line",
+          "page": 12,
+          "source": {
+            "id": "soft-empty-line",
+            "runs": [
+              {
+                "text": "AAAA\n\nBBBB",
+                "decoration": [
+                  "line-through"
+                ]
+              }
+            ],
+            "expected": [
+              {
+                "kind": "line-through",
+                "left": 40,
+                "right": 88,
+                "line": 0
+              },
+              {
+                "kind": "line-through",
+                "left": 40,
+                "right": 88,
+                "line": 2
+              }
+            ]
+          },
+          "importedText": "AAAA\n\nBBBB",
+          "expected": [
+            {
+              "kind": "line-through",
+              "left": 40,
+              "right": 88,
+              "line": 0
+            },
+            {
+              "kind": "line-through",
+              "left": 40,
+              "right": 88,
+              "line": 2
+            }
+          ],
+          "measured": [
+            {
+              "kind": "line-through",
+              "line": 0,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            },
+            {
+              "kind": "line-through",
+              "line": 2,
+              "left": 39.99700164794922,
+              "right": 87.98800659179688
+            }
+          ],
+          "spans": [
+            {
+              "text": "AAAA",
+              "origin": [
+                39.99700164794922,
+                65.99099731445312
+              ],
+              "box": [
+                39.99700164794922,
+                49.98059844970703,
+                88.0281982421875,
+                69.99359893798828
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            },
+            {
+              "text": "BBBB",
+              "origin": [
+                39.99700164794922,
+                125.88699340820312
+              ],
+              "box": [
+                39.99700164794922,
+                109.87659454345703,
+                88.0281982421875,
+                129.88958740234375
+              ],
+              "font": "LiberationMono",
+              "size": 20.01300048828125
+            }
+          ],
+          "drawings": [
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 60.689998626708984,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            },
+            {
+              "left": 39.99700164794922,
+              "right": 87.98800659179688,
+              "y": 120.58599090576172,
+              "width": 1.3890000581741333,
+              "color": [
+                0.06666667014360428,
+                0.13333334028720856,
+                0.20000000298023224
+              ]
+            }
+          ],
+          "status": "matched"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "source": {
+    "path": "references/GordenPPTSkill/templates/geometric-summary/template.pptx",
+    "id": "2d2c4efff591",
+    "sha256": "94c24c9cb259caf88bbbf86f47771b69ef36873491c2cfe8161f54ec56fcaebd",
+    "pages": 21,
+    "entries": [
+      "2d2c4efff591-0001",
+      "2d2c4efff591-0002",
+      "2d2c4efff591-0003",
+      "2d2c4efff591-0004",
+      "2d2c4efff591-0005",
+      "2d2c4efff591-0006",
+      "2d2c4efff591-0007",
+      "2d2c4efff591-0008",
+      "2d2c4efff591-0009",
+      "2d2c4efff591-0010",
+      "2d2c4efff591-0011",
+      "2d2c4efff591-0012",
+      "2d2c4efff591-0013",
+      "2d2c4efff591-0014",
+      "2d2c4efff591-0015",
+      "2d2c4efff591-0016",
+      "2d2c4efff591-0017",
+      "2d2c4efff591-0018",
+      "2d2c4efff591-0019",
+      "2d2c4efff591-0020",
+      "2d2c4efff591-0021"
+    ]
+  },
+  "renderer": "source-aware DrawingML browser DOM -> standalone editable HTML/SVG",
+  "records": [
+    {
+      "id": "2d2c4efff591-0001",
+      "source": "references/GordenPPTSkill/templates/geometric-summary/template.pptx",
+      "sourcePage": 1,
+      "sourceSha256": "94c24c9cb259caf88bbbf86f47771b69ef36873491c2cfe8161f54ec56fcaebd",
+      "markdownSha256": "e93046d61e706d0d3cfa2831af125c1f2e33408fff5aa51e758abb6ee4c96aad",
+      "textBlocks": 7,
+      "textOverflow": 0,
+      "missingImages": 0,
+      "svgCount": 122,
+      "textLength": 215,
+      "nodeErrors": [],
+      "original": "originals/2d2c4efff591/0001.jpg",
+      "replica": "2d2c4efff591-0001.jpg",
+      "changed": true
+    },
+    {
+      "id": "2d2c4efff591-0002",
+      "source": "references/GordenPPTSkill/templates/geometric-summary/template.pptx",
+      "sourcePage": 2,
+      "sourceSha256": "94c24c9cb259caf88bbbf86f47771b69ef36873491c2cfe8161f54ec56fcaebd",
+      "markdownSha256": "30fea4163d221722ce1b74a38eb633600e4bc2429546dc30fca9859ab36f70e2",
+      "textBlocks": 17,
+      "textOverflow": 0,
+      "missingImages": 0,
+      "svgCount": 139,
+      "textLength": 193,
+      "nodeErrors": [],
+      "original": "originals/2d2c4efff591/0002.jpg",
+      "replica": "2d2c4efff591-0002.jpg",
+      "changed": true
+    },
+    {
+      "id": "2d2c4efff591-0003",
+      "source": "references/GordenPPTSkill/templates/geometric-summary/template.pptx",
+      "sourcePage": 3,
+      "sourceSha256": "94c24c9cb259caf88bbbf86f47771b69ef36873491c2cfe8161f54ec56fcaebd",
+      "markdownSha256": "6e0c5577144a740afcb4fb2e50e837332edc0d2985ef387b4f423a89f47cb9cb",
+      "textBlocks": 6,
+      "textOverflow": 0,
+      "missingImages": 0,
+      "svgCount": 101,
+      "textLength": 94,
+      "nodeErrors": [],
+      "original": "originals/2d2c4efff591/0003.jpg",
+      "replica": "2d2c4efff591-0003.jpg",
+      "changed": true
+    }
+  ]
+}

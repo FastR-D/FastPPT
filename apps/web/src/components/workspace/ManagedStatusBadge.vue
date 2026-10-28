@@ -1,10 +1,8 @@
 <script setup lang="ts">
+import { Box, Button, Header, Heading, Panel, Text } from '@fastppt/components'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-import type {
-  McpConfigStatus,
-  SkillInstallStatus,
-} from '@fastppt/protocol'
+import type { McpConfigStatus, SkillInstallStatus } from '@fastppt/protocol'
 
 const props = defineProps<{
   skillStatuses: readonly SkillInstallStatus[]
@@ -18,7 +16,7 @@ type Severity = 'healthy' | 'attention' | 'critical'
 const CRITICAL_STATES = new Set(['missing', 'conflict', 'disabled'])
 const ATTENTION_STATES = new Set(['update-available', 'pending-trust'])
 
-const totalSkills = computed(() => props.skillStatuses.length)
+const totalSkills = computed(() => props.skillStatuses.filter(status => status.state !== 'on-demand').length)
 const installedSkills = computed(
   () => props.skillStatuses.filter((s) => s.state === 'installed').length,
 )
@@ -42,6 +40,7 @@ const severity = computed<Severity>(() => {
 })
 
 const stateLabel: Record<string, string> = {
+  'on-demand': '按需接入',
   installed: '已安装',
   configured: '已配置',
   missing: '缺失',
@@ -53,7 +52,7 @@ const stateLabel: Record<string, string> = {
 
 const mcpStateLabel = computed(() =>
   props.mcpStatus
-    ? stateLabel[props.mcpStatus.state] ?? props.mcpStatus.state
+    ? (stateLabel[props.mcpStatus.state] ?? props.mcpStatus.state)
     : '未配置',
 )
 
@@ -70,7 +69,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <button
+  <Button
+    size="xs"
+    variant="quiet"
     type="button"
     class="managed-badge-button"
     :class="severity"
@@ -79,112 +80,128 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
     aria-haspopup="dialog"
     @click="open = true"
   >
-    <span class="badge-dot" aria-hidden="true" />
-    <span class="badge-count">{{ totalManaged }}</span>
-  </button>
+    <Text class="badge-dot" aria-hidden="true" />
+    <Text class="badge-count">
+      {{
+        severity === 'critical'
+          ? '环境需修复'
+          : severity === 'attention'
+            ? '环境待确认'
+            : '环境就绪'
+      }}
+      · {{ totalManaged }}
+    </Text>
+  </Button>
 
   <Teleport to="body">
-    <div
+    <Box
       v-if="open"
       class="modal-backdrop"
       role="presentation"
       @mousedown.self="close"
     >
-      <section
+      <Panel
         class="status-modal"
         role="dialog"
         aria-modal="true"
         aria-label="Skill 与 MCP 安装状态"
       >
-        <header class="modal-header">
-          <div>
-            <span class="eyebrow">安装状态</span>
-            <h2>Skill 与 MCP</h2>
-            <p v-if="harnessLabel" class="modal-harness">{{ harnessLabel }}</p>
-          </div>
-          <button
+        <Header class="modal-header">
+          <Box>
+            <Text class="eyebrow">安装状态</Text>
+            <Heading as="h2">Skill 与 MCP</Heading>
+            <Text v-if="harnessLabel" as="p" class="modal-harness">
+              {{
+                harnessLabel
+              }}
+            </Text>
+          </Box>
+          <Button
+            variant="secondary"
             type="button"
             class="close-button"
             aria-label="关闭"
             @click="close"
           >
             ×
-          </button>
-        </header>
+          </Button>
+        </Header>
 
-        <div class="modal-content">
-          <div class="modal-summary" :class="severity">
-            <span>{{ installedSkills }}/{{ totalSkills }} 个 Skill 已安装</span>
-            <span class="summary-mcp">MCP {{ mcpStateLabel }}</span>
-          </div>
+        <Box class="modal-content">
+          <Box class="modal-summary" :class="severity">
+            <Text>{{ installedSkills }}/{{ totalSkills }} 个 Skill 已安装</Text>
+            <Text class="summary-mcp">MCP {{ mcpStateLabel }}</Text>
+          </Box>
 
-          <div class="status-list">
-            <div
+          <Box class="status-list">
+            <Box
               v-for="skill in skillStatuses"
               :key="skill.skillId"
               class="status-row"
             >
-              <span class="row-main">
+              <Text class="row-main">
                 {{ skill.skillId }}
-                <small v-if="skill.kind === 'theme'" class="row-theme">
+                <Text
+                  v-if="skill.kind === 'theme'"
+                  as="small"
+                  class="row-theme"
+                >
                   {{ skill.themeId }}
-                </small>
-              </span>
-              <span class="row-side">
-                <small v-if="skill.expectedVersion" class="row-version">
+                </Text>
+              </Text>
+              <Text class="row-side">
+                <Text
+                  v-if="skill.expectedVersion"
+                  as="small"
+                  class="row-version"
+                >
                   {{ skill.expectedVersion }}
-                </small>
-                <em :class="['row-state', `state-${skill.state}`]">
+                </Text>
+                <Text as="em" :class="['row-state', `state-${skill.state}`]">
                   {{ stateLabel[skill.state] ?? skill.state }}
-                </em>
-              </span>
-              <p v-if="skill.message" class="row-message">{{ skill.message }}</p>
-            </div>
+                </Text>
+              </Text>
+              <Text v-if="skill.message" as="p" class="row-message">
+                {{ skill.message }}
+              </Text>
+            </Box>
 
-            <div v-if="mcpStatus" class="status-row">
-              <span class="row-main">fastppt MCP</span>
-              <span class="row-side">
-                <em :class="['row-state', `state-${mcpStatus.state}`]">
+            <Box v-if="mcpStatus" class="status-row">
+              <Text class="row-main">fastppt MCP</Text>
+              <Text class="row-side">
+                <Text
+                  as="em"
+                  :class="['row-state', `state-${mcpStatus.state}`]"
+                >
                   {{ stateLabel[mcpStatus.state] ?? mcpStatus.state }}
-                </em>
-              </span>
-              <p v-if="mcpStatus.message" class="row-message">
+                </Text>
+              </Text>
+              <Text v-if="mcpStatus.message" as="p" class="row-message">
                 {{ mcpStatus.message }}
-              </p>
-            </div>
+              </Text>
+            </Box>
 
-            <div v-if="!skillStatuses.length && !mcpStatus" class="status-empty">
+            <Box
+              v-if="!skillStatuses.length && !mcpStatus"
+              class="status-empty"
+            >
               暂无状态信息
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+            </Box>
+          </Box>
+        </Box>
+      </Panel>
+    </Box>
   </Teleport>
 </template>
 
 <style scoped>
-/* Inline signal light beside the "FastPPT" brand text. */
+/* Compact environment status in the workbench status bar. */
 .managed-badge-button {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   height: 18px;
-  padding: 0 5px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-panel-raised);
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 9px;
   line-height: 1;
-  cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
-}
-
-.managed-badge-button:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text);
 }
 
 .badge-dot {
@@ -194,16 +211,18 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   border-radius: 50%;
   background: var(--color-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 16%, transparent);
-  transition: background 120ms ease, box-shadow 120ms ease;
+  transition:
+    background 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .managed-badge-button.attention .badge-dot {
-  background: #fcd34d;
+  background: var(--color-warning);
   box-shadow: 0 0 0 2px rgb(252 211 77 / 18%);
 }
 
 .managed-badge-button.critical .badge-dot {
-  background: #f87171;
+  background: var(--color-danger);
   box-shadow: 0 0 0 2px rgb(248 113 113 / 18%);
 }
 
@@ -221,8 +240,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(3 8 7 / 76%);
-  backdrop-filter: blur(8px);
+  background: var(--color-overlay);
 }
 
 .status-modal {
@@ -234,7 +252,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   border: 1px solid var(--color-border-strong);
   border-radius: 14px;
   background: var(--color-panel-raised);
-  box-shadow: 0 24px 80px rgb(0 0 0 / 45%);
+  box-shadow: var(--shadow-modal);
 }
 
 .modal-header {
@@ -269,19 +287,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 .close-button {
   width: 30px;
   height: 30px;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-panel);
-  color: var(--color-muted);
-  font-size: 20px;
   line-height: 1;
-  cursor: pointer;
-}
-
-.close-button:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text);
 }
 
 .modal-content {
@@ -299,20 +305,20 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   margin-bottom: 10px;
   padding: 8px 12px;
   border-radius: 9px;
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   font-family: var(--font-mono);
   font-size: 11px;
 }
 
 .modal-summary.attention {
-  color: #fcd34d;
-  background: color-mix(in srgb, #fcd34d 14%, transparent);
+  color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
 }
 
 .modal-summary.critical {
-  color: #f87171;
-  background: color-mix(in srgb, #f87171 14%, transparent);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
 }
 
 .status-list {
@@ -347,7 +353,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   margin-left: 5px;
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .row-side {
@@ -360,7 +366,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 .row-version {
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .row-state {
@@ -373,21 +379,21 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 
 .row-state.state-installed,
 .row-state.state-configured {
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 .row-state.state-update-available,
 .row-state.state-pending-trust {
-  color: #fcd34d;
-  background: color-mix(in srgb, #fcd34d 14%, transparent);
+  color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
 }
 
 .row-state.state-missing,
 .row-state.state-conflict,
 .row-state.state-disabled {
-  color: #f87171;
-  background: color-mix(in srgb, #f87171 14%, transparent);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
 }
 
 .row-message {
@@ -409,10 +415,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 @media (max-width: 720px) {
   .managed-badge-button {
     width: 16px;
-    padding: 0;
     justify-content: center;
-    border-color: transparent;
-    background: transparent;
   }
   .badge-count {
     display: none;

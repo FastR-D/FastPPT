@@ -31,7 +31,7 @@ export function textGraphemeRanges(text: string): TextGraphemeRange[] {
 
 export function canvasFont(style: CSSStyleDeclaration): string {
   const stretch =
-    style.fontStretch && style.fontStretch !== 'normal'
+    style.fontStretch && !['normal', '100%'].includes(style.fontStretch)
       ? `${style.fontStretch} `
       : ''
   return `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${stretch}${style.fontSize} ${style.fontFamily}`
@@ -44,25 +44,25 @@ export function measureTextAdvance(
   if (!text) return 0
   const letterSpacing = Number.parseFloat(style.letterSpacing)
   const font = canvasFont(style)
+  const canvasAdvance = () => {
+    const context = document.createElement('canvas').getContext('2d')
+    if (!context) return 0
+    context.fontKerning = style.fontKerning as CanvasFontKerning
+    context.font = font
+    const graphemeCount = textGraphemeRanges(text).length
+    return context.measureText(text).width + Math.max(0, graphemeCount - 1) * (Number.isFinite(letterSpacing) ? letterSpacing : 0)
+  }
+  // Pretext does not accept the CSS kerning mode; preserve disabled pairs.
+  if (style.fontKerning === 'none') return canvasAdvance()
   try {
     const prepared = prepareWithSegments(text, font, {
       whiteSpace: pretextWhiteSpace(style.whiteSpace),
       wordBreak: style.wordBreak === 'keep-all' ? 'keep-all' : 'normal',
-      ...(Number.isFinite(letterSpacing) && letterSpacing !== 0
-        ? { letterSpacing }
-        : {}),
+      ...(Number.isFinite(letterSpacing) && letterSpacing !== 0 ? { letterSpacing } : {}),
     })
     return measureNaturalWidth(prepared)
   } catch {
-    const context = document.createElement('canvas').getContext('2d')
-    if (!context) return 0
-    context.font = font
-    const graphemeCount = textGraphemeRanges(text).length
-    return (
-      context.measureText(text).width +
-      Math.max(0, graphemeCount - 1) *
-        (Number.isFinite(letterSpacing) ? letterSpacing : 0)
-    )
+    return canvasAdvance()
   }
 }
 
