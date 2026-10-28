@@ -10,6 +10,9 @@ export const NativePathsSchema = z.object({
 }).strict().refine(value => value.paths.reduce((sum, path) => sum + path.points.length, 0) <= 32768, 'Geometry has too many points')
 
 export interface NativePaths { paths: Array<{points: Array<[number,number]>;closed:boolean}>;fillRule:'nonzero'|'evenodd' }
+export function parseNativePaths(value: unknown): NativePaths {
+  return NativePathsSchema.parse(value) as NativePaths
+}
 export interface NativeGeometry extends NativePaths {
   version: 1; fill: string; stroke: string; strokeWidthRatio: number
   fillOpacity?: number; strokeOpacity?: number
