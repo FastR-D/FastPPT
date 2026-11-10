@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test'
 import { existsSync } from 'node:fs'
 
-const systemChrome = '/usr/bin/google-chrome'
+const systemChrome = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ?? '/usr/bin/google-chrome'
 
 export default defineConfig({
   testDir: './specs',

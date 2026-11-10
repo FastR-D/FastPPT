@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {
-  useColorMode,
   Box,
   Button,
   Header,
   Panel,
   Text,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
+import { isDark } from '../../color-mode.js'
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
 import type { EditorView } from '@codemirror/view'
 
@@ -26,7 +26,6 @@ const emit = defineEmits<{
 }>()
 
 const editorElement = useTemplateRef<HTMLDivElement>('editorElement')
-const { isDark } = useColorMode()
 let editorView: EditorView | undefined
 let updateTheme: (() => void) | undefined
 

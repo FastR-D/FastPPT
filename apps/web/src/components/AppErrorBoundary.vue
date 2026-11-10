@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, Button, Heading, Panel, Text } from '@fastppt/components'
+import { Box, Button, Heading, Panel, Text } from '@fastrd/ui-vue'
 import { onErrorCaptured, ref } from 'vue'
 
 const failure = ref(false)

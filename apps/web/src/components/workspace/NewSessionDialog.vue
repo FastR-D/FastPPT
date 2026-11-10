@@ -10,10 +10,10 @@ import {
   Heading,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, shallowRef, watch } from 'vue'
 
-import { Select as AppSelect, type SelectItem } from '@fastppt/components'
+import { Select as AppSelect, type SelectItem } from '@fastrd/ui-vue'
 
 import { wizardRoute } from '../../workspace/creation-wizard.js'
 import type {

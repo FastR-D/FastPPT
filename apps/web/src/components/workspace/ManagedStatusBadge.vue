@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Box, Button, Header, Heading, Panel, Text } from '@fastppt/components'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { Box, Button, Header, Heading, Modal, Text } from '@fastrd/ui-vue'
+import { computed, ref } from 'vue'
 
 import type { McpConfigStatus, SkillInstallStatus } from '@fastppt/protocol'
 
@@ -60,12 +60,6 @@ function close(): void {
   open.value = false
 }
 
-function onKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Escape') close()
-}
-
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
@@ -93,105 +87,55 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
     </Text>
   </Button>
 
-  <Teleport to="body">
-    <Box
-      v-if="open"
-      class="modal-backdrop"
-      role="presentation"
-      @mousedown.self="close"
-    >
-      <Panel
-        class="status-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Skill 与 MCP 安装状态"
+  <Modal :open="open" class="status-modal" label="Skill 与 MCP 安装状态" @close="close">
+    <Header class="modal-header">
+      <Box>
+        <Text class="eyebrow">安装状态</Text>
+        <Heading as="h2">Skill 与 MCP</Heading>
+        <Text v-if="harnessLabel" as="p" class="modal-harness">{{ harnessLabel }}</Text>
+      </Box>
+      <Button
+        variant="secondary"
+        type="button"
+        class="close-button"
+        aria-label="关闭"
+        @click="close"
       >
-        <Header class="modal-header">
-          <Box>
-            <Text class="eyebrow">安装状态</Text>
-            <Heading as="h2">Skill 与 MCP</Heading>
-            <Text v-if="harnessLabel" as="p" class="modal-harness">
-              {{
-                harnessLabel
-              }}
-            </Text>
-          </Box>
-          <Button
-            variant="secondary"
-            type="button"
-            class="close-button"
-            aria-label="关闭"
-            @click="close"
-          >
-            ×
-          </Button>
-        </Header>
+        ×
+      </Button>
+    </Header>
 
-        <Box class="modal-content">
-          <Box class="modal-summary" :class="severity">
-            <Text>{{ installedSkills }}/{{ totalSkills }} 个 Skill 已安装</Text>
-            <Text class="summary-mcp">MCP {{ mcpStateLabel }}</Text>
-          </Box>
+    <Box class="modal-content">
+      <Box class="modal-summary" :class="severity">
+        <Text>{{ installedSkills }}/{{ totalSkills }} 个 Skill 已安装</Text>
+        <Text class="summary-mcp">MCP {{ mcpStateLabel }}</Text>
+      </Box>
 
-          <Box class="status-list">
-            <Box
-              v-for="skill in skillStatuses"
-              :key="skill.skillId"
-              class="status-row"
-            >
-              <Text class="row-main">
-                {{ skill.skillId }}
-                <Text
-                  v-if="skill.kind === 'theme'"
-                  as="small"
-                  class="row-theme"
-                >
-                  {{ skill.themeId }}
-                </Text>
-              </Text>
-              <Text class="row-side">
-                <Text
-                  v-if="skill.expectedVersion"
-                  as="small"
-                  class="row-version"
-                >
-                  {{ skill.expectedVersion }}
-                </Text>
-                <Text as="em" :class="['row-state', `state-${skill.state}`]">
-                  {{ stateLabel[skill.state] ?? skill.state }}
-                </Text>
-              </Text>
-              <Text v-if="skill.message" as="p" class="row-message">
-                {{ skill.message }}
-              </Text>
-            </Box>
-
-            <Box v-if="mcpStatus" class="status-row">
-              <Text class="row-main">fastppt MCP</Text>
-              <Text class="row-side">
-                <Text
-                  as="em"
-                  :class="['row-state', `state-${mcpStatus.state}`]"
-                >
-                  {{ stateLabel[mcpStatus.state] ?? mcpStatus.state }}
-                </Text>
-              </Text>
-              <Text v-if="mcpStatus.message" as="p" class="row-message">
-                {{ mcpStatus.message }}
-              </Text>
-            </Box>
-
-            <Box
-              v-if="!skillStatuses.length && !mcpStatus"
-              class="status-empty"
-            >
-              暂无状态信息
-            </Box>
-          </Box>
+      <Box class="status-list">
+        <Box v-for="skill in skillStatuses" :key="skill.skillId" class="status-row">
+          <Text class="row-main">
+            {{ skill.skillId }}
+            <Text v-if="skill.kind === 'theme'" as="small" class="row-theme">{{ skill.themeId }}</Text>
+          </Text>
+          <Text class="row-side">
+            <Text v-if="skill.expectedVersion" as="small" class="row-version">{{ skill.expectedVersion }}</Text>
+            <Text as="em" :class="['row-state', `state-${skill.state}`]">{{ stateLabel[skill.state] ?? skill.state }}</Text>
+          </Text>
+          <Text v-if="skill.message" as="p" class="row-message">{{ skill.message }}</Text>
         </Box>
-      </Panel>
+
+        <Box v-if="mcpStatus" class="status-row">
+          <Text class="row-main">fastppt MCP</Text>
+          <Text class="row-side">
+            <Text as="em" :class="['row-state', `state-${mcpStatus.state}`]">{{ stateLabel[mcpStatus.state] ?? mcpStatus.state }}</Text>
+          </Text>
+          <Text v-if="mcpStatus.message" as="p" class="row-message">{{ mcpStatus.message }}</Text>
+        </Box>
+
+        <Box v-if="!skillStatuses.length && !mcpStatus" class="status-empty">暂无状态信息</Box>
+      </Box>
     </Box>
-  </Teleport>
+  </Modal>
 </template>
 
 <style scoped>
@@ -231,37 +175,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   line-height: 1;
 }
 
-/* Modal — matches the theme-catalog modal pattern: dimmed + blurred backdrop,
-   centered panel with its own top/bottom bounds and internal scrolling. */
-.modal-backdrop {
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--color-overlay);
-}
-
-.status-modal {
+.status-modal[open] {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  width: min(520px, 100%);
+  width: min(520px, calc(100vw - 48px));
   max-height: min(620px, calc(100dvh - 48px));
   overflow: hidden;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 14px;
-  background: var(--color-panel-raised);
-  box-shadow: var(--shadow-modal);
-}
-
-.modal-header {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--color-border);
 }
 
 .eyebrow {

@@ -8,4 +8,4 @@ export {
   type JsonlRpcClientOptions,
   type RpcCommand,
   type RpcMessage,
-} from './jsonl-rpc.js'
+} from '@fastrd/harness-transport'

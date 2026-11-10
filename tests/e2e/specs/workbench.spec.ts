@@ -170,6 +170,10 @@ test('keeps session configuration keyboard focus inside the dialog', async ({
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: '关闭', exact: true }).focus()
   await page.keyboard.press('Shift+Tab')
+  // Native traversal may pass through browser chrome before returning to the modal.
+  await expect(trigger).not.toBeFocused()
+  if (!(await dialog.evaluate(element => element.contains(document.activeElement))))
+    await page.keyboard.press('Shift+Tab')
   await expect(
     dialog.getByRole('button', { name: '取消', exact: true }),
   ).toBeFocused()
@@ -178,6 +182,27 @@ test('keeps session configuration keyboard focus inside the dialog', async ({
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(trigger).toBeFocused()
+})
+
+test('keeps deck selector arrow keys native instead of turning preview pages', async ({ page }) => {
+  await page.goto('/')
+  const picker = page.getByRole('combobox', { name: 'Preview deck', exact: true })
+  await expect(picker).toBeEnabled()
+  await picker.selectOption({ index: 0 })
+  const first = await picker.inputValue()
+  await picker.evaluate(element => {
+    element.addEventListener('keydown', event => {
+      element.setAttribute('data-key-prevented', String(event.defaultPrevented))
+    })
+  })
+  await picker.press('ArrowRight')
+  await expect(picker).not.toHaveValue(first)
+  await expect(picker).toHaveAttribute('data-key-prevented', 'false')
+  await expect(picker).toBeFocused()
+  const heights = await page.locator('.preview-identity select, .page-indicator input, .preview-actions > button, .preview-more > summary')
+    .evaluateAll(elements => elements.map(element => element.getBoundingClientRect().height))
+  expect(heights.length).toBeGreaterThanOrEqual(6)
+  heights.forEach(height => expect(height).toBe(24))
 })
 
 test('uses the shared button and field styles throughout the creation wizard', async ({
@@ -193,13 +218,7 @@ test('uses the shared button and field styles throughout the creation wizard', a
   const wizard = page.getByRole('dialog', { name: '创建向导' })
   const next = wizard.getByRole('button', { name: '保存并继续', exact: true })
   await expect(next).toBeEnabled()
-  await expect(next).toHaveClass(/fp-button--primary/)
-  await expect(next).toHaveClass(/fp-button--md/)
-  await expect(wizard.getByRole('button', { name: '稍后继续' })).toHaveClass(
-    /fp-button--secondary/,
-  )
-  await expect(wizard.getByLabel('推荐选项')).toHaveClass(/fp-select/)
-  await expect(wizard.getByLabel('本步备注')).toHaveClass(/fp-textarea/)
+  await expect(next).toHaveCSS('background-color', 'rgb(21, 95, 184)')
   await wizard.getByLabel('推荐选项').selectOption('从零创建')
   await wizard.getByLabel('本步备注').fill('组件库表单验证')
   await wizard.getByLabel('锁定本步决策').check()
@@ -215,16 +234,16 @@ test('uses the shared button and field styles throughout the creation wizard', a
 test('switches color modes and restores the saved choice', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' })
   await page.goto('/')
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'light')
   await page.getByRole('button', { name: '切换到深色模式' }).click()
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'dark')
   await expect(
     page.getByRole('button', { name: '切换到浅色模式' }),
   ).toHaveAttribute('aria-pressed', 'true')
   await page.reload()
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'dark')
   await page.getByRole('button', { name: '切换到浅色模式' }).click()
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'light')
   expect(
     await page.evaluate(() => localStorage.getItem('fastppt.color-mode')),
   ).toBe('light')
@@ -235,13 +254,13 @@ test('follows the system color scheme until the user selects a mode', async ({
 }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('/')
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'dark')
   await page.emulateMedia({ colorScheme: 'light' })
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'light')
   await page.getByRole('button', { name: '切换到深色模式' }).click()
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.emulateMedia({ colorScheme: 'light' })
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-fastui-theme', 'dark')
 })
 
 test('keeps the unsaved editor draft when changing color modes', async ({

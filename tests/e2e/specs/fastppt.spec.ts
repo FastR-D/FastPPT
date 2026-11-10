@@ -158,8 +158,7 @@ test('runs the complete local workspace, Harness, editor, preview and export flo
   await page.setViewportSize({ width: 1600, height: 900 })
 
   async function pickOption(picker: Locator, label: string): Promise<void> {
-    await picker.click()
-    await page.getByRole('option', { name: label, exact: true }).click()
+    await picker.selectOption({ label })
   }
 
   async function createConfiguredSession(): Promise<void> {
@@ -193,7 +192,7 @@ test('runs the complete local workspace, Harness, editor, preview and export flo
     ).toBeVisible()
     if (switchDuringRun) {
       await pickOption(deckPicker, 'landing')
-      await expect(deckPicker).toHaveText('landing')
+      await expect(deckPicker.locator('option:checked')).toHaveText('landing')
     }
     await expect(sendButton).toBeVisible()
   }
@@ -561,8 +560,7 @@ test('grants separate rule exceptions for a real PPTX export and revokes publica
   await page.goto('/')
   const picker = page.getByLabel('Preview deck')
   await expect(picker).toBeVisible()
-  await picker.click()
-  await page.getByRole('option', { name: 'rule-exceptions', exact: true }).click()
+  await picker.selectOption({ label: 'rule-exceptions' })
   await expect(page.frameLocator('iframe[title="Slidev preview"]').locator('.slidev-layout').filter({ hasText: 'First review page' }).first()).toBeVisible()
   const panel = page.locator('.rule-exceptions')
   await panel.locator('summary').first().click()
@@ -630,8 +628,7 @@ test('keeps animation targets from the current deck when an earlier response arr
   await page.goto('/')
   const picker = page.getByLabel('Preview deck')
   await expect(picker).toBeVisible()
-  await picker.click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await picker.selectOption({ label: 'slides' })
   let releaseOld!: () => void
   let oldStarted!: () => void
   let oldDelivered!: () => void
@@ -652,8 +649,7 @@ test('keeps animation targets from the current deck when an earlier response arr
   try {
     await page.getByRole('tab', { name: '动画', exact: true }).click()
     await started
-    await picker.click()
-    await page.getByRole('option', { name: 'landing', exact: true }).click()
+    await picker.selectOption({ label: 'landing' })
     const target = page.locator('.timeline-details').getByLabel('对象')
     await expect(target).toHaveValue('current-deck-target')
     releaseOld()
@@ -668,8 +664,7 @@ test('applies motion presets by scope and preserves manual overrides when saving
   await page.goto('/')
   const picker = page.getByLabel('Preview deck')
   await expect(picker).toBeVisible()
-  await picker.click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await picker.selectOption({ label: 'slides' })
   await page.route('**/api/v1/decks/*/animations', async route => {
     if (route.request().method() === 'GET') await route.fulfill({ json: { version: 1, animations: [] } })
     else await route.continue()
@@ -726,8 +721,7 @@ test('renders imported placeholder geometry and measures visible content in the 
   const response = await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content: markdown } })
   expect(response.ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const iframe = page.getByTitle('Slidev preview')
   const preview = iframe.contentFrame()
   await expect(preview.getByRole('heading', { name: 'Imported title 中文 عربي' })).toBeVisible()
@@ -819,8 +813,7 @@ test('keeps source paragraph levels independent through nested lists, editing an
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-levels\n---\n\n::ph-0::\n\n<ul><li id="outer-level">First 一级<ul><li id="inner-level">Second 二级</li></ul></li><li id="last-level">Third 一级</li></ul><div><svg id="source-inline-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20" width="40" height="20"><path d="M0 10L20 0L40 10L20 20Z" fill="#112233" /></svg></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   const paragraphs = preview.locator('[data-fastppt-text-level]')
   await expect.poll(async () => ({ count: await paragraphs.count(), errors: renderErrors })).toEqual({ count: 3, errors: [] })
@@ -873,8 +866,7 @@ test('captures and binds an explicit rich text frame as one editable placeholder
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-levels\n---\n\n::ph-0::\n\n<div id="rich-body" data-fastppt-text-box><p>First <em>强调</em> <a href="https://example.com/" style="border:0;padding:0;text-decoration:underline">link</a></p><ul><li>Level one<ul><li>Second 二级<br>next<span style="display:none">HIDDEN</span></li></ul></li></ul><p></p></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   await expect(preview.locator('#rich-body [data-fastppt-text-level]')).toHaveCount(4)
   // A group animation must not be applied again to each paragraph descendant.
@@ -945,8 +937,7 @@ test('retains independent source languages through nested lists, inline override
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-languages\n---\n\n::ph-0::\n\n<div id="language-frame" data-fastppt-text-box><p>Base</p><p data-fastppt-level="2">Clear</p><ul lang="ja-JP"><li>Outer<ul><li>Nested</li></ul></li></ul><p>Inline <em lang="zh-CN" data-fastppt-alt-lang="">中文</em> tail</p><p lang="" data-fastppt-alt-lang="ko-KR">Authored</p><p data-fastppt-level="3">Third</p><p data-fastppt-level="2"></p></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   const frame = preview.locator('#language-frame')
   await expect(frame.locator('[data-fastppt-text-level]')).toHaveCount(8)
@@ -993,8 +984,7 @@ test('keeps source text body insets and vertical alignment through resizing and 
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-text-body\n---\n\n::ph-0::\n\n<div id="body-frame" data-fastppt-text-box><p>底部对齐 A long line remains unwrapped when the source text body disables wrapping.</p></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   await expect(preview.locator('#body-frame')).toBeVisible()
   const measure = () => preview.locator('#body-frame').evaluate(element => {
@@ -1047,8 +1037,7 @@ test('keeps source bullet markers editable, separate from text, and synchronized
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-bullets\n---\n\n::ph-0::\n\n<div id="bullet-frame" data-fastppt-text-box><p><span style="display:none">HIDDEN</span><strong style="color:#445566">中文 First marker follows this visible run.</strong> This long paragraph wraps onto another line so the hanging marker stays outside the body and never becomes part of the text. This line keeps the same indentation.</p><p data-fastppt-level="2">Explicit symbol font, size and color.<br>Soft break</p><p data-fastppt-level="3">No marker at level three.</p><p data-fastppt-level="9">Ninth level returns to the base marker style.</p><p></p><ul><li data-fastppt-level="2" data-fastppt-no-bullet><p>Local cancellation.</p></li></ul></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   const frame = preview.locator('#bullet-frame')
   await expect(frame).toBeVisible()
@@ -1121,8 +1110,7 @@ test('recomputes native automatic numbering by DOM order and keeps frame and res
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-numbering\n---\n\n::ph-0::\n\n<div id="number-frame" data-fastppt-text-box><p>A</p><p>B</p><p data-fastppt-level="2">C</p><p data-fastppt-no-bullet>Plain</p><p data-fastppt-level="2">D</p><p>E</p><p data-fastppt-level="2">F</p><p></p><p style="display:none">Hidden</p><ul><li data-fastppt-start-at="2">  <p>Restart</p>  <p>After</p>  </li></ul></div><div id="other-frame" data-fastppt-text-box><p>Independent</p></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   const frame = preview.locator('#number-frame'), markers = frame.locator('[data-fastppt-bullet-marker]')
   await expect(frame).toBeVisible()
@@ -1183,8 +1171,7 @@ test('measures literal source tabs across runs, explicit clears, soft breaks and
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-tabs\n---\n\n::ph-0::\n\n<div id="tab-frame" data-fastppt-text-box><p>A<span>&#9;</span><strong>中文</strong>&#9;&#9;D</p><p data-fastppt-level="2">A&#9;B&#9;C</p><p data-fastppt-level="3">A&#9;B&#9;C</p><p data-fastppt-level="4">A&#9;B&#9;C</p><p>A&#9;B<br>C&#9;D</p></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), frame = preview.locator('#tab-frame')
   await expect(frame).toBeVisible()
   const markers = frame.locator('[data-fastppt-tab]')
@@ -1272,8 +1259,7 @@ test('measures centered and right tab fields across inline runs, breaks, collisi
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-tabs\n---\n\n::ph-0::\n\n<div id="aligned-frame" data-fastppt-text-box><p data-fastppt-level="5">A&#9;<span data-field="center" data-stop="1500000">AB<strong>中文</strong></span>&#9;<span data-field="center" data-stop="3500000">CD</span></p><p data-fastppt-level="6">A&#9;<span data-field="right" data-stop="1500000"><strong>AB</strong>中文</span>&#9;<span data-field="right" data-stop="3500000">CD</span></p><p data-fastppt-level="5">A&#9;&#9;<span data-field="center" data-stop="3500000">E</span></p><p data-fastppt-level="6">A&#9;<span data-field="right" data-stop="1500000">BB</span><br>X&#9;<span data-field="right" data-stop="1500000">YY</span></p><p data-fastppt-level="5">A&#9;<span data-clamped>MMMMMMMMMMMMMMMMMMMMMMMMMMMM</span></p><p data-fastppt-level="6">A&#9;<span data-field="right" data-stop="1500000">F</span>&#9;<span data-field="right" data-stop="3500000">G</span>&#9;<span data-field="left" data-stop="3600000">H</span></p><p data-fastppt-level="5">A&#9;<span data-newline>{{ "BB\\nX" }}</span>&#9;<span data-field="center" data-stop="1500000">YY</span></p></div>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), frame = preview.locator('#aligned-frame')
   await expect(frame).toBeVisible()
   await expect(frame.locator('[data-fastppt-tab]')).toHaveCount(14)
@@ -1327,8 +1313,7 @@ layout: source-tabs
 `
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), frame = preview.locator('#decimal-frame')
   await expect(frame).toBeVisible()
   await expect(frame.locator('[data-fastppt-tab]')).toHaveCount(17)
@@ -1402,8 +1387,7 @@ test('captures automatic tab lines and reselects stops after wrapping without ad
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-wrapped-tabs\n---\n' + bodies.map((body, index) => `\n::ph-${index}::\n\n<div id="flow-${index}" data-fastppt-text-box>${body}</div>\n`).join('')
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), root = preview.locator('.source-layout')
   await expect(preview.locator('#flow-3')).toBeVisible()
   const capturePath = `http://127.0.0.1:4328/@fs${fileURLToPath(new URL('../../../packages/slidewave/src/slidev/capture.ts', import.meta.url))}`
@@ -1466,8 +1450,7 @@ test('measures bullet first-line occupancy, alignment and baselines without chan
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-bullet-geometry\n---\n' + [0, 1, 2, 3].map(index => `\n::ph-${index}::\n\n<div id="geometry-${index}" data-fastppt-text-box><p>AAAA BBBB CCCC</p><p data-fastppt-level="2">AAAA BBBB CCCC</p><p data-fastppt-level="3">AAAA BBBB CCCC</p><p data-fastppt-level="7">AAAA BBBB</p><p data-fastppt-level="3">AAAAAAAAAAAAAAAAAAAA</p><p data-fastppt-level="4"><strong>Small</strong></p><p data-fastppt-level="5">Large<br>Soft</p><p data-fastppt-level="6">Points</p><p></p><p style="display:none">Hidden</p></div>\n`).join('')
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame()
   const root = preview.locator('.source-layout')
   await expect(preview.locator('#geometry-0')).toBeVisible()
@@ -1547,8 +1530,7 @@ test('projects source decorations onto editable runs with independent cancellati
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-decorations\n---\n\n::ph-0::\n\n<div id="decorations" data-fastppt-text-box><p>Both 中文</p><p data-fastppt-level="2">Strike only</p><p data-fastppt-level="3">Underline only</p><p data-fastppt-level="9">Plain <u>HTML underline</u> <s>HTML strike</s></p><p data-fastppt-underline="false">Local strike <span data-fastppt-strike="false">Cancelled</span> Resumed</p><p>Base <span data-fastppt-underline="false"><strong>Strike</strong><span data-fastppt-strike="false"> Neither</span></span> Both</p><p data-fastppt-level="4">Decorated bullet body</p><p data-fastppt-underline="false" data-fastppt-strike="false"></p><p data-fastppt-level="3">Before<br>After <a href="https://example.com/" style="border:0;color:inherit">Link</a></p><p data-fastppt-level="5">A&#9;B</p></div>\n\n::ph-1::\n\n<p id="ordinary-decoration">Ordinary 中文 <span data-fastppt-underline="false">strike</span></p>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), root = preview.locator('.source-layout'), frame = preview.locator('#decorations')
   await expect(frame).toBeVisible()
   const projected = () => frame.locator('[data-fastppt-text-decoration-run]').evaluateAll(elements => elements.map(element => ({ text: element.textContent, lines: getComputedStyle(element).textDecorationLine })))
@@ -1624,8 +1606,7 @@ test('preserves signed source letter spacing through levels, inline edits, tabs,
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-letter-spacing\n---\n\n::ph-0::\n\n<div id="spacing" data-fastppt-text-box><p>AAAA</p><p data-fastppt-level="2">BBBB</p><p data-fastppt-level="3">CCCC</p><p data-fastppt-level="4">Fractional</p><p>A<span style="letter-spacing:0">Zero</span><strong style="letter-spacing:-0.125cqw">Negative</strong><a href="https://example.com/" style="border:0;color:inherit;letter-spacing:0">Link</a></p><p data-fastppt-level="3"></p><p>Before<br>After</p><p data-fastppt-level="5">A&#9;B</p><p>Latin中文</p></div>\n' + [1, 2, 3].map(index => `\n::ph-${index}::\n\n<div id="spacing-wrap-${index}" data-fastppt-text-box><p>AAAA BBBB CCCC</p></div>\n`).join('') + '\n::ph-4::\n\n<p id="ordinary-spacing">Ordinary中文</p>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), root = preview.locator('.source-layout'), frame = preview.locator('#spacing')
   await expect(frame).toBeVisible()
   const computedSpacing = () => frame.locator('p').evaluateAll(paragraphs => paragraphs.map(element => Number(((parseFloat(getComputedStyle(element).letterSpacing) || 0) * 960 / parseFloat(getComputedStyle(element.closest('.source-layout')!).width)).toFixed(2))))
@@ -1691,8 +1672,7 @@ test('preserves source baseline ratios without shrinking fonts or double-shiftin
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-baseline\n---\n\n::ph-0::\n\n<div id="baseline" data-fastppt-text-box><p>Raised 中文</p><p data-fastppt-level="2">Normal</p><p data-fastppt-level="3">Lowered</p><p>A<span data-fastppt-baseline="0">Zero</span><strong data-fastppt-baseline="-25" data-fastppt-underline="true" style="letter-spacing:0.1cqw">Down</strong><a href="https://example.com/" data-fastppt-baseline="10" style="border:0;color:inherit">Link</a><span style="font-size:0.5em">Small</span></p><p data-fastppt-level="3"></p><p>Before<br data-fastppt-baseline="0">After</p><p data-fastppt-level="4">A&#9;<span data-fastppt-baseline="100">Raised</span><span data-fastppt-baseline="-100">Lowered</span></p><p data-fastppt-level="5">Bullet</p></div>\n\n::ph-1::\n\n<div id="baseline-wrap" data-fastppt-text-box><p>A&#9;AAAA BBBB CCCC<br>End</p></div>\n\n::ph-2::\n\n<p id="ordinary-baseline">Ordinary中文</p><p id="ordinary-zero" data-fastppt-baseline="0">Ordinary中文</p>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), root = preview.locator('.source-layout'), frame = preview.locator('#baseline')
   await expect(frame).toBeVisible()
   const geometry = () => frame.locator('p').evaluateAll(paragraphs => paragraphs.map(element => {
@@ -1800,8 +1780,7 @@ test('preserves kerning thresholds through font boundaries, resizing, editing an
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-kerning\n---\n\n::ph-0::\n\n<div id="kerning" data-fastppt-text-box><p>AVATAR To WA</p><p data-fastppt-level="2">AVATAR To WA</p><p data-fastppt-level="3">AVATAR To WA</p><p data-fastppt-level="4">AVATAR To WA</p><p><span style="font-size:0.5em">Small</span><span data-fastppt-kerning-threshold="0" style="font-size:0.5em">Always</span><a href="https://example.com/" style="font-size:1.5em;border:0;color:inherit">Large</a></p><p data-fastppt-level="3"></p><p>Before<br data-fastppt-kerning-threshold="0">After</p><p data-fastppt-level="5">AVATAR&#9;To WA</p><p>Latin中文</p></div>\n\n::ph-1::\n\n<div id="kerning-wrap-on" data-fastppt-text-box><p>AVATAR To WA</p></div>\n\n::ph-2::\n\n<div id="kerning-wrap-off" data-fastppt-text-box><p>AVATAR To WA</p></div>\n\n::ph-3::\n\n<p id="ordinary-kerning">Ordinary中文</p>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), root = preview.locator('.source-layout'), frame = preview.locator('#kerning')
   await expect(frame).toBeVisible()
   const modes = () => frame.locator('[data-fastppt-text-kerning]').evaluateAll(elements => elements.filter(element => element.tagName === 'SPAN').map(element => ({ text: element.textContent, mode: getComputedStyle(element).fontKerning })))
@@ -1882,8 +1861,7 @@ test('preserves original capitalization text through templates, Unicode expansio
   const content = '---\ntheme: slidev-theme-academy\nlayout: source-capitalization\n---\n\n::ph-0::\n\n<div id="capitals" data-fastppt-text-box><p>Straße中文</p><p data-fastppt-level="2">Straße</p><p data-fastppt-level="3">Abc xyz</p><p data-fastppt-level="4">Abc xyz</p><p lang="tr-TR">i ı I İ <span data-fastppt-capitalization="none">i</span></p><p data-fastppt-level="3"></p><p>Before<br data-fastppt-capitalization="small">After</p><p data-fastppt-level="5">Straße&#9;xyz</p><p><a href="https://example.com/" style="border:0;color:inherit" data-fastppt-capitalization="small">Linked</a><span data-fastppt-baseline="20" style="letter-spacing:1px">Shift</span></p><p data-fastppt-level="6">Body</p></div>\n\n::ph-1::\n\n<div id="capitals-wrap" data-fastppt-text-box><p>Straße&#9;StraßeStraße</p></div>\n\n::ph-2::\n\n<p id="ordinary-capitals">Straße中文</p>\n'
   expect((await request.put(`http://127.0.0.1:4317/api/v1/decks/${deck.id}/markdown`, { data: { expectedRevision: deck.revision, content } })).ok()).toBe(true)
   await page.goto('/')
-  await page.getByLabel('Preview deck').click()
-  await page.getByRole('option', { name: 'slides', exact: true }).click()
+  await page.getByLabel('Preview deck').selectOption({ label: 'slides' })
   const preview = page.getByTitle('Slidev preview').contentFrame(), root = preview.locator('.source-layout'), frame = preview.locator('#capitals')
   await expect(frame).toBeVisible()
   const modes = () => frame.locator('p').evaluateAll(elements => elements.slice(0, 4).map(element => {

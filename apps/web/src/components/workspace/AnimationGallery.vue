@@ -15,7 +15,7 @@ import {
   SelectOption,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import type {
   AnimationDocumentV1,

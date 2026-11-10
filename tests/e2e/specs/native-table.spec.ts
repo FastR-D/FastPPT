@@ -227,10 +227,7 @@ th, td { border: 1px solid #808080 !important; border-radius: 0 !important; padd
     await page.goto('/')
     const picker = page.getByLabel('Preview deck')
     await expect(picker).toBeVisible()
-    await picker.click()
-    await page
-      .getByRole('option', { name: 'native-structured', exact: true })
-      .click()
+    await picker.selectOption({ label: 'native-structured' })
     await expect(
       page
         .getByTitle('Slidev preview')

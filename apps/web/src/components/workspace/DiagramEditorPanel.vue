@@ -11,7 +11,7 @@ import {
   SelectOption,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, ref, watch } from 'vue'
 import { useGatewayClient } from '../../api/useGatewayClient.js'
 import type { DeckSummary } from '@fastppt/protocol'

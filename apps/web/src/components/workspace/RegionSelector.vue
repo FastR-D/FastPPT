@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, Text } from '@fastppt/components'
+import { Box, Text } from '@fastrd/ui-vue'
 import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 import { regionFromPoints } from '../../workspace/visual-edit.js'
 import type { SlideRegion } from '@fastppt/protocol'

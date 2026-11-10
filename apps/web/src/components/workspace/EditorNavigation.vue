@@ -6,7 +6,7 @@ import {
   Header,
   Panel,
   Text,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, nextTick, shallowRef, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 import { parseSlidevDocument } from '@fastppt/markdown/parser'
 import { createPageWheelHandler } from '../../workspace/page-wheel.js'

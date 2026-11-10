@@ -13,7 +13,7 @@ import {
   SelectOption,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import type { ColorPalette, HarnessKind } from '@fastppt/protocol'
 import { useGatewayClient } from '../../api/useGatewayClient.js'

@@ -26,7 +26,8 @@
     "zod": "catalog:",
     "@fastppt/markdown": "workspace:*",
     "markdown-it": "^14.3.0",
-    "@fastppt/components": "workspace:*"
+    "@fastrd/ui-vue": "https://github.com/FastR-D/FastUI/releases/download/v0.1.0/fastrd-ui-vue-0.1.0.tgz",
+    "@fastrd/ui-foundation": "https://github.com/FastR-D/FastUI/releases/download/v0.1.0/fastrd-ui-foundation-0.1.0.tgz"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

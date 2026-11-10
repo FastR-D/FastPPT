@@ -15,7 +15,7 @@ import {
   SelectOption,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import AnimationGallery from './AnimationGallery.vue'
 import { orderedNativeEffects } from '@fastppt/slidewave/native-motion'
 import {

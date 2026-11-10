@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { JsonlRpcClient } from '../src/jsonl-rpc.js'
+import { JsonlRpcClient } from '@fastrd/harness-transport'
 
 const rpcFixture = String.raw`
 const readline = require('node:readline')

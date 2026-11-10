@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { useColorMode, Box, BrandMark, Button, Header, Text } from '@fastppt/components'
-import { Icon as AppIcon } from '@fastppt/components'
+import { Box, Button, Header, Text } from '@fastrd/ui-vue'
+import { BrandMark, Icon as AppIcon } from '../ui/index.js'
+import { isDark, toggleColorMode } from '../../color-mode.js'
 import {
   workspaceModeLabels,
   type WorkspaceMode,
@@ -13,7 +14,6 @@ const emit = defineEmits<{
   search: []
   toggleSidebar: []
 }>()
-const { isDark, toggle: toggleColorMode } = useColorMode()
 </script>
 
 <template>

@@ -30,6 +30,7 @@ let lastTurnInput = null
 rl.on('line', line => {
   const message = JSON.parse(line)
   if (message.id === 900 && !message.method) {
+    if (message.result?.decision !== 'accept') process.exit(23)
     send({ method: 'serverRequest/resolved', params: { threadId: activeThread, requestId: 900 } })
     send({ method: 'item/completed', params: { threadId: activeThread, turnId: activeTurn, item: { id: 'cmd-1', type: 'commandExecution', command: 'pnpm test', cwd: process.cwd(), status: 'completed' } } })
     send({ method: 'item/completed', params: { threadId: activeThread, turnId: activeTurn, item: { id: 'agent-2', type: 'agentMessage', text: 'Finished' } } })
@@ -40,12 +41,23 @@ rl.on('line', line => {
     case 'initialize': send({ id: message.id, result: { userAgent: 'fixture' } }); break
     case 'initialized': break
     case 'thread/list': send({ id: message.id, result: { data: [thread('thread-listed')], nextCursor: null } }); break
-    case 'thread/read': send({ id: message.id, result: { thread: thread(message.params.threadId) } }); break
-    case 'thread/start': send({ id: message.id, result: { thread: thread('thread-created') } }); break
+    case 'thread/read': {
+      if (message.params.includeTurns !== true) process.exit(27)
+      const history = thread(message.params.threadId)
+      if (message.params.threadId === 'large-history') history.turns[0].items[1].text = 'x'.repeat(2_100_000)
+      if (message.params.threadId === 'unicode-history') history.turns[0].items[1].text = '中'.repeat(700_000)
+      send({ id: message.id, result: { thread: history } }); break
+    }
+    case 'thread/start':
+      if (message.params.sandbox !== 'danger-full-access' || message.params.approvalPolicy !== 'never') process.exit(24)
+      send({ id: message.id, result: { thread: thread('thread-created') } }); break
     case 'thread/name/set': send({ id: message.id, result: {} }); break
-    case 'thread/resume': send({ id: message.id, result: { thread: thread(message.params.threadId) } }); break
+    case 'thread/resume':
+      if (message.params.sandbox !== 'danger-full-access' || message.params.approvalPolicy !== 'never') process.exit(25)
+      send({ id: message.id, result: { thread: thread(message.params.threadId) } }); break
     case 'thread/fork': send({ id: message.id, result: { thread: thread('thread-forked') } }); break
     case 'turn/start': {
+      if (message.params.sandboxPolicy.type !== 'dangerFullAccess' || message.params.approvalPolicy !== 'never') process.exit(26)
       lastTurnInput = message.params.input
       activeThread = message.params.threadId
       activeTurn = message.params.input[0].text.includes('cancel') ? 'turn-cancel' : 'turn-run'
@@ -140,6 +152,27 @@ describe('CodexAdapter', () => {
       codex.forkSession({ sessionId: 'thread-listed', cwd: process.cwd() }),
     ).resolves.toEqual({ harness: 'codex', sessionId: 'thread-forked' })
     await codex.dispose()
+  })
+
+  it.each([
+    ['large-history', 'x'.repeat(2_100_000)],
+    ['unicode-history', '中'.repeat(700_000)],
+  ])('reads complete %s above 2MB without disconnecting another request', async (sessionId, content) => {
+    const codex = adapter()
+    try {
+      const [history, page] = await Promise.all([
+        codex.getSession({ sessionId }),
+        codex.listSessions({ cwd: process.cwd() }),
+      ])
+      expect(history.summary.id).toBe(sessionId)
+      expect(history.messages.map(message => message.content)).toEqual(['Hello', content])
+      expect(page.data[0]?.id).toBe('thread-listed')
+      await expect(codex.getSession({ sessionId: 'thread-listed' })).resolves.toMatchObject({
+        messages: [{ content: 'Hello' }, { content: 'Hi there' }],
+      })
+    } finally {
+      await codex.dispose()
+    }
   })
 
   it('normalizes streams and resolves reverse-RPC approvals', async () => {

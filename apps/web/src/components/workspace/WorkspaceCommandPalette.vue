@@ -2,14 +2,14 @@
 import {
   Box,
   Button,
-  DialogSurface,
+  Modal,
   Footer,
   Header,
   Text,
   TextField,
-} from '@fastppt/components'
-import { computed, nextTick, shallowRef, watch } from 'vue'
-import { Icon as AppIcon } from '@fastppt/components'
+} from '@fastrd/ui-vue'
+import { computed, shallowRef, watch } from 'vue'
+import { Icon as AppIcon } from '../ui/index.js'
 import {
   workspaceCommands,
   type WorkspaceCommand,
@@ -17,7 +17,7 @@ import {
 
 const props = defineProps<{ open: boolean; previewReady: boolean }>()
 const emit = defineEmits<{ close: []; run: [command: WorkspaceCommand] }>()
-const dialog = shallowRef<HTMLDialogElement>()
+const surface = shallowRef<HTMLDivElement>()
 const input = shallowRef<HTMLInputElement>()
 const query = shallowRef('')
 const activeIndex = shallowRef(0)
@@ -34,14 +34,11 @@ watch(query, () => {
 })
 watch(
   () => props.open,
-  async (open) => {
-    await nextTick()
+  (open) => {
     if (open) {
       query.value = ''
       activeIndex.value = 0
-      dialog.value?.showModal()
-      input.value?.focus()
-    } else dialog.value?.close()
+    }
   },
   { immediate: true },
 )
@@ -65,7 +62,7 @@ function navigate(event: KeyboardEvent): void {
       (event.key === 'ArrowDown' ? 1 : -1) +
       filtered.value.length) %
     filtered.value.length
-  dialog.value
+  surface.value
     ?.querySelectorAll('button[data-command]')
     ?.item(activeIndex.value)
     ?.scrollIntoView({ block: 'nearest' })
@@ -73,63 +70,60 @@ function navigate(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <Teleport to="body">
-    <DialogSurface
-      ref="dialog"
-      class="command-palette"
-      aria-label="命令面板"
-      @cancel.prevent="emit('close')"
-      @close="emit('close')"
-      @click.self="emit('close')"
-    >
-      <Box class="command-surface" @keydown="navigate">
-        <Header>
-          <AppIcon name="search" /><TextField
-            ref="input"
-            v-model="query"
-            aria-label="搜索命令"
-            placeholder="搜索功能或运行命令…"
-            autocomplete="off"
-          /><Button
-            variant="icon"
-            type="button"
-            aria-label="关闭"
-            title="关闭 · Esc"
-            @click="emit('close')"
-          >
-            <Text as="kbd">Esc</Text>
-          </Button>
-        </Header>
-        <Box class="command-list">
-          <Button
-            v-for="(command, index) in filtered"
-            :key="command.id"
-            variant="quiet"
-            type="button"
-            data-command
-            :class="{ active: index === activeIndex }"
-            :disabled="command.requiresPreview && !previewReady"
-            @pointermove="activeIndex = index"
-            @click="run(index)"
-          >
-            <Text>{{ command.label }}</Text
-            ><Text as="small">
-              {{
-                command.requiresPreview && !previewReady
-                  ? '预览就绪后可用'
-                  : command.group
-              }}
-            </Text>
-          </Button>
-          <Text v-if="!filtered.length" as="p">没有匹配的命令</Text>
-        </Box>
-        <Footer>
-          <Text>↑ ↓ 选择 · Enter 运行</Text
-          ><Text>{{ filtered.length }} 个命令</Text>
-        </Footer>
+  <Modal
+    :open="open"
+    class="command-palette"
+    label="命令面板"
+    @close="emit('close')"
+  >
+    <Box ref="surface" class="command-surface" @keydown="navigate">
+      <Header>
+        <AppIcon name="search" /><TextField
+          ref="input"
+          v-model="query"
+          autofocus
+          aria-label="搜索命令"
+          placeholder="搜索功能或运行命令…"
+          autocomplete="off"
+        /><Button
+          variant="icon"
+          type="button"
+          aria-label="关闭"
+          title="关闭 · Esc"
+          @click="emit('close')"
+        >
+          <Text as="kbd">Esc</Text>
+        </Button>
+      </Header>
+      <Box class="command-list">
+        <Button
+          v-for="(command, index) in filtered"
+          :key="command.id"
+          variant="quiet"
+          type="button"
+          data-command
+          :class="{ active: index === activeIndex }"
+          :disabled="command.requiresPreview && !previewReady"
+          @pointermove="activeIndex = index"
+          @click="run(index)"
+        >
+          <Text>{{ command.label }}</Text
+          ><Text as="small">
+            {{
+              command.requiresPreview && !previewReady
+                ? '预览就绪后可用'
+                : command.group
+            }}
+          </Text>
+        </Button>
+        <Text v-if="!filtered.length" as="p">没有匹配的命令</Text>
       </Box>
-    </DialogSurface>
-  </Teleport>
+      <Footer>
+        <Text>↑ ↓ 选择 · Enter 运行</Text
+        ><Text>{{ filtered.length }} 个命令</Text>
+      </Footer>
+    </Box>
+  </Modal>
 </template>
 
 <style scoped>
@@ -138,14 +132,6 @@ function navigate(event: KeyboardEvent): void {
   max-height: 80dvh;
   padding: 0;
   margin: 12dvh auto auto;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  color: var(--color-text);
-  background: var(--color-panel);
-  box-shadow: var(--shadow-modal);
-}
-.command-palette::backdrop {
-  background: var(--color-overlay);
 }
 .command-surface {
   display: flex;

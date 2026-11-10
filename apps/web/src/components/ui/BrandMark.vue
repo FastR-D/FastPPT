@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { fastpptIconUrl } from './brand.js'
+import { Image } from '@fastrd/ui-vue'
 </script>
 
 <template>
-  <img :src="fastpptIconUrl" class="fp-brand-mark" width="28" height="28" alt="" aria-hidden="true" />
+  <Image :src="fastpptIconUrl" class="fp-brand-mark" width="28" height="28" alt="" aria-hidden="true" />
 </template>
 
 <style scoped>

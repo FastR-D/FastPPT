@@ -6,6 +6,7 @@ import {
   Header,
   Heading,
   Link,
+  Modal,
   Panel,
   Svg,
   SvgPath,
@@ -16,8 +17,8 @@ import {
   TableHeader,
   TableRow,
   Text,
-} from '@fastppt/components'
-import { computed, onUnmounted, shallowRef } from 'vue'
+} from '@fastrd/ui-vue'
+import { computed, shallowRef } from 'vue'
 
 import { useGatewayClient } from '../../api/useGatewayClient.js'
 
@@ -71,12 +72,6 @@ async function openSkill(theme: DeepReadonly<ThemeSummary>): Promise<void> {
   }
 }
 
-function handleWindowKey(event: KeyboardEvent): void {
-  if (event.key === 'Escape') closeModal()
-}
-
-window.addEventListener('keydown', handleWindowKey)
-onUnmounted(() => window.removeEventListener('keydown', handleWindowKey))
 </script>
 
 <template>
@@ -166,85 +161,53 @@ onUnmounted(() => window.removeEventListener('keydown', handleWindowKey))
       </Table>
     </Box>
 
-    <Teleport to="body">
-      <Box
-        v-if="detailTheme || skillTheme"
-        class="modal-backdrop"
-        role="presentation"
-        @mousedown.self="closeModal"
-      >
-        <Panel
-          class="theme-modal"
-          role="dialog"
-          aria-modal="true"
-          :aria-labelledby="detailTheme ? 'theme-detail-title' : 'skill-title'"
+    <Modal
+      :open="Boolean(detailTheme || skillTheme)"
+      class="theme-modal"
+      :labelledby="detailTheme ? 'theme-detail-title' : 'skill-title'"
+      @close="closeModal"
+    >
+      <Header class="modal-header">
+        <Box v-if="detailTheme">
+          <Text class="eyebrow">Theme capabilities</Text>
+          <Heading id="theme-detail-title" as="h2">{{ detailTheme.displayName }}</Heading>
+          <Text as="p">{{ detailTheme.description }}</Text>
+        </Box>
+        <Box v-else-if="skillTheme">
+          <Text class="eyebrow">Agent skill source</Text>
+          <Heading id="skill-title" as="h2">{{ skillTheme.skillId }}</Heading>
+          <Text as="p">{{ skillTheme.skillVersion }} · SKILL.md</Text>
+        </Box>
+        <Button
+          variant="secondary"
+          class="close-button"
+          type="button"
+          aria-label="关闭弹窗"
+          @click="closeModal"
         >
-          <Header class="modal-header">
-            <Box v-if="detailTheme">
-              <Text class="eyebrow">Theme capabilities</Text>
-              <Heading id="theme-detail-title" as="h2">
-                {{
-                  detailTheme.displayName
-                }}
-              </Heading>
-              <Text as="p">{{ detailTheme.description }}</Text>
-            </Box>
-            <Box v-else-if="skillTheme">
-              <Text class="eyebrow">Agent skill source</Text>
-              <Heading id="skill-title" as="h2">
-                {{
-                  skillTheme.skillId
-                }}
-              </Heading>
-              <Text as="p">{{ skillTheme.skillVersion }} · SKILL.md</Text>
-            </Box>
-            <Button
-              variant="secondary"
-              class="close-button"
-              type="button"
-              aria-label="关闭弹窗"
-              @click="closeModal"
-            >
-              ×
-            </Button>
-          </Header>
+          ×
+        </Button>
+      </Header>
 
-          <Box v-if="detailTheme" class="modal-content feature-list">
-            <Article
-              v-for="feature in detailTheme.supportedFeatures"
-              :key="feature.id"
-            >
-              <Text as="strong">{{ feature.label }}</Text>
-              <Text as="code">{{ feature.id }}</Text>
-              <Text as="p">{{ feature.description }}</Text>
-            </Article>
-            <Panel class="layout-list">
-              <Text as="strong">可用布局</Text>
-              <Box>
-                <Text v-for="layout in detailTheme.layouts" :key="layout.id">
-                  {{ layout.label }}
-                </Text>
-              </Box>
-            </Panel>
-          </Box>
-          <Box v-else class="modal-content skill-source">
-            <Text v-if="skillLoading" as="p" class="catalog-state"
-            >
-              正在读取 SKILL.md…
-            </Text
-            >
-            <Text v-else-if="skillError" as="p" class="catalog-state error">
-              {{ skillError }}
-            </Text>
-            <Text v-else as="pre"
-            >
-              <Text as="code">{{ skillDocument?.content }}</Text>
-            </Text
-            >
+      <Box v-if="detailTheme" class="modal-content feature-list">
+        <Article v-for="feature in detailTheme.supportedFeatures" :key="feature.id">
+          <Text as="strong">{{ feature.label }}</Text>
+          <Text as="code">{{ feature.id }}</Text>
+          <Text as="p">{{ feature.description }}</Text>
+        </Article>
+        <Panel class="layout-list">
+          <Text as="strong">可用布局</Text>
+          <Box>
+            <Text v-for="layout in detailTheme.layouts" :key="layout.id">{{ layout.label }}</Text>
           </Box>
         </Panel>
       </Box>
-    </Teleport>
+      <Box v-else class="modal-content skill-source">
+        <Text v-if="skillLoading" as="p" class="catalog-state">正在读取 SKILL.md…</Text>
+        <Text v-else-if="skillError" as="p" class="catalog-state error">{{ skillError }}</Text>
+        <Text v-else as="pre"><Text as="code">{{ skillDocument?.content }}</Text></Text>
+      </Box>
+    </Modal>
   </Panel>
 </template>
 
@@ -380,33 +343,12 @@ code {
 .catalog-state.error {
   color: var(--color-danger);
 }
-.modal-backdrop {
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--color-overlay);
-}
-.theme-modal {
+.theme-modal[open] {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  width: min(820px, 100%);
+  width: min(820px, calc(100vw - 48px));
   max-height: min(760px, calc(100dvh - 48px));
   overflow: hidden;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 14px;
-  background: var(--color-panel-raised);
-  box-shadow: var(--shadow-modal);
-}
-.modal-header {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 20px 22px;
-  border-bottom: 1px solid var(--color-border);
 }
 .modal-header h2 {
   margin-top: 4px;

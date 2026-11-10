@@ -14,6 +14,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@fastrd/harness-transport": "https://github.com/FastR-D/FastHarness/releases/download/v0.1.0/fastrd-harness-transport-0.1.0.tgz",
     "@fastppt/harness-core": "workspace:*",
     "@fastppt/protocol": "workspace:*",
     "zod": "catalog:"

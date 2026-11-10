@@ -20,8 +20,8 @@ task_plan.md
 /ppts/
 /decks/
 assets/
-!packages/components/src/assets/
-!packages/components/src/assets/fastppt-icon.svg
+!apps/web/src/components/ui/assets/
+!apps/web/src/components/ui/assets/fastppt-icon.svg
 
 # FastPPT workspace files
 .codex/

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Svg, SvgPath } from '@fastrd/ui-vue'
 defineProps<{ name: string }>()
 const paths: Record<string, string> = {
   moon: 'M20 15a9 9 0 0 1-11-11 9 9 0 1 0 11 11Z',
@@ -25,7 +26,7 @@ const paths: Record<string, string> = {
 </script>
 
 <template>
-  <svg
+  <Svg
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -34,8 +35,8 @@ const paths: Record<string, string> = {
     stroke-linejoin="round"
     aria-hidden="true"
   >
-    <path :d="paths[name] ?? paths.grid" />
-  </svg>
+    <SvgPath :d="paths[name] ?? paths.grid" />
+  </Svg>
 </template>
 
 <style scoped>
