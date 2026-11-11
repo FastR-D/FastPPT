@@ -10,6 +10,8 @@
  * in the `@font-face` rules in `src/index.css`.
  */
 
+import { fileURLToPath } from 'node:url'
+
 /** @typedef {{ file: string; license: string; variable?: boolean; subset?: boolean; weight?: number; style?: 'normal'|'italic'; faces?: Record<string, { file: string; variable?: boolean; subset?: boolean }> }} FontFile */
 
 /** @type {Record<string, FontFile>} */
@@ -60,7 +62,7 @@ export const OPTIONAL_FONT_FILES = {}
 export function resolveFontPath(family) {
   const entry = FONT_FILES[family] ?? OPTIONAL_FONT_FILES[family]
   if (!entry) return undefined
-  return new URL(`../${entry.file}`, import.meta.url).pathname
+  return fileURLToPath(new URL(`../${entry.file}`, import.meta.url))
 }
 
 /**
@@ -71,14 +73,14 @@ export function resolveFontPath(family) {
 export function resolveFontDescriptor(family) {
   const entry = FONT_FILES[family] ?? OPTIONAL_FONT_FILES[family]
   if (!entry) return undefined
-  const path = new URL(`../${entry.file}`, import.meta.url).pathname
+  const path = fileURLToPath(new URL(`../${entry.file}`, import.meta.url))
   const faces = entry.faces
     ? Object.fromEntries(
         Object.entries(entry.faces).map(([face, descriptor]) => [
           face,
           {
             ...descriptor,
-            path: new URL(`../${descriptor.file}`, import.meta.url).pathname,
+            path: fileURLToPath(new URL(`../${descriptor.file}`, import.meta.url)),
           },
         ]),
       )

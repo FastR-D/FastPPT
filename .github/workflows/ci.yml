@@ -24,6 +24,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @fastppt/fonts verify-fonts
       - run: pnpm --filter @fastppt/e2e exec playwright install --with-deps chromium
       - run: pnpm typecheck
       - run: pnpm lint

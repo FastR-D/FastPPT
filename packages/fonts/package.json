@@ -78,13 +78,13 @@
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run --passWithNoTests",
     "format": "prettier --write .",
-    "fetch-fonts": "node scripts/fetch-fonts.mjs"
+    "verify-fonts": "node scripts/verify-fonts.mjs"
   },
   "files": [
     "assets",
     "src"
   ],
-  "license": "OFL-1.1",
+  "license": "SEE LICENSE IN THIRD_PARTY_NOTICES.md",
   "devDependencies": {
     "@types/node": "catalog:",
     "typescript": "catalog:",

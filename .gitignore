@@ -64,3 +64,11 @@ assets/
 /packages/resources/visual-comparison/*-progress.json
 
 !packages/animations/manifest.csv
+
+!packages/fonts/assets/
+packages/fonts/assets/*
+!packages/fonts/assets/fonts/
+packages/fonts/assets/fonts/*
+!packages/fonts/assets/fonts/*.ttf
+!packages/fonts/assets/licenses/
+!packages/fonts/assets/licenses/*.txt
