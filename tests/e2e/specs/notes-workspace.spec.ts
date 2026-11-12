@@ -6,7 +6,7 @@ async function openNotesDeck(page: Page): Promise<void> {
   const picker = page.getByLabel('Preview deck')
   await expect(picker).toBeVisible()
   await picker.selectOption({ label: 'notes-qa' })
-  await expect(page.frameLocator('.preview-stage iframe').getByRole('heading', { name: 'Notes E2E', exact: true })).toBeVisible()
+  await expect(page.frameLocator('.preview-stage iframe').getByRole('heading', { name: 'Notes page 1', exact: true })).toBeVisible()
 }
 
 test('links the notes outline, editor and preview without losing drafts on page changes or failed saves', async ({ page }) => {

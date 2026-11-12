@@ -879,10 +879,12 @@ describe('gateway', () => {
     expect(
       foreignLocalOrigin.headers['access-control-allow-origin'],
     ).toBeUndefined()
-    const fontPath = '/api/v1/resources/assets/000000000000000000000000.woff2'
-    expect((await app.inject({ method: 'GET', url: fontPath, headers: { origin: 'null' } })).statusCode).toBe(404)
-    for (const [method, url] of [['POST', fontPath], ['GET', '/api/v1/workspace'], ['GET', fontPath.replace('.woff2', '.png')]] as const)
-      expect((await app.inject({ method, url, headers: { origin: 'null' } })).statusCode).toBe(403)
+    for (const length of [24, 64]) {
+      const fontPath = `/api/v1/resources/assets/${'0'.repeat(length)}.woff2`
+      expect((await app.inject({ method: 'GET', url: fontPath, headers: { origin: 'null' } })).statusCode).toBe(404)
+      for (const [method, url] of [['POST', fontPath], ['GET', '/api/v1/workspace'], ['GET', fontPath.replace('.woff2', '.png')]] as const)
+        expect((await app.inject({ method, url, headers: { origin: 'null' } })).statusCode).toBe(403)
+    }
   })
 
   it('returns precise not-found errors for runs and browser inspections', async () => {

@@ -31,3 +31,9 @@ jobs:
       # Each package launches its own workers/Slidev builds on the shared runner.
       - run: pnpm test --concurrency=2
       - run: pnpm build --concurrency=2
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-results
+          path: tests/e2e/test-results
+          if-no-files-found: ignore

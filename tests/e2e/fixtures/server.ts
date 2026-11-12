@@ -467,7 +467,7 @@ await writeFile(
 )
 await writeFile(
   resolve(E2E_WORKSPACE, 'notes-qa.md'),
-  '---\ntheme: slidev-theme-academy\ntitle: Notes E2E\n---\n\n# Notes page 1\n\n---\n\n# Notes page 2\n\n---\n\n# Notes page 3\n\n---\n\n# Notes page 4\n',
+  '---\ntheme: slidev-theme-academy\nlayout: content\ntitle: Notes E2E\n---\n\n# Notes page 1\n\n---\nlayout: content\n---\n\n# Notes page 2\n\n---\nlayout: content\n---\n\n# Notes page 3\n\n---\nlayout: content\n---\n\n# Notes page 4\n',
 )
 
 const copyTheme = (source: string, target: string) => cp(source, target, { recursive: true, filter: path => !['.theme-build', 'dist', '.turbo'].includes(basename(path)) })

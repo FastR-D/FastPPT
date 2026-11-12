@@ -1477,7 +1477,7 @@ export async function createGateway(
     // Script-free resource iframes have opaque origins. Their local webfonts
     // need CORS, so allow only immutable font reads from that sandbox origin.
     const sandboxFont = origin === 'null' && (request.method === 'GET' || request.method === 'HEAD')
-      && (/^\/api\/v1\/resources\/assets\/[a-f0-9]{24}\.woff2(?:\?|$)/.test(request.url) || /^\/api\/v1\/animations\/runtime\.js(?:\?|$)/.test(request.url))
+      && (/^\/api\/v1\/resources\/assets\/[a-f0-9]+\.woff2(?:\?|$)/.test(request.url) || /^\/api\/v1\/animations\/runtime\.js(?:\?|$)/.test(request.url))
     if (sandboxFont) return
     if (!origin || config.allowedWebOrigins.includes(origin)) return
     request.log.warn({ origin }, 'Rejected browser origin')
