@@ -1926,10 +1926,9 @@ describe('gateway', () => {
     const fixtureThemes = createThemeFixture()
     const app = await makeApp(root, undefined, fixtureThemes)
     openApps.push(app)
-    const sample = resolve(
-      dirname(fileURLToPath(import.meta.url)),
-      '../../../references/pptx-renderer/docs/example/1-chart-and-complex/source.pptx',
-    )
+    const sample = join(root, 'source.pptx')
+    const { writeEditablePptx } = await import('@fastppt/slidewave/server')
+    await writeEditablePptx(exportSnapshot, sample, { embedFonts: false })
     const pptx = readFileSync(sample)
     const response = await app.inject({
       method: 'POST',
