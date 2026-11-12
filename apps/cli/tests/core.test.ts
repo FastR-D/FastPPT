@@ -262,7 +262,7 @@ describe('CLI core service integration', () => {
       revision: written.revision,
     })
     const installed = (await run(['skills', 'install'])) as {
-      statuses: Array<{ skillId: string; state: string }>
+      statuses: Array<{ skillId: string; kind: string; state: string }>
     }
     expect(
       installed.statuses.filter(
@@ -271,9 +271,11 @@ describe('CLI core service integration', () => {
           item.skillId === 'fastppt-ppt-generate',
       ),
     ).toHaveLength(4)
-    expect(installed.statuses.every((item) => item.state === 'installed')).toBe(
-      true,
-    )
+    for (const item of installed.statuses) {
+      expect(item, item.skillId).toMatchObject({
+        state: item.kind === 'theme' ? 'on-demand' : 'installed',
+      })
+    }
     expect(
       await readFile(
         join(workspaceRoot, '.agents/skills/fastppt/references/cli.md'),

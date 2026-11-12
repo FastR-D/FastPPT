@@ -879,10 +879,12 @@ describe('gateway', () => {
     expect(
       foreignLocalOrigin.headers['access-control-allow-origin'],
     ).toBeUndefined()
-    const fontPath = '/api/v1/resources/assets/000000000000000000000000.woff2'
-    expect((await app.inject({ method: 'GET', url: fontPath, headers: { origin: 'null' } })).statusCode).toBe(404)
-    for (const [method, url] of [['POST', fontPath], ['GET', '/api/v1/workspace'], ['GET', fontPath.replace('.woff2', '.png')]] as const)
-      expect((await app.inject({ method, url, headers: { origin: 'null' } })).statusCode).toBe(403)
+    for (const length of [24, 64]) {
+      const fontPath = `/api/v1/resources/assets/${'0'.repeat(length)}.woff2`
+      expect((await app.inject({ method: 'GET', url: fontPath, headers: { origin: 'null' } })).statusCode).toBe(404)
+      for (const [method, url] of [['POST', fontPath], ['GET', '/api/v1/workspace'], ['GET', fontPath.replace('.woff2', '.png')]] as const)
+        expect((await app.inject({ method, url, headers: { origin: 'null' } })).statusCode).toBe(403)
+    }
   })
 
   it('returns precise not-found errors for runs and browser inspections', async () => {
@@ -1926,10 +1928,9 @@ describe('gateway', () => {
     const fixtureThemes = createThemeFixture()
     const app = await makeApp(root, undefined, fixtureThemes)
     openApps.push(app)
-    const sample = resolve(
-      dirname(fileURLToPath(import.meta.url)),
-      '../../../references/pptx-renderer/docs/example/1-chart-and-complex/source.pptx',
-    )
+    const sample = join(root, 'source.pptx')
+    const { writeEditablePptx } = await import('@fastppt/slidewave/server')
+    await writeEditablePptx(exportSnapshot, sample, { embedFonts: false })
     const pptx = readFileSync(sample)
     const response = await app.inject({
       method: 'POST',
@@ -1940,7 +1941,7 @@ describe('gateway', () => {
         themeName: 'import-test',
       },
     })
-    expect(response.statusCode).toBe(200)
+    expect(response.statusCode, response.body).toBe(200)
     const result = ImportPptxThemeResultSchema.parse(response.json())
     expect(result.themeId).toBe('slidev-theme-import-test')
     expect(result.skillId).toBe('fastppt-theme-import-test')
@@ -2225,7 +2226,7 @@ describe('gateway', () => {
       components: expect.any(Array),
       message: expect.any(String),
     })
-  })
+  }, 30_000) // Writes, imports and approves a real PPTX, including registry reload.
 
   it('rejects non-PPTX theme imports before starting extraction', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-import-invalid-'))

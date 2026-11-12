@@ -24,8 +24,16 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @fastppt/fonts verify-fonts
       - run: pnpm --filter @fastppt/e2e exec playwright install --with-deps chromium
       - run: pnpm typecheck
       - run: pnpm lint
-      - run: pnpm test
-      - run: pnpm build
+      # Each package launches its own workers/Slidev builds on the shared runner.
+      - run: pnpm test --concurrency=2
+      - run: pnpm build --concurrency=2
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-results
+          path: tests/e2e/test-results
+          if-no-files-found: ignore

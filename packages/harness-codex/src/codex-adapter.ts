@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process'
+import { constants as bufferConstants } from 'node:buffer'
 import { randomUUID } from 'node:crypto'
 import { access } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
@@ -17,7 +18,7 @@ import {
 } from '@fastppt/protocol'
 import { z } from 'zod'
 
-import { JsonlRpcClient, RpcError } from './jsonl-rpc.js'
+import { JsonlRpcClient, RpcError } from '@fastrd/harness-transport'
 
 import type {
   ApprovalDecisionInput,
@@ -48,7 +49,7 @@ import type {
   JsonlRpcClientOptions,
   RpcCommand,
   RpcMessage,
-} from './jsonl-rpc.js'
+} from '@fastrd/harness-transport'
 
 const execFileAsync = promisify(execFile)
 
@@ -269,6 +270,9 @@ export class CodexAdapter implements HarnessAdapter {
         : (options.imageSkillPath ?? defaultImageSkillPath(process.env))
     const codexCommand = options.codexCommand ?? 'codex'
     const rpcOptions: JsonlRpcClientOptions = {
+      // The previous readline transport had only Node's UTF-16 string ceiling.
+      // A code unit needs at most 3 UTF-8 bytes; retain that runtime envelope.
+      maxRecordBytes: 3 * bufferConstants.MAX_STRING_LENGTH,
       commandFactory:
         options.commandFactory ??
         (() => ({

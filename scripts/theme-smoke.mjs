@@ -10,10 +10,13 @@ const skill = await readFile(join(packageRoot, manifest.skill.sourceDir, 'SKILL.
 
 if (packageJson.name !== manifest.packageName || packageJson.version !== manifest.skill.version)
   throw new Error('Theme package identity/version does not match its manifest')
-if (!skill.startsWith('---\n') || !skill.includes(`name: ${manifest.skill.id}`))
+if (!/^---\r?\n/.test(skill) || !skill.includes(`name: ${manifest.skill.id}`))
   throw new Error('Theme Skill frontmatter does not match its manifest')
 
-for (const sourceDirectory of ['components', 'layouts']) {
+const sourceDirectories = (await readdir(packageRoot)).filter((name) =>
+  ['components', 'layouts'].includes(name),
+)
+for (const sourceDirectory of sourceDirectories) {
   const files = (await readdir(join(packageRoot, sourceDirectory))).filter((file) =>
     file.endsWith('.vue'),
   )

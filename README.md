@@ -35,6 +35,8 @@ FastPPT Web
 - 现代浏览器
 - Claude Code 或 Codex CLI（只使用对应 Agent 时需要）
 
+源码工作区的共享包从官方 npm registry 消费：`apps/web/package.json` 中的 `@fastrd/ui-foundation`、`@fastrd/ui-vue`，以及 `packages/harness-codex/package.json` 中的 `@fastrd/harness-transport` 均精确锁定 `0.1.2`。在仓库根目录执行 `pnpm install --frozen-lockfile --registry=https://registry.npmjs.org/`，统一使用根 `pnpm-lock.yaml`。更新锁前先用 `npm view <包名>@0.1.2 version dist --json --registry=https://registry.npmjs.org/` 确认版本、tarball 和 provenance；发布尚未可用时等待发布完成，不切换到 GitHub tarball。
+
 ### 安装 CLI
 
 全局安装：

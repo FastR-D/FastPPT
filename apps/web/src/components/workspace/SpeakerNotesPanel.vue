@@ -9,7 +9,7 @@ import {
   Text,
   TextArea,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import {
   resolveGatewayUrl,

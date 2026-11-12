@@ -1,0 +1,49 @@
+/* Host layout vocabulary; the palette and controls are owned by FastUI. */
+:root {
+  --color-canvas: var(--fastui-page);
+  --color-panel: var(--fastui-surface);
+  --color-panel-raised: var(--fastui-raised);
+  --color-preview-shell: var(--fastui-workspace);
+  --color-border: var(--fastui-border);
+  --color-border-strong: var(--fastui-border-strong);
+  --color-text: var(--fastui-text);
+  --color-secondary: var(--fastui-secondary);
+  --color-muted: var(--fastui-muted);
+  --color-placeholder: var(--fastui-muted);
+  --color-accent: var(--fastui-focus);
+  --color-accent-strong: var(--fastui-focus);
+  --color-accent-fill: var(--fastui-primary);
+  --color-accent-hover: var(--fastui-primary-hover);
+  --color-accent-disabled: var(--fastui-disabled);
+  --color-brand: var(--fastui-focus);
+  --color-on-accent: var(--fastui-on-primary);
+  --color-selected: var(--fastui-selected);
+  --color-hover: var(--fastui-raised);
+  --color-danger: var(--fastui-danger);
+  --color-danger-soft: color-mix(in srgb, var(--fastui-danger) 10%, var(--fastui-surface));
+  --color-warning: var(--fastui-warning);
+  --color-warning-soft: color-mix(in srgb, var(--fastui-warning) 10%, var(--fastui-surface));
+  --color-success: var(--fastui-success);
+  --color-disabled: var(--fastui-disabled);
+  --color-overlay: var(--fastui-overlay);
+  --color-preview-dot: var(--fastui-border);
+  --shadow-popover: 0 8px 28px color-mix(in srgb, var(--fastui-overlay) 40%, transparent);
+  --shadow-modal: 0 24px 64px var(--fastui-overlay);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--fastui-focus) 24%, transparent);
+  --control-height-xs: var(--fastui-height-xs);
+  --control-height-sm: var(--fastui-height-sm);
+  --font-sans: var(--fastui-font);
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+}
+html, body, #app { width: 100%; min-height: 100%; margin: 0; }
+body { color: var(--color-text); background: var(--color-canvas); font-size: 14px; line-height: 1.55; }
+body.resizing-workspace { cursor: col-resize; user-select: none; }
+body.resizing-workspace iframe { pointer-events: none; }
+.icon-button { display: grid; place-items: center; width: 28px; height: 28px; padding: 5px; border: 0; border-radius: 4px; background: transparent; color: var(--color-muted); }
+.icon-button:hover { color: var(--color-accent-strong); background: var(--color-selected); }
+#app .fastui-dialog > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; min-height: 46px; }
+#app .fastui-dialog > header .fastui-heading { margin: 0; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
+#app .fastui-dialog > header > div { min-width: 0; }
+#app .fastui-dialog > footer { padding: 12px 16px; }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, Frame, Text } from '@fastppt/components'
+import { Box, Frame, Text } from '@fastrd/ui-vue'
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { resolveGatewayUrl } from '../../api/useGatewayClient.js'
 

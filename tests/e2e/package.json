@@ -27,6 +27,7 @@
   "devDependencies": {
     "@playwright/test": "1.62.1",
     "@types/node": "catalog:",
+    "fontverter": "2.0.0",
     "typescript": "catalog:"
   }
 }

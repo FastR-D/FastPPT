@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Aside, Box, Button, Footer, Main, Nav, Text } from '@fastppt/components'
+import { Aside, Box, Button, Footer, Main, Nav, Text } from '@fastrd/ui-vue'
 import {
   computed,
   defineAsyncComponent,

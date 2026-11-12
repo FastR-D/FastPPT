@@ -1,6 +1,7 @@
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, posix } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
@@ -21,7 +22,7 @@ const TEST_CATALOG: Record<string, { file: string; variable?: boolean }> = {
 const testResolveFont = (family: string): { path: string; variable?: boolean } | undefined => {
   const entry = TEST_CATALOG[family]
   if (!entry) return undefined
-  return { path: new URL(entry.file, FONT_ROOT).pathname, variable: entry.variable }
+  return { path: fileURLToPath(new URL(entry.file, FONT_ROOT)), variable: entry.variable }
 }
 
 function textElement(id: string, text: string, fontFamily: string): Record<string, unknown> {
@@ -98,7 +99,7 @@ describe('PPTX font embedding', () => {
       expect(Buffer.from(extractEotFontData(eot)).equals(font)).toBe(true)
       if (inherited) expect(await output.file('ppt/slides/slide1.xml')!.async('string')).not.toMatch(/<a:rPr[^>]* cap=/)
     }
-  })
+  }, 30_000) // Two PPTX exports retain the complete original CJK font.
 
   it('still pins the requested weight when retaining a variable font for capitalization', async () => {
     const element = textElement('caps', 'a', 'Inter')

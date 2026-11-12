@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, readFile, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
-import { ResourceLibrary, rankResources, summarizeComposition, type LayoutResource } from '../src/index.js'
+import { ResourceLibrary, rankResources, resolveResourcesRoot, summarizeComposition, type LayoutResource } from '../src/index.js'
 const sample = (id: string, tags: string[], status: LayoutResource['status'] = 'reconstructed'): LayoutResource => ({
   id, title: id, kind: 'diagram', description: tags.join(' '), tags, style: 'neutral', scenarios: '',
   source: 'fixture.pptx', sourcePage: 1, file: `pages/${id}.md`, aspect: 16 / 9, density: 'balanced',
@@ -73,7 +73,7 @@ describe('resource retrieval', () => {
     const library = new ResourceLibrary(root)
     const current = await library.read('semantic')
     expect(current?.composition?.objects).toHaveLength(60)
-    expect(current?.compositionPath).toContain('compositions/semantic.json')
+    expect(current?.compositionPath).toBe(join(root, 'compositions', 'semantic.json'))
     const summary = summarizeComposition(current!.composition!)
     expect(summary.objects).toHaveLength(16)
     expect(summary.objects[0]?.text).toHaveLength(160)
@@ -86,7 +86,7 @@ describe('resource retrieval', () => {
   it('indexes every source page exactly once, with readable single-page files and evidence', async () => {
     const library = new ResourceLibrary()
     const entries = await library.entries()
-    const report = JSON.parse(await readFile(new URL('../scan-report.json', import.meta.url), 'utf8')) as { pageCount: number; sources: { pages: number; entries: string[] }[] }
+    const report = JSON.parse(await readFile(join(await resolveResourcesRoot(), 'scan-report.json'), 'utf8')) as { pageCount: number; sources: { pages: number; entries: string[] }[] }
     expect(entries.length).toBe(report.pageCount)
     expect(new Set(entries.map(item => item.id)).size).toBe(entries.length)
     expect(report.sources.flatMap(source => source.entries).sort()).toEqual(entries.map(item => item.id).sort())

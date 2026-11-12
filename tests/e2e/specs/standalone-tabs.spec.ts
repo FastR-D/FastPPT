@@ -115,7 +115,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
         .poll(
           async () => {
             try {
-              return (await fetch('http://127.0.0.1:4332')).ok
+              return (await fetch('http://localhost:4332')).ok
             } catch {
               return false
             }
@@ -124,8 +124,10 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
         )
         .toBe(true),
       failed,
-    ])
-    await page.goto('http://127.0.0.1:4332/1')
+    ]).catch((cause: unknown) => {
+      throw new Error(`Standalone Slidev did not become ready: ${serverOutput}`, { cause })
+    })
+    await page.goto('http://localhost:4332/1')
     const frame = page.locator('#standalone-frame')
     await expect(frame.locator('[data-fastppt-tab]')).toHaveCount(2)
     expect(await frame.textContent()).toBe('A\tB\tC')
@@ -152,7 +154,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
       return Math.round((element.getBoundingClientRect().left - paragraph.getBoundingClientRect().left) / root.getBoundingClientRect().width * 1000)
     }))).toEqual([150, 150])
     await expect(decimal.locator('[data-fastppt-tab-error]')).toHaveCount(0)
-    await page.goto('http://127.0.0.1:4332/2')
+    await page.goto('http://localhost:4332/2')
     const flow = page.locator('#standalone-flow')
     await expect(flow).toBeVisible()
     await expect.poll(() => flow.locator('[data-fastppt-tab]').evaluateAll(elements => elements.map(element => {
@@ -160,7 +162,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
       return [Math.round((element.getBoundingClientRect().left - paragraph.getBoundingClientRect().left) * factor), Math.round(element.getBoundingClientRect().width * factor), Math.round((element.getBoundingClientRect().top - paragraph.getBoundingClientRect().top) * factor)]
     }))).toEqual([[0, 72, 30], [0, 240, 30]])
     await expect(flow.locator('[data-fastppt-tab-error]')).toHaveCount(0)
-    await page.goto('http://127.0.0.1:4332/3')
+    await page.goto('http://localhost:4332/3')
     const bullets = page.locator('#standalone-bullets')
     await expect(bullets).toBeVisible()
     const measured = () => bullets.locator('p').evaluateAll(elements => elements.map(element => {
@@ -172,7 +174,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
     await page.setViewportSize({ width: 1200, height: 800 })
     await expect.poll(measured).toEqual([{ label: '*', prefix: 32, baseline: 0 }, { label: '1234.', prefix: 40, baseline: 0 }, { label: '*', prefix: 41.6, baseline: 0 }])
     await expect(bullets.locator('[data-fastppt-bullet-error]')).toHaveCount(0)
-    await page.goto('http://127.0.0.1:4332/4')
+    await page.goto('http://localhost:4332/4')
     const decorations = page.locator('#standalone-decorations')
     await expect(decorations).toBeVisible()
     const decorationStyles = () => decorations.locator('[data-fastppt-text-decoration-run]').evaluateAll(elements => elements.map(element => ({ text: element.textContent, line: getComputedStyle(element).textDecorationLine, skipInk: getComputedStyle(element).textDecorationSkipInk })))
@@ -192,7 +194,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
     await writeFile(entry, (await readFile(entry, 'utf8')).replace('Strike only', 'Edited strike').replace('data-fastppt-level="2"', 'data-fastppt-level="9"'))
     await expect(decorations).toContainText('Edited strike')
     await expect.poll(decorationStyles).toEqual(expect.arrayContaining([{ text: 'Edited strike', line: 'none', skipInk: 'none' }]))
-    await page.goto('http://127.0.0.1:4332/5')
+    await page.goto('http://localhost:4332/5')
     const spacing = page.locator('#standalone-spacing')
     await expect(spacing).toBeVisible()
     const spacingValues = () => spacing.locator('p').evaluateAll(elements => elements.map(element => Number(((parseFloat(getComputedStyle(element).letterSpacing) || 0) * 960 / parseFloat(getComputedStyle(element.closest('.source-layout')!).width)).toFixed(2))))
@@ -203,7 +205,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
     await writeFile(entry, (await readFile(entry, 'utf8')).replace('data-fastppt-level="2">Zero', 'data-fastppt-level="3">Edited compact'))
     await expect(spacing).toContainText('Edited compact')
     await expect.poll(spacingValues).toEqual([2, -2, -2, 2, 2])
-    await page.goto('http://127.0.0.1:4332/6')
+    await page.goto('http://localhost:4332/6')
     const baseline = page.locator('#standalone-baseline')
     await expect(baseline).toBeVisible()
     const baselines = () => baseline.locator('[data-fastppt-text-baseline-run]').evaluateAll(elements => elements.map(element => {
@@ -217,7 +219,7 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
     await writeFile(entry, (await readFile(entry, 'utf8')).replace('data-fastppt-baseline="0">Reset', 'data-fastppt-baseline="-10">Edited baseline'))
     await expect(baseline).toContainText('Edited baseline')
     await expect.poll(baselines).toEqual([30, -25, -10, 30, 30, 30])
-    await page.goto('http://127.0.0.1:4332/7')
+    await page.goto('http://localhost:4332/7')
     const kerning = page.locator('#standalone-kerning')
     await expect(kerning).toBeVisible()
     const modes = () => kerning.locator('p > [data-fastppt-script-text] > span').evaluateAll(elements => elements.map(element => getComputedStyle(element).fontKerning))
@@ -228,12 +230,12 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
     await writeFile(entry, (await readFile(entry, 'utf8')).replace('data-fastppt-level="3">AVATAR', 'data-fastppt-level="2">Edited AVATAR'))
     await expect(kerning).toContainText('Edited AVATAR')
     await expect.poll(modes).toEqual(['normal', 'normal', 'normal', 'normal'])
-    await page.goto('http://127.0.0.1:4332/8')
+    await page.goto('http://localhost:4332/8')
     const fixedKerning = page.locator('[data-fastppt-layout-object="MCP Pairs"] > span')
     await expect(fixedKerning).toHaveCSS('font-kerning', 'none')
     await fixedKerning.evaluate(element => { (element as HTMLElement).style.fontSize = '4cqw' })
     await expect(fixedKerning).toHaveCSS('font-kerning', 'normal')
-    await page.goto('http://127.0.0.1:4332/9')
+    await page.goto('http://localhost:4332/9')
     const capitalization = page.locator('#standalone-capitalization')
     await expect(capitalization).toBeVisible()
     const capitalizationText = () => capitalization.locator('p').evaluateAll(elements => elements.map(element => ({ original: element.textContent, display: (element as HTMLElement).innerText })))
@@ -243,10 +245,10 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
     await expect(capitalization.locator('[data-fastppt-tab-error]')).toHaveCount(0)
     await writeFile(entry, (await readFile(entry, 'utf8')).replace('<p>Straße</p>', '<p data-fastppt-capitalization="none">Edited Straße</p>'))
     await expect(capitalization.locator('p').first()).toHaveJSProperty('innerText', 'Edited Straße')
-    await page.goto('http://127.0.0.1:4332/10')
+    await page.goto('http://localhost:4332/10')
     await expect(page.locator('[data-fastppt-layout-object="MCP Capitals"] > span')).toHaveCSS('font-variant-caps', 'small-caps')
 
-    await page.goto('http://127.0.0.1:4332/11')
+    await page.goto('http://localhost:4332/11')
     const rtl = page.locator('#standalone-rtl')
     await expect(rtl).toBeVisible()
     expect(await rtl.textContent()).toBe('مرحبا بالعالم 123 ABCשלום עולם 123 ABC')

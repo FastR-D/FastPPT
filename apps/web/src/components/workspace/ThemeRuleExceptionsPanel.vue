@@ -9,7 +9,7 @@ import {
   SelectOption,
   Text,
   TextArea,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, ref, watch, type DeepReadonly } from 'vue'
 import {
   ThemeRuleExceptionContextRequestSchema,

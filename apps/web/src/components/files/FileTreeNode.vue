@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, Button, Text } from '@fastppt/components'
+import { Box, Button, Text } from '@fastrd/ui-vue'
 import { computed, shallowRef } from 'vue'
 
 import type { FileNode } from '@fastppt/protocol'

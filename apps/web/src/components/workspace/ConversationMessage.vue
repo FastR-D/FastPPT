@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, Button, RichText } from '@fastppt/components'
+import { Box, Button, RichText } from '@fastrd/ui-vue'
 import { computed, shallowRef } from 'vue'
 import { renderMessageMarkdown } from '../../workspace/message-markdown.js'
 const props = defineProps<{ content: string }>()

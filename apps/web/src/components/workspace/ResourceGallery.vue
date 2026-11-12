@@ -3,7 +3,7 @@ import {
   Article,
   Box,
   Button,
-  DialogSurface,
+  Modal,
   Disclosure,
   DisclosureTrigger,
   Footer,
@@ -15,8 +15,8 @@ import {
   SelectOption,
   Text,
   TextField,
-} from '@fastppt/components'
-import { nextTick, onMounted, onUnmounted, shallowRef, watch } from 'vue'
+} from '@fastrd/ui-vue'
+import { onMounted, onUnmounted, shallowRef, watch } from 'vue'
 import ResourcePreview from './ResourcePreview.vue'
 import { useGatewayClient } from '../../api/useGatewayClient.js'
 import type { LayoutResourceSummary } from '@fastppt/protocol'
@@ -39,16 +39,9 @@ const items = shallowRef<LayoutResourceSummary[]>([])
 const loading = shallowRef(false)
 const error = shallowRef('')
 const inspection = shallowRef<LayoutResourceSummary>()
-const inspectionDialog = shallowRef<HTMLDialogElement>()
 function sourceLabel(value: string): string {
   return value.replace(/[-—–_\s]*旁门左道\s*PPT(?:\s*原创出品)?/giu, '')
 }
-watch(inspection, async (value) => {
-  await nextTick()
-  if (value && !inspectionDialog.value?.open)
-    inspectionDialog.value?.showModal()
-  else if (!value) inspectionDialog.value?.close()
-})
 function inspectPage(delta: number): void {
   const index = items.value.findIndex(
     (item) => item.id === inspection.value?.id,
@@ -293,11 +286,10 @@ onUnmounted(() => {
       >
     </Footer
     >
-    <DialogSurface
-      ref="inspectionDialog"
+    <Modal
+      :open="Boolean(inspection)"
       class="inspection-dialog"
-      aria-label="版式现场预览"
-      @cancel="inspection = undefined"
+      label="版式现场预览"
       @close="inspection = undefined"
       @keydown.left.prevent="inspectPage(-1)"
       @keydown.right.prevent="inspectPage(1)"
@@ -359,7 +351,7 @@ onUnmounted(() => {
         </Footer
         >
       </template>
-    </DialogSurface>
+    </Modal>
   </Panel>
 </template>
 
@@ -521,13 +513,6 @@ details p {
   width: min(1200px, 94vw);
   max-height: 94vh;
   padding: 24px;
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  color: var(--color-text);
-  background: var(--color-panel);
-}
-.inspection-dialog::backdrop {
-  background: var(--color-overlay);
 }
 .inspection-dialog header {
   margin-bottom: 12px;

@@ -22,7 +22,7 @@ test('exports captured creative objects as native animated groups with original 
  const response=await page.request.get('http://127.0.0.1:4317/api/v1/animations/c9f1632d31e4-0006');const value=CreativeAnimationDetailSchema.parse(await response.json())
  const body=String(value.markdown).replace(/^---\n[\s\S]*?\n---\n/,'')
  await page.goto('/');await page.setContent(`<style>body{margin:0}#creative-root{position:relative;width:960px;height:540px;font:20px Arial}</style><div id="creative-root">${body}</div>`)
- const path=`http://127.0.0.1:4318/@fs${root}packages/slidewave/src/slidev/capture.ts`
+  const path=`http://127.0.0.1:4328/@fs/${root.replaceAll('\\', '/')}packages/slidewave/src/slidev/capture.ts`
  const slide=await page.evaluate(async path=>{const{captureHtmlSlide}=await import(path) as {captureHtmlSlide:(el:HTMLElement,opts:{snapshotVersion:number})=>Promise<HtmlSlideSnapshot>};return captureHtmlSlide(document.querySelector<HTMLElement>('#creative-root')!,{snapshotVersion:2})},path)
  const snapshot=HtmlDeckSnapshotSchema.parse({version:2,source:'slidev',slides:[slide],warnings:[]})
  const effects=value.motion.groups.flatMap(group=>group.effects).map(effect=>{

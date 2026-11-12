@@ -1,10 +1,10 @@
 const rule = {
   meta: {
     type: 'problem',
-    docs: { description: 'Keep native HTML inside @fastppt/components.' },
+    docs: { description: 'Use @fastrd/ui-vue primitives in application templates.' },
     schema: [],
     messages: {
-      native: '业务模板禁止裸 HTML <{{tag}}>；请使用 @fastppt/components。',
+      native: '业务模板禁止裸 HTML <{{tag}}>；请使用 @fastrd/ui-vue。',
       escape: '交互元素不能通过 Box/as 绕过组件库，请使用对应控件组件。',
     },
   },

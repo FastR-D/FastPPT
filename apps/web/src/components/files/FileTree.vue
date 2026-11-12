@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box } from '@fastppt/components'
+import { Box } from '@fastrd/ui-vue'
 import FileTreeNode from './FileTreeNode.vue'
 
 import type { FileNode } from '@fastppt/protocol'

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates src/index.css (all families) and src/families/<slug>.css (one
- * family each) from the catalog. Run after fetch-fonts. Themes should import
+ * family each) from the catalog. Themes should import
  * per-family entries so Vite only bundles the fonts they use.
  */
 import { mkdir, writeFile } from 'node:fs/promises'

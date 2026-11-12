@@ -20,7 +20,7 @@ import {
   TableRow,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, onMounted, ref } from 'vue'
 
 import type { ImportAnalysisV1, ImportPptxThemeResult } from '@fastppt/protocol'

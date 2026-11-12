@@ -2,7 +2,6 @@
 import {
   Article,
   Box,
-  BrandMark,
   Button,
   Description,
   DescriptionList,
@@ -17,7 +16,8 @@ import {
   Text,
   TextArea,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
+import { BrandMark } from '../ui/index.js'
 import {
   computed,
   defineAsyncComponent,

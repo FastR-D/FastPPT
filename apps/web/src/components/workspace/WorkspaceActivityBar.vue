@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button, Nav, Text } from '@fastppt/components'
-import { Icon as AppIcon } from '@fastppt/components'
+import { Button, Nav, Text } from '@fastrd/ui-vue'
+import { Icon as AppIcon } from '../ui/index.js'
 import { computed } from 'vue'
 import {
   primaryView,

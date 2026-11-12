@@ -16,7 +16,7 @@ import {
   Text,
   TextArea,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { useGatewayClient } from '../../api/useGatewayClient.js'
 import {
@@ -299,7 +299,7 @@ watch(
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 14px var(--fp-modal-padding);
+  padding: 14px 24px;
   border-bottom: 1px solid var(--color-border);
   font-size: 12px;
   color: var(--color-muted);

@@ -1,0 +1,19 @@
+The following notices are recorded in the bundled fonts' name tables.
+These fonts are distributed under the accompanying SIL Open Font License 1.1.
+
+Caveat: Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
+Fira Code: Copyright 2014-2020 The Fira Code Project Authors (https://github.com/tonsky/FiraCode)
+Inter: Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
+JetBrains Mono: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+Lexend: Copyright 2019 The Lexend Project Authors (https://github.com/googlefonts/lexend)
+LXGW WenKai: Copyright 2021-2026 LXGW (https://github.com/lxgw/LxgwWenKai)
+             Copyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee)
+Noto Sans SC: (c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+Noto Serif SC: (c) 2017-2024 Adobe (http://www.adobe.com/).
+Nunito Sans: Copyright 2016 The Nunito Sans Project Authors (https://github.com/Fonthausen/NunitoSans)
+Shantell Sans: Copyright 2022 The Shantell Sans Project Authors (https://github.com/arrowtype/shantell-sans)
+Sofia Sans: Copyright 2019 The Sofia Sans Project Authors (https://github.com/lettersoup/Sofia-Sans)
+Space Grotesk: Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk)
+Space Mono: Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono)
+
+MiSans is used in FastPPT under its separate Xiaomi license in MiSans.txt.

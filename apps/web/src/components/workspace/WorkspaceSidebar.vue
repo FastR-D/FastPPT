@@ -7,12 +7,12 @@ import {
   Panel,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, nextTick, shallowRef } from 'vue'
 
-import { Select as AppSelect, type SelectItem } from '@fastppt/components'
+import { Select as AppSelect, type SelectItem } from '@fastrd/ui-vue'
 import EditorNavigation from './EditorNavigation.vue'
-import { Icon as AppIcon } from '@fastppt/components'
+import { Icon as AppIcon } from '../ui/index.js'
 
 import type { SessionSummary, HarnessKind } from '@fastppt/protocol'
 import type { DeepReadonly } from 'vue'

@@ -18,7 +18,7 @@ import {
   SelectOption,
   Text,
   TextField,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import {
   computed,
   onMounted,
@@ -37,7 +37,7 @@ import { resolveGatewayUrl } from '../../api/useGatewayClient.js'
 import RegionSelector from './RegionSelector.vue'
 import { useDetailsMenu } from '../../workspace/use-details-menu.js'
 import { createPageWheelHandler } from '../../workspace/page-wheel.js'
-import { Select as AppSelect, type SelectItem } from '@fastppt/components'
+import { Select as AppSelect, type SelectItem } from '@fastrd/ui-vue'
 import ThemeRuleExceptionsPanel from './ThemeRuleExceptionsPanel.vue'
 
 import type {
@@ -439,6 +439,8 @@ function navigateToPage(): void {
 }
 
 function handlePreviewKey(event: KeyboardEvent): void {
+  if (event.defaultPrevented) return
+  if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]')) return
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
   if (event.altKey || event.ctrlKey || event.metaKey) return
   event.preventDefault()
@@ -1151,7 +1153,7 @@ onUnmounted(() => {
   min-width: 0;
   gap: 10px;
 }
-.preview-identity :deep(.app-select) {
+.preview-identity :deep(.fastui-select) {
   flex: 1;
   min-width: 0;
   max-width: none;
@@ -1173,6 +1175,12 @@ onUnmounted(() => {
   position: relative;
 }
 .preview-more > summary {
+  display: flex;
+  align-items: center;
+  height: var(--control-height-xs);
+  padding: 1px 6px;
+  font-size: 12px;
+  line-height: 1.5;
   list-style: none;
   white-space: nowrap;
 }

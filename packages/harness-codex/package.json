@@ -14,6 +14,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@fastrd/harness-transport": "0.1.2",
     "@fastppt/harness-core": "workspace:*",
     "@fastppt/protocol": "workspace:*",
     "zod": "catalog:"

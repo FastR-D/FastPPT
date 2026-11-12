@@ -1,0 +1,2 @@
+# Resource composition hashes commit exact Markdown bytes across platforms.
+packages/resources/pages/*.md text eol=lf

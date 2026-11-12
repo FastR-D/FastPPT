@@ -1,0 +1,24 @@
+{
+  "sources": {
+    "ofl": "FastR-D/FastPPT@62abbaef872bc8e1cb6f28f35439eaabbb512083:packages/fonts/assets/fonts",
+    "misans": "dsrkafuu/misans@caf1ccdb565f3cc47699e92937db7a677cbb877d:raw/Normal/ttf"
+  },
+  "sha256": {
+    "caveat-variable.ttf": "0bdb6b660482d31531b3945849fba5916b3ef8695da7024a9e6b9ee3c4157988",
+    "fira-code-variable.ttf": "9335b082b3c7850d98a64b584f3417f65355f3471278bb5eeb8c6c0e8657aeeb",
+    "inter-variable.ttf": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+    "jetbrains-mono-variable.ttf": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda",
+    "lexend-variable.ttf": "3add53e641fbc81da64da4bb254285e2831b52b029527bc0714e2b9610832ee6",
+    "lxgw-wenkai-regular.ttf": "39ad71264b588165b469e35e6afb162a378dacd1f95348160240ba9038ac3009",
+    "misans-bold.ttf": "c01078cf5e0ca166672612e29ae8c94f3a6b224d047ffbf3801e33003051ec0e",
+    "misans-regular.ttf": "6aa32ded55e110a95be10080e0c322f2382681cd581c5cbb24f4fd4ce96fbb08",
+    "misans-semibold.ttf": "c7dc0cc24679c52af0a137d6a1edce7cf816af2a76ba9256d54b220cb0ea232c",
+    "noto-sans-sc-variable.ttf": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "noto-serif-sc-variable.ttf": "050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9",
+    "nunito-sans-variable.ttf": "f934d7142fb4784bf828da485b7dcbd90c0c80d514e9d49a5da0ed3a1ae2491d",
+    "shantell-sans-variable.ttf": "d98a7913853f78d71aa0b86daf66b5eddb5a3266c07bfd51ef70632b88c41084",
+    "sofia-sans-variable.ttf": "a3e1019b8867e21b75d26a7b59d4eb2c81d1acf6b69b9ae6cedca269fb68e291",
+    "space-grotesk-variable.ttf": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72",
+    "space-mono-regular.ttf": "95837e182baeeada83368f7748db28357f0a1b75c6b84ff7065b5edf933c8e18"
+  }
+}

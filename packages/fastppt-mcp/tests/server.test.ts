@@ -96,7 +96,25 @@ layout: content
 
 describe('FastPPT MCP', () => {
   it('resolves SVG href and CSS webfont assets even when a resource exceeds the inline source budget', async () => {
-    const { service } = await fixture()
+    // Image packs are installed separately. Exercise the real MCP/file boundary
+    // with a local pack; this test resolves asset bytes, it does not render fonts.
+    const pack = await temporaryDirectory('fastppt-resource-pack-')
+    await mkdir(join(pack, 'pages'))
+    await mkdir(join(pack, 'assets'))
+    const markdown = '---\nlayout: none\n---\n<svg><image xlink:href="../assets/aa.svg"/></svg>\n<style>@font-face{src:url("../assets/bb.woff2")}</style>\n' + '<!-- source budget -->'.repeat(300)
+    await writeFile(join(pack, 'pages/9a04224856b0-0134.md'), markdown)
+    await writeFile(join(pack, 'assets/aa.svg'), '<svg xmlns="http://www.w3.org/2000/svg"/>')
+    await writeFile(join(pack, 'assets/bb.woff2'), 'opaque asset bytes for path resolution')
+    await writeFile(join(pack, 'index.json'), JSON.stringify({ version: 1, entries: [{ id: '9a04224856b0-0134', file: 'pages/9a04224856b0-0134.md' }] }))
+    const previousRoot = process.env.FASTPPT_RESOURCES_ROOT
+    let service: FastPptMcpService
+    try {
+      process.env.FASTPPT_RESOURCES_ROOT = pack
+      service = (await fixture()).service
+    } finally {
+      if (previousRoot === undefined) delete process.env.FASTPPT_RESOURCES_ROOT
+      else process.env.FASTPPT_RESOURCES_ROOT = previousRoot
+    }
     const reference = await service.resources.read('9a04224856b0-0134')
     expect(reference).toBeDefined()
     const hrefs = [...reference!.markdown.matchAll(/xlink:href="(\.\.\/assets\/[^"<>]+)"/g)].map(match => match[1]!)
@@ -109,6 +127,7 @@ describe('FastPPT MCP', () => {
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)])
     try {
       const response = await client.callTool({ name: 'read_resource', arguments: { id: '9a04224856b0-0134', maxChars: 4000 } })
+      expect(response.isError, JSON.stringify(response.content)).not.toBe(true)
       const data = response.structuredContent as { markdown: string | null; sourceChars: number; assets: { reference: string; localPath: string }[] }
       expect(data.sourceChars).toBe(reference!.markdown.length)
       expect(data.markdown).toBeNull()

@@ -407,7 +407,7 @@ async function loadTheme(packageRoot: string): Promise<RegisteredTheme> {
     layoutIds.add(layout.id)
     const layoutPath = await resolveOwnedPath(
       packageRoot,
-      join('layouts', `${layout.id}.vue`),
+      posix.join('layouts', `${layout.id}.vue`),
       'layout',
     )
     if (!(await stat(layoutPath)).isFile())

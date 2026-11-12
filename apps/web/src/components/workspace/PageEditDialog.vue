@@ -8,7 +8,7 @@ import {
   Heading,
   Text,
   TextArea,
-} from '@fastppt/components'
+} from '@fastrd/ui-vue'
 import { computed, shallowRef, watch } from 'vue'
 import ResourceGallery from './ResourceGallery.vue'
 import type { LayoutResourceSummary, SlideRegion } from '@fastppt/protocol'
