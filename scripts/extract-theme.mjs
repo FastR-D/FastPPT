@@ -22,6 +22,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { createHash } from 'node:crypto'
 import { basename, join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 // jszip is a dependency of @fastppt/slidewave. Resolve it from the repo layout
 // (dev) or the packaged CLI layout (dist/node_modules/@fastppt/slidewave).
@@ -32,7 +33,7 @@ async function resolveJszip() {
   ]
   for (const candidate of candidates) {
     try {
-      return (await import(createRequire(candidate).resolve('jszip'))).default
+      return (await import(pathToFileURL(createRequire(candidate).resolve('jszip')).href)).default
     } catch {
       /* try next */
     }

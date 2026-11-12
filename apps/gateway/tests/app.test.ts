@@ -1939,7 +1939,7 @@ describe('gateway', () => {
         themeName: 'import-test',
       },
     })
-    expect(response.statusCode).toBe(200)
+    expect(response.statusCode, response.body).toBe(200)
     const result = ImportPptxThemeResultSchema.parse(response.json())
     expect(result.themeId).toBe('slidev-theme-import-test')
     expect(result.skillId).toBe('fastppt-theme-import-test')
@@ -2224,7 +2224,7 @@ describe('gateway', () => {
       components: expect.any(Array),
       message: expect.any(String),
     })
-  })
+  }, 30_000) // Writes, imports and approves a real PPTX, including registry reload.
 
   it('rejects non-PPTX theme imports before starting extraction', async () => {
     const root = mkdtempSync(join(tmpdir(), 'fastppt-import-invalid-'))
