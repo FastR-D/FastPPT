@@ -28,5 +28,6 @@ jobs:
       - run: pnpm --filter @fastppt/e2e exec playwright install --with-deps chromium
       - run: pnpm typecheck
       - run: pnpm lint
-      - run: pnpm test
-      - run: pnpm build
+      # Each package launches its own workers/Slidev builds on the shared runner.
+      - run: pnpm test --concurrency=2
+      - run: pnpm build --concurrency=2
