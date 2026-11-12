@@ -1,5 +1,7 @@
 import { layoutSystemSfc } from '@fastppt/fastppt-mcp/theme-design'
 import { cp, readFile, readdir, rm, mkdir, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
+import { createRequire } from 'node:module'
 import { basename, dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import type { NativeMasterLayout } from '@fastppt/slidewave/server'
@@ -43,6 +45,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = resolve(here, '../../..')
 export const E2E_WORKSPACE = '/tmp/fastppt-e2e-workspace'
 const fixtureThemesRoot = '/tmp/fastppt-e2e-themes'
+const fixtureResourcesRoot = '/tmp/fastppt-e2e-resources'
 
 function delay(milliseconds: number): Promise<void> {
   return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds))
@@ -493,6 +496,26 @@ await writeFile(resolve(ruleThemeRoot, 'agent/SKILL.md'), (await readFile(resolv
 await writeFile(resolve(ruleThemeRoot, 'agent/theme-rules.json'), JSON.stringify({ version: 1, rules: [{ id: 'deck.pages', kind: 'max-slides', value: 1, severity: 'error' }] }))
 await writeFile(resolve(E2E_WORKSPACE, 'rule-exceptions.md'), `---\ntheme: ${ruleThemeId}\nlayout: default\n---\n\n# First review page\n\n---\n\n# Second review page\n`)
 
+// Exercise resource HTTP delivery with a local, reproducible webfont pack.
+// Private reference-library binaries are installed separately from the checkout.
+await rm(fixtureResourcesRoot, { recursive: true, force: true })
+await cp(resolve(repositoryRoot, 'packages/resources'), fixtureResourcesRoot, {
+  recursive: true,
+  filter: path => !['node_modules', 'dist', '.turbo'].includes(basename(path)),
+})
+const fontverter = createRequire(import.meta.url)('fontverter') as {
+  convert(font: Buffer, format: 'woff2'): Promise<Buffer>
+}
+const webfont = await fontverter.convert(await readFile(resolve(repositoryRoot, 'packages/fonts/assets/fonts/space-mono-regular.ttf')), 'woff2')
+const fontName = `${createHash('sha256').update(webfont).digest('hex')}.woff2`
+await mkdir(resolve(fixtureResourcesRoot, 'assets'), { recursive: true })
+await writeFile(resolve(fixtureResourcesRoot, 'assets', fontName), webfont)
+await writeFile(resolve(fixtureResourcesRoot, 'pages/font-qa.md'), `---\ntitle: Local font QA\n---\n<style>@font-face{font-family:fp-e2e-space-mono;src:url('../assets/${fontName}') format('woff2')}[data-resource-text]{font-family:fp-e2e-space-mono}</style><div><p data-resource-text>Local webfont 0123456789</p></div>`)
+const resourceIndex = JSON.parse(await readFile(resolve(fixtureResourcesRoot, 'index.json'), 'utf8')) as { version: number; entries: unknown[] }
+resourceIndex.entries.push({ id: 'font-qa', title: 'Local font QA', kind: 'layout', description: 'Bundled Space Mono webfont', tags: [], style: 'plain', scenarios: 'font loading', source: 'packages/fonts/assets/fonts/space-mono-regular.ttf', sourcePage: 1, file: 'pages/font-qa.md', aspect: 16 / 9, density: 'airy', status: 'reconstructed', warnings: [], license: 'OFL-1.1', stats: { objects: 1, textBlocks: 1 }, searchText: 'local webfont' })
+await writeFile(resolve(fixtureResourcesRoot, 'index.json'), JSON.stringify(resourceIndex))
+process.env.FASTPPT_RESOURCES_ROOT = fixtureResourcesRoot
+
 const app = await createGateway(
   {
     host: '127.0.0.1',
@@ -527,6 +550,7 @@ async function close(): Promise<void> {
   } finally {
     await rm(E2E_WORKSPACE, { recursive: true, force: true })
     await rm(fixtureThemesRoot, { recursive: true, force: true })
+    await rm(fixtureResourcesRoot, { recursive: true, force: true })
   }
 }
 process.once('SIGINT', () => void close())

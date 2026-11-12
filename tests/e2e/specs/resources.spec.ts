@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('loads source webfonts inside the script-free opaque resource sandbox', async ({ page }) => {
   await page.goto('http://127.0.0.1:4317/health')
-  await page.setContent('<iframe title="font-qa" sandbox="" style="width:960px;height:540px" src="http://127.0.0.1:4317/api/v1/resources/preview/9a04224856b0-0134"></iframe>')
+  await page.setContent('<iframe title="font-qa" sandbox="" style="width:960px;height:540px" src="http://127.0.0.1:4317/api/v1/resources/preview/font-qa"></iframe>')
   const frame = page.frameLocator('iframe[title="font-qa"]')
   await expect(frame.locator('[data-resource-text]').first()).toBeVisible()
   await expect.poll(async () => frame.locator('html').evaluate(() => [...document.fonts].filter(font => font.family.includes('fp-') && font.status === 'loaded').length)).toBeGreaterThan(0)

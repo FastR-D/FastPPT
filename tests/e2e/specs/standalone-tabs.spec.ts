@@ -124,7 +124,9 @@ test('generated theme preserves source tabs in standalone Slidev without the hos
         )
         .toBe(true),
       failed,
-    ])
+    ]).catch((cause: unknown) => {
+      throw new Error(`Standalone Slidev did not become ready: ${serverOutput}`, { cause })
+    })
     await page.goto('http://127.0.0.1:4332/1')
     const frame = page.locator('#standalone-frame')
     await expect(frame.locator('[data-fastppt-tab]')).toHaveCount(2)
