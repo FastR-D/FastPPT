@@ -1,5 +1,13 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import type { DeckNotesDocument } from '@fastppt/protocol'
+
+async function openNotesDeck(page: Page): Promise<void> {
+  await page.goto('/')
+  const picker = page.getByLabel('Preview deck')
+  await expect(picker).toBeVisible()
+  await picker.selectOption({ label: 'notes-qa' })
+  await expect(page.frameLocator('.preview-stage iframe').getByRole('heading', { name: 'Notes page 1', exact: true })).toBeVisible()
+}
 
 test('links the notes outline, editor and preview without losing drafts on page changes or failed saves', async ({ page }) => {
   const errors: string[] = []
@@ -31,7 +39,7 @@ test('links the notes outline, editor and preview without losing drafts on page 
     }
     await route.fulfill({ json: notes })
   })
-  await page.goto('/')
+  await openNotesDeck(page)
   await expect.poll(async () => Number((await page.locator('.status-pages').innerText()).match(/\/ (\d+) 页/)?.[1])).toBeGreaterThanOrEqual(3)
   pageCount = Number((await page.locator('.status-pages').innerText()).match(/\/ (\d+) 页/)?.[1])
   expect(pageCount).toBeGreaterThanOrEqual(3)
@@ -80,7 +88,7 @@ test('links the notes outline, editor and preview without losing drafts on page 
 })
 
 test('uses a shared SVG icon and equally compact preview controls without a black surround', async ({ page }) => {
-  await page.goto('/')
+  await openNotesDeck(page)
   const preview = page.locator('.preview-panel')
   const frame = page.frameLocator('.preview-stage iframe')
   await expect(frame.locator('#slide-content')).toBeVisible()
@@ -98,7 +106,7 @@ test('uses a shared SVG icon and equally compact preview controls without a blac
 })
 
 test('keeps the editor file tree above the page outline and shares page selection with the preview', async ({ page }) => {
-  await page.goto('/')
+  await openNotesDeck(page)
   await page.getByRole('tab', { name: '编辑', exact: true }).click()
   const sidebar = page.getByRole('complementary', { name: '编辑导航', exact: true })
   const files = sidebar.getByRole('complementary', { name: '文件树', exact: true })
@@ -114,7 +122,7 @@ test('keeps the editor file tree above the page outline and shares page selectio
 })
 
 test('turns pages with the wheel over the outline and the unused preview area', async ({ page }) => {
-  await page.goto('/')
+  await openNotesDeck(page)
   await page.getByRole('tab', { name: '编辑', exact: true }).click()
   const outline = page.getByRole('complementary', { name: '页面大纲', exact: true })
   await outline.locator('.slide-item').nth(2).click()

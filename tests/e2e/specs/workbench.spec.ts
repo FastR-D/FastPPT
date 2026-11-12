@@ -170,13 +170,11 @@ test('keeps session configuration keyboard focus inside the dialog', async ({
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: '关闭', exact: true }).focus()
   await page.keyboard.press('Shift+Tab')
-  // Native traversal may pass through browser chrome before returning to the modal.
+  // Native dialogs may focus the dialog surface at the traversal boundary.
   await expect(trigger).not.toBeFocused()
-  if (!(await dialog.evaluate(element => element.contains(document.activeElement))))
-    await page.keyboard.press('Shift+Tab')
-  await expect(
-    dialog.getByRole('button', { name: '取消', exact: true }),
-  ).toBeFocused()
+  await expect.poll(() => dialog.evaluate(element => element.contains(document.activeElement))).toBe(true)
+  await page.keyboard.press('Tab')
+  await expect.poll(() => dialog.evaluate(element => element.contains(document.activeElement))).toBe(true)
   await page.keyboard.press('Control+k')
   await expect(page.getByRole('dialog', { name: '创建向导' })).toHaveCount(0)
   await page.keyboard.press('Escape')

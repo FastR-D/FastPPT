@@ -1,4 +1,4 @@
-import { rm } from 'node:fs/promises'
+import { rename, rm } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
 import { expect, test, type Locator } from '@playwright/test'
@@ -289,21 +289,25 @@ test('runs the complete local workspace, Harness, editor, preview and export flo
   await download.saveAs(downloadPath)
   expect(wakeLockFailures).toEqual([])
 
-  await rm(`${workspace}/.claude/skills/fastppt-theme-academy`, {
-    recursive: true,
-    force: true,
-  })
-  await page.setViewportSize({ width: 1600, height: 900 })
-  await page.getByRole('tab', { name: '对话' }).click()
-  await pickOption(harnessPicker, 'Claude')
-  await pickOption(deckPicker, 'slides')
-  await expect(
-    page.getByText('missing', { exact: false }).first(),
-  ).toBeVisible()
-  await page.getByRole('tab', { name: '对话' }).click()
-  await composer.fill('This must not enter the Harness')
-  await expect(page.getByRole('button', { name: '发送' })).toBeDisabled()
-  await expect(page.getByText('发送已禁用', { exact: false })).toBeVisible()
+  // Common Skills are required; unselected theme Skills are loaded on demand.
+  const commonSkill = `${workspace}/.claude/skills/fastppt`
+  const skillBackup = `${workspace}/.claude/fastppt-e2e-skill-backup`
+  await rename(commonSkill, skillBackup)
+  try {
+    await page.setViewportSize({ width: 1600, height: 900 })
+    await page.getByRole('tab', { name: '对话' }).click()
+    await pickOption(harnessPicker, 'Claude')
+    await pickOption(deckPicker, 'slides')
+    await page.getByRole('button', { name: '查看 Skill 与 MCP 安装状态' }).click()
+    const status = page.getByRole('dialog', { name: 'Skill 与 MCP 安装状态' })
+    await expect(status.locator('.status-row').filter({ has: status.locator('.row-main', { hasText: /^fastppt$/ }) })).toContainText('缺失')
+    await status.getByRole('button', { name: '关闭', exact: true }).click()
+    await composer.fill('This must not enter the Harness')
+    await expect(page.getByRole('button', { name: '发送' })).toBeDisabled()
+    await expect(page.getByText('发送已禁用', { exact: false })).toBeVisible()
+  } finally {
+    await rename(skillBackup, commonSkill)
+  }
 
   await page.locator('body').click({ position: { x: 20, y: 20 } })
   await page.keyboard.press('Control+Shift+P')
@@ -432,7 +436,7 @@ test('runs the complete local workspace, Harness, editor, preview and export flo
 
   await page.keyboard.press('Control+Shift+P')
   await expect(page.getByRole('dialog', { name: '命令面板' })).toBeVisible()
-  await page.getByRole('dialog', { name: '命令面板' }).getByRole('button', { name: '创建向导' }).click()
+  await page.getByRole('dialog', { name: '命令面板' }).getByRole('button', { name: '新建演示文稿' }).click()
   const wizard = page.getByRole('dialog', { name: '创建向导' })
   await expect(wizard).toBeVisible()
   await wizard.getByRole('button', { name: '关闭' }).click()
@@ -446,7 +450,7 @@ test('resumes creation decisions and carries the final delivery step into a real
   const openWizard = async () => {
     await expect(page.getByText('fastppt-e2e-workspace').first()).toBeVisible()
     await page.keyboard.press('Control+Shift+P')
-    await page.getByRole('dialog', { name: '命令面板' }).getByRole('button', { name: '创建向导' }).click()
+    await page.getByRole('dialog', { name: '命令面板' }).getByRole('button', { name: '新建演示文稿' }).click()
   }
   await openWizard()
   const wizard = page.getByRole('dialog', { name: '创建向导' })
@@ -563,6 +567,7 @@ test('grants separate rule exceptions for a real PPTX export and revokes publica
   await picker.selectOption({ label: 'rule-exceptions' })
   await expect(page.frameLocator('iframe[title="Slidev preview"]').locator('.slidev-layout').filter({ hasText: 'First review page' }).first()).toBeVisible()
   const panel = page.locator('.rule-exceptions')
+  await page.locator('.preview-more > summary').click()
   await panel.locator('summary').first().click()
   await expect(panel.locator('.rule-issue')).toContainText('deck.pages')
   const grant = panel.getByRole('button', { name: '批准此问题例外' })
@@ -681,6 +686,7 @@ test('applies motion presets by scope and preserves manual overrides when saving
   })
   await page.getByRole('tab', { name: '动画', exact: true }).click()
   const panel = page.locator('.animation-panel')
+  await panel.locator('.timeline-details > summary').click()
   const save = async () => {
     const sent = page.waitForRequest(req => req.method() === 'PUT' && /\/animations$/.test(new URL(req.url()).pathname))
     await panel.getByRole('button', { name: '保存动画', exact: true }).click()

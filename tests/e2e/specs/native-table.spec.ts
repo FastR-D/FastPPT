@@ -234,6 +234,7 @@ th, td { border: 1px solid #808080 !important; border-radius: 0 !important; padd
         .contentFrame()
         .getByRole('heading', { name: '原生数据表格' }),
     ).toBeVisible()
+    await page.locator('.preview-more > summary').click()
     await page.locator('.export-options summary').click()
     await page.getByLabel('导出策略').selectOption('strict-editable')
     await page.getByLabel('导出审查', { exact: true }).uncheck()

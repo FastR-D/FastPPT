@@ -13,7 +13,7 @@ test('captures an HTML compound polygon once and exports an editable hole with c
   const metadata={version:1,fillRule:'evenodd',paths:[{closed:true,points:[[0,0],[1,0],[1,1],[0,1]]},{closed:true,points:[[.25,.25],[.75,.25],[.75,.75],[.25,.75]]}],fill:'#123456',stroke:'none',strokeWidthRatio:0,fillOpacity:.5}
   const payload=JSON.stringify(metadata).replaceAll('"','&quot;')
   await page.setContent(`<style>body{margin:0}#capture-root{width:960px;height:540px;position:relative;background:white}</style><main id="capture-root"><div data-fastppt-group="target" style="position:absolute;inset:0"><div data-fastppt-geometry="${payload}" style="position:absolute;left:100px;top:100px;width:300px;height:250px;opacity:.5"><div style="position:absolute;inset:0;background:#123456;opacity:.5;clip-path:polygon(evenodd,0% 0%,100% 0%,100% 100%,0% 100%,0% 0%,25% 25%,75% 25%,75% 75%,25% 75%,25% 25%,0% 0%)"></div></div></div></main>`)
-  const path=`http://127.0.0.1:4318/@fs${root}packages/slidewave/src/slidev/capture.ts`
+  const path=`http://127.0.0.1:4328/@fs/${root.replaceAll('\\', '/')}packages/slidewave/src/slidev/capture.ts`
   const slide=await page.evaluate(async path=>{const {captureHtmlSlide}=await import(path) as {captureHtmlSlide:(node:HTMLElement,options:{snapshotVersion:number})=>Promise<HtmlSlideSnapshot>};return captureHtmlSlide(document.querySelector<HTMLElement>('#capture-root')!,{snapshotVersion:2})},path)
   const targets=slide.elements.filter(e=>e.source.anchor==='target')
   expect(targets).toHaveLength(1)
@@ -39,7 +39,7 @@ test('exports a converted library page as separate editable geometry and text',a
   await page.setContent((await library.preview('11ebacee969e-0010'))!)
   await page.evaluate(()=>document.fonts.ready)
   const sourceCount=await page.locator('[data-fastppt-geometry]').count()
-  const path=`http://127.0.0.1:4318/@fs${root}packages/slidewave/src/slidev/capture.ts`
+  const path=`http://127.0.0.1:4328/@fs/${root.replaceAll('\\', '/')}packages/slidewave/src/slidev/capture.ts`
   const slide=await page.evaluate(async path=>{
     const {captureHtmlSlide}=await import(path) as {captureHtmlSlide:(node:HTMLElement,options:{snapshotVersion:number})=>Promise<HtmlSlideSnapshot>}
     return captureHtmlSlide(document.querySelector<HTMLElement>('main > div')!,{snapshotVersion:2})
