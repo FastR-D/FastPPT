@@ -3,7 +3,7 @@
 2026-10-09，使用 **LibreOffice 7.3.7.2 30(Build:2)** 导出 PDF，再用 `pdftotext -bbox-layout` 提取文字及位置。源码、PPTX 和 PDF 的 SHA-256、渲染器版本、逐页期望与观测保存在 [JSON 报告](tabs-libreoffice-7.3.7.2.json)。报告允许 0.25 点的位置误差；文字内容或数量不符仍失败。
 
 ```sh
-pnpm --filter @fastppt/e2e exec tsx scripts/tabs-compatibility.ts /home/gugumur/FastPPT/.fastppt/validation/tabs
+pnpm --filter @fastppt/e2e exec tsx scripts/tabs-compatibility.ts .fastppt/validation/tabs
 ```
 
 脚本需要 LibreOffice、Poppler 的 pdftotext 和 Python 3。每次执行先删除旧产物和报告，避免转换失败时使用上轮 PDF。测试输入固定使用 Liberation Mono、20 点字号；实际导出画布为 13.333 英寸，不能把默认导出误当作 10 英寸。输出保存在指定目录，本机路径为 `.fastppt/validation/tabs/`。

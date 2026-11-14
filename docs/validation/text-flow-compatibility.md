@@ -3,7 +3,7 @@
 2026-10-09，LibreOffice **7.3.7.2 30(Build:2)**，隔离的 Linux／en-US 配置。当前[报告](text-flow-libreoffice-7.3.7.2.json)保存应用版本、实际区域设置、初始配置及原生 PPTX／诊断副本／PDF／复现脚本摘要、导入文字与停止点、字体清单、逐页文字位置和状态。
 
 ```sh
-pnpm --filter @fastppt/e2e exec tsx scripts/text-flow-compatibility.ts /home/gugumur/FastPPT/.fastppt/validation/text-flow
+pnpm --filter @fastppt/e2e exec tsx scripts/text-flow-compatibility.ts .fastppt/validation/text-flow
 ```
 
 需要 LibreOffice、支持 UNO 的系统 Python 3、`pdftotext` 和 `pdffonts`。复用隔离应用辅助进程，打开后只读取属性，导出 PDF 前不修改文档。脚本先从真实 ZIP 核对正文、段落数、indent 和宽度，再生成明确标记的无 indent 诊断副本；框体序列化误差限于 0.001pt。生产输出始终保留来源 indent。

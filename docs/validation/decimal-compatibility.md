@@ -3,7 +3,7 @@
 2026-10-09，LibreOffice **7.3.7.2 30(Build:2)**，分别使用独立的 en-US、de-DE、fr-FR 系统区域设置。可重放的 [JSON 报告](decimal-libreoffice-7.3.7.2.json) 保存应用配置、实际读回的区域设置、导入后的制表符属性、源／输出哈希及逐页文字位置。
 
 ```sh
-pnpm --filter @fastppt/e2e exec tsx scripts/decimal-compatibility.ts /home/gugumur/FastPPT/.fastppt/validation/decimal
+pnpm --filter @fastppt/e2e exec tsx scripts/decimal-compatibility.ts .fastppt/validation/decimal
 ```
 
 需要 LibreOffice、支持 UNO 的 `/usr/bin/python3`、Python 3 和 Poppler 的 `pdftotext`。每次运行创建独立配置目录和随机 UNO 管道，完成后关闭该实例；不会连接用户现有的 Office 会话。PDF 导出前只读取段落属性，不修改导入文档。初始配置留档并计算哈希，请求值必须与 UNO 回读的实际值一致。
