@@ -27,6 +27,10 @@ export const useFilesStore = defineStore('files', () => {
   const latestEvent = shallowRef<ServerEvent>()
   const client = useGatewayClient()
   const retry = createConnectivityRetry()
+  // A reopen starts a new session even when its path is unchanged.
+  let session = { opening: false }
+  let readVersion = 0
+  let draftVersion = 0
 
   const dirty = computed(
     () =>
@@ -57,35 +61,57 @@ export const useFilesStore = defineStore('files', () => {
   }
 
   async function openFile(path: string): Promise<void> {
+    const openedSession = { opening: true }
+    session = openedSession
+    saving.value = false
     error.value = undefined
     externalChange.value = false
+    if (selectedFile.value?.path !== path) {
+      selectedFile.value = undefined
+      draft.value = ''
+    }
+    const edits = draftVersion
     try {
       const content = await client.readFile(path)
+      if (session !== openedSession) return
       selectedFile.value = content
-      draft.value = content.content
+      if (draftVersion === edits) draft.value = content.content
     } catch (cause) {
+      if (session !== openedSession) return
       error.value = cause instanceof Error ? cause.message : '无法读取文件'
+    } finally {
+      openedSession.opening = false
     }
   }
 
   function updateDraft(content: string): void {
+    if (draft.value !== content) draftVersion++
     draft.value = content
   }
 
   async function save(): Promise<void> {
-    if (!selectedFile.value || !dirty.value || saving.value) return
+    if (!selectedFile.value || session.opening || !dirty.value || saving.value)
+      return
+    const savedSession = session
+    const selected = selectedFile.value
+    const content = draft.value
+    const edits = draftVersion
+    // Reads begun before this write cannot replace its acknowledged baseline.
+    readVersion++
     saving.value = true
     error.value = undefined
     try {
       const updated = await client.writeFile({
-        path: selectedFile.value.path,
-        content: draft.value,
-        expectedRevision: selectedFile.value.revision,
+        path: selected.path,
+        content,
+        expectedRevision: selected.revision,
       })
+      if (session !== savedSession) return
       selectedFile.value = updated
-      draft.value = updated.content
+      if (draftVersion === edits) draft.value = updated.content
       externalChange.value = false
     } catch (cause) {
+      if (session !== savedSession) return
       if (isGatewayError(cause) && cause.status === 409) {
         externalChange.value = true
         error.value =
@@ -94,7 +120,7 @@ export const useFilesStore = defineStore('files', () => {
         error.value = cause instanceof Error ? cause.message : '保存失败'
       }
     } finally {
-      saving.value = false
+      if (session === savedSession) saving.value = false
     }
   }
 
@@ -107,7 +133,7 @@ export const useFilesStore = defineStore('files', () => {
         ? String(event.data.path)
         : undefined
     if (!currentPath || eventPath !== currentPath) return
-    if (dirty.value) {
+    if (dirty.value || saving.value) {
       externalChange.value = true
       return
     }
@@ -115,11 +141,20 @@ export const useFilesStore = defineStore('files', () => {
   }
 
   async function resyncWorkspace(): Promise<void> {
-    await loadTree()
+    const syncedSession = session
     const selected = selectedFile.value
-    if (!selected) return
+    const read = ++readVersion
+    const ownsRead = () =>
+      session === syncedSession &&
+      !session.opening &&
+      readVersion === read &&
+      selectedFile.value === selected &&
+      !saving.value
+    await loadTree()
+    if (!selected || !ownsRead()) return
     try {
       const current = await client.readFile(selected.path)
+      if (!ownsRead()) return
       if (current.revision === selected.revision) return
       if (dirty.value) {
         externalChange.value = true
@@ -129,6 +164,7 @@ export const useFilesStore = defineStore('files', () => {
       draft.value = current.content
       externalChange.value = false
     } catch (cause) {
+      if (!ownsRead()) return
       error.value = cause instanceof Error ? cause.message : '无法重新同步文件'
     }
   }
