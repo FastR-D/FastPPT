@@ -4,6 +4,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -80,6 +81,43 @@ describe('workspace path policy', () => {
 })
 
 describe('workspace files', () => {
+  it('rejects NUL overwrites without changing bytes, revision or directory entries', async () => {
+    const root = temporaryDirectory('fastppt-workspace-')
+    const original = Buffer.from('# 原文 🌍\n')
+    writeFileSync(join(root, 'slides.md'), original)
+    const workspace = await WorkspaceService.create(root)
+    const before = await workspace.readTextFile('slides.md')
+
+    await expect(
+      workspace.writeTextFile({
+        path: 'slides.md',
+        content: 'bad\0text',
+        expectedRevision: before.revision,
+      }),
+    ).rejects.toMatchObject({ code: 'INVALID_REQUEST', statusCode: 400 })
+
+    expect(readFileSync(join(root, 'slides.md'))).toEqual(original)
+    expect(await workspace.readTextFile('slides.md')).toEqual(before)
+    expect(readdirSync(root)).toEqual(['slides.md'])
+  })
+
+  it('rejects NUL before creating parents and still round-trips Unicode text', async () => {
+    const root = temporaryDirectory('fastppt-workspace-')
+    const workspace = await WorkspaceService.create(root)
+    await expect(
+      workspace.writeTextFile({ path: 'new/deck/slides.md', content: '\0' }),
+    ).rejects.toMatchObject({ code: 'INVALID_REQUEST', statusCode: 400 })
+    expect(readdirSync(root)).toEqual([])
+
+    const content = '# 你好 🌍\n'
+    const saved = await workspace.writeTextFile({
+      path: 'new/deck/slides.md',
+      content,
+    })
+    expect(readFileSync(join(root, 'new/deck/slides.md'), 'utf8')).toBe(content)
+    expect(await workspace.readTextFile(saved.path)).toEqual(saved)
+  })
+
   it('reads, atomically writes and enforces revisions', async () => {
     const root = temporaryDirectory('fastppt-workspace-')
     mkdirSync(join(root, 'deck'))

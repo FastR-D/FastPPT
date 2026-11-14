@@ -448,6 +448,13 @@ export class WorkspaceService {
     }
 
     const bytes = Buffer.from(input.content, 'utf8')
+    if (isBinaryContent(bytes)) {
+      throw new WorkspaceError(
+        'INVALID_REQUEST',
+        'Binary content cannot be written as text.',
+        400,
+      )
+    }
     if (bytes.byteLength > this.maxReadBytes) {
       throw new WorkspaceError(
         'FILE_TOO_LARGE',

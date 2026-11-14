@@ -941,6 +941,27 @@ describe('gateway', () => {
       headers,
     })
     const before = FileContentSchema.parse(read.json())
+    for (const path of ['slides.md', 'new/deck/slides.md']) {
+      const rejected = await app.inject({
+        method: 'PUT',
+        url: '/api/v1/workspace/files/content',
+        headers,
+        payload: { path, content: 'bad\0text' },
+      })
+      expect(rejected.statusCode).toBe(400)
+      expect(rejected.json()).toMatchObject({
+        error: { code: 'INVALID_REQUEST', retryable: false },
+      })
+    }
+    expect(readFileSync(join(root, 'slides.md'), 'utf8')).toBe(before.content)
+    expect(existsSync(join(root, 'new'))).toBe(false)
+    const unchanged = await app.inject({
+      method: 'GET',
+      url: '/api/v1/workspace/files/content?path=slides.md',
+      headers,
+    })
+    expect(FileContentSchema.parse(unchanged.json())).toEqual(before)
+
     const write = await app.inject({
       method: 'PUT',
       url: '/api/v1/workspace/files/content',
