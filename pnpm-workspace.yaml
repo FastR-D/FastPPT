@@ -5,17 +5,17 @@ packages:
   - tests/*
 
 catalog:
-  '@chenglou/pretext': ^0.0.8
-  '@slidev/cli': 52.19.0
-  '@slidev/client': 52.19.0
+  '@chenglou/pretext': ^1.0.0
+  '@slidev/cli': 53.1.0
+  '@slidev/client': 53.1.0
   '@slidev/theme-default': 0.25.0
   '@slidev/types': 52.19.0
-  '@types/node': ^26.1.2
-  lucide: ^0.544.0
+  '@types/node': ^26.6.6
+  lucide: ^1.72.0
   pptxgenjs: ^4.0.1
   prismjs: ^1.30.0
-  typescript: ^6.0.3
-  vite: 8.2.0
+  typescript: ^7.0.2
+  vite: 8.3.8
   vitest: ^4.1.10
   zod: ^4.0.14
 

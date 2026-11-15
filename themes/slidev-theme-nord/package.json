@@ -19,12 +19,12 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@slidev/types": "^52.10.1",
+    "@slidev/types": "^53.1.0",
     "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
-    "@slidev/cli": "^52.10.1",
-    "playwright-chromium": "^1.57.0"
+    "@slidev/cli": "^53.1.0",
+    "playwright-chromium": "^1.65.0"
   },
   "//": "Learn more: https://sli.dev/guide/write-theme.html",
   "slidev": {

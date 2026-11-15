@@ -39,11 +39,11 @@
     "screenshot": "slidev export example.md --format png"
   },
   "dependencies": {
-    "@slidev/types": "^52.14.1",
+    "@slidev/types": "^53.1.0",
     "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
-    "@slidev/cli": "^52.14.1"
+    "@slidev/cli": "^53.1.0"
   },
   "slidev": {
     "colorSchema": "dark",

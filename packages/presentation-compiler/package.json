@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@fastppt/presentation-ir": "workspace:*",
-    "yaml": "^2.8.1",
+    "yaml": "^2.9.1",
     "@fastppt/markdown": "workspace:*"
   },
   "devDependencies": {
