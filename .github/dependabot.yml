@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm-dependencies:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /packages/resources/scripts
+    schedule:
+      interval: weekly
+    groups:
+      pip-dependencies:
+        patterns: ["*"]
