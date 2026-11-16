@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@fastppt/presentation-ir": "workspace:*",
-    "jszip": "^3.10.1",
+    "jszip": "^3.10.2",
     "@fastppt/slidewave": "workspace:*"
   },
   "devDependencies": {

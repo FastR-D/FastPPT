@@ -42,8 +42,8 @@
     "pptxgenjs": "catalog:",
     "prismjs": "catalog:",
     "zod": "catalog:",
-    "jszip": "^3.10.1",
-    "subset-font": "^2.5.0",
+    "jszip": "^3.10.2",
+    "subset-font": "^2.9.0",
     "ttf2eot": "^3.1.0"
   },
   "devDependencies": {

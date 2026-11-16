@@ -54,7 +54,7 @@
     "LICENSE"
   ],
   "devDependencies": {
-    "@slidev/cli": "^52.0.0"
+    "@slidev/cli": "^53.1.0"
   },
   "scripts": {
     "test": "node ../../scripts/theme-smoke.mjs .",

@@ -75,12 +75,12 @@
     }
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.0",
-    "@iconify/vue": "^5.0.0",
+    "@iconify-json/lucide": "^1.2.153",
+    "@iconify/vue": "^5.0.5",
     "@fastppt/fonts": "workspace:*"
   },
   "optionalDependencies": {
-    "yaml": "^2.0.0",
-    "sharp": "^0.33.0"
+    "yaml": "^2.9.1",
+    "sharp": "^0.35.5"
   }
 }

@@ -80,25 +80,25 @@
   "author": "",
   "type": "commonjs",
   "dependencies": {
-    "@slidev/parser": "^52.14.2",
-    "@slidev/types": "^52.14.2",
-    "markdown-it": "^14.1.0",
-    "typescript": "^6.0.3",
-    "vue": "^3.5.13",
+    "@slidev/parser": "^53.1.0",
+    "@slidev/types": "^53.1.0",
+    "markdown-it": "^15.0.3",
+    "typescript": "catalog:",
+    "vue": "^3.5.45",
     "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@eslint/js": "^10.0.1",
-    "@slidev/cli": "^52.14.2",
+    "@slidev/cli": "^53.1.0",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "eslint": "^10.2.0",
-    "eslint-plugin-vue": "^10.8.0",
-    "globals": "^17.5.0",
-    "playwright-chromium": "^1.59.1",
-    "postcss": "^8.5.9",
-    "typescript-eslint": "^8.58.2",
+    "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "playwright-chromium": "^1.65.0",
+    "postcss": "^8.5.32",
+    "typescript-eslint": "^8.72.2",
     "vite": "catalog:",
-    "vue-tsc": "^3.2.7"
+    "vue-tsc": "^3.3.14"
   }
 }

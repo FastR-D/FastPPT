@@ -14,7 +14,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@iconify-json/ant-design": "^1.2.8",
+    "@iconify-json/ant-design": "^1.2.9",
     "@iconify-json/mdi": "^1.2.3"
   },
   "devDependencies": {

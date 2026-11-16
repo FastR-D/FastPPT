@@ -34,16 +34,16 @@
     "*.vue"
   ],
   "dependencies": {
-    "@slidev/types": "^51.1.1",
-    "@vueuse/core": "^12.7.0",
-    "@vueuse/math": "^12.7.0",
+    "@slidev/types": "^53.1.0",
+    "@vueuse/core": "^15.0.0",
+    "@vueuse/math": "^15.0.0",
     "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
-    "@slidev/cli": "51.1.1",
-    "playwright-chromium": "1.50.1",
-    "postcss": "8.5.2",
-    "rimraf": "6.0.1"
+    "@slidev/cli": "53.1.0",
+    "playwright-chromium": "1.65.0",
+    "postcss": "8.5.32",
+    "rimraf": "6.1.4"
   },
   "engines": {
     "node": ">=20.0.0",

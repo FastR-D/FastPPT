@@ -31,25 +31,25 @@
   ],
   "dependencies": {
     "@chenglou/pretext": "catalog:",
-    "@citation-js/core": "^0.7.21",
-    "@citation-js/plugin-bibtex": "^0.7.21",
-    "@citation-js/plugin-csl": "^0.7.22",
-    "@citation-js/plugin-doi": "^0.7.21",
-    "@iconify-json/ant-design": "^1.2.8",
+    "@citation-js/core": "^0.9.0",
+    "@citation-js/plugin-bibtex": "^0.9.0",
+    "@citation-js/plugin-csl": "^0.9.0",
+    "@citation-js/plugin-doi": "^0.9.0",
+    "@iconify-json/ant-design": "^1.2.9",
     "@iconify-json/mdi": "^1.2.3",
     "@slidev/client": "catalog:",
     "@slidev/types": "catalog:",
-    "pinia": "^4.0.2",
+    "pinia": "^4.1.0",
     "@fastppt/slidewave": "workspace:*",
-    "unocss": "^66.3.3",
-    "unocss-preset-palette": "^0.5.0",
+    "unocss": "^66.12.0",
+    "unocss-preset-palette": "^0.6.0",
     "vite": "catalog:",
-    "vue": "^3.5.18",
+    "vue": "^3.5.45",
     "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
     "typescript": "catalog:",
-    "vue-tsc": "^3.0.4"
+    "vue-tsc": "^3.3.14"
   },
   "slidev": {
     "colorSchema": "light",

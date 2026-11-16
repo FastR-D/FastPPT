@@ -19,13 +19,13 @@
     "@fastppt/protocol": "workspace:*",
     "@fastppt/slidewave": "workspace:*",
     "@fastppt/theme-registry": "workspace:*",
-    "@modelcontextprotocol/sdk": "1.30.0",
-    "jszip": "3.10.1",
-    "tsx": "^4.20.3",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "jszip": "3.10.2",
+    "tsx": "^4.23.15",
     "@fastppt/slidev-host": "workspace:*"
   },
   "devDependencies": {
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.65.0",
     "@types/node": "catalog:",
     "fontverter": "2.0.0",
     "typescript": "catalog:"

@@ -23,25 +23,25 @@
   "dependencies": {
     "@fix-webm-duration/fix": "^1.0.1",
     "@typescript/ata": "^0.9.8",
-    "ansis": "^4.3.1",
+    "ansis": "^4.5.0",
     "file-saver": "^2.0.5",
     "lz-string": "^1.5.0",
     "pptxgenjs": "catalog:",
     "recordrtc": "^5.6.2",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.8.0",
-    "eslint-plugin-vue": "^10.3.0",
-    "globals": "^17.9.0",
-    "prettier": "^3.6.2",
+    "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.0",
     "slidev-theme-academy": "workspace:*",
     "slidev-theme-landing": "workspace:*",
-    "turbo": "^2.5.6",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0",
-    "vue-eslint-parser": "^10.2.0"
+    "turbo": "^2.11.11",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.72.2",
+    "vue-eslint-parser": "^10.4.2"
   },
   "pnpm": {
     "overrides": {

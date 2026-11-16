@@ -1,6 +1,7 @@
 import '@unocss/reset/tailwind.css'
 import 'virtual:uno.css'
-import '@fastrd/ui-vue/styles.css'
+import '@fastrd/ui-foundation/tokens.css'
+import '@fastrd/ui-foundation/controls.css'
 import './styles/app.css'
 import { fastpptIconUrl } from './components/ui/index.js'
 import './color-mode.js'

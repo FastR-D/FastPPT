@@ -42,12 +42,12 @@
     "screenshot": "slidev export example.md --format png"
   },
   "dependencies": {
-    "@iconify/vue": "^4.3.0",
-    "@slidev/types": "^52.14.1",
+    "@iconify/vue": "^5.0.5",
+    "@slidev/types": "^53.1.0",
     "@fastppt/fonts": "workspace:*"
   },
   "devDependencies": {
-    "@slidev/cli": "^52.14.1"
+    "@slidev/cli": "^53.1.0"
   },
   "slidev": {
     "colorSchema": "light",

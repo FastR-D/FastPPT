@@ -31,7 +31,7 @@ export default defineConfig({
       },
     }),
     presetPalette({
-      colors: {
+      themeColors: {
         primary: landingColors.blue,
         secondary: landingColors.green,
         ...Object.fromEntries(

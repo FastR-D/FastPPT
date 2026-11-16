@@ -2,6 +2,10 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: /
+    # vue-tsc requires the JavaScript compiler API removed in TypeScript 7.
+    ignore:
+      - dependency-name: typescript
+        versions: [">=7"]
     schedule:
       interval: weekly
     groups:
