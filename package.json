@@ -39,7 +39,7 @@
     "slidev-theme-academy": "workspace:*",
     "slidev-theme-landing": "workspace:*",
     "turbo": "^2.11.11",
-    "typescript": "^7.0.2",
+    "typescript": "catalog:",
     "typescript-eslint": "^8.72.2",
     "vue-eslint-parser": "^10.4.2"
   },

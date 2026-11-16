@@ -83,7 +83,7 @@
     "@slidev/parser": "^53.1.0",
     "@slidev/types": "^53.1.0",
     "markdown-it": "^15.0.3",
-    "typescript": "^7.0.2",
+    "typescript": "catalog:",
     "vue": "^3.5.45",
     "@fastppt/fonts": "workspace:*"
   },
