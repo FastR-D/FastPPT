@@ -102,7 +102,7 @@ export async function formatSlidevMarkdown(
     await validateSlidevMarkdown(source)
     const formatted = mergeLeadingAdjacentFrontmatter(
       normalizeFrontmatterSpacing(
-        await format(source, {
+        await format(normalizeFrontmatterSpacing(source), {
           parser: 'slidev',
           plugins: [slidevPlugin],
           printWidth: options.printWidth ?? 90,
