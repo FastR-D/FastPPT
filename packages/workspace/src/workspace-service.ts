@@ -13,6 +13,7 @@ import {
 } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 import { basename, dirname, join, relative, sep } from 'node:path'
+import lockfile from 'proper-lockfile'
 
 import type {
   FileContent,
@@ -62,10 +63,14 @@ async function gitIgnoredPaths(
 ): Promise<Set<string>> {
   if (!paths.length) return new Set()
   return await new Promise((resolve) => {
-    const child = spawn('git', ['check-ignore', '--no-index', '--stdin', '-z'], {
-      cwd: root,
-      stdio: ['pipe', 'pipe', 'ignore'],
-    })
+    const child = spawn(
+      'git',
+      ['check-ignore', '--no-index', '--stdin', '-z'],
+      {
+        cwd: root,
+        stdio: ['pipe', 'pipe', 'ignore'],
+      },
+    )
     const chunks: Buffer[] = []
     child.stdout.on('data', (chunk: Buffer) => chunks.push(chunk))
     child.once('error', () => resolve(new Set()))
@@ -138,6 +143,70 @@ export class WorkspaceService {
     return this.isIgnored(relativePath)
   }
 
+  private assertAllowedPath(relativePath: string): void {
+    assertNonSecretPath(relativePath)
+    if (this.isIgnored(relativePath))
+      throw new WorkspaceError(
+        'PATH_OUTSIDE_WORKSPACE',
+        'The path is ignored.',
+        403,
+      )
+  }
+
+  private assertAllowedCanonicalPath(absolutePath: string): void {
+    if (!isContained(this.root, absolutePath))
+      throw new WorkspaceError(
+        'PATH_OUTSIDE_WORKSPACE',
+        'The resolved path escapes the workspace.',
+        403,
+      )
+    this.assertAllowedPath(
+      relative(this.root, absolutePath).split(sep).join('/'),
+    )
+  }
+
+  private async resolveReadablePath(relativePath: string): Promise<string> {
+    this.assertAllowedPath(relativePath)
+    const absolutePath = await resolveExistingPath(this.root, relativePath)
+    this.assertAllowedCanonicalPath(absolutePath)
+    return absolutePath
+  }
+
+  private async prepareWriteTarget(relativePath: string): Promise<string> {
+    const parents = relativePath.split('/').slice(0, -1)
+    let parent = this.root
+    for (let index = 0; index < parents.length; index++) {
+      const candidate = join(parent, parents[index]!)
+      try {
+        parent = await realpath(candidate)
+        this.assertAllowedCanonicalPath(parent)
+      } catch (cause) {
+        if ((cause as NodeJS.ErrnoException).code !== 'ENOENT') throw cause
+        let exists = false
+        try {
+          await lstat(candidate)
+          exists = true
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+        }
+        if (exists)
+          throw new WorkspaceError(
+            'PATH_OUTSIDE_WORKSPACE',
+            'The destination link cannot be resolved safely.',
+            403,
+          )
+        parent = join(parent, ...parents.slice(index))
+        break
+      }
+    }
+    this.assertAllowedCanonicalPath(join(parent, basename(relativePath)))
+    await mkdir(parent, { recursive: true })
+    parent = await realpath(parent)
+    const target = join(parent, basename(relativePath))
+    this.assertAllowedCanonicalPath(target)
+    return target
+  }
+
   async listFiles(): Promise<FileNode[]> {
     let visited = 0
     const visit = async (
@@ -207,15 +276,7 @@ export class WorkspaceService {
 
   async readTextFile(requestedPath: string): Promise<FileContent> {
     const relativePath = normalizeRelativePath(requestedPath)
-    assertNonSecretPath(relativePath)
-    if (this.isIgnored(relativePath)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The path is ignored.',
-        403,
-      )
-    }
-    const absolutePath = await resolveExistingPath(this.root, relativePath)
+    const absolutePath = await this.resolveReadablePath(relativePath)
     const metadata = await stat(absolutePath)
     if (!metadata.isFile()) {
       throw new WorkspaceError(
@@ -250,15 +311,7 @@ export class WorkspaceService {
 
   async assertFileAvailable(requestedPath: string): Promise<void> {
     const relativePath = normalizeRelativePath(requestedPath)
-    assertNonSecretPath(relativePath)
-    if (this.isIgnored(relativePath)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The path is ignored.',
-        403,
-      )
-    }
-    const absolutePath = await resolveExistingPath(this.root, relativePath)
+    const absolutePath = await this.resolveReadablePath(relativePath)
     const metadata = await stat(absolutePath)
     if (!metadata.isFile()) {
       throw new WorkspaceError(
@@ -271,14 +324,6 @@ export class WorkspaceService {
 
   async resolveImageAttachment(requestedPath: string): Promise<string> {
     const relativePath = normalizeRelativePath(requestedPath)
-    assertNonSecretPath(relativePath)
-    if (this.isIgnored(relativePath)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The attachment path is ignored.',
-        403,
-      )
-    }
     if (!/\.(?:gif|jpe?g|png|webp)$/i.test(relativePath)) {
       throw new WorkspaceError(
         'INVALID_REQUEST',
@@ -286,7 +331,7 @@ export class WorkspaceService {
         400,
       )
     }
-    const absolutePath = await resolveExistingPath(this.root, relativePath)
+    const absolutePath = await this.resolveReadablePath(relativePath)
     const metadata = await stat(absolutePath)
     if (!metadata.isFile()) {
       throw new WorkspaceError(
@@ -364,14 +409,7 @@ export class WorkspaceService {
         400,
       )
     }
-    assertNonSecretPath(relativePath)
-    if (this.isIgnored(relativePath)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The image destination path is ignored.',
-        403,
-      )
-    }
+    this.assertAllowedPath(relativePath)
     if (!relativePath.toLowerCase().endsWith(extension)) {
       throw new WorkspaceError(
         'INVALID_REQUEST',
@@ -379,17 +417,7 @@ export class WorkspaceService {
         400,
       )
     }
-    const unresolvedTarget = join(this.root, relativePath)
-    await mkdir(dirname(unresolvedTarget), { recursive: true })
-    const realParent = await realpath(dirname(unresolvedTarget))
-    if (!isContained(this.root, realParent)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The image destination parent escapes the workspace.',
-        403,
-      )
-    }
-    const target = join(realParent, basename(unresolvedTarget))
+    const target = await this.prepareWriteTarget(relativePath)
     try {
       await lstat(target)
       throw new WorkspaceError(
@@ -438,14 +466,7 @@ export class WorkspaceService {
         400,
       )
     }
-    assertNonSecretPath(relativePath)
-    if (this.isIgnored(relativePath)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The path is ignored.',
-        403,
-      )
-    }
+    this.assertAllowedPath(relativePath)
 
     const bytes = Buffer.from(input.content, 'utf8')
     if (isBinaryContent(bytes)) {
@@ -463,54 +484,70 @@ export class WorkspaceService {
       )
     }
 
-    const unresolvedTarget = join(this.root, relativePath)
-    await mkdir(dirname(unresolvedTarget), { recursive: true })
-    const realParent = await realpath(dirname(unresolvedTarget))
-    if (!isContained(this.root, realParent)) {
-      throw new WorkspaceError(
-        'PATH_OUTSIDE_WORKSPACE',
-        'The target parent escapes the workspace.',
-        403,
-      )
-    }
-    const target = join(realParent, basename(unresolvedTarget))
-    let current: FileContent | undefined
+    const target = await this.prepareWriteTarget(relativePath)
+    const realParent = dirname(target)
+    let release: () => Promise<void>
     try {
-      current = await this.readTextFile(relativePath)
+      release = await lockfile.lock(target, {
+        realpath: false,
+        lockfilePath: join(
+          realParent,
+          `.${basename(target)}.fastppt-write-lock`,
+        ),
+      })
     } catch (cause) {
-      if (!(cause instanceof WorkspaceError) || cause.code !== 'FILE_NOT_FOUND')
-        throw cause
-    }
-
-    if (
-      input.expectedRevision &&
-      current?.revision !== input.expectedRevision
-    ) {
-      throw new WorkspaceError(
-        'FILE_REVISION_CONFLICT',
-        'The file changed since it was read.',
-        409,
-        { currentRevision: current?.revision },
-      )
-    }
-
-    const temporary = join(
-      realParent,
-      `.${basename(target)}.${randomUUID()}.tmp`,
-    )
-    const handle = await open(temporary, 'wx', 0o600)
-    try {
-      await handle.writeFile(bytes)
-      await handle.sync()
-    } finally {
-      await handle.close()
-    }
-    try {
-      await rename(temporary, target)
-    } catch (cause) {
-      await unlink(temporary).catch(() => undefined)
+      if ((cause as NodeJS.ErrnoException).code === 'ELOCKED')
+        throw new WorkspaceError(
+          'FILE_REVISION_CONFLICT',
+          'Another writer is updating this file.',
+          409,
+        )
       throw cause
     }
-    return this.readTextFile(relativePath)
+    try {
+      let current: FileContent | undefined
+      try {
+        current = await this.readTextFile(relativePath)
+      } catch (cause) {
+        if (
+          !(cause instanceof WorkspaceError) ||
+          cause.code !== 'FILE_NOT_FOUND'
+        )
+          throw cause
+      }
+
+      if (
+        input.expectedRevision &&
+        current?.revision !== input.expectedRevision
+      ) {
+        throw new WorkspaceError(
+          'FILE_REVISION_CONFLICT',
+          'The file changed since it was read.',
+          409,
+          { currentRevision: current?.revision },
+        )
+      }
+
+      const temporary = join(
+        realParent,
+        `.${basename(target)}.${randomUUID()}.tmp`,
+      )
+      const handle = await open(temporary, 'wx', 0o600)
+      try {
+        await handle.writeFile(bytes)
+        await handle.sync()
+      } finally {
+        await handle.close()
+      }
+      try {
+        await rename(temporary, target)
+      } catch (cause) {
+        await unlink(temporary).catch(() => undefined)
+        throw cause
+      }
+      return await this.readTextFile(relativePath)
+    } finally {
+      await release()
+    }
   }
 }

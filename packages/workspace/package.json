@@ -10,17 +10,19 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
-    "test": "vitest run",
+    "test": "pnpm build && node tests/workspace-process-contract.mjs && vitest run",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@fastppt/protocol": "workspace:*",
     "chokidar": "^6.0.0",
-    "picomatch": "^4.0.7"
+    "picomatch": "^4.0.7",
+    "proper-lockfile": "^4.1.2"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/picomatch": "^4.0.2",
+    "@types/proper-lockfile": "^4.1.4",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

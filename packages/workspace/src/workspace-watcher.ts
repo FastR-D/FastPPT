@@ -1,9 +1,9 @@
 import { relative, sep } from 'node:path'
+import { lstatSync } from 'node:fs'
 
 import { watch, type FSWatcher } from 'chokidar'
 
 import type { WorkspaceFileEvent } from '@fastppt/protocol'
-import type { Stats } from 'node:fs'
 
 import { normalizeRelativePath } from './path-policy.js'
 import type { WorkspaceService } from './workspace-service.js'
@@ -20,15 +20,23 @@ interface PendingEvent {
   identity?: string
 }
 
-function fileIdentity(stats: Stats | undefined): string | undefined {
-  if (!stats || stats.ino === 0) return undefined
-  return [
-    stats.dev,
-    stats.ino,
-    stats.birthtimeMs,
-    stats.isDirectory() ? 'directory' : 'file',
-    stats.size,
-  ].join(':')
+function fileIdentity(path: string): string | undefined {
+  try {
+    // Chokidar can mix bigint initial stats with number update stats. Use one
+    // exact representation for every observation rather than rounding inodes.
+    const stats = lstatSync(path, { bigint: true })
+    if (stats.ino === 0n) return undefined
+    return [
+      stats.dev,
+      stats.ino,
+      stats.birthtimeNs,
+      stats.isDirectory() ? 'directory' : 'file',
+      stats.size,
+    ].join(':')
+  } catch {
+    // A disappeared/unreadable entry has no proven identity to coalesce.
+    return undefined
+  }
 }
 
 export class WorkspaceWatcher {
@@ -75,12 +83,10 @@ export class WorkspaceWatcher {
       })
     })
     this.watcher
-      .on('add', (path, stats) => this.enqueue('added', path, false, stats))
-      .on('change', (path, stats) =>
-        this.enqueue('changed', path, false, stats),
-      )
+      .on('add', (path) => this.enqueue('added', path, false))
+      .on('change', (path) => this.enqueue('changed', path, false))
       .on('unlink', (path) => this.enqueue('removed', path, false))
-      .on('addDir', (path, stats) => this.enqueue('added', path, true, stats))
+      .on('addDir', (path) => this.enqueue('added', path, true))
       .on('unlinkDir', (path) => this.enqueue('removed', path, true))
   }
 
@@ -102,15 +108,15 @@ export class WorkspaceWatcher {
     type: 'added' | 'changed' | 'removed',
     absolutePath: string,
     isDirectory: boolean,
-    stats?: Stats,
   ): void {
     const path = normalizeRelativePath(
       relative(this.workspace.root, absolutePath).split(sep).join('/'),
     )
     if (!path || this.workspace.ignores(path)) return
     const previousIdentity = this.identities.get(path)
-    const identity = fileIdentity(stats) ?? previousIdentity
-    if (type === 'removed') this.identities.delete(path)
+    const identity =
+      type === 'removed' ? previousIdentity : fileIdentity(absolutePath)
+    if (type === 'removed' || !identity) this.identities.delete(path)
     else if (identity) this.identities.set(path, identity)
     if (this.initializing) return
     this.pending.set(path, {
