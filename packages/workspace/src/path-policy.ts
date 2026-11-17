@@ -35,6 +35,8 @@ const DEFAULT_IGNORES = [
   ]),
   '.mcp.json',
   '.mcp.json.fastppt-backup-*',
+  '**/.*.fastppt-write-lock',
+  '**/.*.fastppt-write-lock/**',
 ]
 
 const SECRET_NAMES = new Set([
