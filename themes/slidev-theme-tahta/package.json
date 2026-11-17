@@ -75,7 +75,7 @@
     }
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.153",
+    "@iconify-json/lucide": "^1.2.154",
     "@iconify/vue": "^5.0.5",
     "@fastppt/fonts": "workspace:*"
   },
