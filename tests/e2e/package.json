@@ -25,9 +25,9 @@
     "@fastppt/slidev-host": "workspace:*"
   },
   "devDependencies": {
-    "@playwright/test": "1.65.0",
+    "@playwright/test": "1.65.1",
     "@types/node": "catalog:",
-    "fontverter": "2.0.0",
+    "fontverter": "2.1.0",
     "typescript": "catalog:"
   }
 }
